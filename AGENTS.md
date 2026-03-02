@@ -60,7 +60,8 @@ include/                      # public API headers
     scratch.h                 # arena checkpoint helper
     vmem.h                    # low-level virtual-memory primitives
   processes/                  # process creation and lifecycle helpers
-    process.h                 # subprocess spawning, waiting, output capture, and stdio pipe helpers
+    pipe.h                    # process-owned stdio pipe handles and pipe I/O helpers
+    process.h                 # subprocess spawning, waiting, and output capture helpers
     process_current.h         # current-process identifier, priority, and termination helpers
   strings/                    # UTF-aware string and Unicode helpers
     char.h                    # per-code-unit ASCII classification, case, and hex helpers
@@ -91,7 +92,8 @@ src/                          # module implementations
   containers/                 # implementations for container modules with source files
   memory/                     # implementations for memory/*
   processes/                  # implementations for processes/*
-    process.c                # subprocess spawning, waiting, output capture, and stdio pipe helpers
+    pipe.c                   # process-owned stdio pipe handles and pipe I/O helpers
+    process.c                # subprocess spawning, waiting, and output capture helpers
     process_current.c        # current-process identifier, priority, and termination helpers
   strings/                    # implementations for strings/*
   utils/                      # implementations for utils/*

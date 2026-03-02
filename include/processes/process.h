@@ -12,9 +12,6 @@
 // Opaque handle to a spawned process.
 typedef void* process;
 
-// Opaque handle to a process-owned stdio pipe.
-typedef void* process_pipe;
-
 // Spawn-time process I/O and lifecycle options.
 typedef struct process_options {
   b32 pipe_stdin;
@@ -50,36 +47,6 @@ func b32 process_is_valid(process prc);
 
 // Returns the OS-level identifier of a spawned process.
 func u64 process_get_id(process prc);
-
-// Returns the stdin pipe for a spawned process when pipe_stdin was enabled.
-// Returns NULL when stdin is not available.
-func process_pipe process_get_stdin(process prc);
-
-// Returns the stdout pipe for a spawned process when pipe_stdout was enabled.
-// Returns NULL when stdout is not available.
-func process_pipe process_get_stdout(process prc);
-
-// Returns the stderr pipe for a spawned process when pipe_stderr was enabled.
-// Returns NULL when stderr is not available.
-func process_pipe process_get_stderr(process prc);
-
-// Returns true if pip is a valid process pipe handle.
-func b32 process_pipe_is_valid(process_pipe pip);
-
-// Reads up to size bytes from a process pipe.
-// Returns the number of bytes read.
-func sz process_pipe_read(process_pipe pip, void* ptr, sz size);
-
-// Writes up to size bytes to a process pipe.
-// Returns the number of bytes written.
-func sz process_pipe_write(process_pipe pip, const void* ptr, sz size);
-
-// Flushes buffered data for a writable process pipe.
-func b32 process_pipe_flush(process_pipe pip);
-
-// Closes a process pipe.
-// Closing stdin is the portable way to signal EOF to the child process.
-func void process_pipe_close(process_pipe pip);
 
 // Reads the entire piped stdout stream, blocking until the process exits.
 // The returned pointer is allocated by SDL and must be released with process_read_free.

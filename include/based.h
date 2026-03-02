@@ -34,6 +34,7 @@
 #include "memory/vmem.h"
 
 // Include process modules.
+#include "processes/pipe.h"
 #include "processes/process.h"
 #include "processes/process_current.h"
 
