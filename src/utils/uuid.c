@@ -95,8 +95,8 @@ func b32 uuid_parse_cstr8(const c8* src, uuid* out) {
       continue;
     }
 
-    i32 high = char8_hex_to_nibble(src[src_index]);
-    i32 low = char8_hex_to_nibble(src[src_index + 1]);
+    i32 high = c8_hex_to_nibble(src[src_index]);
+    i32 low = c8_hex_to_nibble(src[src_index + 1]);
     if (high < 0 || low < 0) {
       return 0;
     }
@@ -126,8 +126,8 @@ func b32 uuid_to_cstr8(uuid value, c8* dst, sz cap) {
     }
 
     u8 byte_value = value.bytes[byte_index];
-    dst[dst_index++] = char8_nibble_to_hex((u8)(byte_value >> 4U));
-    dst[dst_index++] = char8_nibble_to_hex((u8)(byte_value & 0x0FU));
+    dst[dst_index++] = c8_nibble_to_hex((u8)(byte_value >> 4U));
+    dst[dst_index++] = c8_nibble_to_hex((u8)(byte_value & 0x0FU));
   }
 
   dst[dst_index] = '\0';

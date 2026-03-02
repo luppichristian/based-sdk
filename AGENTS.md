@@ -34,6 +34,7 @@ include/                      # public API headers
   basic/                      # core types, macros, asserts, logging, environment helpers
     assert.h                  # runtime assertions and assert callbacks
     codespace.h               # callsite/source location helpers
+    entry.h                   # entry-point abstraction hooks
     env_defines.h             # platform, arch, compiler, build macros
     intrinsics.h              # popcount, bit scans, byte swap, rotates
     keyword_defines.h         # project keyword and attribute macros
@@ -64,6 +65,7 @@ include/                      # public API headers
     strings.h                 # bounded mutable string wrappers
     unicode.h                 # UTF encoding, decoding, and conversion
   utils/                      # general-purpose utility helpers
+    cmdline.h                 # argc/argv wrapper helpers and option lookup
     crc.h                     # CRC-32 and CRC-64 checksum helpers
     endian.h                  # native, little-endian, and big-endian conversions
     id.h                      # typed 8/16/32/64 identifier wrappers and formatting
@@ -89,6 +91,8 @@ src/                          # module implementations
   utils/                      # implementations for utils/*
   threads/                    # implementations for threads/*
 tests/                        # GoogleTest coverage
+  test_based.cpp             # umbrella include smoke test
+  test_cmdline.cpp           # cmdline wrapper and option lookup coverage
 ```
 
 Names should remain descriptive enough that this section can stay compact; 

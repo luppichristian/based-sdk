@@ -6,6 +6,7 @@
 // Include basic module.
 #include "basic/assert.h"
 #include "basic/codespace.h"
+#include "basic/entry.h"
 #include "basic/env_defines.h"
 #include "basic/intrinsics.h"
 #include "basic/keyword_defines.h"
@@ -39,6 +40,7 @@
 #include "strings/unicode.h"
 
 // Include utility modules.
+#include "utils/cmdline.h"
 #include "utils/crc.h"
 #include "utils/endian.h"
 #include "utils/id.h"
