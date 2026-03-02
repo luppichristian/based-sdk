@@ -19,6 +19,7 @@
 #include "containers/doubly_list.h"
 #include "containers/hash_map.h"
 #include "containers/ring_list.h"
+#include "containers/sort.h"
 #include "containers/singly_list.h"
 #include "containers/stack_list.h"
 #include "containers/tree.h"

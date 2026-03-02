@@ -47,6 +47,7 @@ include/                      # public API headers
     doubly_list.h             # intrusive doubly-linked list macros
     hash_map.h                # Robin Hood hash map API
     ring_list.h               # intrusive circular doubly-linked list macros
+    sort.h                    # array sorting helpers and typed sort entry points
     singly_list.h             # intrusive singly-linked list macros
     stack_list.h              # intrusive LIFO stack macros
     tree.h                    # intrusive N-ary tree macros
@@ -90,6 +91,7 @@ include/                      # public API headers
 src/                          # module implementations
   basic/                      # implementations for basic/*
   containers/                 # implementations for container modules with source files
+    sort.c                   # array sorting helpers and typed sort entry points
   memory/                     # implementations for memory/*
   processes/                  # implementations for processes/*
     pipe.c                   # process-owned stdio pipe handles and pipe I/O helpers
