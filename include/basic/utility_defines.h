@@ -81,11 +81,11 @@ Big numeric utilities (powers of 1000):
 // Array Utilities
 // =========================================================================
 
-// countof — number of elements in a fixed-size array.
-#define countof(x) (sizeof(x) / sizeof((x)[0]))
+// count_of — number of elements in a fixed-size array.
+#define count_of(x) (sizeof(x) / sizeof((x)[0]))
 
-// sizeof_each — size in bytes of a single element of a fixed-size array.
-#define sizeof_each(x) sizeof((x)[0])
+// size_of_each — size in bytes of a single element of a fixed-size array.
+#define size_of_each(x) sizeof((x)[0])
 
 // multiline_literal — converts a multi-line token sequence into a string literal.
 #define multiline_literal(...) stringify_exp(__VA_ARGS__)
@@ -130,7 +130,7 @@ Big numeric utilities (powers of 1000):
 #define in_range(x, lo, hi) ((x) >= (lo) && (x) <= (hi))
 
 // in_bounds — non-zero if index i is a valid index for fixed-size array arr.
-#define in_bounds(arr, i) ((i) >= 0 && (size_t)(i) < countof(arr))
+#define in_bounds(arr, i) ((i) >= 0 && (size_t)(i) < count_of(arr))
 
 // =========================================================================
 // Swap Utility

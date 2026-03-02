@@ -25,7 +25,7 @@ func thread_priority thread_get_priority(void) {
 }
 
 func b32 thread_set_priority(thread_priority priority) {
-  if (priority >= countof(sdl_priorities)) {
+  if (priority >= count_of(sdl_priorities)) {
     return false;  // Invalid priority
   }
 

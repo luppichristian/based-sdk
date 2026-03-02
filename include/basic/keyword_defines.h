@@ -27,6 +27,7 @@ Functional keywords:
 - 'no_inline' for suggesting the compiler not to inline a function.
 - 'align_as' for specifying the alignment of a variable or type.
 - 'align_of' for querying the alignment requirement of a type.
+- 'size_of' alias for sizeof, but as a keyword for consistency with align_of.
 - 'likely' and 'unlikely' for branch prediction hints to the compiler.
 - 'read_only' for variables that are constant and should not be modified after init.
 
@@ -145,6 +146,9 @@ If ALL_GLOBAL_VARS_STATIC is defined, all global variables will be declared as s
 #else
 #  define align_of(x) sizeof(x)
 #endif
+
+// size_of — alias for sizeof, but as a keyword for consistency with align_of.
+#define size_of(x) sizeof(x)
 
 // likely / unlikely — branch prediction hints.
 #if defined(COMPILER_GCC) || defined(COMPILER_CLANG) || \
