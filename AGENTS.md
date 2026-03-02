@@ -63,7 +63,12 @@ include/                      # public API headers
     strings.h                 # bounded mutable string wrappers
     unicode.h                 # UTF encoding, decoding, and conversion
   utils/                      # general-purpose utility helpers
+    crc.h                     # CRC-32 and CRC-64 checksum helpers
+    endian.h                  # native, little-endian, and big-endian conversions
+    id.h                      # typed 8/16/32/64 identifier wrappers and formatting
     timer.h                   # lightweight scalar timer helpers
+    timestamp.h               # duration-style signed microsecond timestamps
+    uuid.h                    # UUID parsing, formatting, and inspection
     version.h                 # packed semantic-version helpers
   threads/                    # threading, sync, and atomics
     atomics.h                 # atomic integer/pointer APIs and fences

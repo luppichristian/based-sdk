@@ -38,7 +38,12 @@
 #include "strings/unicode.h"
 
 // Include utility modules.
+#include "utils/crc.h"
+#include "utils/endian.h"
+#include "utils/id.h"
 #include "utils/timer.h"
+#include "utils/timestamp.h"
+#include "utils/uuid.h"
 #include "utils/version.h"
 
 // Include threading modules.
