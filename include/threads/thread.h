@@ -6,18 +6,6 @@
 #include "../basic/codespace.h"
 
 // =========================================================================
-// Thread Priority
-// =========================================================================
-
-// Scheduling priority levels for a thread.
-typedef enum thread_priority {
-  THREAD_PRIORITY_LOW,
-  THREAD_PRIORITY_NORMAL,
-  THREAD_PRIORITY_HIGH,
-  THREAD_PRIORITY_TIME_CRITICAL,
-} thread_priority;
-
-// =========================================================================
 // Thread
 // =========================================================================
 

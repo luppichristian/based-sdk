@@ -5,9 +5,13 @@
 
 #include "thread.h"
 
-// =========================================================================
-// Current Thread
-// =========================================================================
+// Scheduling priority levels for a thread.
+typedef enum thread_priority {
+  THREAD_PRIORITY_LOW,
+  THREAD_PRIORITY_NORMAL,
+  THREAD_PRIORITY_HIGH,
+  THREAD_PRIORITY_TIME_CRITICAL,
+} thread_priority;
 
 // Returns the OS-level identifier of the calling thread.
 func u64 thread_id(void);

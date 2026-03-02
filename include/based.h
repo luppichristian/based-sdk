@@ -33,6 +33,10 @@
 #include "memory/scratch.h"
 #include "memory/vmem.h"
 
+// Include process modules.
+#include "processes/process.h"
+#include "processes/process_current.h"
+
 // Include string modules.
 #include "strings/char.h"
 #include "strings/cstrings.h"

@@ -1,0 +1,102 @@
+// MIT License
+// Copyright (c) 2026 Christian Luppi
+
+#pragma once
+
+#include "../basic/codespace.h"
+
+// =========================================================================
+// Process
+// =========================================================================
+
+// Opaque handle to a spawned process.
+typedef void* process;
+
+// Opaque handle to a process-owned stdio pipe.
+typedef void* process_pipe;
+
+// Spawn-time process I/O and lifecycle options.
+typedef struct process_options {
+  b32 pipe_stdin;
+  b32 pipe_stdout;
+  b32 pipe_stderr;
+  b32 stderr_to_stdout;
+  b32 background;
+} process_options;
+
+// Returns the default spawn options:
+// no pipes, no stderr redirection, foreground process.
+func process_options process_options_default(void);
+
+// Returns capture-friendly spawn options:
+// stdout piped and stderr merged into stdout.
+func process_options process_options_captured(void);
+
+// Creates a new process with default options.
+// args[0] must be the executable path and the array must be NULL-terminated.
+func process _process_create(const c8* const* args, callsite site);
+
+// Creates a new process with explicit options.
+// args[0] must be the executable path and the array must be NULL-terminated.
+func process _process_create_with(const c8* const* args, process_options options, callsite site);
+
+#define process_create(args) \
+  _process_create(args, CALLSITE_HERE)
+#define process_create_with(args, options) \
+  _process_create_with(args, options, CALLSITE_HERE)
+
+// Returns true if prc is a valid process handle.
+func b32 process_is_valid(process prc);
+
+// Returns the OS-level identifier of a spawned process.
+func u64 process_get_id(process prc);
+
+// Returns the stdin pipe for a spawned process when pipe_stdin was enabled.
+// Returns NULL when stdin is not available.
+func process_pipe process_get_stdin(process prc);
+
+// Returns the stdout pipe for a spawned process when pipe_stdout was enabled.
+// Returns NULL when stdout is not available.
+func process_pipe process_get_stdout(process prc);
+
+// Returns the stderr pipe for a spawned process when pipe_stderr was enabled.
+// Returns NULL when stderr is not available.
+func process_pipe process_get_stderr(process prc);
+
+// Returns true if pip is a valid process pipe handle.
+func b32 process_pipe_is_valid(process_pipe pip);
+
+// Reads up to size bytes from a process pipe.
+// Returns the number of bytes read.
+func sz process_pipe_read(process_pipe pip, void* ptr, sz size);
+
+// Writes up to size bytes to a process pipe.
+// Returns the number of bytes written.
+func sz process_pipe_write(process_pipe pip, const void* ptr, sz size);
+
+// Flushes buffered data for a writable process pipe.
+func b32 process_pipe_flush(process_pipe pip);
+
+// Closes a process pipe.
+// Closing stdin is the portable way to signal EOF to the child process.
+func void process_pipe_close(process_pipe pip);
+
+// Reads the entire piped stdout stream, blocking until the process exits.
+// The returned pointer is allocated by SDL and must be released with process_read_free.
+// To capture stderr as well, create the process with process_options_captured().
+func void* process_read(process prc, sz* out_size, i32* out_exit_code);
+
+// Releases a buffer returned by process_read.
+func void process_read_free(void* ptr);
+
+// Waits for the process to exit.
+// If block is false, this polls and returns false while the process is still running.
+func b32 process_wait(process prc, b32 block, i32* out_exit_code);
+
+// Requests termination of the process.
+// If force is false, the OS is asked to terminate it gracefully when possible.
+func b32 process_kill(process prc, b32 force);
+
+// Destroys the tracking handle for a process.
+// This does not terminate the process.
+func void process_destroy(process prc);

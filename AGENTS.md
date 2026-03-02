@@ -59,6 +59,9 @@ include/                      # public API headers
     ring.h                    # byte-oriented ring buffer
     scratch.h                 # arena checkpoint helper
     vmem.h                    # low-level virtual-memory primitives
+  processes/                  # process creation and lifecycle helpers
+    process.h                 # subprocess spawning, waiting, output capture, and stdio pipe helpers
+    process_current.h         # current-process identifier, priority, and termination helpers
   strings/                    # UTF-aware string and Unicode helpers
     char.h                    # per-code-unit ASCII classification, case, and hex helpers
     cstrings.h                # null-terminated string utilities
@@ -87,6 +90,9 @@ src/                          # module implementations
   basic/                      # implementations for basic/*
   containers/                 # implementations for container modules with source files
   memory/                     # implementations for memory/*
+  processes/                  # implementations for processes/*
+    process.c                # subprocess spawning, waiting, output capture, and stdio pipe helpers
+    process_current.c        # current-process identifier, priority, and termination helpers
   strings/                    # implementations for strings/*
   utils/                      # implementations for utils/*
   threads/                    # implementations for threads/*
