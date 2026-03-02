@@ -2,7 +2,7 @@
 
 ## Hello
 
-**KEEP THIS ALWAYS UP TO DATE, THIS IS YOUR MEMORY*
+**KEEP THIS ALWAYS UP TO DATE, THIS IS YOUR MEMORY**
 
 `based` is a cross-platform C23 utility library with public headers under `include/`, implementations under `src/`, and GoogleTest coverage under `tests/`.
 
@@ -62,6 +62,9 @@ include/                      # public API headers
     cstrings.h                # null-terminated string utilities
     strings.h                 # bounded mutable string wrappers
     unicode.h                 # UTF encoding, decoding, and conversion
+  utils/                      # general-purpose utility helpers
+    timer.h                   # lightweight scalar timer helpers
+    version.h                 # packed semantic-version helpers
   threads/                    # threading, sync, and atomics
     atomics.h                 # atomic integer/pointer APIs and fences
     condvar.h                 # condition variable API
@@ -77,6 +80,7 @@ src/                          # module implementations
   containers/                 # implementations for container modules with source files
   memory/                     # implementations for memory/*
   strings/                    # implementations for strings/*
+  utils/                      # implementations for utils/*
   threads/                    # implementations for threads/*
 tests/                        # GoogleTest coverage
 ```

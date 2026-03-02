@@ -37,6 +37,10 @@
 #include "strings/strings.h"
 #include "strings/unicode.h"
 
+// Include utility modules.
+#include "utils/timer.h"
+#include "utils/version.h"
+
 // Include threading modules.
 #include "threads/atomics.h"
 #include "threads/condvar.h"
