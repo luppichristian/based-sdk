@@ -58,6 +58,11 @@
 #include "processes/process.h"
 #include "processes/process_current.h"
 
+// Include system modules.
+#include "system/cpu_info.h"
+#include "system/system_info.h"
+#include "system/system_runtime.h"
+
 // Include string modules.
 #include "strings/char.h"
 #include "strings/cstrings.h"

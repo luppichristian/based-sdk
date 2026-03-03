@@ -10,6 +10,8 @@ Use this file as the authoritative repo guide for future coding tasks. If files 
 
 Keeping this file up to date is mandatory. Any change that adds, removes, or materially repurposes files or directories covered here must update `AGENTS.md` in the same change.
 
+NOTE: For now you can skip tests
+
 ## Code Rules
 - Never build, configure cmake yourself. Always let me do it.
 - Every `.h`, `.c`, and test file should start with:
@@ -81,6 +83,10 @@ include/                      # public API headers
     pipe.h                    # process-owned stdio pipe handles and pipe I/O helpers
     process.h                 # subprocess spawning, waiting, and output capture helpers
     process_current.h         # current-process identifier, priority, and termination helpers
+  system/                     # host, cpu, and runtime system introspection helpers
+    cpu_info.h                # CPU identity, logical core count, and instruction-set support queries
+    system_info.h             # OS, machine, and active-user information queries
+    system_runtime.h          # current CPU and memory usage snapshots for the host and process
   strings/                    # UTF-aware string and Unicode helpers
     char.h                    # per-code-unit ASCII classification, case, and hex helpers
     cstrings.h                # null-terminated string utilities
@@ -92,7 +98,7 @@ include/                      # public API headers
     endian.h                  # native, little-endian, and big-endian conversions
     id.h                      # typed 8/16/32/64 identifier wrappers and formatting
     timer.h                   # lightweight scalar timer helpers
-    timestamp.h               # duration-style signed microsecond timestamps
+    timestamp.h               # duration-style signed microsecond timestamps and wall-clock queries
     uuid.h                    # UUID parsing, formatting, and inspection
     version.h                 # packed semantic-version helpers
   threads/                    # threading, sync, and atomics
@@ -131,6 +137,10 @@ src/                          # module implementations
     pipe.c                   # process-owned stdio pipe handles and pipe I/O helpers
     process.c                # subprocess spawning, waiting, and output capture helpers
     process_current.c        # current-process identifier, priority, and termination helpers
+  system/                     # implementations for system/*
+    cpu_info.c               # CPU identity, logical core count, and instruction-set support queries
+    system_info.c            # OS, machine, and active-user information queries
+    system_runtime.c         # current CPU and memory usage snapshots for the host and process
   strings/                    # implementations for strings/*
   utils/                      # implementations for utils/*
   threads/                    # implementations for threads/*

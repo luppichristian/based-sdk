@@ -3,6 +3,8 @@
 
 #include "utils/timestamp.h"
 
+#include "../sdl3_include.h"
+
 func i64 timestamp_round_to_i64(f64 value) {
   if (value >= 0.0) {
     return (i64)(value + 0.5);
@@ -13,6 +15,16 @@ func i64 timestamp_round_to_i64(f64 value) {
 func timestamp timestamp_zero(void) {
   timestamp value = {.microseconds = 0};
   return value;
+}
+
+func timestamp timestamp_now(void) {
+  SDL_Time current_time = 0;
+
+  if (!SDL_GetCurrentTime(&current_time)) {
+    return timestamp_zero();
+  }
+
+  return timestamp_from_microseconds((i64)SDL_NS_TO_US(current_time));
 }
 
 func timestamp timestamp_from_microseconds(i64 microseconds) {

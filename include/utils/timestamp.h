@@ -15,6 +15,9 @@ static_assert(size_of(timestamp) == size_of(i64));
 // Constructs a zero timestamp.
 func timestamp timestamp_zero(void);
 
+// Returns the current wall-clock time as Unix-epoch microseconds, or zero on failure.
+func timestamp timestamp_now(void);
+
 // Constructs a timestamp from whole microseconds.
 func timestamp timestamp_from_microseconds(i64 microseconds);
 
