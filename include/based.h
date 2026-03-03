@@ -44,6 +44,15 @@
 #include "filesystem/info.h"
 #include "filesystem/path.h"
 
+// Include input modules.
+#include "input/devices.h"
+#include "input/gamepads.h"
+#include "input/keyboard.h"
+#include "input/mouse.h"
+#include "input/msg.h"
+#include "input/tablet.h"
+#include "input/touch.h"
+
 // Include process modules.
 #include "processes/pipe.h"
 #include "processes/process.h"

@@ -1,0 +1,81 @@
+// MIT License
+// Copyright (c) 2026 Christian Luppi
+
+#pragma once
+
+#include "devices.h"
+
+// =========================================================================
+// Gamepads
+// =========================================================================
+
+// Maximum number of cached gamepad slots exposed by this module.
+#define GAMEPADS_MAX_COUNT 4
+
+// Logical gamepad buttons used by the shared state cache.
+typedef enum gamepad_button {
+  GAMEPAD_BUTTON_INVALID = -1,
+  GAMEPAD_BUTTON_SOUTH = 0,
+  GAMEPAD_BUTTON_EAST = 1,
+  GAMEPAD_BUTTON_WEST = 2,
+  GAMEPAD_BUTTON_NORTH = 3,
+  GAMEPAD_BUTTON_BACK = 4,
+  GAMEPAD_BUTTON_GUIDE = 5,
+  GAMEPAD_BUTTON_START = 6,
+  GAMEPAD_BUTTON_LEFT_STICK = 7,
+  GAMEPAD_BUTTON_RIGHT_STICK = 8,
+  GAMEPAD_BUTTON_LEFT_SHOULDER = 9,
+  GAMEPAD_BUTTON_RIGHT_SHOULDER = 10,
+  GAMEPAD_BUTTON_DPAD_UP = 11,
+  GAMEPAD_BUTTON_DPAD_DOWN = 12,
+  GAMEPAD_BUTTON_DPAD_LEFT = 13,
+  GAMEPAD_BUTTON_DPAD_RIGHT = 14,
+  GAMEPAD_BUTTON_MISC1 = 15,
+  GAMEPAD_BUTTON_RIGHT_PADDLE1 = 16,
+  GAMEPAD_BUTTON_LEFT_PADDLE1 = 17,
+  GAMEPAD_BUTTON_RIGHT_PADDLE2 = 18,
+  GAMEPAD_BUTTON_LEFT_PADDLE2 = 19,
+  GAMEPAD_BUTTON_TOUCHPAD = 20,
+  GAMEPAD_BUTTON_MISC2 = 21,
+  GAMEPAD_BUTTON_MISC3 = 22,
+  GAMEPAD_BUTTON_MISC4 = 23,
+  GAMEPAD_BUTTON_MISC5 = 24,
+  GAMEPAD_BUTTON_MISC6 = 25,
+  GAMEPAD_BUTTON_COUNT = 26,
+} gamepad_button;
+
+// Logical axes exposed by the shared state cache.
+typedef enum gamepad_axis {
+  GAMEPAD_AXIS_INVALID = -1,
+  GAMEPAD_AXIS_LEFTX = 0,
+  GAMEPAD_AXIS_LEFTY = 1,
+  GAMEPAD_AXIS_RIGHTX = 2,
+  GAMEPAD_AXIS_RIGHTY = 3,
+  GAMEPAD_AXIS_LEFT_TRIGGER = 4,
+  GAMEPAD_AXIS_RIGHT_TRIGGER = 5,
+  GAMEPAD_AXIS_COUNT = 6,
+} gamepad_axis;
+
+// Returns the number of active gamepad slots.
+func sz gamepads_get_count(void);
+
+// Returns 1 if slot_index currently holds a connected gamepad, 0 otherwise.
+func b32 gamepads_is_connected(sz slot_index);
+
+// Writes the device id for slot_index into out_id. Returns 1 on success, 0 otherwise.
+func b32 gamepads_get_device_id(sz slot_index, input_device_id* out_id);
+
+// Returns the cached gamepad name for slot_index, or NULL when unavailable.
+func const c8* gamepads_get_name(sz slot_index);
+
+// Returns 1 if the connected gamepad exposes button, 0 otherwise.
+func b32 gamepads_has_button(sz slot_index, gamepad_button button);
+
+// Returns the cached pressed state for button.
+func b32 gamepads_get_button(sz slot_index, gamepad_button button);
+
+// Returns 1 if the connected gamepad exposes axis, 0 otherwise.
+func b32 gamepads_has_axis(sz slot_index, gamepad_axis axis);
+
+// Returns the cached signed axis value for axis.
+func i16 gamepads_get_axis(sz slot_index, gamepad_axis axis);

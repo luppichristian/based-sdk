@@ -69,6 +69,14 @@ include/                      # public API headers
     filewatch.h               # efsw-backed directory watch wrapper
     info.h                    # cross-platform filesystem metadata queries
     path.h                    # struct-backed fixed-capacity paths and path/file helpers
+  input/                      # SDL-backed input APIs without exposing SDL in public headers
+    devices.h                 # device enumeration and shared input-device identifiers
+    gamepads.h                # four-slot gamepad query helpers
+    keyboard.h                # keyboard presence and key-state queries
+    mouse.h                   # mouse state queries and coordinate conversion helpers
+    msg.h                     # SDL event wrapper, queue polling, and custom message posting
+    tablet.h                  # graphics-tablet enumeration and pen-state helpers
+    touch.h                   # touch-device and finger query helpers
   processes/                  # process creation and lifecycle helpers
     pipe.h                    # process-owned stdio pipe handles and pipe I/O helpers
     process.h                 # subprocess spawning, waiting, and output capture helpers
@@ -111,6 +119,14 @@ src/                          # module implementations
     filewatch.c              # efsw-backed directory watch wrapper
     info.c                   # cross-platform filesystem metadata queries
     path.c                   # struct-backed fixed-capacity paths and path/file helpers
+  input/                      # implementations for input/*
+    devices.c               # device enumeration and metadata queries
+    gamepads.c              # four-slot SDL gamepad state cache
+    keyboard.c              # keyboard presence and state queries
+    mouse.c                 # mouse state and coordinate conversion helpers
+    msg.c                   # SDL event translation and custom message posting
+    tablet.c                # HID-backed tablet enumeration and cached pen state
+    touch.c                 # touch-device and finger queries
   processes/                  # implementations for processes/*
     pipe.c                   # process-owned stdio pipe handles and pipe I/O helpers
     process.c                # subprocess spawning, waiting, and output capture helpers
@@ -121,6 +137,7 @@ src/                          # module implementations
 tests/                        # GoogleTest coverage
   test_based.cpp             # umbrella include smoke test
   test_filesystem.cpp        # filesystem metadata, copying, and stream helper coverage
+  test_input.cpp             # input header and type smoke test
   test_path.cpp              # path manipulation coverage
 ```
 
