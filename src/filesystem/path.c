@@ -123,13 +123,13 @@ func b32 path_is_absolute_cstr(const c8* src) {
 
 func path path_from_cstr(const c8* src) {
   path value;
-  str8_from_cstr(value.buf, PATH_CAP, src);
+  str8_from_cstr(value.buf, size_of(value.buf), src);
   return value;
 }
 
 func path path_from_str8(str8 src) {
   path value = path_empty_value();
-  cstr8_copy_n(value.buf, PATH_CAP, src.ptr, src.size);
+  cstr8_copy_n(value.buf, size_of(value.buf), src.ptr, src.size);
   return value;
 }
 
@@ -137,12 +137,12 @@ func path path_join_cstr(const path* lhs, const c8* rhs) {
   path result;
 
   if (path_is_absolute_cstr(rhs) || cstr8_is_empty(path_buf(lhs))) {
-    cstr8_copy(result.buf, PATH_CAP, rhs);
+    cstr8_copy(result.buf, size_of(result.buf), rhs);
     path_normalize(&result);
     return result;
   }
 
-  cstr8_copy(result.buf, PATH_CAP, path_buf(lhs));
+  cstr8_copy(result.buf, size_of(result.buf), path_buf(lhs));
   path_remove_trailing_slash(&result);
 
   while (path_is_separator(*rhs)) {
@@ -150,11 +150,12 @@ func path path_join_cstr(const path* lhs, const c8* rhs) {
   }
 
   sz dst_len = cstr8_len(result.buf);
-  if (*rhs != '\0' && dst_len > 0 && !path_is_separator(result.buf[dst_len - 1]) && dst_len + 1 < PATH_CAP) {
-    cstr8_append_char(result.buf, PATH_CAP, '/');
+  if (*rhs != '\0' && dst_len > 0 && !path_is_separator(result.buf[dst_len - 1]) &&
+      dst_len + 1 < size_of(result.buf)) {
+    cstr8_append_char(result.buf, size_of(result.buf), '/');
   }
 
-  cstr8_concat(result.buf, PATH_CAP, rhs);
+  cstr8_concat(result.buf, size_of(result.buf), rhs);
   path_normalize(&result);
   return result;
 }
@@ -257,7 +258,7 @@ func path path_get_extension(const path* src) {
   sz dot_idx = path_extension_start_cstr(path_buf(src));
 
   if (dot_idx != SZ_MAX) {
-    cstr8_copy(result.buf, PATH_CAP, path_buf(src) + dot_idx);
+    cstr8_copy(result.buf, size_of(result.buf), path_buf(src) + dot_idx);
   }
 
   return result;
@@ -268,7 +269,7 @@ func path path_get_name(const path* src) {
   sz name_idx = path_name_start_cstr(path_buf(src));
   sz src_len = path_trimmed_length_cstr(path_buf(src));
 
-  cstr8_copy_n(result.buf, PATH_CAP, path_buf(src) + name_idx, src_len - name_idx);
+  cstr8_copy_n(result.buf, size_of(result.buf), path_buf(src) + name_idx, src_len - name_idx);
   return result;
 }
 
@@ -299,7 +300,7 @@ func path path_get_common(const path* src_list, sz path_count) {
   for (item_idx = 1; item_idx < path_count; item_idx += 1) {
     current = src_list[item_idx];
     path_normalize(&current);
-    cstr8_common_prefix(result.buf, current.buf, result.buf, PATH_CAP);
+    cstr8_common_prefix(result.buf, current.buf, result.buf, size_of(result.buf));
   }
 
   path_remove_name(&result);
@@ -310,11 +311,11 @@ func path path_get_current(void) {
   path result = path_empty_value();
 
 #if defined(PLATFORM_WINDOWS)
-  if (_getcwd(result.buf, PATH_CAP) == NULL) {
+  if (_getcwd(result.buf, size_of(result.buf)) == NULL) {
     return path_empty_value();
   }
 #elif defined(PLATFORM_UNIX) || defined(PLATFORM_ANDROID) || defined(PLATFORM_IOS)
-  if (getcwd(result.buf, PATH_CAP) == NULL) {
+  if (getcwd(result.buf, size_of(result.buf)) == NULL) {
     return path_empty_value();
   }
 #else

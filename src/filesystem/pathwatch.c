@@ -1,29 +1,29 @@
 // MIT License
 // Copyright (c) 2026 Christian Luppi
 
-#include "filesystem/filewatch.h"
+#include "filesystem/pathwatch.h"
 
 #include <efsw/efsw.h>
 
-typedef struct filewatch_binding {
+typedef struct pathwatch_binding {
   void* native_handle;
-  filewatch_event_callback* event_fn;
-  filewatch_missed_callback* missed_fn;
+  pathwatch_event_callback* event_fn;
+  pathwatch_missed_callback* missed_fn;
   void* user_data;
-} filewatch_binding;
+} pathwatch_binding;
 
-#define FILEWATCH_BINDING_CAP 64
+const_var sz PATHWATCH_BINDING_CAP = 64;
 
-func filewatch_binding* filewatch_bindings(void) {
-  local_persist filewatch_binding bindings[FILEWATCH_BINDING_CAP] = {0};
+func pathwatch_binding* pathwatch_bindings(void) {
+  local_persist pathwatch_binding bindings[PATHWATCH_BINDING_CAP] = {0};
   return bindings;
 }
 
-func filewatch_binding* filewatch_find_binding(void* native_handle) {
-  filewatch_binding* bindings = filewatch_bindings();
+func pathwatch_binding* pathwatch_find_binding(void* native_handle) {
+  pathwatch_binding* bindings = pathwatch_bindings();
   sz item_idx = 0;
 
-  for (item_idx = 0; item_idx < FILEWATCH_BINDING_CAP; item_idx += 1) {
+  for (item_idx = 0; item_idx < PATHWATCH_BINDING_CAP; item_idx += 1) {
     if (bindings[item_idx].native_handle == native_handle) {
       return &bindings[item_idx];
     }
@@ -32,13 +32,13 @@ func filewatch_binding* filewatch_find_binding(void* native_handle) {
   return NULL;
 }
 
-func filewatch_binding* filewatch_bind_create(
+func pathwatch_binding* pathwatch_bind_create(
     void* native_handle,
-    filewatch_event_callback* event_fn,
-    filewatch_missed_callback* missed_fn,
+    pathwatch_event_callback* event_fn,
+    pathwatch_missed_callback* missed_fn,
     void* user_data) {
-  filewatch_binding* binding = filewatch_find_binding(native_handle);
-  filewatch_binding* bindings = filewatch_bindings();
+  pathwatch_binding* binding = pathwatch_find_binding(native_handle);
+  pathwatch_binding* bindings = pathwatch_bindings();
   sz item_idx = 0;
 
   if (binding != NULL) {
@@ -48,7 +48,7 @@ func filewatch_binding* filewatch_bind_create(
     return binding;
   }
 
-  for (item_idx = 0; item_idx < FILEWATCH_BINDING_CAP; item_idx += 1) {
+  for (item_idx = 0; item_idx < PATHWATCH_BINDING_CAP; item_idx += 1) {
     if (bindings[item_idx].native_handle == NULL) {
       bindings[item_idx].native_handle = native_handle;
       bindings[item_idx].event_fn = event_fn;
@@ -61,8 +61,8 @@ func filewatch_binding* filewatch_bind_create(
   return NULL;
 }
 
-func void filewatch_bind_remove(void* native_handle) {
-  filewatch_binding* binding = filewatch_find_binding(native_handle);
+func void pathwatch_bind_remove(void* native_handle) {
+  pathwatch_binding* binding = pathwatch_find_binding(native_handle);
   if (binding != NULL) {
     binding->native_handle = NULL;
     binding->event_fn = NULL;
@@ -71,22 +71,22 @@ func void filewatch_bind_remove(void* native_handle) {
   }
 }
 
-func filewatch_action filewatch_map_action(enum efsw_action action) {
+func pathwatch_action pathwatch_map_action(enum efsw_action action) {
   switch (action) {
     case EFSW_ADD:
-      return FILEWATCH_ACTION_CREATE;
+      return PATHWATCH_ACTION_CREATE;
     case EFSW_DELETE:
-      return FILEWATCH_ACTION_DELETE;
+      return PATHWATCH_ACTION_DELETE;
     case EFSW_MODIFIED:
-      return FILEWATCH_ACTION_MODIFY;
+      return PATHWATCH_ACTION_MODIFY;
     case EFSW_MOVED:
-      return FILEWATCH_ACTION_MOVE;
+      return PATHWATCH_ACTION_MOVE;
     default:
-      return FILEWATCH_ACTION_MODIFY;
+      return PATHWATCH_ACTION_MODIFY;
   }
 }
 
-func void filewatch_dispatch(
+func void pathwatch_dispatch(
     efsw_watcher native_handle,
     efsw_watchid watch_id,
     const char* dir_ptr,
@@ -94,14 +94,14 @@ func void filewatch_dispatch(
     enum efsw_action action,
     const char* old_file_ptr,
     void* user_data) {
-  filewatch_event event;
-  filewatch_binding* binding = NULL;
+  pathwatch_event event;
+  pathwatch_binding* binding = NULL;
   path dir_path;
   path file_path;
 
   (void)user_data;
 
-  binding = filewatch_find_binding(native_handle);
+  binding = pathwatch_find_binding(native_handle);
   if (binding == NULL || binding->event_fn == NULL) {
     return;
   }
@@ -110,7 +110,7 @@ func void filewatch_dispatch(
   file_path = path_from_cstr(file_ptr != NULL ? file_ptr : "");
 
   event.watch_id = (i64)watch_id;
-  event.action = filewatch_map_action(action);
+  event.action = pathwatch_map_action(action);
   event.watch_path = dir_path;
   event.item_path = path_join(&dir_path, &file_path);
   event.old_item_path = path_from_cstr("");
@@ -123,11 +123,11 @@ func void filewatch_dispatch(
   binding->event_fn(&event, binding->user_data);
 }
 
-func void filewatch_dispatch_missed(
+func void pathwatch_dispatch_missed(
     efsw_watcher native_handle,
     efsw_watchid watch_id,
     const char* dir_ptr) {
-  filewatch_binding* binding = filewatch_find_binding(native_handle);
+  pathwatch_binding* binding = pathwatch_find_binding(native_handle);
   path dir_path;
 
   (void)watch_id;
@@ -140,12 +140,12 @@ func void filewatch_dispatch_missed(
   binding->missed_fn(&dir_path, binding->user_data);
 }
 
-func filewatch filewatch_create(
-    filewatch_event_callback* event_fn,
-    filewatch_missed_callback* missed_fn,
+func pathwatch pathwatch_create(
+    pathwatch_event_callback* event_fn,
+    pathwatch_missed_callback* missed_fn,
     void* user_data,
     b32 use_generic_mode) {
-  filewatch watcher;
+  pathwatch watcher;
 
   watcher.native_handle = efsw_create(use_generic_mode ? 1 : 0);
   watcher.event_fn = event_fn;
@@ -153,7 +153,7 @@ func filewatch filewatch_create(
   watcher.user_data = user_data;
 
   if (watcher.native_handle == NULL ||
-      filewatch_bind_create(watcher.native_handle, event_fn, missed_fn, user_data) == NULL) {
+      pathwatch_bind_create(watcher.native_handle, event_fn, missed_fn, user_data) == NULL) {
     if (watcher.native_handle != NULL) {
       efsw_release((efsw_watcher)watcher.native_handle);
     }
@@ -166,12 +166,12 @@ func filewatch filewatch_create(
   return watcher;
 }
 
-func void filewatch_destroy(filewatch* watcher) {
+func void pathwatch_destroy(pathwatch* watcher) {
   if (watcher == NULL || watcher->native_handle == NULL) {
     return;
   }
 
-  filewatch_bind_remove(watcher->native_handle);
+  pathwatch_bind_remove(watcher->native_handle);
   efsw_release((efsw_watcher)watcher->native_handle);
   watcher->native_handle = NULL;
   watcher->event_fn = NULL;
@@ -179,7 +179,7 @@ func void filewatch_destroy(filewatch* watcher) {
   watcher->user_data = NULL;
 }
 
-func b32 filewatch_start(filewatch* watcher) {
+func b32 pathwatch_start(pathwatch* watcher) {
   if (watcher == NULL || watcher->native_handle == NULL) {
     return 0;
   }
@@ -188,7 +188,7 @@ func b32 filewatch_start(filewatch* watcher) {
   return 1;
 }
 
-func i64 filewatch_add(filewatch* watcher, const path* src, b32 recursive) {
+func i64 pathwatch_add(pathwatch* watcher, const path* src, b32 recursive) {
   efsw_watchid watch_id = 0;
 
   if (watcher == NULL || watcher->native_handle == NULL || src == NULL) {
@@ -198,16 +198,16 @@ func i64 filewatch_add(filewatch* watcher, const path* src, b32 recursive) {
   watch_id = efsw_addwatch_withoptions(
       (efsw_watcher)watcher->native_handle,
       src->buf,
-      filewatch_dispatch,
+      pathwatch_dispatch,
       recursive ? 1 : 0,
       NULL,
       0,
       watcher,
-      filewatch_dispatch_missed);
+      pathwatch_dispatch_missed);
   return (i64)watch_id;
 }
 
-func b32 filewatch_remove(filewatch* watcher, i64 watch_id) {
+func b32 pathwatch_remove(pathwatch* watcher, i64 watch_id) {
   if (watcher == NULL || watcher->native_handle == NULL) {
     return 0;
   }
@@ -216,7 +216,7 @@ func b32 filewatch_remove(filewatch* watcher, i64 watch_id) {
   return 1;
 }
 
-func b32 filewatch_remove_path(filewatch* watcher, const path* src) {
+func b32 pathwatch_remove_path(pathwatch* watcher, const path* src) {
   if (watcher == NULL || watcher->native_handle == NULL || src == NULL) {
     return 0;
   }
@@ -225,7 +225,7 @@ func b32 filewatch_remove_path(filewatch* watcher, const path* src) {
   return 1;
 }
 
-func b32 filewatch_follow_symlinks(filewatch* watcher, b32 enabled) {
+func b32 pathwatch_follow_symlinks(pathwatch* watcher, b32 enabled) {
   if (watcher == NULL || watcher->native_handle == NULL) {
     return 0;
   }
@@ -234,7 +234,7 @@ func b32 filewatch_follow_symlinks(filewatch* watcher, b32 enabled) {
   return 1;
 }
 
-func b32 filewatch_allow_out_of_scope_links(filewatch* watcher, b32 enabled) {
+func b32 pathwatch_allow_out_of_scope_links(pathwatch* watcher, b32 enabled) {
   if (watcher == NULL || watcher->native_handle == NULL) {
     return 0;
   }
@@ -243,6 +243,6 @@ func b32 filewatch_allow_out_of_scope_links(filewatch* watcher, b32 enabled) {
   return 1;
 }
 
-func const c8* filewatch_get_last_error(void) {
+func const c8* pathwatch_get_last_error(void) {
   return efsw_getlasterror();
 }

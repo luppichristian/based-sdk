@@ -74,14 +74,14 @@ func const c8* system_architecture_name(void) {
 func void system_query_windows_version(system_info* out_info) {
   HMODULE module_handle = GetModuleHandleA("ntdll.dll");
   if (module_handle == NULL) {
-    system_copy_string(out_info->os_name, SYSTEM_INFO_OS_NAME_CAP, "Windows");
+    system_copy_string(out_info->os_name, size_of(out_info->os_name), "Windows");
     return;
   }
 
   rtl_get_version_fn get_version =
       (rtl_get_version_fn)GetProcAddress(module_handle, "RtlGetVersion");
   if (get_version == NULL) {
-    system_copy_string(out_info->os_name, SYSTEM_INFO_OS_NAME_CAP, "Windows");
+    system_copy_string(out_info->os_name, size_of(out_info->os_name), "Windows");
     return;
   }
 
@@ -90,13 +90,13 @@ func void system_query_windows_version(system_info* out_info) {
   version_info.dwOSVersionInfoSize = sizeof(version_info);
 
   if (get_version(&version_info) != 0) {
-    system_copy_string(out_info->os_name, SYSTEM_INFO_OS_NAME_CAP, "Windows");
+    system_copy_string(out_info->os_name, size_of(out_info->os_name), "Windows");
     return;
   }
 
-  system_copy_string(out_info->os_name, SYSTEM_INFO_OS_NAME_CAP, "Windows");
+  system_copy_string(out_info->os_name, size_of(out_info->os_name), "Windows");
   snprintf(out_info->os_version,
-           SYSTEM_INFO_OS_VERSION_CAP,
+           size_of(out_info->os_version),
            "%lu.%lu build %lu",
            (unsigned long)version_info.dwMajorVersion,
            (unsigned long)version_info.dwMinorVersion,
@@ -111,7 +111,7 @@ func b32 system_info_query(system_info* out_info) {
 
   memset(out_info, 0, sizeof(*out_info));
   system_copy_string(out_info->architecture_name,
-                     SYSTEM_INFO_ARCH_NAME_CAP,
+                     size_of(out_info->architecture_name),
                      system_architecture_name());
 
 #if defined(PLATFORM_WINDOWS)
@@ -122,12 +122,12 @@ func b32 system_info_query(system_info* out_info) {
 
   system_query_windows_version(out_info);
 
-  DWORD computer_size = (DWORD)SYSTEM_INFO_COMPUTER_NAME_CAP;
+  DWORD computer_size = (DWORD)size_of(out_info->computer_name);
   if (GetComputerNameA(out_info->computer_name, &computer_size) == 0) {
     out_info->computer_name[0] = '\0';
   }
 
-  DWORD user_size = (DWORD)SYSTEM_INFO_USER_NAME_CAP;
+  DWORD user_size = (DWORD)size_of(out_info->user_name);
   if (GetUserNameA(out_info->user_name, &user_size) == 0) {
     out_info->user_name[0] = '\0';
   } else if (user_size > 0) {
@@ -139,23 +139,23 @@ func b32 system_info_query(system_info* out_info) {
     const c8* home_drive = getenv("HOMEDRIVE");
     const c8* home_part = getenv("HOMEPATH");
     if (home_drive != NULL && home_part != NULL) {
-      snprintf(out_info->user_home, SYSTEM_INFO_HOME_PATH_CAP, "%s%s", home_drive, home_part);
+      snprintf(out_info->user_home, size_of(out_info->user_home), "%s%s", home_drive, home_part);
     }
   } else {
-    system_copy_string(out_info->user_home, SYSTEM_INFO_HOME_PATH_CAP, home_path);
+    system_copy_string(out_info->user_home, size_of(out_info->user_home), home_path);
   }
 
   return 1;
 #elif defined(PLATFORM_UNIX) || defined(PLATFORM_ANDROID) || defined(PLATFORM_IOS)
   struct utsname uname_info;
   if (uname(&uname_info) == 0) {
-    system_copy_string(out_info->os_name, SYSTEM_INFO_OS_NAME_CAP, uname_info.sysname);
+    system_copy_string(out_info->os_name, size_of(out_info->os_name), uname_info.sysname);
     snprintf(out_info->os_version,
-             SYSTEM_INFO_OS_VERSION_CAP,
+             size_of(out_info->os_version),
              "%s %s",
              uname_info.release,
              uname_info.version);
-    system_copy_string(out_info->computer_name, SYSTEM_INFO_COMPUTER_NAME_CAP, uname_info.nodename);
+    system_copy_string(out_info->computer_name, size_of(out_info->computer_name), uname_info.nodename);
   }
 
   sp page_size = (sp)sysconf(_SC_PAGESIZE);
@@ -167,28 +167,28 @@ func b32 system_info_query(system_info* out_info) {
   const c8* user_name = getenv("USER");
   const c8* home_path = getenv("HOME");
   if (user_name != NULL) {
-    system_copy_string(out_info->user_name, SYSTEM_INFO_USER_NAME_CAP, user_name);
+    system_copy_string(out_info->user_name, size_of(out_info->user_name), user_name);
   }
   if (home_path != NULL) {
-    system_copy_string(out_info->user_home, SYSTEM_INFO_HOME_PATH_CAP, home_path);
+    system_copy_string(out_info->user_home, size_of(out_info->user_home), home_path);
   }
 
   if (out_info->user_name[0] == '\0' || out_info->user_home[0] == '\0') {
     struct passwd* pass_info = getpwuid(geteuid());
     if (pass_info != NULL) {
       if (out_info->user_name[0] == '\0') {
-        system_copy_string(out_info->user_name, SYSTEM_INFO_USER_NAME_CAP, pass_info->pw_name);
+        system_copy_string(out_info->user_name, size_of(out_info->user_name), pass_info->pw_name);
       }
       if (out_info->user_home[0] == '\0') {
-        system_copy_string(out_info->user_home, SYSTEM_INFO_HOME_PATH_CAP, pass_info->pw_dir);
+        system_copy_string(out_info->user_home, size_of(out_info->user_home), pass_info->pw_dir);
       }
     }
   }
 
   return 1;
 #else
-  system_copy_string(out_info->os_name, SYSTEM_INFO_OS_NAME_CAP, "unknown");
-  system_copy_string(out_info->os_version, SYSTEM_INFO_OS_VERSION_CAP, "unknown");
+  system_copy_string(out_info->os_name, size_of(out_info->os_name), "unknown");
+  system_copy_string(out_info->os_version, size_of(out_info->os_version), "unknown");
   return 0;
 #endif
 }

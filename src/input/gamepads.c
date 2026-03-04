@@ -20,7 +20,7 @@ func void gamepads_release_slot(sz slot_index) {
     SDL_CloseGamepad(gamepad_slots[slot_index].handle);
   }
 
-  gamepad_slots[slot_index] = (gamepad_slot_state){0};
+  gamepad_slots[slot_index] = (gamepad_slot_state) {0};
 }
 
 func void gamepads_sync_slots(void) {
@@ -72,9 +72,9 @@ func b32 gamepads_is_connected(sz slot_index) {
   return slot_index < GAMEPADS_MAX_COUNT && gamepad_slots[slot_index].handle != NULL;
 }
 
-func b32 gamepads_get_device_id(sz slot_index, input_device_id* out_id) {
+func b32 gamepads_get_device_id(sz slot_index, device_id* out_id) {
   if (out_id) {
-    *out_id = (input_device_id){0};
+    *out_id = (device_id) {0};
   }
 
   if (!gamepads_is_connected(slot_index)) {
@@ -82,7 +82,7 @@ func b32 gamepads_get_device_id(sz slot_index, input_device_id* out_id) {
   }
 
   if (out_id) {
-    out_id->type = INPUT_DEVICE_TYPE_GAMEPAD;
+    out_id->type = DEVICE_TYPE_GAMEPAD;
     out_id->instance = (u64)gamepad_slots[slot_index].id;
   }
 

@@ -8,8 +8,8 @@ func b32 keyboard_is_available(void) {
   return SDL_HasKeyboard() ? 1 : 0;
 }
 
-func b32 keyboard_get_primary_device_id(input_device_id* out_id) {
-  return devices_get_device(INPUT_DEVICE_TYPE_KEYBOARD, 0, out_id);
+func b32 keyboard_get_primary_device_id(device_id* out_id) {
+  return devices_get_device(DEVICE_TYPE_KEYBOARD, 0, out_id);
 }
 
 func b32 keyboard_is_key_down(u32 scancode) {

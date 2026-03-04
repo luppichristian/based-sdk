@@ -45,7 +45,7 @@ func b32 file_make_temp_path(const path* src, path* out_path) {
 
   for (attempt_idx = 0; attempt_idx < 32; attempt_idx += 1) {
     tmp_path = *src;
-    if (!cstr8_append_format(tmp_path.buf, PATH_CAP, ".tmp.%u", attempt_idx)) {
+    if (!cstr8_append_format(tmp_path.buf, size_of(tmp_path.buf), ".tmp.%u", attempt_idx)) {
       return 0;
     }
 

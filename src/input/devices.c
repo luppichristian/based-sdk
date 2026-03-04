@@ -71,20 +71,20 @@ func u64 devices_hash_path(const c8* src) {
   return hash_value;
 }
 
-func input_device_id devices_make_id(input_device_type type, u64 instance) {
-  input_device_id result = {0};
+func device_id devices_make_id(device_type type, u64 instance) {
+  device_id result = {0};
   result.type = type;
   result.instance = instance;
   return result;
 }
 
-func b32 devices_try_fill_tablet_info(SDL_hid_device_info* entry, input_device_info* out_info) {
+func b32 devices_try_fill_tablet_info(SDL_hid_device_info* entry, device_info* out_info) {
   if (!entry || entry->usage_page != 0x0D || !out_info) {
     return 0;
   }
 
-  *out_info = (input_device_info){0};
-  out_info->id = devices_make_id(INPUT_DEVICE_TYPE_TABLET, devices_hash_path(entry->path));
+  *out_info = (device_info) {0};
+  out_info->id = devices_make_id(DEVICE_TYPE_TABLET, devices_hash_path(entry->path));
   out_info->connected = 1;
   out_info->vendor_id = (u16)entry->vendor_id;
   out_info->product_id = (u16)entry->product_id;
@@ -100,7 +100,7 @@ func b32 devices_try_fill_tablet_info(SDL_hid_device_info* entry, input_device_i
   return 1;
 }
 
-func b32 devices_find_tablet_by_index(sz index, input_device_id* out_id) {
+func b32 devices_find_tablet_by_index(sz index, device_id* out_id) {
   SDL_hid_device_info* head = SDL_hid_enumerate(0, 0);
   SDL_hid_device_info* entry = head;
   sz current_index = 0;
@@ -110,7 +110,7 @@ func b32 devices_find_tablet_by_index(sz index, input_device_id* out_id) {
     if (entry->usage_page == 0x0D) {
       if (current_index == index) {
         if (out_id) {
-          *out_id = devices_make_id(INPUT_DEVICE_TYPE_TABLET, devices_hash_path(entry->path));
+          *out_id = devices_make_id(DEVICE_TYPE_TABLET, devices_hash_path(entry->path));
         }
         found = 1;
         break;
@@ -129,7 +129,7 @@ func b32 devices_find_tablet_by_index(sz index, input_device_id* out_id) {
   return found;
 }
 
-func b32 devices_find_tablet_info(input_device_id id, input_device_info* out_info) {
+func b32 devices_find_tablet_info(device_id id, device_info* out_info) {
   SDL_hid_device_info* head = SDL_hid_enumerate(0, 0);
   SDL_hid_device_info* entry = head;
   b32 found = 0;
@@ -154,61 +154,61 @@ func b32 devices_find_tablet_info(input_device_id id, input_device_info* out_inf
   return found;
 }
 
-func b32 input_device_id_is_valid(input_device_id src) {
-  return src.type != INPUT_DEVICE_TYPE_UNKNOWN && src.instance != 0;
+func b32 device_id_is_valid(device_id src) {
+  return src.type != DEVICE_TYPE_UNKNOWN && src.instance != 0;
 }
 
-func const c8* devices_get_type_name(input_device_type type) {
+func const c8* devices_get_type_name(device_type type) {
   switch (type) {
-    case INPUT_DEVICE_TYPE_KEYBOARD:
+    case DEVICE_TYPE_KEYBOARD:
       return "keyboard";
-    case INPUT_DEVICE_TYPE_MOUSE:
+    case DEVICE_TYPE_MOUSE:
       return "mouse";
-    case INPUT_DEVICE_TYPE_GAMEPAD:
+    case DEVICE_TYPE_GAMEPAD:
       return "gamepad";
-    case INPUT_DEVICE_TYPE_TABLET:
+    case DEVICE_TYPE_TABLET:
       return "tablet";
-    case INPUT_DEVICE_TYPE_TOUCH:
+    case DEVICE_TYPE_TOUCH:
       return "touch";
-    case INPUT_DEVICE_TYPE_UNKNOWN:
+    case DEVICE_TYPE_UNKNOWN:
     default:
       return "unknown";
   }
 }
 
-func sz devices_get_count(input_device_type type) {
+func sz devices_get_count(device_type type) {
   int count = 0;
 
   switch (type) {
-    case INPUT_DEVICE_TYPE_KEYBOARD: {
+    case DEVICE_TYPE_KEYBOARD: {
       SDL_KeyboardID* ids = SDL_GetKeyboards(&count);
       if (ids) {
         SDL_free(ids);
       }
       return count > 0 ? (sz)count : 0;
     }
-    case INPUT_DEVICE_TYPE_MOUSE: {
+    case DEVICE_TYPE_MOUSE: {
       SDL_MouseID* ids = SDL_GetMice(&count);
       if (ids) {
         SDL_free(ids);
       }
       return count > 0 ? (sz)count : 0;
     }
-    case INPUT_DEVICE_TYPE_GAMEPAD: {
+    case DEVICE_TYPE_GAMEPAD: {
       SDL_JoystickID* ids = SDL_GetGamepads(&count);
       if (ids) {
         SDL_free(ids);
       }
       return count > 0 ? (sz)count : 0;
     }
-    case INPUT_DEVICE_TYPE_TOUCH: {
+    case DEVICE_TYPE_TOUCH: {
       SDL_TouchID* ids = SDL_GetTouchDevices(&count);
       if (ids) {
         SDL_free(ids);
       }
       return count > 0 ? (sz)count : 0;
     }
-    case INPUT_DEVICE_TYPE_TABLET: {
+    case DEVICE_TYPE_TABLET: {
       SDL_hid_device_info* head = SDL_hid_enumerate(0, 0);
       SDL_hid_device_info* entry = head;
       sz total = 0;
@@ -226,94 +226,94 @@ func sz devices_get_count(input_device_type type) {
 
       return total;
     }
-    case INPUT_DEVICE_TYPE_UNKNOWN:
+    case DEVICE_TYPE_UNKNOWN:
     default:
       return 0;
   }
 }
 
-func b32 devices_get_device(input_device_type type, sz index, input_device_id* out_id) {
+func b32 devices_get_device(device_type type, sz index, device_id* out_id) {
   int count = 0;
 
   if (out_id) {
-    *out_id = (input_device_id){0};
+    *out_id = (device_id) {0};
   }
 
   switch (type) {
-    case INPUT_DEVICE_TYPE_KEYBOARD: {
+    case DEVICE_TYPE_KEYBOARD: {
       SDL_KeyboardID* ids = SDL_GetKeyboards(&count);
       b32 found = ids && index < (sz)count;
 
       if (found && out_id) {
-        *out_id = devices_make_id(INPUT_DEVICE_TYPE_KEYBOARD, (u64)ids[index]);
+        *out_id = devices_make_id(DEVICE_TYPE_KEYBOARD, (u64)ids[index]);
       }
       if (ids) {
         SDL_free(ids);
       }
       return found;
     }
-    case INPUT_DEVICE_TYPE_MOUSE: {
+    case DEVICE_TYPE_MOUSE: {
       SDL_MouseID* ids = SDL_GetMice(&count);
       b32 found = ids && index < (sz)count;
 
       if (found && out_id) {
-        *out_id = devices_make_id(INPUT_DEVICE_TYPE_MOUSE, (u64)ids[index]);
+        *out_id = devices_make_id(DEVICE_TYPE_MOUSE, (u64)ids[index]);
       }
       if (ids) {
         SDL_free(ids);
       }
       return found;
     }
-    case INPUT_DEVICE_TYPE_GAMEPAD: {
+    case DEVICE_TYPE_GAMEPAD: {
       SDL_JoystickID* ids = SDL_GetGamepads(&count);
       b32 found = ids && index < (sz)count;
 
       if (found && out_id) {
-        *out_id = devices_make_id(INPUT_DEVICE_TYPE_GAMEPAD, (u64)ids[index]);
+        *out_id = devices_make_id(DEVICE_TYPE_GAMEPAD, (u64)ids[index]);
       }
       if (ids) {
         SDL_free(ids);
       }
       return found;
     }
-    case INPUT_DEVICE_TYPE_TOUCH: {
+    case DEVICE_TYPE_TOUCH: {
       SDL_TouchID* ids = SDL_GetTouchDevices(&count);
       b32 found = ids && index < (sz)count;
 
       if (found && out_id) {
-        *out_id = devices_make_id(INPUT_DEVICE_TYPE_TOUCH, (u64)ids[index]);
+        *out_id = devices_make_id(DEVICE_TYPE_TOUCH, (u64)ids[index]);
       }
       if (ids) {
         SDL_free(ids);
       }
       return found;
     }
-    case INPUT_DEVICE_TYPE_TABLET:
+    case DEVICE_TYPE_TABLET:
       return devices_find_tablet_by_index(index, out_id);
-    case INPUT_DEVICE_TYPE_UNKNOWN:
+    case DEVICE_TYPE_UNKNOWN:
     default:
       return 0;
   }
 }
 
-func b32 devices_is_connected(input_device_id id) {
+func b32 devices_is_connected(device_id id) {
   return devices_get_info(id, NULL);
 }
 
-func b32 devices_get_info(input_device_id id, input_device_info* out_info) {
+func b32 devices_get_info(device_id id, device_info* out_info) {
   int count = 0;
 
-  if (!input_device_id_is_valid(id)) {
+  if (!device_id_is_valid(id)) {
     return 0;
   }
 
   if (out_info) {
-    *out_info = (input_device_info){0};
+    *out_info = (device_info) {0};
     out_info->id = id;
   }
 
   switch (id.type) {
-    case INPUT_DEVICE_TYPE_KEYBOARD: {
+    case DEVICE_TYPE_KEYBOARD: {
       SDL_KeyboardID* ids = SDL_GetKeyboards(&count);
       b32 found = 0;
 
@@ -334,7 +334,7 @@ func b32 devices_get_info(input_device_id id, input_device_info* out_info) {
 
       return found;
     }
-    case INPUT_DEVICE_TYPE_MOUSE: {
+    case DEVICE_TYPE_MOUSE: {
       SDL_MouseID* ids = SDL_GetMice(&count);
       b32 found = 0;
 
@@ -355,7 +355,7 @@ func b32 devices_get_info(input_device_id id, input_device_info* out_info) {
 
       return found;
     }
-    case INPUT_DEVICE_TYPE_GAMEPAD: {
+    case DEVICE_TYPE_GAMEPAD: {
       SDL_JoystickID* ids = SDL_GetGamepads(&count);
       b32 found = 0;
 
@@ -376,7 +376,7 @@ func b32 devices_get_info(input_device_id id, input_device_info* out_info) {
 
       return found;
     }
-    case INPUT_DEVICE_TYPE_TOUCH: {
+    case DEVICE_TYPE_TOUCH: {
       SDL_TouchID* ids = SDL_GetTouchDevices(&count);
       b32 found = 0;
 
@@ -398,9 +398,9 @@ func b32 devices_get_info(input_device_id id, input_device_info* out_info) {
 
       return found;
     }
-    case INPUT_DEVICE_TYPE_TABLET:
+    case DEVICE_TYPE_TABLET:
       return devices_find_tablet_info(id, out_info);
-    case INPUT_DEVICE_TYPE_UNKNOWN:
+    case DEVICE_TYPE_UNKNOWN:
     default:
       return 0;
   }

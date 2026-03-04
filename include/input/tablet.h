@@ -23,7 +23,7 @@ typedef enum tablet_axis {
 
 // Last observed pen state reported by the tablet backend.
 typedef struct tablet_pen_state {
-  input_device_id id;
+  device_id id;
   u32 pen_id;
   b32 in_proximity;
   b32 touching;
@@ -42,10 +42,10 @@ func b32 tablet_is_available(void);
 func sz tablet_get_count(void);
 
 // Writes the tablet device id at index into out_id. Returns 1 on success, 0 otherwise.
-func b32 tablet_get_device_id(sz index, input_device_id* out_id);
+func b32 tablet_get_device_id(sz index, device_id* out_id);
 
 // Writes the latest cached pen state into out_state. Returns 1 on success, 0 otherwise.
 func b32 tablet_get_last_pen_state(tablet_pen_state* out_state);
 
 // Reads a raw HID report from id into dst. Returns 1 on success, 0 otherwise.
-func b32 tablet_read_hid_report(input_device_id id, void* dst, sz capacity, sz* out_size, i32 timeout_ms);
+func b32 tablet_read_hid_report(device_id id, void* dst, sz capacity, sz* out_size, i32 timeout_ms);

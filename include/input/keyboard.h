@@ -13,7 +13,7 @@
 func b32 keyboard_is_available(void);
 
 // Writes the primary keyboard device id into out_id. Returns 1 on success, 0 otherwise.
-func b32 keyboard_get_primary_device_id(input_device_id* out_id);
+func b32 keyboard_get_primary_device_id(device_id* out_id);
 
 // Returns 1 if the key identified by scancode is currently pressed, 0 otherwise.
 func b32 keyboard_is_key_down(u32 scancode);

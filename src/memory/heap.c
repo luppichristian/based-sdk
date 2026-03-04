@@ -11,7 +11,7 @@
 
 // Bytes reserved before user data to store the back-pointer to heap_chunk.
 // Using sizeof(heap_chunk*) ensures the stored pointer is naturally aligned.
-#define HEAP_BACK_REF_SZ (sizeof(heap_chunk*))
+const_var sz HEAP_BACK_REF_SZ = sizeof(heap_chunk*);
 
 // Union used for type-safe pointer serialisation into/from a raw byte buffer.
 // This avoids multilevel pointer conversions that would be flagged by clang-tidy.

@@ -10,7 +10,7 @@
 // =========================================================================
 
 // Maximum number of cached gamepad slots exposed by this module.
-#define GAMEPADS_MAX_COUNT 4
+const_var sz GAMEPADS_MAX_COUNT = 4;
 
 // Logical gamepad buttons used by the shared state cache.
 typedef enum gamepad_button {
@@ -63,7 +63,7 @@ func sz gamepads_get_count(void);
 func b32 gamepads_is_connected(sz slot_index);
 
 // Writes the device id for slot_index into out_id. Returns 1 on success, 0 otherwise.
-func b32 gamepads_get_device_id(sz slot_index, input_device_id* out_id);
+func b32 gamepads_get_device_id(sz slot_index, device_id* out_id);
 
 // Returns the cached gamepad name for slot_index, or NULL when unavailable.
 func const c8* gamepads_get_name(sz slot_index);

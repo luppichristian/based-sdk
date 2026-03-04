@@ -14,15 +14,15 @@ typedef void* pipe;
 
 // Returns the stdin pipe for a spawned process when pipe_stdin was enabled.
 // Returns NULL when stdin is not available.
-func pipe process_get_stdin(process prc);
+func pipe pipe_stdin(process prc);
 
 // Returns the stdout pipe for a spawned process when pipe_stdout was enabled.
 // Returns NULL when stdout is not available.
-func pipe process_get_stdout(process prc);
+func pipe pipe_stdout(process prc);
 
 // Returns the stderr pipe for a spawned process when pipe_stderr was enabled.
 // Returns NULL when stderr is not available.
-func pipe process_get_stderr(process prc);
+func pipe pipe_stderr(process prc);
 
 // Returns true if pip is a valid pipe handle.
 func b32 pipe_is_valid(pipe pip);

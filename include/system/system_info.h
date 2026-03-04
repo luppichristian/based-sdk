@@ -4,21 +4,15 @@
 #pragma once
 
 #include "../basic/primitive_types.h"
-
-#define SYSTEM_INFO_OS_NAME_CAP       64
-#define SYSTEM_INFO_OS_VERSION_CAP    128
-#define SYSTEM_INFO_ARCH_NAME_CAP     32
-#define SYSTEM_INFO_COMPUTER_NAME_CAP 128
-#define SYSTEM_INFO_USER_NAME_CAP     128
-#define SYSTEM_INFO_HOME_PATH_CAP     512
+#include "../strings/cstrings.h"
 
 typedef struct system_info {
-  c8 os_name[SYSTEM_INFO_OS_NAME_CAP];
-  c8 os_version[SYSTEM_INFO_OS_VERSION_CAP];
-  c8 architecture_name[SYSTEM_INFO_ARCH_NAME_CAP];
-  c8 computer_name[SYSTEM_INFO_COMPUTER_NAME_CAP];
-  c8 user_name[SYSTEM_INFO_USER_NAME_CAP];
-  c8 user_home[SYSTEM_INFO_HOME_PATH_CAP];
+  str8_short os_name;
+  str8_short os_version;
+  str8_short architecture_name;
+  str8_short computer_name;
+  str8_short user_name;
+  str8_short user_home;
   sz page_size;
   sz allocation_granularity;
 } system_info;

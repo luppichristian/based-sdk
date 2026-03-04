@@ -48,21 +48,21 @@ func sz tablet_get_count(void) {
   return total;
 }
 
-func b32 tablet_get_device_id(sz index, input_device_id* out_id) {
+func b32 tablet_get_device_id(sz index, device_id* out_id) {
   SDL_hid_device_info* head = SDL_hid_enumerate(0, 0);
   SDL_hid_device_info* entry = head;
   sz current_index = 0;
   b32 found = 0;
 
   if (out_id) {
-    *out_id = (input_device_id){0};
+    *out_id = (device_id) {0};
   }
 
   while (entry) {
     if (entry->usage_page == 0x0D) {
       if (current_index == index) {
         if (out_id) {
-          out_id->type = INPUT_DEVICE_TYPE_TABLET;
+          out_id->type = DEVICE_TYPE_TABLET;
           out_id->instance = tablet_hash_path(entry->path);
         }
         found = 1;
@@ -91,10 +91,10 @@ func b32 tablet_get_last_pen_state(tablet_pen_state* out_state) {
   return 1;
 }
 
-func b32 tablet_read_hid_report(input_device_id id, void* dst, sz capacity, sz* out_size, i32 timeout_ms) {
+func b32 tablet_read_hid_report(device_id id, void* dst, sz capacity, sz* out_size, i32 timeout_ms) {
   SDL_hid_device_info* head = SDL_hid_enumerate(0, 0);
   SDL_hid_device_info* entry = head;
-  c8 path_buf[INPUT_DEVICE_NAME_CAPACITY] = {0};
+  str8_short path_buf = {0};
   SDL_hid_device* device = NULL;
   int read_size = -1;
 
@@ -102,7 +102,7 @@ func b32 tablet_read_hid_report(input_device_id id, void* dst, sz capacity, sz* 
     *out_size = 0;
   }
 
-  if (!dst || !capacity || id.type != INPUT_DEVICE_TYPE_TABLET) {
+  if (!dst || !capacity || id.type != DEVICE_TYPE_TABLET) {
     if (head) {
       SDL_hid_free_enumeration(head);
     }

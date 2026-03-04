@@ -19,8 +19,8 @@
 #include "containers/doubly_list.h"
 #include "containers/hash_map.h"
 #include "containers/ring_list.h"
-#include "containers/sort.h"
 #include "containers/singly_list.h"
+#include "containers/sort.h"
 #include "containers/stack_list.h"
 #include "containers/tree.h"
 
@@ -38,10 +38,10 @@
 #include "filesystem/archive.h"
 #include "filesystem/directory.h"
 #include "filesystem/file.h"
-#include "filesystem/file_map.h"
-#include "filesystem/file_stream.h"
-#include "filesystem/filewatch.h"
-#include "filesystem/info.h"
+#include "filesystem/pathinfo.h"
+#include "filesystem/filemap.h"
+#include "filesystem/filestream.h"
+#include "filesystem/pathwatch.h"
 #include "filesystem/path.h"
 
 // Include input modules.

@@ -4,7 +4,7 @@
 #include "processes/pipe.h"
 #include "../sdl3_include.h"
 
-func pipe process_get_stdin(process prc) {
+func pipe pipe_stdin(process prc) {
   if (!prc) {
     return NULL;
   }
@@ -12,7 +12,7 @@ func pipe process_get_stdin(process prc) {
   return (pipe)SDL_GetProcessInput((SDL_Process*)prc);
 }
 
-func pipe process_get_stdout(process prc) {
+func pipe pipe_stdout(process prc) {
   if (!prc) {
     return NULL;
   }
@@ -20,7 +20,7 @@ func pipe process_get_stdout(process prc) {
   return (pipe)SDL_GetProcessOutput((SDL_Process*)prc);
 }
 
-func pipe process_get_stderr(process prc) {
+func pipe pipe_stderr(process prc) {
   if (!prc) {
     return NULL;
   }

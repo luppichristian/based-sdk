@@ -2,6 +2,7 @@
 // Copyright (c) 2026 Christian Luppi
 
 #include "filesystem/archive.h"
+#include "basic/utility_defines.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -534,7 +535,7 @@ func b32 archive_save_file(const archive* arc, const path* dst) {
 
     if (ent->is_directory) {
       if (!cstr8_is_empty(item_path.buf) && item_path.buf[cstr8_len(item_path.buf) - 1] != '/') {
-        cstr8_append_char(item_path.buf, PATH_CAP, '/');
+        cstr8_append_char(item_path.buf, count_of(item_path.buf), '/');
       }
     }
 

@@ -4,9 +4,7 @@
 #pragma once
 
 #include "../basic/primitive_types.h"
-
-#define CPU_INFO_VENDOR_NAME_CAP 32
-#define CPU_INFO_BRAND_NAME_CAP  96
+#include "../strings/cstrings.h"
 
 typedef struct cpu_instruction_set_info {
   b32 mmx;
@@ -29,8 +27,8 @@ typedef struct cpu_instruction_set_info {
 } cpu_instruction_set_info;
 
 typedef struct cpu_info {
-  c8 vendor_name[CPU_INFO_VENDOR_NAME_CAP];
-  c8 brand_name[CPU_INFO_BRAND_NAME_CAP];
+  str8_short vendor_name;
+  str8_short brand_name;
   u32 logical_core_count;
   u32 cache_line_bytes;
   b32 supports_64bit;

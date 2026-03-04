@@ -66,10 +66,10 @@ include/                      # public API headers
     archive.h                 # in-memory archive model with ZIP load/save helpers
     directory.h               # directory creation, removal, iteration, and special-directory queries
     file.h                    # high-level whole-file operations
-    file_map.h                # memory-mapped file views with optional write-back
-    file_stream.h             # unified native-file and archive-entry stream wrapper
-    filewatch.h               # efsw-backed directory watch wrapper
-    info.h                    # cross-platform filesystem metadata queries
+    filemap.h                # memory-mapped file views with optional write-back
+    filestream.h             # unified native-file and archive-entry stream wrapper
+    pathinfo.h                # cross-platform filesystem metadata queries
+    pathwatch.h               # efsw-backed directory watch wrapper
     path.h                    # struct-backed fixed-capacity paths and path/file helpers
   input/                      # SDL-backed input APIs without exposing SDL in public headers
     devices.h                 # device enumeration and shared input-device identifiers
@@ -120,10 +120,10 @@ src/                          # module implementations
     archive.c                # in-memory archive model with ZIP load/save helpers
     directory.c              # directory creation, removal, iteration, and special-directory queries
     file.c                   # high-level whole-file operations
-    file_map.c               # memory-mapped file views with optional write-back
-    file_stream.c            # unified native-file and archive-entry stream wrapper
-    filewatch.c              # efsw-backed directory watch wrapper
-    info.c                   # cross-platform filesystem metadata queries
+    filemap.c               # memory-mapped file views with optional write-back
+    filestream.c            # unified native-file and archive-entry stream wrapper
+    pathinfo.c               # cross-platform filesystem metadata queries
+    pathwatch.c              # efsw-backed directory watch wrapper
     path.c                   # struct-backed fixed-capacity paths and path/file helpers
   input/                      # implementations for input/*
     devices.c               # device enumeration and metadata queries

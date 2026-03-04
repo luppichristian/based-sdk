@@ -3,16 +3,13 @@
 
 #pragma once
 
+#include "../strings/cstrings.h"
 #include "../strings/strings.h"
 #include "../utils/timestamp.h"
 
-#define PATH_CAP 512
-
 typedef struct path {
-  c8 buf[PATH_CAP];
+  str8_medium buf;
 } path;
-
-static_assert(size_of(path) == PATH_CAP);
 
 // Copies src into a new path value.
 func path path_from_cstr(const c8* src);

@@ -62,14 +62,14 @@ func void cpu_set_compile_time_fallback(cpu_info* out_info) {
 #endif
 
 #if defined(ARCH_ARM64) || defined(ARCH_ARM)
-  cpu_copy_string(out_info->vendor_name, CPU_INFO_VENDOR_NAME_CAP, "ARM");
-  cpu_copy_string(out_info->brand_name, CPU_INFO_BRAND_NAME_CAP, "ARM processor");
+  cpu_copy_string(out_info->vendor_name, size_of(out_info->vendor_name), "ARM");
+  cpu_copy_string(out_info->brand_name, size_of(out_info->brand_name), "ARM processor");
 #elif defined(ARCH_X86_64) || defined(ARCH_X86)
-  cpu_copy_string(out_info->vendor_name, CPU_INFO_VENDOR_NAME_CAP, "x86");
-  cpu_copy_string(out_info->brand_name, CPU_INFO_BRAND_NAME_CAP, "x86 processor");
+  cpu_copy_string(out_info->vendor_name, size_of(out_info->vendor_name), "x86");
+  cpu_copy_string(out_info->brand_name, size_of(out_info->brand_name), "x86 processor");
 #else
-  cpu_copy_string(out_info->vendor_name, CPU_INFO_VENDOR_NAME_CAP, "unknown");
-  cpu_copy_string(out_info->brand_name, CPU_INFO_BRAND_NAME_CAP, "unknown");
+  cpu_copy_string(out_info->vendor_name, size_of(out_info->vendor_name), "unknown");
+  cpu_copy_string(out_info->brand_name, size_of(out_info->brand_name), "unknown");
 #endif
 
 #if defined(__ARM_NEON) || defined(__ARM_NEON__)
@@ -114,7 +114,7 @@ func void cpu_fill_x86_strings(cpu_info* out_info) {
     memcpy(&vendor_name[4], &base_regs[3], 4);
     memcpy(&vendor_name[8], &base_regs[2], 4);
     vendor_name[12] = '\0';
-    cpu_copy_string(out_info->vendor_name, CPU_INFO_VENDOR_NAME_CAP, vendor_name);
+    cpu_copy_string(out_info->vendor_name, size_of(out_info->vendor_name), vendor_name);
   }
 
   i32 ext_regs[4];
@@ -133,7 +133,7 @@ func void cpu_fill_x86_strings(cpu_info* out_info) {
   cpu_read_cpuid(0x80000003U, 0, &brand_regs[4]);
   cpu_read_cpuid(0x80000004U, 0, &brand_regs[8]);
   memcpy(brand_name, brand_regs, 48);
-  cpu_copy_string(out_info->brand_name, CPU_INFO_BRAND_NAME_CAP, brand_name);
+  cpu_copy_string(out_info->brand_name, size_of(out_info->brand_name), brand_name);
 }
 
 func void cpu_fill_x86_features(cpu_info* out_info) {

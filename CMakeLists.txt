@@ -121,6 +121,13 @@ endif()
 # Define LM2_CUSTOM_ASSERT to use custom assert in libmath2.
 target_compile_definitions(libmath2 PUBLIC LM2_CUSTOM_ASSERT)
 
+# Suppress Clang's GNU extension folding warning without affecting other compilers.
+set(
+    BASED_CLANG_FOLDING_CONSTANT_WARNING
+    $<$<COMPILE_LANG_AND_ID:C,Clang,AppleClang>:-Wno-gnu-folding-constant>
+    $<$<COMPILE_LANG_AND_ID:CXX,Clang,AppleClang>:-Wno-gnu-folding-constant>
+)
+
 # =========================================================================
 # Library (always static for now)
 # =========================================================================
@@ -130,6 +137,7 @@ add_library(based STATIC ${BASED_SOURCES})
 target_include_directories(based PUBLIC include)
 target_link_libraries(based PRIVATE SDL3::SDL3 efsw miniz PUBLIC olib::static libmath2)
 target_compile_definitions(based PRIVATE _CRT_SECURE_NO_WARNINGS)
+target_compile_options(based PRIVATE ${BASED_CLANG_FOLDING_CONSTANT_WARNING})
 
 # =========================================================================
 # Tests
@@ -153,6 +161,7 @@ if(BASED_BUILD_TESTS)
     file(GLOB TEST_SOURCES "tests/*.cpp")
     add_executable(based-tests ${TEST_SOURCES})
     target_link_libraries(based-tests PRIVATE based GTest::gtest_main)
+    target_compile_options(based-tests PRIVATE ${BASED_CLANG_FOLDING_CONSTANT_WARNING})
 
     include(GoogleTest)
     gtest_discover_tests(based-tests)
