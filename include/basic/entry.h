@@ -1,44 +1,75 @@
 // MIT License
 // Copyright (c) 2026 Christian Luppi
 
+#pragma once
+
 #include "../utils/cmdline.h"
 #include "primitive_types.h"
 
+// =========================================================================
+// Application Entry Points
+// =========================================================================
+
 #if defined(ENTRY_TYPE_APP)
 
-// This follows's SDL3 conventions for the entry point, which is cross-platform and supports Unicode command lines.
+// SDL-style application lifecycle used for cross-platform entry handling.
+// The runtime owns the outer platform entry point and forwards the parsed
+// command line plus caller-managed state through this interface.
 
-// TODO: Will implement this later...
+typedef enum app_result {
+  APP_RESULT_CONTINUE,  // Continue calling update().
+  APP_RESULT_SUCCESS,   // Exit successfully.
+  APP_RESULT_FAIL,      // Exit with failure.
+  APP_RESULT_MAX,
+} app_result;
+
+// Called once before the main loop starts.
+// Implementations can allocate and store user state through state.
+func app_result init(cmdline cmdl, void** state);
+
+// Called repeatedly until it returns APP_RESULT_SUCCESS or APP_RESULT_FAIL.
+func app_result update(void* state);
+
+// Called once during shutdown, even after a failed init().
+func void quit(void* state);
 
 #elif defined(ENTRY_TYPE_MAIN)
 
-// Standard C/C++ entry point.
-// The main function is called with the command line arguments.
-
-// Returns 1 on success, 0 on failure.
-func b32 main(cmdline cmdl);
+// Simple command-line entry point wrapper.
+// Returns true on success, false on failure.
+func b32 entry_main(cmdline cmdl);
 
 #elif defined(ENTRY_TYPE_MODULE)
 
-// A module is essentially a DLL with a standardized entry point.
-// The module_init function is called when the module is loaded,
-// and module_quit is called when the module is unloaded.
-// This is because there's a custom module system.
+// Module lifecycle used by the custom dynamic-module loader.
+// module_init() runs when the module is loaded and module_quit() runs when it
+// is unloaded.
 
-// Initializes the module. Returns 1 on success, 0 on failure.
+// Exported wrapper used by the module loader.
 func dll_export b32 module_init(void);
 
-// Quits the module, its fine to call even if init failed.
+// Exported wrapper used by the module loader.
 func dll_export void module_quit(void);
+
+// User callback invoked after entry_init() succeeds.
+// Returns true on success, false on failure.
+func b32 entry_module_init(void);
+
+// User callback invoked before entry_quit().
+// Safe to call even if initialization failed.
+func void entry_module_quit(void);
 
 #endif
 
-// The following function must be implemented if you use a custom
-// entry point (none of the above).
-// All above entry points call this internally.
+// =========================================================================
+// Shared Program Lifecycle
+// =========================================================================
 
-// Initializes the program. Returns 1 on success, 0 on failure.
+// Common initialization hook used by custom entry points.
+// The built-in entry paths above also route through this function internally.
+// Returns true on success, false on failure.
 func b32 entry_init(cmdline cmdline);
 
-// Quits the program, its fine to call even if init failed.
+// Common shutdown hook paired with entry_init().
+// Safe to call even if initialization failed.
 func void entry_quit(void);
