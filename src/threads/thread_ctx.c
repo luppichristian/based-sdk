@@ -106,6 +106,14 @@ func b32 thread_ctx_log_sync_from_main(void) {
   return true;
 }
 
+func void thread_ctx_log_begin_frame(void) {
+  log_state_begin_frame(thread_ctx_get_log_state());
+}
+
+func log_frame* thread_ctx_log_end_frame(u32 severity_mask) {
+  return log_state_end_frame(thread_ctx_get_log_state(), severity_mask);
+}
+
 func b32 thread_ctx_init(allocator main_allocator) {
   if (!main_allocator.alloc_fn || tls_thread_ctx.is_initialized) {
     return false;

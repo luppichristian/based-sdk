@@ -30,6 +30,26 @@ typedef enum log_level {
 // otherwise it will be ignored.
 typedef b32 (*log_callback)(log_level level, const char* msg, callsite site);
 
+// Bitmask helper for filtering one or more severities.
+#define log_level_mask(level) (1u << (level))
+
+// One retained log message stored in a linked list owned by a log_state or log_frame.
+typedef struct log_message {
+  struct log_message* next;
+  log_level level;
+  callsite site;
+  const c8* text;
+} log_message;
+
+// One log frame. log_state owns a persistent root frame for retained history,
+// and may also hold a stack of active nested frames.
+typedef struct log_frame {
+  struct log_frame* prev_active;
+  log_message* messages_head;
+  log_message* messages_tail;
+  sz message_count;
+} log_frame;
+
 // Per-thread (or caller-owned) log configuration.
 // The mutex is optional. When present, it serializes access to callback/level.
 typedef struct log_state {
@@ -37,6 +57,8 @@ typedef struct log_state {
   mutex mutex_handle;
   log_level level;
   log_callback callback;
+  log_frame* root_frame;
+  log_frame* active_frame;
 } log_state;
 
 // Returns label string for the given log level.
@@ -59,9 +81,41 @@ func void log_state_set_level(log_state* state, log_level level);
 // Sets the callback for the given state.
 func void log_state_set_callback(log_state* state, log_callback callback);
 
-// Copies the effective level/callback from src into dst.
-// This does not create or destroy mutexes; each state keeps its own locking mode.
+// Moves the retained root-frame messages from src into dst by splicing the
+// linked list nodes directly. Messages are appended to dst->root_frame and
+// removed from src->root_frame.
+// This does not modify either state's level, callback, mutex ownership,
+// or active nested frame stack.
 func void log_state_sync(log_state* dst, log_state* src);
+
+// Begins a nested log frame on the given state.
+// Messages logged after this call are included in the frame until it is ended.
+func void log_state_begin_frame(log_state* state);
+
+// Ends the most recent log frame and returns a snapshot of messages collected
+// since the matching log_state_begin_frame call.
+// severity_mask filters the returned messages; pass 0 to include all severities.
+// Returns NULL when there is no active frame or when no messages matched.
+func log_frame* log_state_end_frame(log_state* state, u32 severity_mask);
+
+// Global-state wrappers for log frames.
+func void log_begin_frame(void);
+func log_frame* log_end_frame(u32 severity_mask);
+
+// Frame helpers.
+func void log_frame_destroy(log_frame* frame);
+func b32 log_frame_has_messages(log_frame* frame);
+func sz log_frame_message_count(log_frame* frame);
+func log_message* log_frame_first(log_frame* frame);
+func log_message* log_frame_last(log_frame* frame);
+func log_message* log_message_next(log_message* message);
+func log_level log_message_level(log_message* message);
+func callsite log_message_site(log_message* message);
+func const c8* log_message_text(log_message* message);
+
+// Iterates over every message in a log frame from first to last.
+#define LOG_FRAME_FOREACH(frame, it) \
+  for (log_message* it = log_frame_first(frame); (it) != NULL; (it) = log_message_next(it))
 
 // Returns the process-global fallback log state.
 // It is created lazily on first use and is safe to use from any thread.

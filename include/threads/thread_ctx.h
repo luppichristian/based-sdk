@@ -72,9 +72,15 @@ func void thread_ctx_clear_temp(void);
 func void thread_ctx_log_set_level(log_level level);
 func void thread_ctx_log_set_callback(log_callback callback);
 
-// Copies the process-global log configuration into the current thread_ctx log state.
+// Moves the process-global retained root-frame messages into the current
+// thread_ctx log state. The current thread's callback and severity level are
+// left unchanged.
 // Returns false if the current thread has no initialized thread_ctx.
 func b32 thread_ctx_log_sync_from_main(void);
+
+// Thread-context wrappers for nested log frames.
+func void thread_ctx_log_begin_frame(void);
+func log_frame* thread_ctx_log_end_frame(u32 severity_mask);
 
 // Convenience macros for logging against the current thread's effective log state.
 #define thread_log_fatal(...)   _log(thread_ctx_get_log_state(), LOG_LEVEL_FATAL, CALLSITE_HERE, __VA_ARGS__)
