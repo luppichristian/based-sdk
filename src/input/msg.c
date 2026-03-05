@@ -10,12 +10,14 @@ func void tablet_internal_on_msg(const msg* src);
 func void keyboard_internal_on_msg(const msg* src);
 func void mouse_internal_on_msg(const msg* src);
 func void gamepads_internal_on_msg(const msg* src);
+func void bindings_internal_on_msg(const msg* src);
 
 func void msg_notify_internal_listeners(const msg* src) {
   keyboard_internal_on_msg(src);
   mouse_internal_on_msg(src);
   gamepads_internal_on_msg(src);
   tablet_internal_on_msg(src);
+  bindings_internal_on_msg(src);
 }
 
 const_var i32 MSG_PAYLOAD_CODE = 0x42415345;
