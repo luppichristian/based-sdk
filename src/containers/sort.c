@@ -321,13 +321,13 @@ func sz sort_quick(
     return elem_count;
   }
 
-  if (elem_count > (((sz)-1) / sizeof(sort_range))) {
+  if (elem_count > (((sz)-1) / size_of(sort_range))) {
     sort_quick_recursive(base_ptr, 0, elem_count, elem_size, compare, user_data);
     return elem_count;
   }
 
   struct allocator alc = allocator;
-  sz stack_size = elem_count * sizeof(sort_range);
+  sz stack_size = elem_count * size_of(sort_range);
   sort_range* stack_ptr = (sort_range*)allocator_alloc(&alc, stack_size);
   if (!stack_ptr) {
     sort_quick_recursive(base_ptr, 0, elem_count, elem_size, compare, user_data);

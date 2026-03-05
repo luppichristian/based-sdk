@@ -84,7 +84,7 @@ func allocator heap_get_allocator(heap* hep);
 
 // Attaches a caller-owned memory region to the heap's block chain.
 // The region must remain valid for the lifetime of the heap (or until removed).
-// sizeof(heap_block) bytes are consumed by the embedded block header; the remaining
+// size_of(heap_block) bytes are consumed by the embedded block header; the remaining
 // memory is carved into a single free chunk ready for allocation.
 func void heap_add_block(heap* hep, void* ptr, sz size);
 
@@ -132,11 +132,11 @@ func void* _heap_realloc(
 // heap_alloc_array  allocates an array of count elements of type.
 // heap_realloc_array resizes a previously allocated array of type.
 #define heap_alloc_type(hp, type) \
-  ((type*)heap_alloc(hp, sizeof(type), align_of(type)))
+  ((type*)heap_alloc(hp, size_of(type), align_of(type)))
 #define heap_alloc_array(hp, type, count) \
-  ((type*)heap_alloc(hp, sizeof(type) * (count), align_of(type)))
+  ((type*)heap_alloc(hp, size_of(type) * (count), align_of(type)))
 #define heap_realloc_array(hp, ptr, old_count, new_count, type) \
-  ((type*)heap_realloc(hp, ptr, sizeof(type) * (old_count), sizeof(type) * (new_count), align_of(type)))
+  ((type*)heap_realloc(hp, ptr, size_of(type) * (old_count), size_of(type) * (new_count), align_of(type)))
 
 // =========================================================================
 // Lifecycle

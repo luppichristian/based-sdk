@@ -18,9 +18,9 @@ func b32 ctx_init(ctx* context, allocator main_allocator, b32 use_log_mutex) {
   assert(main_allocator.dealloc_fn != NULL);
   assert(use_log_mutex == 0 || use_log_mutex == 1);
 
-  memset(context, 0, sizeof(*context));
+  memset(context, 0, size_of(*context));
   if (!log_state_init(&context->log, use_log_mutex)) {
-    memset(context, 0, sizeof(*context));
+    memset(context, 0, size_of(*context));
     return false;
   }
 
@@ -45,7 +45,7 @@ func void ctx_quit(ctx* context) {
   arena_destroy(&context->perm_arena);
   log_state_quit(&context->log);
   thread_log_trace("ctx_quit: context=%p", (void*)context);
-  memset(context, 0, sizeof(*context));
+  memset(context, 0, size_of(*context));
 }
 
 func b32 ctx_is_init(ctx* context) {

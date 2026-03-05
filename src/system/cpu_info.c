@@ -138,8 +138,8 @@ func void cpu_fill_x86_strings(cpu_info* out_info) {
 
   i32 brand_regs[12];
   c8 brand_name[49];
-  memset(brand_regs, 0, sizeof(brand_regs));
-  memset(brand_name, 0, sizeof(brand_name));
+  memset(brand_regs, 0, size_of(brand_regs));
+  memset(brand_name, 0, size_of(brand_name));
   cpu_read_cpuid(0x80000002U, 0, &brand_regs[0]);
   cpu_read_cpuid(0x80000003U, 0, &brand_regs[4]);
   cpu_read_cpuid(0x80000004U, 0, &brand_regs[8]);
@@ -196,7 +196,7 @@ func b32 cpu_info_query(cpu_info* out_info) {
   }
   assert(out_info != NULL);
 
-  memset(out_info, 0, sizeof(*out_info));
+  memset(out_info, 0, size_of(*out_info));
   out_info->logical_core_count = cpu_query_logical_cores();
   out_info->cache_line_bytes = 64;
   cpu_set_compile_time_fallback(out_info);

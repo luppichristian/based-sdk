@@ -181,20 +181,20 @@ const_var dp DP_MAX = PTRDIFF_MAX;
 // Compile-time size guarantees
 // =========================================================================
 
-static_assert(sizeof(i8) == 1);
-static_assert(sizeof(u8) == 1);
-static_assert(sizeof(i16) == 2);
-static_assert(sizeof(u16) == 2);
-static_assert(sizeof(i32) == 4);
-static_assert(sizeof(u32) == 4);
-static_assert(sizeof(i64) == 8);
-static_assert(sizeof(u64) == 8);
-static_assert(sizeof(f32) == 4);
-static_assert(sizeof(f64) == 8);
-static_assert(sizeof(b8) == 1);
-static_assert(sizeof(b16) == 2);
-static_assert(sizeof(b32) == 4);
-static_assert(sizeof(b64) == 8);
-static_assert(sizeof(c8) == 1);
-static_assert(sizeof(c16) == 2);
-static_assert(sizeof(c32) == 4);
+static_assert(size_of(i8) == 1);
+static_assert(size_of(u8) == 1);
+static_assert(size_of(i16) == 2);
+static_assert(size_of(u16) == 2);
+static_assert(size_of(i32) == 4);
+static_assert(size_of(u32) == 4);
+static_assert(size_of(i64) == 8);
+static_assert(size_of(u64) == 8);
+static_assert(size_of(f32) == 4);
+static_assert(size_of(f64) == 8);
+static_assert(size_of(b8) == 1);
+static_assert(size_of(b16) == 2);
+static_assert(size_of(b32) == 4);
+static_assert(size_of(b64) == 8);
+static_assert(size_of(c8) == 1);
+static_assert(size_of(c16) == 2);
+static_assert(size_of(c32) == 4);

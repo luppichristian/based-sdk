@@ -13,10 +13,10 @@
 //   atomic_u64 { u64 val; }  <->  _Atomic uint64_t                (C11; lock-free on all targets)
 // The (void*) intermediate cast is the idiomatic C way to suppress strict-aliasing analysis
 // while preserving defined pointer-conversion semantics.
-static_assert(sizeof(atomic_i32) == sizeof(SDL_AtomicInt));
-static_assert(sizeof(atomic_u32) == sizeof(SDL_AtomicU32));
-static_assert(sizeof(atomic_i64) == sizeof(_Atomic int64_t));
-static_assert(sizeof(atomic_u64) == sizeof(_Atomic uint64_t));
+static_assert(size_of(atomic_i32) == size_of(SDL_AtomicInt));
+static_assert(size_of(atomic_u32) == size_of(SDL_AtomicU32));
+static_assert(size_of(atomic_i64) == size_of(_Atomic int64_t));
+static_assert(size_of(atomic_u64) == size_of(_Atomic uint64_t));
 
 // =========================================================================
 // atomic_i32

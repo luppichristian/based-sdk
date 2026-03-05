@@ -62,7 +62,7 @@ func b32 hash_map_rehash(hash_map* map, sz new_cap) {
   }
   assert(map != NULL);
   hash_map_slot* new_slots =
-      (hash_map_slot*)allocator_calloc(&map->alloc, new_cap, sizeof(hash_map_slot));
+      (hash_map_slot*)allocator_calloc(&map->alloc, new_cap, size_of(hash_map_slot));
   if (!new_slots) {
     return 0;
   }
@@ -75,7 +75,7 @@ func b32 hash_map_rehash(hash_map* map, sz new_cap) {
   }
 
   if (map->slots) {
-    allocator_dealloc(&map->alloc, map->slots, map->cap * sizeof(hash_map_slot));
+    allocator_dealloc(&map->alloc, map->slots, map->cap * size_of(hash_map_slot));
   }
   map->slots = new_slots;
   map->cap = new_cap;
@@ -110,7 +110,7 @@ func hash_map_slot* hash_map_find_slot(hash_map* map, u64 key) {
 
 func hash_map hash_map_create(sz cap, allocator alloc) {
   hash_map map;
-  memset(&map, 0, sizeof(map));
+  memset(&map, 0, size_of(map));
   map.alloc = alloc;
   assert(alloc.alloc_fn != NULL);
   assert(alloc.dealloc_fn != NULL);
@@ -120,7 +120,7 @@ func hash_map hash_map_create(sz cap, allocator alloc) {
     actual *= 2;
   }
   map.cap = actual;
-  map.slots = (hash_map_slot*)allocator_calloc(&map.alloc, actual, sizeof(hash_map_slot));
+  map.slots = (hash_map_slot*)allocator_calloc(&map.alloc, actual, size_of(hash_map_slot));
   return map;
 }
 
@@ -129,7 +129,7 @@ func void hash_map_destroy(hash_map* map) {
     return;
   }
   if (map->slots) {
-    allocator_dealloc(&map->alloc, map->slots, map->cap * sizeof(hash_map_slot));
+    allocator_dealloc(&map->alloc, map->slots, map->cap * size_of(hash_map_slot));
     map->slots = NULL;
   }
   map->count = 0;
@@ -141,7 +141,7 @@ func void hash_map_clear(hash_map* map) {
     return;
   }
   if (map->slots) {
-    memset(map->slots, 0, map->cap * sizeof(hash_map_slot));
+    memset(map->slots, 0, map->cap * size_of(hash_map_slot));
   }
   map->count = 0;
 }
@@ -207,7 +207,7 @@ func b32 hash_map_remove(hash_map* map, u64 key) {
         sz nxt = (cur + 1) & (map->cap - 1);
         hash_map_slot* next_slot = &map->slots[nxt];
         if (!next_slot->occupied || next_slot->probe_dist == 0) {
-          memset(&map->slots[cur], 0, sizeof(hash_map_slot));
+          memset(&map->slots[cur], 0, size_of(hash_map_slot));
           break;
         }
         map->slots[cur] = *next_slot;

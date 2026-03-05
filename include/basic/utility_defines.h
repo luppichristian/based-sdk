@@ -83,10 +83,10 @@ Big numeric utilities (powers of 1000):
 // =========================================================================
 
 // count_of — number of elements in a fixed-size array.
-#define count_of(x) (sizeof(x) / sizeof((x)[0]))
+#define count_of(x) (size_of(x) / size_of((x)[0]))
 
 // size_of_each — size in bytes of a single element of a fixed-size array.
-#define size_of_each(x) sizeof((x)[0])
+#define size_of_each(x) size_of((x)[0])
 
 // multiline_literal — converts a multi-line token sequence into a string literal.
 #define multiline_literal(...) stringify_exp(__VA_ARGS__)
@@ -115,7 +115,7 @@ Big numeric utilities (powers of 1000):
 // =========================================================================
 
 // field_sizeof — size in bytes of a field within a struct.
-#define field_sizeof(type, field) sizeof(((type*)0)->field)
+#define field_sizeof(type, field) size_of(((type*)0)->field)
 
 // offset_of — byte offset of a field within a struct.
 #define offset_of(type, field) offsetof(type, field)

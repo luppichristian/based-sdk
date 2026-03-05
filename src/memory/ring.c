@@ -13,7 +13,7 @@
 
 func ring ring_create(void* ptr, sz capacity, mutex opt_mutex) {
   ring rng;
-  memset(&rng, 0, sizeof(rng));
+  memset(&rng, 0, size_of(rng));
   rng.ptr = (u8*)ptr;
   rng.capacity = capacity;
   rng.opt_mutex = opt_mutex;
@@ -23,7 +23,7 @@ func ring ring_create(void* ptr, sz capacity, mutex opt_mutex) {
   lifecycle_msg.object_lifecycle.object_type = (u32)MSG_OBJECT_TYPE_RING;
   lifecycle_msg.object_lifecycle.object_ptr = &rng;
   if (!msg_post(&lifecycle_msg)) {
-    memset(&rng, 0, sizeof(rng));
+    memset(&rng, 0, size_of(rng));
   }
   thread_log_trace("ring_create: capacity=%zu", (size_t)capacity);
   return rng;
@@ -37,7 +37,7 @@ func ring ring_create_mutexed(void* ptr, sz capacity) {
 
 func ring ring_create_alloc(allocator parent_alloc, sz capacity, mutex opt_mutex) {
   ring rng;
-  memset(&rng, 0, sizeof(rng));
+  memset(&rng, 0, size_of(rng));
   rng.parent = parent_alloc;
   rng.capacity = capacity;
   rng.opt_mutex = opt_mutex;
@@ -54,7 +54,7 @@ func ring ring_create_alloc(allocator parent_alloc, sz capacity, mutex opt_mutex
     if (rng.buf_owned && rng.parent.alloc_fn) {
       _allocator_dealloc(&rng.parent, rng.ptr, rng.capacity, CALLSITE_HERE);
     }
-    memset(&rng, 0, sizeof(rng));
+    memset(&rng, 0, size_of(rng));
   }
   thread_log_trace("ring_create_alloc: capacity=%zu", (size_t)capacity);
   return rng;

@@ -78,7 +78,7 @@ func b32 runtime_query_linux_cpu(runtime_cpu_sample* out_sample) {
   }
 
   c8 line_buffer[256];
-  if (fgets(line_buffer, sizeof(line_buffer), stat_file) == NULL) {
+  if (fgets(line_buffer, size_of(line_buffer), stat_file) == NULL) {
     fclose(stat_file);
     return 0;
   }
@@ -146,12 +146,12 @@ func b32 system_runtime_query(system_runtime_info* out_info) {
   }
   assert(out_info != NULL);
 
-  memset(out_info, 0, sizeof(*out_info));
+  memset(out_info, 0, size_of(*out_info));
 
 #if defined(PLATFORM_WINDOWS)
   MEMORYSTATUSEX memory_status;
-  memset(&memory_status, 0, sizeof(memory_status));
-  memory_status.dwLength = sizeof(memory_status);
+  memset(&memory_status, 0, size_of(memory_status));
+  memory_status.dwLength = size_of(memory_status);
   if (GlobalMemoryStatusEx(&memory_status) == 0) {
     return 0;
   }
@@ -161,7 +161,7 @@ func b32 system_runtime_query(system_runtime_info* out_info) {
   out_info->memory_used = out_info->memory_total - out_info->memory_available;
 
   PROCESS_MEMORY_COUNTERS memory_counters;
-  memset(&memory_counters, 0, sizeof(memory_counters));
+  memset(&memory_counters, 0, size_of(memory_counters));
   get_process_memory_info_fn get_memory_info = NULL;
   HMODULE psapi_module = NULL;
   HMODULE kernel_module = GetModuleHandleA("kernel32.dll");
@@ -178,7 +178,7 @@ func b32 system_runtime_query(system_runtime_info* out_info) {
   }
 
   if (get_memory_info != NULL &&
-      get_memory_info(GetCurrentProcess(), &memory_counters, sizeof(memory_counters)) != 0) {
+      get_memory_info(GetCurrentProcess(), &memory_counters, size_of(memory_counters)) != 0) {
     out_info->process_memory_used = (sz)memory_counters.WorkingSetSize;
     out_info->process_memory_peak = (sz)memory_counters.PeakWorkingSetSize;
   }
@@ -239,7 +239,7 @@ func b32 system_runtime_query(system_runtime_info* out_info) {
   }
 
   struct rusage usage_info;
-  memset(&usage_info, 0, sizeof(usage_info));
+  memset(&usage_info, 0, size_of(usage_info));
   if (getrusage(RUSAGE_SELF, &usage_info) == 0) {
     out_info->process_memory_peak = (sz)((u64)usage_info.ru_maxrss * 1024ULL);
   }
@@ -266,7 +266,7 @@ func b32 system_runtime_query(system_runtime_info* out_info) {
   return 1;
 #elif defined(PLATFORM_MACOS) || defined(PLATFORM_IOS)
   u64 total_memory = 0;
-  sz total_size = sizeof(total_memory);
+  sz total_size = size_of(total_memory);
   if (sysctlbyname("hw.memsize", &total_memory, &total_size, NULL, 0) == 0) {
     out_info->memory_total = (sz)total_memory;
   }

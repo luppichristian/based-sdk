@@ -15,7 +15,7 @@
 func void arena_block_setup(arena_block* blk, sz size, b8 owned) {
   blk->next = NULL;
   blk->size = size;
-  blk->used = sizeof(arena_block);
+  blk->used = size_of(arena_block);
   blk->owned = owned;
 }
 
@@ -49,7 +49,7 @@ func void* arena_block_alloc(arena_block* blk, sz size, sz align) {
 
 func void* arena_alloc_callback(void* user_data, callsite site, sz size) {
   arena* arn = (arena*)user_data;
-  return _arena_alloc(arn, size, sizeof(void*), site);
+  return _arena_alloc(arn, size, size_of(void*), site);
 }
 
 func void arena_dealloc_callback(void* user_data, callsite site, void* ptr) {
@@ -65,7 +65,7 @@ func void* arena_realloc_callback(
     sz old_size,
     sz new_size) {
   arena* arn = (arena*)user_data;
-  return _arena_realloc(arn, ptr, old_size, new_size, sizeof(void*), site);
+  return _arena_realloc(arn, ptr, old_size, new_size, size_of(void*), site);
 }
 
 // =========================================================================
@@ -74,7 +74,7 @@ func void* arena_realloc_callback(
 
 func arena arena_create(allocator parent_alloc, mutex opt_mutex, sz default_block_sz) {
   arena arn;
-  memset(&arn, 0, sizeof(arn));
+  memset(&arn, 0, size_of(arn));
   arn.parent = parent_alloc;
   arn.opt_mutex = opt_mutex;
   arn.default_block_sz = default_block_sz;
@@ -84,7 +84,7 @@ func arena arena_create(allocator parent_alloc, mutex opt_mutex, sz default_bloc
   lifecycle_msg.object_lifecycle.object_type = (u32)MSG_OBJECT_TYPE_ARENA;
   lifecycle_msg.object_lifecycle.object_ptr = &arn;
   if (!msg_post(&lifecycle_msg)) {
-    memset(&arn, 0, sizeof(arn));
+    memset(&arn, 0, size_of(arn));
   }
   thread_log_trace("arena_create: block_sz=%zu", (size_t)default_block_sz);
   return arn;
@@ -155,7 +155,7 @@ func allocator arena_get_allocator(arena* arn) {
 // =========================================================================
 
 func void arena_add_block(arena* arn, void* ptr, sz size) {
-  if (arn == NULL || ptr == NULL || size <= sizeof(arena_block)) {
+  if (arn == NULL || ptr == NULL || size <= size_of(arena_block)) {
     return;
   }
   assert(arn != NULL);
@@ -230,7 +230,7 @@ func void* _arena_alloc(arena* arn, sz size, sz align, callsite site) {
   }
 
   if (!result && arn->parent.alloc_fn) {
-    sz needed = sizeof(arena_block) + align + size;
+    sz needed = size_of(arena_block) + align + size;
     sz block_sz = arn->default_block_sz > needed ? arn->default_block_sz : needed;
     arena_block* new_blk = (arena_block*)_allocator_alloc(&arn->parent, block_sz, site);
     if (new_blk) {
@@ -314,7 +314,7 @@ func void arena_clear(arena* arn) {
 
   arena_block* blk = arn->blocks_head;
   while (blk) {
-    blk->used = sizeof(arena_block);
+    blk->used = size_of(arena_block);
     blk = blk->next;
   }
 

@@ -13,7 +13,7 @@
 
 // Intrusive header embedded at the start of every memory region managed by an arena.
 // Usable space begins immediately after this struct; arena_alloc advances the cursor
-// within [ptr + sizeof(arena_block), ptr + size).
+// within [ptr + size_of(arena_block), ptr + size).
 typedef struct arena_block {
   struct arena_block* next;
   sz size;   // Total byte size of the region, including this header.
@@ -70,8 +70,8 @@ func allocator arena_get_allocator(arena* arn);
 
 // Attaches a caller-owned memory region to the arena's block chain.
 // The region must remain valid for the lifetime of the arena (or until removed).
-// sizeof(arena_block) bytes are consumed by the embedded header; the remaining
-// size - sizeof(arena_block) bytes are available for allocations.
+// size_of(arena_block) bytes are consumed by the embedded header; the remaining
+// size - size_of(arena_block) bytes are available for allocations.
 func void arena_add_block(arena* arn, void* ptr, sz size);
 
 // Detaches the manually-added block whose base address equals ptr.
@@ -113,11 +113,11 @@ func void* _arena_realloc(
 // arena_alloc_array allocates an array of count elements of type.
 // arena_realloc_array resizes a previously allocated array of type.
 #define arena_alloc_type(arn, type) \
-  ((type*)arena_alloc(arn, sizeof(type), align_of(type)))
+  ((type*)arena_alloc(arn, size_of(type), align_of(type)))
 #define arena_alloc_array(arn, type, count) \
-  ((type*)arena_alloc(arn, sizeof(type) * (count), align_of(type)))
+  ((type*)arena_alloc(arn, size_of(type) * (count), align_of(type)))
 #define arena_realloc_array(arn, ptr, old_count, new_count, type) \
-  ((type*)arena_realloc(arn, ptr, sizeof(type) * (old_count), sizeof(type) * (new_count), align_of(type)))
+  ((type*)arena_realloc(arn, ptr, size_of(type) * (old_count), size_of(type) * (new_count), align_of(type)))
 
 // =========================================================================
 // Lifecycle

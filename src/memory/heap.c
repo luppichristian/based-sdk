@@ -13,14 +13,14 @@
 // =========================================================================
 
 // Bytes reserved before user data to store the back-pointer to heap_chunk.
-// Using sizeof(heap_chunk*) ensures the stored pointer is naturally aligned.
-const_var sz HEAP_BACK_REF_SZ = sizeof(heap_chunk*);
+// Using size_of(heap_chunk*) ensures the stored pointer is naturally aligned.
+const_var sz HEAP_BACK_REF_SZ = size_of(heap_chunk*);
 
 // Union used for type-safe pointer serialisation into/from a raw byte buffer.
 // This avoids multilevel pointer conversions that would be flagged by clang-tidy.
 typedef union heap_chunk_ref {
   heap_chunk* ptr;
-  u8 bytes[sizeof(heap_chunk*)];
+  u8 bytes[size_of(heap_chunk*)];
 } heap_chunk_ref;
 
 // Writes the chunk back-pointer into the padding bytes just before user_ptr.
@@ -64,15 +64,15 @@ func void heap_block_setup(heap* hep, heap_block* blk, sz size, b8 owned) {
   blk->size = size;
   blk->owned = owned;
 
-  sz body = size - sizeof(heap_block);
-  if (body <= sizeof(heap_chunk)) {
+  sz body = size - size_of(heap_block);
+  if (body <= size_of(heap_chunk)) {
     return;
   }
 
   heap_chunk* chunk = (heap_chunk*)(blk + 1);
   chunk->next_in_block = NULL;
   chunk->next_free = hep->free_head;
-  chunk->size = body - sizeof(heap_chunk);
+  chunk->size = body - size_of(heap_chunk);
   chunk->align_pad = 0;
   chunk->is_free = 1;
   hep->free_head = chunk;
@@ -113,12 +113,12 @@ func void* heap_try_alloc(heap* hep, sz size, sz eff_align) {
 
       sz remaining = avail - pad - size;
       // Split if the remainder can hold at least one minimal future allocation.
-      sz split_min = sizeof(heap_chunk) + HEAP_BACK_REF_SZ;
+      sz split_min = size_of(heap_chunk) + HEAP_BACK_REF_SZ;
       if (remaining >= split_min) {
         heap_chunk* split = (heap_chunk*)(usr + size);
         split->next_in_block = chunk->next_in_block;
         split->next_free = hep->free_head;
-        split->size = remaining - sizeof(heap_chunk);
+        split->size = remaining - size_of(heap_chunk);
         split->align_pad = 0;
         split->is_free = 1;
         hep->free_head = split;
@@ -148,7 +148,7 @@ func void* heap_try_alloc(heap* hep, sz size, sz eff_align) {
 
 func void* heap_alloc_callback(void* user_data, callsite site, sz size) {
   heap* hap = (heap*)user_data;
-  return _heap_alloc(hap, size, sizeof(void*), site);
+  return _heap_alloc(hap, size, size_of(void*), site);
 }
 
 func void heap_dealloc_callback(void* user_data, callsite site, void* ptr) {
@@ -163,7 +163,7 @@ func void* heap_realloc_callback(
     sz old_size,
     sz new_size) {
   heap* hap = (heap*)user_data;
-  return _heap_realloc(hap, ptr, old_size, new_size, sizeof(void*), site);
+  return _heap_realloc(hap, ptr, old_size, new_size, size_of(void*), site);
 }
 
 // =========================================================================
@@ -172,7 +172,7 @@ func void* heap_realloc_callback(
 
 func heap heap_create(allocator parent_alloc, mutex opt_mutex, sz default_block_sz) {
   heap hep;
-  memset(&hep, 0, sizeof(hep));
+  memset(&hep, 0, size_of(hep));
   hep.parent = parent_alloc;
   hep.opt_mutex = opt_mutex;
   hep.default_block_sz = default_block_sz;
@@ -182,7 +182,7 @@ func heap heap_create(allocator parent_alloc, mutex opt_mutex, sz default_block_
   lifecycle_msg.object_lifecycle.object_type = (u32)MSG_OBJECT_TYPE_HEAP;
   lifecycle_msg.object_lifecycle.object_ptr = &hep;
   if (!msg_post(&lifecycle_msg)) {
-    memset(&hep, 0, sizeof(hep));
+    memset(&hep, 0, size_of(hep));
   }
   thread_log_trace("heap_create: block_sz=%zu", (size_t)default_block_sz);
   return hep;
@@ -254,7 +254,7 @@ func allocator heap_get_allocator(heap* hep) {
 // =========================================================================
 
 func void heap_add_block(heap* hep, void* ptr, sz size) {
-  if (hep == NULL || ptr == NULL || size <= sizeof(heap_block)) {
+  if (hep == NULL || ptr == NULL || size <= size_of(heap_block)) {
     return;
   }
   if (hep->opt_mutex) {
@@ -333,7 +333,7 @@ func void* _heap_alloc(heap* hep, sz size, sz align, callsite site) {
   void* result = heap_try_alloc(hep, size, eff_align);
 
   if (!result && hep->parent.alloc_fn) {
-    sz overhead = sizeof(heap_block) + sizeof(heap_chunk) + HEAP_BACK_REF_SZ;
+    sz overhead = size_of(heap_block) + size_of(heap_chunk) + HEAP_BACK_REF_SZ;
     sz needed = overhead + size;
     sz block_sz = hep->default_block_sz > needed ? hep->default_block_sz : needed;
     heap_block* new_blk = (heap_block*)_allocator_alloc(&hep->parent, block_sz, site);
@@ -372,7 +372,7 @@ func void _heap_dealloc(heap* hep, void* ptr, callsite site) {
   heap_chunk* nxt = chunk->next_in_block;
   if (nxt && nxt->is_free) {
     heap_free_list_remove(hep, nxt);
-    chunk->size += sizeof(heap_chunk) + nxt->size;
+    chunk->size += size_of(heap_chunk) + nxt->size;
     chunk->next_in_block = nxt->next_in_block;
   }
 
@@ -409,7 +409,7 @@ func void* _heap_realloc(
     // Try to extend in place by absorbing the immediately following free chunk.
     heap_chunk* nxt = chunk->next_in_block;
     if (nxt && nxt->is_free) {
-      sz combined = chunk->size + sizeof(heap_chunk) + nxt->size;
+      sz combined = chunk->size + size_of(heap_chunk) + nxt->size;
       if (combined >= new_size) {
         heap_free_list_remove(hep, nxt);
         chunk->size = combined;
@@ -452,12 +452,12 @@ func void heap_clear(heap* hep) {
 
   heap_block* blk = hep->blocks_head;
   while (blk) {
-    sz body = blk->size - sizeof(heap_block);
-    if (body > sizeof(heap_chunk)) {
+    sz body = blk->size - size_of(heap_block);
+    if (body > size_of(heap_chunk)) {
       heap_chunk* chunk = (heap_chunk*)(blk + 1);
       chunk->next_in_block = NULL;
       chunk->next_free = hep->free_head;
-      chunk->size = body - sizeof(heap_chunk);
+      chunk->size = body - size_of(heap_chunk);
       chunk->align_pad = 0;
       chunk->is_free = 1;
       hep->free_head = chunk;

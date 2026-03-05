@@ -54,7 +54,7 @@ func i32 thread_entry_wrapper(void* raw) {
     thread_ctx_quit();
   }
 
-  allocator_dealloc(&payload->payload_allocator, payload, sizeof(*payload));
+  allocator_dealloc(&payload->payload_allocator, payload, size_of(*payload));
   return exit_code;
 }
 
@@ -76,7 +76,7 @@ func thread thread_create_impl(thread_func entry, void* arg, cstr8 name, allocat
     return NULL;
   }
 
-  thread_entry_payload* payload = (thread_entry_payload*)allocator_alloc(&payload_allocator, sizeof(*payload));
+  thread_entry_payload* payload = (thread_entry_payload*)allocator_alloc(&payload_allocator, size_of(*payload));
   if (!payload) {
     return NULL;
   }
@@ -92,7 +92,7 @@ func thread thread_create_impl(thread_func entry, void* arg, cstr8 name, allocat
 
   thread thd = (thread)SDL_CreateThread(thread_entry_wrapper, name, payload);
   if (!thd) {
-    allocator_dealloc(&payload_allocator, payload, sizeof(*payload));
+    allocator_dealloc(&payload_allocator, payload, size_of(*payload));
     thread_log_error("thread_create_impl: SDL_CreateThread failed name=%s", name != NULL ? name : "<null>");
     return NULL;
   }

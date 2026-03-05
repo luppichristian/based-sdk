@@ -89,8 +89,8 @@ func void system_query_windows_version(system_info* out_info) {
   }
 
   OSVERSIONINFOW version_info;
-  memset(&version_info, 0, sizeof(version_info));
-  version_info.dwOSVersionInfoSize = sizeof(version_info);
+  memset(&version_info, 0, size_of(version_info));
+  version_info.dwOSVersionInfoSize = size_of(version_info);
 
   if (get_version(&version_info) != 0) {
     system_copy_string(out_info->os_name, size_of(out_info->os_name), "Windows");
@@ -113,7 +113,7 @@ func b32 system_info_query(system_info* out_info) {
   }
   assert(out_info != NULL);
 
-  memset(out_info, 0, sizeof(*out_info));
+  memset(out_info, 0, size_of(*out_info));
   system_copy_string(out_info->architecture_name,
                      size_of(out_info->architecture_name),
                      system_architecture_name());

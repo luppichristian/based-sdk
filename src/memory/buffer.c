@@ -115,7 +115,7 @@ func void buffer_set8(buffer buff, u8 value) {
 
 func void buffer_set16(buffer buff, u16 value) {
   u16* data = (u16*)buff.ptr;
-  sz count = buff.size / sizeof(u16);
+  sz count = buff.size / size_of(u16);
   for (sz idx = 0; idx < count; idx++) {
     data[idx] = value;
   }
@@ -123,7 +123,7 @@ func void buffer_set16(buffer buff, u16 value) {
 
 func void buffer_set32(buffer buff, u32 value) {
   u32* data = (u32*)buff.ptr;
-  sz count = buff.size / sizeof(u32);
+  sz count = buff.size / size_of(u32);
   for (sz idx = 0; idx < count; idx++) {
     data[idx] = value;
   }
@@ -131,7 +131,7 @@ func void buffer_set32(buffer buff, u32 value) {
 
 func void buffer_set64(buffer buff, u64 value) {
   u64* data = (u64*)buff.ptr;
-  sz count = buff.size / sizeof(u64);
+  sz count = buff.size / size_of(u64);
   for (sz idx = 0; idx < count; idx++) {
     data[idx] = value;
   }

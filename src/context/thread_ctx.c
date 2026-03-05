@@ -104,9 +104,9 @@ func b32 thread_ctx_init(allocator main_allocator) {
     return false;
   }
 
-  memset(&thread_ctx, 0, sizeof(thread_ctx));
+  memset(&thread_ctx, 0, size_of(thread_ctx));
   if (!ctx_init(&thread_ctx, main_allocator, false)) {
-    memset(&thread_ctx, 0, sizeof(thread_ctx));
+    memset(&thread_ctx, 0, size_of(thread_ctx));
     return false;
   }
 

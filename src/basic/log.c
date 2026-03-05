@@ -103,12 +103,12 @@ func void log_state_unlock_pair(log_state* first, log_state* second) {
 
 func log_frame* log_frame_create(void) {
   allocator alloc = log_allocator_resolve();
-  log_frame* frame = (log_frame*)allocator_alloc(&alloc, sizeof(*frame));
+  log_frame* frame = (log_frame*)allocator_alloc(&alloc, size_of(*frame));
   if (!frame) {
     return NULL;
   }
   assert(alloc.alloc_fn != NULL);
-  memset(frame, 0, sizeof(*frame));
+  memset(frame, 0, size_of(*frame));
   return frame;
 }
 
@@ -120,14 +120,14 @@ func log_msg* log_msg_create(log_level level, callsite site, cstr8 msg) {
     return NULL;
   }
   text_len = cstr8_len(msg);
-  total_size = sizeof(log_msg) + text_len + 1;
+  total_size = size_of(log_msg) + text_len + 1;
   log_msg* message = (log_msg*)allocator_alloc(&alloc, total_size);
   if (!message) {
     return NULL;
   }
 
   assert(msg != NULL);
-  memset(message, 0, sizeof(*message));
+  memset(message, 0, size_of(*message));
   message->level = level;
   message->site = site;
   message->text = (cstr8)(message + 1);
@@ -143,7 +143,7 @@ func void log_msg_destroy(log_msg* message) {
   }
   assert(message->text != NULL);
   text_len = cstr8_len(message->text);
-  allocator_dealloc(&alloc, message, sizeof(*message) + text_len + 1);
+  allocator_dealloc(&alloc, message, size_of(*message) + text_len + 1);
 }
 
 func void log_msg_list_destroy(log_msg* head) {
@@ -187,7 +187,7 @@ func void log_frame_destroy_unsafe(log_frame* frame) {
   }
 
   log_frame_clear_messages_unsafe(frame);
-  allocator_dealloc(&alloc, frame, sizeof(*frame));
+  allocator_dealloc(&alloc, frame, size_of(*frame));
 }
 
 func void log_state_store_message(log_state* state, log_level level, callsite site, cstr8 msg) {
@@ -309,7 +309,7 @@ func b32 log_state_init(log_state* state, b32 use_mutex) {
   }
   assert(use_mutex == 0 || use_mutex == 1);
 
-  memset(state, 0, sizeof(*state));
+  memset(state, 0, size_of(*state));
   state->level = LOG_LEVEL_DEFAULT;
   state->root_frame = log_frame_create();
   if (!state->root_frame) {
@@ -356,7 +356,7 @@ func void log_state_quit(log_state* state) {
     mutex_lock(state_mutex);
   }
   log_state_clear_frames_unsafe(state);
-  memset(state, 0, sizeof(*state));
+  memset(state, 0, size_of(*state));
   if (state_mutex) {
     mutex_unlock(state_mutex);
     mutex_destroy(state_mutex);
@@ -539,7 +539,7 @@ func void _log(log_state* state, log_level level, callsite site, cstr8 fmt, ...)
   str8_large buf = {0};
   va_list args;
   va_start(args, fmt);
-  vsnprintf(buf, sizeof(buf), fmt, args);
+  vsnprintf(buf, size_of(buf), fmt, args);
   va_end(args);
 
   msg log_msg = {0};
@@ -547,7 +547,7 @@ func void _log(log_state* state, log_level level, callsite site, cstr8 fmt, ...)
   log_msg.log.state_ptr = resolved;
   log_msg.log.level = level;
   log_msg.log.source_site = site;
-  snprintf(log_msg.log.text, sizeof(log_msg.log.text), "%s", buf);
+  snprintf(log_msg.log.text, size_of(log_msg.log.text), "%s", buf);
   if (!msg_post(&log_msg)) {
     return;
   }

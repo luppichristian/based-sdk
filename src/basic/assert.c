@@ -7,7 +7,7 @@
 #include "input/msg.h"
 #include "threads/atomics.h"
 #include "../sdl3_include.h"
-
+#include "basic/utility_defines.h"
 #include <stdlib.h>
 
 // =========================================================================
@@ -50,7 +50,7 @@ func void assert_log_msg(cstr8 msg, callsite site) {
 // Defaults to quit if the message box cannot be displayed.
 func i32 assert_dialog(cstr8 msg, callsite site) {
   str8_long buf = {0};
-  cstr8_format(buf, sizeof(buf), "Assertion failed: %s\n\nin %s() at %s:%u", msg, site.function, site.filename, site.line);
+  cstr8_format(buf, size_of(buf), "Assertion failed: %s\n\nin %s() at %s:%u", msg, site.function, site.filename, site.line);
 
   SDL_MessageBoxButtonData buttons[] = {
       {SDL_MESSAGEBOX_BUTTON_RETURNKEY_DEFAULT, 1, "Breakpoint"},
@@ -63,7 +63,7 @@ func i32 assert_dialog(cstr8 msg, callsite site) {
       NULL,
       "Assertion Failed",
       buf,
-      SDL_arraysize(buttons),
+      count_of(buttons),
       buttons,
       NULL,
   };
@@ -115,7 +115,7 @@ func void _assert(b32 condition, cstr8 cond_msg, callsite site) {
   assert_msg.type = MSG_TYPE_ASSERT;
   assert_msg.assert_data.mode = mode;
   assert_msg.assert_data.source_site = site;
-  SDL_strlcpy(assert_msg.assert_data.text, cond_msg != NULL ? cond_msg : "", MSG_ASSERT_TEXT_CAP);
+  strncpy(assert_msg.assert_data.text, cond_msg != NULL ? cond_msg : "", MSG_ASSERT_TEXT_CAP);
   if (!msg_post(&assert_msg)) {
     return;
   }

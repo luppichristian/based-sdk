@@ -16,27 +16,27 @@
 // Avoids strict-aliasing violations when reading/writing the free-list link.
 typedef union pool_slot_ref {
   void* ptr;
-  u8 bytes[sizeof(void*)];
+  u8 bytes[size_of(void*)];
 } pool_slot_ref;
 
 // Writes the next-free pointer into the first bytes of the slot at slot_ptr.
 func void pool_slot_write_next(void* slot_ptr, void* next_ptr) {
   pool_slot_ref ref;
   ref.ptr = next_ptr;
-  memcpy(slot_ptr, ref.bytes, sizeof(void*));
+  memcpy(slot_ptr, ref.bytes, size_of(void*));
 }
 
 // Reads the next-free pointer from the first bytes of the slot at slot_ptr.
 func void* pool_slot_read_next(void* slot_ptr) {
   pool_slot_ref ref;
-  memcpy(ref.bytes, slot_ptr, sizeof(void*));
+  memcpy(ref.bytes, slot_ptr, size_of(void*));
   return ref.ptr;
 }
 
 // Returns the stride between consecutive slots: large enough for object_size
 // bytes and a free-list pointer, aligned to object_align.
 func sz pool_slot_stride(pool* pol) {
-  sz min_sz = pol->object_size > sizeof(void*) ? pol->object_size : sizeof(void*);
+  sz min_sz = pol->object_size > size_of(void*) ? pol->object_size : size_of(void*);
   return align_up(min_sz, pol->object_align);
 }
 
@@ -49,7 +49,7 @@ func void pool_block_carve(pool* pol, pool_block* blk) {
   u8* base = (u8*)(blk + 1);
   sz pad = (sz)(align_up((up)base, eff_align) - (up)base);
   u8* slot = base + pad;
-  sz header_used = sizeof(pool_block) + pad;
+  sz header_used = size_of(pool_block) + pad;
   sz avail = blk->size > header_used ? blk->size - header_used : 0;
 
   while (avail >= stride) {
@@ -113,7 +113,7 @@ func pool pool_create(
     sz object_size,
     sz object_align) {
   pool pol;
-  memset(&pol, 0, sizeof(pol));
+  memset(&pol, 0, size_of(pol));
   pol.parent = parent_alloc;
   pol.opt_mutex = opt_mutex;
   pol.default_block_sz = default_block_sz;
@@ -125,7 +125,7 @@ func pool pool_create(
   lifecycle_msg.object_lifecycle.object_type = (u32)MSG_OBJECT_TYPE_POOL;
   lifecycle_msg.object_lifecycle.object_ptr = &pol;
   if (!msg_post(&lifecycle_msg)) {
-    memset(&pol, 0, sizeof(pol));
+    memset(&pol, 0, size_of(pol));
   }
   thread_log_trace("pool_create: obj_size=%zu obj_align=%zu", (size_t)object_size, (size_t)object_align);
   return pol;
@@ -202,7 +202,7 @@ func allocator pool_get_allocator(pool* pol) {
 // =========================================================================
 
 func void pool_add_block(pool* pol, void* ptr, sz size) {
-  if (pol == NULL || ptr == NULL || size <= sizeof(pool_block)) {
+  if (pol == NULL || ptr == NULL || size <= size_of(pool_block)) {
     return;
   }
   if (pol->opt_mutex) {
@@ -300,7 +300,7 @@ func void* _pool_alloc(pool* pol, callsite site) {
     pol->free_head = pool_slot_read_next(result);
   } else if (pol->parent.alloc_fn) {
     sz stride = pool_slot_stride(pol);
-    sz overhead = sizeof(pool_block) + pol->object_align;
+    sz overhead = size_of(pool_block) + pol->object_align;
     sz needed = overhead + stride;
     sz block_sz = pol->default_block_sz > needed ? pol->default_block_sz : needed;
     pool_block* new_blk = (pool_block*)_allocator_alloc(&pol->parent, block_sz, site);

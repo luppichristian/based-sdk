@@ -1175,7 +1175,7 @@ func b32 _msg_post(const msg* src, callsite site) {
   }
 
   if (posted_msg.type >= MSG_TYPE_USER) {
-    payload = (msg*)SDL_malloc(sizeof(*payload));
+    payload = (msg*)SDL_malloc(size_of(*payload));
     if (!payload) {
       thread_log_error("msg_post: payload alloc failed type=%u", posted_msg.type);
       return 0;

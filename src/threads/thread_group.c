@@ -35,12 +35,12 @@ func thread_group create_impl(u32 count, thread_group_func entry, void* arg, cst
   }
 
   thread_group group = {0};
-  group.threads = (thread*)allocator_alloc(&alloc, (sz)count * sizeof(thread));
-  group.slots = (thread_group_slot*)allocator_alloc(&alloc, (sz)count * sizeof(thread_group_slot));
+  group.threads = (thread*)allocator_alloc(&alloc, (sz)count * size_of(thread));
+  group.slots = (thread_group_slot*)allocator_alloc(&alloc, (sz)count * size_of(thread_group_slot));
 
   if (!group.threads || !group.slots) {
-    allocator_dealloc(&alloc, group.threads, (sz)count * sizeof(thread));
-    allocator_dealloc(&alloc, group.slots, (sz)count * sizeof(thread_group_slot));
+    allocator_dealloc(&alloc, group.threads, (sz)count * size_of(thread));
+    allocator_dealloc(&alloc, group.slots, (sz)count * size_of(thread_group_slot));
     return empty;
   }
 
@@ -51,7 +51,7 @@ func thread_group create_impl(u32 count, thread_group_func entry, void* arg, cst
 
     if (base_name != NULL) {
       str8_medium name_buf = {0};
-      cstr8_format(name_buf, sizeof(name_buf), "%s[%u]", base_name, idx);
+      cstr8_format(name_buf, size_of(name_buf), "%s[%u]", base_name, idx);
       group.threads[idx] = thread_create_named(thread_group_wrapper, &group.slots[idx], name_buf, main_allocator);
     } else {
       group.threads[idx] = thread_create(thread_group_wrapper, &group.slots[idx], main_allocator);
@@ -61,8 +61,8 @@ func thread_group create_impl(u32 count, thread_group_func entry, void* arg, cst
       for (u32 join_idx = 0; join_idx < idx; join_idx += 1) {
         thread_detach(group.threads[join_idx]);
       }
-      allocator_dealloc(&alloc, group.threads, (sz)count * sizeof(thread));
-      allocator_dealloc(&alloc, group.slots, (sz)count * sizeof(thread_group_slot));
+      allocator_dealloc(&alloc, group.threads, (sz)count * size_of(thread));
+      allocator_dealloc(&alloc, group.slots, (sz)count * size_of(thread_group_slot));
       return empty;
     }
   }
@@ -122,8 +122,8 @@ func void _thread_group_destroy(thread_group* group, callsite site) {
     return;
   }
 
-  allocator_dealloc(&alloc, group->threads, (sz)group->count * sizeof(thread));
-  allocator_dealloc(&alloc, group->slots, (sz)group->count * sizeof(thread_group_slot));
+  allocator_dealloc(&alloc, group->threads, (sz)group->count * size_of(thread));
+  allocator_dealloc(&alloc, group->slots, (sz)group->count * size_of(thread_group_slot));
   group->threads = NULL;
   group->slots = NULL;
   group->count = 0;

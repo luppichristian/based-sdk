@@ -86,7 +86,7 @@ func allocator pool_get_allocator(pool* pol);
 
 // Attaches a caller-owned memory region to the pool's block chain and carves it
 // into free slots. The region must remain valid for the lifetime of the pool (or
-// until removed). sizeof(pool_block) bytes are consumed by the embedded header.
+// until removed). size_of(pool_block) bytes are consumed by the embedded header.
 func void pool_add_block(pool* pol, void* ptr, sz size);
 
 // Detaches the manually-added block whose base address equals ptr.

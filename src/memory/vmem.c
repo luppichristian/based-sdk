@@ -250,7 +250,7 @@ func void* vmem_alloc(sz size) {
   assert(size > 0);
 
   sz alloc_align = vmem_get_alloc_align();
-  sz prefix_size = align_up(sizeof(vmem_alloc_header), alloc_align);
+  sz prefix_size = align_up(size_of(vmem_alloc_header), alloc_align);
 
   if (size > SZ_MAX - prefix_size) {
     return NULL;
