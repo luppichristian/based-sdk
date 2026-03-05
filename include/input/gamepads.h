@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include "capture.h"
 #include "devices.h"
 
 // =========================================================================
@@ -72,16 +73,17 @@ func cstr8 gamepads_get_name(sz slot_index);
 func b32 gamepads_has_button(sz slot_index, gamepad_button button);
 
 // Returns the cached pressed state for button.
-func b32 gamepads_get_button(sz slot_index, gamepad_button button);
+// key selects the capture stream used by one-shot queries.
+func b32 gamepads_get_button(input_key key, sz slot_index, gamepad_button button);
 
-// Returns 1 if button was pressed since last query, 0 otherwise.
-func b32 gamepads_is_button_pressed(sz slot_index, gamepad_button button);
+// Returns 1 if button was pressed since last query for key, 0 otherwise.
+func b32 gamepads_is_button_pressed(input_key key, sz slot_index, gamepad_button button);
 
-// Returns 1 if button was released since last query, 0 otherwise.
-func b32 gamepads_is_button_released(sz slot_index, gamepad_button button);
+// Returns 1 if button was released since last query for key, 0 otherwise.
+func b32 gamepads_is_button_released(input_key key, sz slot_index, gamepad_button button);
 
 // Returns 1 if the connected gamepad exposes axis, 0 otherwise.
 func b32 gamepads_has_axis(sz slot_index, gamepad_axis axis);
 
 // Returns the cached signed axis value for axis.
-func i16 gamepads_get_axis(sz slot_index, gamepad_axis axis);
+func i16 gamepads_get_axis(input_key key, sz slot_index, gamepad_axis axis);

@@ -5,12 +5,24 @@
 #include "input/msg.h"
 #include "../sdl3_include.h"
 
-global_var b32 keyboard_pressed_latched[SDL_SCANCODE_COUNT] = {0};
-global_var b32 keyboard_released_latched[SDL_SCANCODE_COUNT] = {0};
+global_var u32 keyboard_pressed_generation[SDL_SCANCODE_COUNT] = {0};
+global_var u32 keyboard_released_generation[SDL_SCANCODE_COUNT] = {0};
+global_var u32 keyboard_pressed_seen[INPUT_CAPTURE_MAX_KEYS][SDL_SCANCODE_COUNT] = {0};
+global_var u32 keyboard_released_seen[INPUT_CAPTURE_MAX_KEYS][SDL_SCANCODE_COUNT] = {0};
+global_var u32 keyboard_pressed_seen_epoch[INPUT_CAPTURE_MAX_KEYS][SDL_SCANCODE_COUNT] = {0};
+global_var u32 keyboard_released_seen_epoch[INPUT_CAPTURE_MAX_KEYS][SDL_SCANCODE_COUNT] = {0};
 global_var u32 keyboard_repeat_count[SDL_SCANCODE_COUNT] = {0};
 
 func b32 keyboard_scancode_is_valid(u32 scancode) {
   return scancode < (u32)SDL_SCANCODE_COUNT;
+}
+
+func u32 keyboard_next_generation(u32 value) {
+  u32 result = value + 1;
+  if (result == 0) {
+    result = 1;
+  }
+  return result;
 }
 
 func b32 keyboard_is_available(void) {
@@ -21,7 +33,8 @@ func b32 keyboard_get_primary_device_id(device_id* out_id) {
   return devices_get_device(DEVICE_TYPE_KEYBOARD, 0, out_id);
 }
 
-func b32 keyboard_is_key_down(u32 scancode) {
+func b32 keyboard_is_key_down(input_key key, u32 scancode) {
+  (void)key;
   int key_count = 0;
   const bool* state = SDL_GetKeyboardState(&key_count);
 
@@ -32,27 +45,60 @@ func b32 keyboard_is_key_down(u32 scancode) {
   return state[scancode] ? 1 : 0;
 }
 
-func b32 keyboard_is_key_pressed(u32 scancode) {
+func b32 keyboard_is_key_pressed(input_key key, u32 scancode) {
   if (!keyboard_scancode_is_valid(scancode)) {
     return 0;
   }
 
-  b32 pressed = keyboard_pressed_latched[scancode];
-  keyboard_pressed_latched[scancode] = 0;
-  return pressed;
+  sz slot_index = input_capture_get_slot(key);
+  if (slot_index >= INPUT_CAPTURE_MAX_KEYS) {
+    return 0;
+  }
+
+  u32 slot_epoch = input_capture_get_slot_epoch(slot_index);
+  if (keyboard_pressed_seen_epoch[slot_index][scancode] != slot_epoch) {
+    keyboard_pressed_seen_epoch[slot_index][scancode] = slot_epoch;
+    keyboard_pressed_seen[slot_index][scancode] = keyboard_pressed_generation[scancode];
+    return 0;
+  }
+
+  u32 generation = keyboard_pressed_generation[scancode];
+  if (generation == 0 || keyboard_pressed_seen[slot_index][scancode] == generation) {
+    return 0;
+  }
+
+  keyboard_pressed_seen[slot_index][scancode] = generation;
+  return 1;
 }
 
-func b32 keyboard_is_key_released(u32 scancode) {
+func b32 keyboard_is_key_released(input_key key, u32 scancode) {
   if (!keyboard_scancode_is_valid(scancode)) {
     return 0;
   }
 
-  b32 released = keyboard_released_latched[scancode];
-  keyboard_released_latched[scancode] = 0;
-  return released;
+  sz slot_index = input_capture_get_slot(key);
+  if (slot_index >= INPUT_CAPTURE_MAX_KEYS) {
+    return 0;
+  }
+
+  u32 slot_epoch = input_capture_get_slot_epoch(slot_index);
+  if (keyboard_released_seen_epoch[slot_index][scancode] != slot_epoch) {
+    keyboard_released_seen_epoch[slot_index][scancode] = slot_epoch;
+    keyboard_released_seen[slot_index][scancode] = keyboard_released_generation[scancode];
+    return 0;
+  }
+
+  u32 generation = keyboard_released_generation[scancode];
+  if (generation == 0 || keyboard_released_seen[slot_index][scancode] == generation) {
+    return 0;
+  }
+
+  keyboard_released_seen[slot_index][scancode] = generation;
+  return 1;
 }
 
-func u32 keyboard_get_key_repeat_count(u32 scancode) {
+func u32 keyboard_get_key_repeat_count(input_key key, u32 scancode) {
+  (void)key;
   if (!keyboard_scancode_is_valid(scancode)) {
     return 0;
   }
@@ -74,8 +120,8 @@ func b32 keyboard_has_mods_exact(u16 required_mods, u16 forbidden_mods) {
   return ((current_mods & required_mods) == required_mods) && ((current_mods & forbidden_mods) == 0);
 }
 
-func b32 keyboard_is_key_down_mod(u32 scancode, u16 required_mods, u16 forbidden_mods) {
-  return keyboard_is_key_down(scancode) && keyboard_has_mods_exact(required_mods, forbidden_mods);
+func b32 keyboard_is_key_down_mod(input_key key, u32 scancode, u16 required_mods, u16 forbidden_mods) {
+  return keyboard_is_key_down(key, scancode) && keyboard_has_mods_exact(required_mods, forbidden_mods);
 }
 
 func u32 keyboard_get_keycode(u32 scancode, u16 modifiers, b32 key_event) {
@@ -98,16 +144,16 @@ func void keyboard_internal_on_msg(const msg* src) {
   u32 scancode = src->keyboard.scancode;
 
   if (src->type == MSG_TYPE_KEY_DOWN) {
-    keyboard_pressed_latched[scancode] = src->keyboard.repeat ? 0 : 1;
-    keyboard_released_latched[scancode] = 0;
+    if (!src->keyboard.repeat) {
+      keyboard_pressed_generation[scancode] = keyboard_next_generation(keyboard_pressed_generation[scancode]);
+    }
     if (src->keyboard.repeat) {
       keyboard_repeat_count[scancode] += 1;
     } else {
       keyboard_repeat_count[scancode] = 0;
     }
   } else if (src->type == MSG_TYPE_KEY_UP) {
-    keyboard_released_latched[scancode] = 1;
-    keyboard_pressed_latched[scancode] = 0;
+    keyboard_released_generation[scancode] = keyboard_next_generation(keyboard_released_generation[scancode]);
     keyboard_repeat_count[scancode] = 0;
   }
 }

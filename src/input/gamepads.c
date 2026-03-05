@@ -8,11 +8,15 @@
 typedef struct gamepad_slot_state {
   SDL_JoystickID id;
   SDL_Gamepad* handle;
-  b32 button_pressed_latched[GAMEPAD_BUTTON_COUNT];
-  b32 button_released_latched[GAMEPAD_BUTTON_COUNT];
+  u32 button_pressed_generation[GAMEPAD_BUTTON_COUNT];
+  u32 button_released_generation[GAMEPAD_BUTTON_COUNT];
 } gamepad_slot_state;
 
 global_var gamepad_slot_state gamepad_slots[GAMEPADS_MAX_COUNT];
+global_var u32 gamepad_pressed_seen[INPUT_CAPTURE_MAX_KEYS][GAMEPADS_MAX_COUNT][GAMEPAD_BUTTON_COUNT] = {0};
+global_var u32 gamepad_released_seen[INPUT_CAPTURE_MAX_KEYS][GAMEPADS_MAX_COUNT][GAMEPAD_BUTTON_COUNT] = {0};
+global_var u32 gamepad_pressed_seen_epoch[INPUT_CAPTURE_MAX_KEYS][GAMEPADS_MAX_COUNT][GAMEPAD_BUTTON_COUNT] = {0};
+global_var u32 gamepad_released_seen_epoch[INPUT_CAPTURE_MAX_KEYS][GAMEPADS_MAX_COUNT][GAMEPAD_BUTTON_COUNT] = {0};
 
 func void gamepads_release_slot(sz slot_index) {
   if (slot_index >= GAMEPADS_MAX_COUNT) {
@@ -28,6 +32,14 @@ func void gamepads_release_slot(sz slot_index) {
 
 func b32 gamepads_slot_and_button_are_valid(sz slot_index, gamepad_button button) {
   return slot_index < GAMEPADS_MAX_COUNT && button >= 0 && button < GAMEPAD_BUTTON_COUNT;
+}
+
+func u32 gamepads_next_generation(u32 value) {
+  u32 result = value + 1;
+  if (result == 0) {
+    result = 1;
+  }
+  return result;
 }
 
 func sz gamepads_find_slot_by_instance(SDL_JoystickID joystick_id) {
@@ -126,7 +138,8 @@ func b32 gamepads_has_button(sz slot_index, gamepad_button button) {
   return SDL_GamepadHasButton(gamepad_slots[slot_index].handle, (SDL_GamepadButton)button) ? 1 : 0;
 }
 
-func b32 gamepads_get_button(sz slot_index, gamepad_button button) {
+func b32 gamepads_get_button(input_key key, sz slot_index, gamepad_button button) {
+  (void)key;
   gamepads_sync_slots();
 
   if (slot_index >= GAMEPADS_MAX_COUNT || !gamepad_slots[slot_index].handle || button < 0) {
@@ -136,24 +149,57 @@ func b32 gamepads_get_button(sz slot_index, gamepad_button button) {
   return SDL_GetGamepadButton(gamepad_slots[slot_index].handle, (SDL_GamepadButton)button) ? 1 : 0;
 }
 
-func b32 gamepads_is_button_pressed(sz slot_index, gamepad_button button) {
+func b32 gamepads_is_button_pressed(input_key key, sz slot_index, gamepad_button button) {
   if (!gamepads_slot_and_button_are_valid(slot_index, button) || !gamepads_is_connected(slot_index)) {
     return 0;
   }
 
-  b32 pressed = gamepad_slots[slot_index].button_pressed_latched[button];
-  gamepad_slots[slot_index].button_pressed_latched[button] = 0;
-  return pressed;
+  sz key_slot_index = input_capture_get_slot(key);
+  if (key_slot_index >= INPUT_CAPTURE_MAX_KEYS) {
+    return 0;
+  }
+
+  u32 slot_epoch = input_capture_get_slot_epoch(key_slot_index);
+  if (gamepad_pressed_seen_epoch[key_slot_index][slot_index][button] != slot_epoch) {
+    gamepad_pressed_seen_epoch[key_slot_index][slot_index][button] = slot_epoch;
+    gamepad_pressed_seen[key_slot_index][slot_index][button] = gamepad_slots[slot_index].button_pressed_generation[button];
+    return 0;
+  }
+
+  u32 generation = gamepad_slots[slot_index].button_pressed_generation[button];
+  if (generation == 0 || gamepad_pressed_seen[key_slot_index][slot_index][button] == generation) {
+    return 0;
+  }
+
+  gamepad_pressed_seen[key_slot_index][slot_index][button] = generation;
+  return 1;
 }
 
-func b32 gamepads_is_button_released(sz slot_index, gamepad_button button) {
+func b32 gamepads_is_button_released(input_key key, sz slot_index, gamepad_button button) {
   if (!gamepads_slot_and_button_are_valid(slot_index, button) || !gamepads_is_connected(slot_index)) {
     return 0;
   }
 
-  b32 released = gamepad_slots[slot_index].button_released_latched[button];
-  gamepad_slots[slot_index].button_released_latched[button] = 0;
-  return released;
+  sz key_slot_index = input_capture_get_slot(key);
+  if (key_slot_index >= INPUT_CAPTURE_MAX_KEYS) {
+    return 0;
+  }
+
+  u32 slot_epoch = input_capture_get_slot_epoch(key_slot_index);
+  if (gamepad_released_seen_epoch[key_slot_index][slot_index][button] != slot_epoch) {
+    gamepad_released_seen_epoch[key_slot_index][slot_index][button] = slot_epoch;
+    gamepad_released_seen[key_slot_index][slot_index][button] =
+      gamepad_slots[slot_index].button_released_generation[button];
+    return 0;
+  }
+
+  u32 generation = gamepad_slots[slot_index].button_released_generation[button];
+  if (generation == 0 || gamepad_released_seen[key_slot_index][slot_index][button] == generation) {
+    return 0;
+  }
+
+  gamepad_released_seen[key_slot_index][slot_index][button] = generation;
+  return 1;
 }
 
 func b32 gamepads_has_axis(sz slot_index, gamepad_axis axis) {
@@ -166,7 +212,8 @@ func b32 gamepads_has_axis(sz slot_index, gamepad_axis axis) {
   return SDL_GamepadHasAxis(gamepad_slots[slot_index].handle, (SDL_GamepadAxis)axis) ? 1 : 0;
 }
 
-func i16 gamepads_get_axis(sz slot_index, gamepad_axis axis) {
+func i16 gamepads_get_axis(input_key key, sz slot_index, gamepad_axis axis) {
+  (void)key;
   gamepads_sync_slots();
 
   if (slot_index >= GAMEPADS_MAX_COUNT || !gamepad_slots[slot_index].handle || axis < 0) {
@@ -194,10 +241,10 @@ func void gamepads_internal_on_msg(const msg* src) {
 
   gamepad_button button = src->gamepad_button.button;
   if (src->type == MSG_TYPE_GAMEPAD_BUTTON_DOWN) {
-    gamepad_slots[slot_index].button_pressed_latched[button] = 1;
-    gamepad_slots[slot_index].button_released_latched[button] = 0;
+    gamepad_slots[slot_index].button_pressed_generation[button] =
+      gamepads_next_generation(gamepad_slots[slot_index].button_pressed_generation[button]);
   } else {
-    gamepad_slots[slot_index].button_released_latched[button] = 1;
-    gamepad_slots[slot_index].button_pressed_latched[button] = 0;
+    gamepad_slots[slot_index].button_released_generation[button] =
+      gamepads_next_generation(gamepad_slots[slot_index].button_released_generation[button]);
   }
 }

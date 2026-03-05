@@ -46,6 +46,7 @@
 #include "filesystem/pathwatch.h"
 
 // Include input modules.
+#include "input/capture.h"
 #include "input/clipboard.h"
 #include "input/devices.h"
 #include "input/gamepads.h"

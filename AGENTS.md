@@ -75,6 +75,7 @@ include/                      # public API headers
     pathinfo.h                # cross-platform filesystem metadata queries
     pathwatch.h               # efsw-backed directory watch wrapper that emits pathwatch messages
   input/                      # SDL-backed input APIs without exposing SDL in public headers
+    capture.h                 # input-capture keys and per-consumer one-shot state helpers
     clipboard.h               # clipboard text query and transfer helpers
     devices.h                 # device enumeration and shared input-device identifiers
     gamepads.h                # four-slot gamepad query helpers

@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include "capture.h"
 #include "devices.h"
 
 // =========================================================================
@@ -32,19 +33,20 @@ func b32 mouse_is_available(void);
 func b32 mouse_get_primary_device_id(device_id* out_id);
 
 // Returns the current mouse state in the active window coordinate space.
-func mouse_state mouse_get_state(void);
+// key selects the capture stream used by one-shot queries.
+func mouse_state mouse_get_state(input_key key);
 
 // Returns the current mouse state in desktop-global coordinates.
-func mouse_state mouse_get_global_state(void);
+func mouse_state mouse_get_global_state(input_key key);
 
 // Returns the relative mouse delta accumulated since the last pump.
-func mouse_state mouse_get_relative_state(void);
+func mouse_state mouse_get_relative_state(input_key key);
 
 // Returns 1 if button is currently pressed, 0 otherwise.
-func b32 mouse_is_button_down(u8 button);
+func b32 mouse_is_button_down(input_key key, u8 button);
 
-// Returns 1 if button was pressed since last query, 0 otherwise.
-func b32 mouse_is_button_pressed(u8 button);
+// Returns 1 if button was pressed since last query for key, 0 otherwise.
+func b32 mouse_is_button_pressed(input_key key, u8 button);
 
-// Returns 1 if button was released since last query, 0 otherwise.
-func b32 mouse_is_button_released(u8 button);
+// Returns 1 if button was released since last query for key, 0 otherwise.
+func b32 mouse_is_button_released(input_key key, u8 button);
