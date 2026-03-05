@@ -77,14 +77,14 @@ func heap* ctx_get_temp_heap(ctx* context) {
   return ctx_is_init(context) ? &context->temp_heap : NULL;
 }
 
-func void* ctx_get_user_data(ctx* context, sz index) {
+func void* ctx_get_user_data(ctx* context, ctx_user_data_index index) {
   if (!ctx_is_init(context) || index >= CTX_USER_DATA_COUNT) {
     return NULL;
   }
   return context->user_data[index];
 }
 
-func b32 ctx_set_user_data(ctx* context, sz index, void* user_data) {
+func b32 ctx_set_user_data(ctx* context, ctx_user_data_index index, void* user_data) {
   if (!ctx_is_init(context) || index >= CTX_USER_DATA_COUNT) {
     return false;
   }

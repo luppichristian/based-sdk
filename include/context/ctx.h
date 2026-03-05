@@ -9,6 +9,7 @@
 
 // Fixed number of generic user-data slots available in each context.
 const_var sz CTX_USER_DATA_COUNT = 32;
+typedef sz ctx_user_data_index;
 
 // Shared context payload used by both thread-local and global context wrappers.
 typedef struct ctx {
@@ -62,8 +63,8 @@ func heap* ctx_get_temp_heap(ctx* context);
 
 // Accesses one generic user-data slot.
 // Out-of-range access returns NULL / false.
-func void* ctx_get_user_data(ctx* context, sz index);
-func b32 ctx_set_user_data(ctx* context, sz index, void* user_data);
+func void* ctx_get_user_data(ctx* context, ctx_user_data_index index);
+func b32 ctx_set_user_data(ctx* context, ctx_user_data_index index, void* user_data);
 
 // Clears temporary allocators in the context.
 func void ctx_clear_temp(ctx* context);

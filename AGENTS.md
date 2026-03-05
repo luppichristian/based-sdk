@@ -45,7 +45,7 @@ include/                      # public API headers
     utility_defines.h         # general-purpose utility macros
   context/                    # shared context payload plus thread/global wrappers
     ctx.h                     # shared allocator/log/user-data context payload used across wrappers
-    global_ctx.h              # process-global context singleton and helper accessors
+    global_ctx.h              # process-global context singleton, helper accessors, and thread-local user-data permissions
     thread_ctx.h              # thread-local context lifecycle and convenience wrappers
   containers/                 # intrusive containers and container utilities
     binary_tree.h             # intrusive binary tree macros

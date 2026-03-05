@@ -50,11 +50,11 @@ func heap* thread_get_temp_heap(void) {
   return ctx_get_temp_heap(thread_ctx_get());
 }
 
-func void* thread_get_user_data(sz index) {
+func void* thread_get_user_data(ctx_user_data_index index) {
   return ctx_get_user_data(thread_ctx_get(), index);
 }
 
-func b32 thread_set_user_data(sz index, void* user_data) {
+func b32 thread_set_user_data(ctx_user_data_index index, void* user_data) {
   return ctx_set_user_data(thread_ctx_get(), index, user_data);
 }
 
