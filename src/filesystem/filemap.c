@@ -19,7 +19,7 @@
 
 #  include <windows.h>
 
-#elif defined(PLATFORM_UNIX) || defined(PLATFORM_ANDROID) || defined(PLATFORM_IOS)
+#elif defined(PLATFORM_UNIX)
 
 #  include <fcntl.h>
 #  include <sys/mman.h>
@@ -144,7 +144,7 @@ func b32 filemap_flush(filemap* map) {
   filemap_set_error(FILEMAP_ERROR_NONE);
   TracyCZoneEnd(__tracy_zone_ctx);
   return 1;
-#elif defined(PLATFORM_UNIX) || defined(PLATFORM_ANDROID) || defined(PLATFORM_IOS)
+#elif defined(PLATFORM_UNIX)
   if (map->data_ptr != NULL && map->data_size > 0) {
     if (msync(map->data_ptr, map->data_size, MS_SYNC) != 0) {
       filemap_set_error(FILEMAP_ERROR_IO_FAILED);
@@ -209,7 +209,7 @@ func void filemap_close(filemap* map) {
   if (map->native_file != NULL) {
     CloseHandle((HANDLE)map->native_file);
   }
-#elif defined(PLATFORM_UNIX) || defined(PLATFORM_ANDROID) || defined(PLATFORM_IOS)
+#elif defined(PLATFORM_UNIX)
   if (map->data_ptr != NULL && map->data_size > 0) {
     munmap(map->data_ptr, map->data_size);
   }
@@ -324,7 +324,7 @@ func filemap filemap_open(const path* src, filemap_access access) {
   thread_log_trace("filemap_open: windows path=%s size=%zu writable=%u", src->buf, (size_t)map.data_size, (u32)map.writable);
   TracyCZoneEnd(__tracy_zone_ctx);
   return map;
-#elif defined(PLATFORM_UNIX) || defined(PLATFORM_ANDROID) || defined(PLATFORM_IOS)
+#elif defined(PLATFORM_UNIX)
   i32 open_flags = O_RDONLY;
   i32 prot_flags = PROT_READ;
   i32 map_flags = MAP_PRIVATE;
@@ -413,3 +413,4 @@ func filemap filemap_open(const path* src, filemap_access access) {
   return map;
 #endif
 }
+

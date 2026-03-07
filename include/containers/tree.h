@@ -14,6 +14,7 @@ typedef struct tree_links {
   struct tree_links* prev_sibling;
 } tree_links;
 
+// Returns the next node in a pre-order traversal.
 func force_inline void* tree_next_preorder_ptr(void* root_ptr, void* node_ptr) {
   tree_links* root_node = (tree_links*)root_ptr;
   tree_links* cursor = (tree_links*)node_ptr;
@@ -37,9 +38,11 @@ func force_inline void* tree_next_preorder_ptr(void* root_ptr, void* node_ptr) {
   return NULL;
 }
 
+// Structural predicates.
 #define TREE_IS_ROOT(node) ((node)->parent == nullptr)
 #define TREE_IS_LEAF(node) ((node)->first_child == nullptr)
 
+// Mutation helpers.
 #define TREE_INSERT_CHILD_FRONT(parent, node) expr_stmt( \
   (node)->parent = (parent);                              \
   (node)->prev_sibling = nullptr;                         \
@@ -99,6 +102,7 @@ func force_inline void* tree_next_preorder_ptr(void* root_ptr, void* node_ptr) {
   (node)->prev_sibling = nullptr; \
   (node)->next_sibling = nullptr;)
 
+// Typed traversal macros.
 #define TREE_FOREACH_CHILDREN(parent, it) \
   for (typeof((parent)->first_child) it = (parent)->first_child; (it) != nullptr; (it) = (it)->next_sibling)
 

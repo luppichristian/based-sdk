@@ -124,7 +124,7 @@ func b32 vmem_platform_free(void* ptr, sz size) {
   return success;
 }
 
-#elif defined(PLATFORM_UNIX) || defined(PLATFORM_ANDROID) || defined(PLATFORM_IOS)
+#elif defined(PLATFORM_UNIX)
 
 #  include <sys/mman.h>
 #  include <unistd.h>
@@ -316,7 +316,7 @@ func void* vmem_get_alloc_base(void* ptr) {
 
 func sz vmem_get_alloc_align(void) {
   TracyCZoneN(__tracy_zone_ctx, __func__, 1);
-#if defined(PLATFORM_WINDOWS) || defined(PLATFORM_UNIX) || defined(PLATFORM_ANDROID) || defined(PLATFORM_IOS)
+#if defined(PLATFORM_WINDOWS) || defined(PLATFORM_UNIX)
   TracyCZoneEnd(__tracy_zone_ctx);
   return vmem_page_size();
 #else
@@ -521,3 +521,4 @@ func vmem_stats vmem_get_stats(void) {
   TracyCZoneEnd(__tracy_zone_ctx);
   return stats;
 }
+

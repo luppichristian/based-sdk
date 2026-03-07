@@ -132,6 +132,7 @@ typedef struct cstr8_tokenizer {
   sz cursor;
 } cstr8_tokenizer;
 
+// Tokenizer and join helpers.
 func cstr8_tokenizer cstr8_tokenizer_make(cstr8 src, cstr8 delim);
 func b32 cstr8_tokenizer_next(cstr8_tokenizer* tok, c8* out_buf, sz out_cap);
 func sz cstr8_join(c8* dst, sz dst_cap, cstr8 const* parts, sz part_count, cstr8 delim);

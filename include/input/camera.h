@@ -36,6 +36,7 @@ func cstr8 camera_get_name(camera id);
 // Returns the camera physical position for id.
 func camera_position camera_get_position(camera id);
 
+// Device lifecycle and frame retrieval.
 func b32 camera_open(camera id);
 func b32 camera_close(camera id);
 func b32 camera_start(camera id);

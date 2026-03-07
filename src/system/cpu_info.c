@@ -13,7 +13,7 @@
 #if defined(PLATFORM_WINDOWS)
 #  define WIN32_LEAN_AND_MEAN
 #  include <windows.h>
-#elif defined(PLATFORM_UNIX) || defined(PLATFORM_ANDROID) || defined(PLATFORM_IOS)
+#elif defined(PLATFORM_UNIX)
 #  include <unistd.h>
 #endif
 
@@ -55,7 +55,7 @@ func u32 cpu_query_logical_cores(void) {
   GetNativeSystemInfo(&native_info);
   TracyCZoneEnd(__tracy_zone_ctx);
   return (u32)native_info.dwNumberOfProcessors;
-#elif defined(PLATFORM_UNIX) || defined(PLATFORM_ANDROID) || defined(PLATFORM_IOS)
+#elif defined(PLATFORM_UNIX)
   sp core_count = (sp)sysconf(_SC_NPROCESSORS_ONLN);
   if (core_count > 0) {
     TracyCZoneEnd(__tracy_zone_ctx);
@@ -239,3 +239,4 @@ func b32 cpu_info_query(cpu_info* out_info) {
   TracyCZoneEnd(__tracy_zone_ctx);
   return 1;
 }
+

@@ -14,7 +14,9 @@
 #include "../sdl3_include.h"
 #include "basic/profiler.h"
 
+#include <olib.h>
 #include <stdlib.h>
+#include <string.h>
 
 #if defined(ENTRY_TYPE_MAIN)
 func b32 entry_main(cmdline cmdl);
@@ -38,6 +40,62 @@ typedef struct entry_thread_state {
 
 global_var entry_shared_state entry_shared = {0};
 thread_local global_var entry_thread_state entry_thread = {0};
+global_var allocator entry_memory_fallback = {0};
+global_var cmdline entry_cmdline_current = {0};
+
+func allocator entry_get_pipeline_allocator(void) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
+  allocator alloc = thread_get_allocator();
+  if (!alloc.alloc_fn) {
+    alloc = global_get_allocator();
+  }
+  if (!alloc.alloc_fn) {
+    alloc = entry_memory_fallback;
+  }
+  TracyCZoneEnd(__tracy_zone_ctx);
+  return alloc;
+}
+
+func void* entry_pipeline_malloc(sz size) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
+  allocator alloc = entry_get_pipeline_allocator();
+  void* ptr = _allocator_alloc(&alloc, size, CALLSITE_HERE);
+  TracyCZoneEnd(__tracy_zone_ctx);
+  return ptr;
+}
+
+func void entry_pipeline_free(void* ptr) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
+  if (ptr == NULL) {
+    TracyCZoneEnd(__tracy_zone_ctx);
+    return;
+  }
+  allocator alloc = entry_get_pipeline_allocator();
+  _allocator_dealloc(&alloc, ptr, 0, CALLSITE_HERE);
+  TracyCZoneEnd(__tracy_zone_ctx);
+}
+
+func void* entry_pipeline_calloc(sz count, sz size) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
+  allocator alloc = entry_get_pipeline_allocator();
+  void* ptr = _allocator_calloc(&alloc, count, size, CALLSITE_HERE);
+  TracyCZoneEnd(__tracy_zone_ctx);
+  return ptr;
+}
+
+func void* entry_pipeline_realloc(void* ptr, sz size) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
+  allocator alloc = entry_get_pipeline_allocator();
+  void* new_ptr = _allocator_realloc(&alloc, ptr, 0, size, CALLSITE_HERE);
+  TracyCZoneEnd(__tracy_zone_ctx);
+  return new_ptr;
+}
+
+func cmdline entry_get_cmdline(void) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
+  TracyCZoneEnd(__tracy_zone_ctx);
+  return entry_cmdline_current;
+}
 
 // =========================================================================
 // Common lifecycle hooks
@@ -45,17 +103,45 @@ thread_local global_var entry_thread_state entry_thread = {0};
 
 func b32 entry_init(cmdline cmdline) {
   TracyCZoneN(__tracy_zone_ctx, __func__, 1);
-  (void)cmdline;
+  if (entry_cmdline_current.args == NULL && cmdline.args != NULL && cmdline.count > 0) {
+    entry_cmdline_current = cmdline;
+  }
 
 #ifdef OVERRIDE_GLOBAL_DEFAULT_ALLOCATOR
   allocator default_global_allocator = global_allocator_default();
 #else
   allocator default_global_allocator = vmem_get_allocator();
 #endif
+  entry_memory_fallback = default_global_allocator;
+
+  olib_set_memory_fns(
+      entry_pipeline_malloc,
+      entry_pipeline_free,
+      entry_pipeline_calloc,
+      entry_pipeline_realloc);
+
+  if (!SDL_SetMemoryFunctions(
+          entry_pipeline_malloc,
+          entry_pipeline_calloc,
+          entry_pipeline_realloc,
+          entry_pipeline_free)) {
+    TracyCZoneEnd(__tracy_zone_ctx);
+    return false;
+  }
+
+  SDL_InitFlags init_flags =
+      SDL_INIT_AUDIO |
+      SDL_INIT_VIDEO |
+      SDL_INIT_JOYSTICK |
+      SDL_INIT_HAPTIC |
+      SDL_INIT_GAMEPAD |
+      SDL_INIT_EVENTS |
+      SDL_INIT_SENSOR |
+      SDL_INIT_CAMERA;
 
   if (entry_shared.sdl_init_depth == 0) {
-    if (!SDL_WasInit(0)) {
-      if (!SDL_Init(0)) {
+    if (!SDL_WasInit(init_flags)) {
+      if (!SDL_Init(init_flags)) {
         TracyCZoneEnd(__tracy_zone_ctx);
         return false;
       }
@@ -129,6 +215,10 @@ func void entry_quit(void) {
       SDL_Quit();
       entry_shared.owns_sdl = false;
     }
+  }
+  if (entry_shared.sdl_init_depth == 0 && entry_shared.global_ctx_init_depth == 0 &&
+      entry_thread.thread_ctx_init_depth == 0) {
+    entry_cmdline_current = (cmdline) {0};
   }
   TracyCZoneEnd(__tracy_zone_ctx);
 }

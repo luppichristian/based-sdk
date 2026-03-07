@@ -147,7 +147,7 @@ func b32 thread_ctx_init(allocator main_allocator) {
   }
 
   memset(&thread_ctx, 0, size_of(thread_ctx));
-  if (!ctx_init(&thread_ctx, main_allocator, false)) {
+  if (!ctx_init(&thread_ctx, main_allocator, NULL, false)) {
     memset(&thread_ctx, 0, size_of(thread_ctx));
     TracyCZoneEnd(__tracy_zone_ctx);
     return false;

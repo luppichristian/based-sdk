@@ -32,7 +32,7 @@ func b32 file_replace_path(const path* src, const path* dst) {
 #if defined(PLATFORM_WINDOWS)
   TracyCZoneEnd(__tracy_zone_ctx);
   return MoveFileExA(src->buf, dst->buf, MOVEFILE_REPLACE_EXISTING | MOVEFILE_WRITE_THROUGH) ? 1 : 0;
-#elif defined(PLATFORM_UNIX) || defined(PLATFORM_ANDROID) || defined(PLATFORM_IOS)
+#elif defined(PLATFORM_UNIX)
   TracyCZoneEnd(__tracy_zone_ctx);
   return rename(src->buf, dst->buf) == 0 ? 1 : 0;
 #else
@@ -384,3 +384,4 @@ func b32 file_write_all_atomic(const path* src, buffer data) {
   TracyCZoneEnd(__tracy_zone_ctx);
   return 1;
 }
+

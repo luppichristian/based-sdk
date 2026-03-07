@@ -38,6 +38,8 @@ func heap* thread_get_temp_heap(void);
 // Accesses one of the generic user-data slots.
 // Out-of-range access returns NULL / false.
 func void* thread_get_user_data(ctx_user_data_idx idx);
+// Writes one generic user-data slot for the current thread.
+// Out-of-range writes return false.
 func b32 thread_set_user_data(ctx_user_data_idx idx, void* user_data);
 
 // Clears the temporary allocators for the current thread.

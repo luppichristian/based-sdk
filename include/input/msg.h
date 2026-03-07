@@ -91,6 +91,7 @@ func b32 msg_wait(msg* out_msg);
 
 // Waits up to timeout_ms on the process-global queue and writes the next message to out_msg.
 func b32 msg_wait_timeout(msg* out_msg, i32 timeout_ms);
+// Queue inspection helpers.
 func b32 msg_peek(msg* out_msg);
 func i32 msg_count(u32 type_min, u32 type_max);
 func void msg_flush(u32 type_min, u32 type_max);
@@ -110,6 +111,7 @@ func b32 msg_remove_handler(u64 handler_id);
 
 // Removes all registered message handlers.
 func void msg_clear_handlers(void);
+// Installs or clears a process-global event filter callback.
 func void msg_set_filter(msg_filter_fn filter_fn, void* user_data);
 
 // Converts a backend-native event object into a msg. Returns 1 on success, 0 otherwise.

@@ -129,6 +129,7 @@ func void _pool_dealloc(pool* pol, void* ptr, callsite site);
 // No blocks are released to the parent allocator.
 func void pool_clear(pool* pol);
 
+// Aggregate pool statistics.
 func sz pool_block_count(pool* pol);
 func sz pool_slot_size(pool* pol);
 func sz pool_free_count(pool* pol);

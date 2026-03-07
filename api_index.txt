@@ -22,6 +22,7 @@
 51: func dll_export b32 mod_init(void);
 54: func dll_export void mod_quit(void);
 74: func b32 entry_init(cmdline cmdline);
+77: func cmdline entry_get_cmdline(void);
 78: func void entry_quit(void);
 87: func allocator global_allocator_default();
 
@@ -247,7 +248,7 @@
 
 === include\context\ctx.h ===
 15: typedef struct ctx {
-43: func b32 ctx_init(ctx* context, allocator main_allocator, b32 use_log_mutex);
+43: func b32 ctx_init(ctx* context, allocator main_allocator, mutex allocator_mutex, b32 use_log_mutex);
 46: func void ctx_quit(ctx* context);
 49: func b32 ctx_is_init(ctx* context);
 53: func allocator ctx_get_allocator(ctx* context);
@@ -624,7 +625,7 @@
 183: typedef enum msg_core_global_ctx_event_kind {
 188: #define MSG_LOG_TEXT_CAP    512
 189: #define MSG_ASSERT_TEXT_CAP 512
-192: typedef struct msg_core_display_data {
+192: typedef struct msg_core_monitor_data {
 199: typedef struct msg_core_window_data {
 206: typedef struct msg_core_keyboard_device_data {
 211: typedef struct msg_core_keyboard_data {
@@ -667,7 +668,7 @@
 500: typedef struct msg_core_global_ctx_data {
 505: typedef struct msg_core_assert_data {
 511: typedef union msg_core_data {
-556: func void msg_core_fill_display(msg* src, const msg_core_display_data* core_data);
+556: func void msg_core_fill_monitor(msg* src, const msg_core_monitor_data* core_data);
 557: func void msg_core_fill_window(msg* src, const msg_core_window_data* core_data);
 558: func void msg_core_fill_keyboard_device(msg* src, const msg_core_keyboard_device_data* core_data);
 559: func void msg_core_fill_keyboard(msg* src, const msg_core_keyboard_data* core_data);
@@ -709,7 +710,7 @@
 595: func void msg_core_fill_log(msg* src, const msg_core_log_data* core_data);
 596: func void msg_core_fill_assert(msg* src, const msg_core_assert_data* core_data);
 597: func void msg_core_fill_global_ctx(msg* src, const msg_core_global_ctx_data* core_data);
-599: func msg_core_display_data* msg_core_get_display(msg* src);
+599: func msg_core_monitor_data* msg_core_get_monitor(msg* src);
 600: func msg_core_window_data* msg_core_get_window(msg* src);
 601: func msg_core_keyboard_device_data* msg_core_get_keyboard_device(msg* src);
 602: func msg_core_keyboard_data* msg_core_get_keyboard(msg* src);
@@ -935,6 +936,11 @@
 42: func b32 pipe_flush(pipe pip);
 46: func void pipe_close(pipe pip);
 
+=== include\processes\common_processes.h ===
+9: func b32 process_open_weblink(cstr8 url);
+12: func b32 process_open_file_window(cstr8 location);
+15: func b32 process_open_terminal(cstr8 location);
+
 === include\processes\process.h ===
 16: typedef struct process_options {
 29: func process_options process_options_default(void);
@@ -957,6 +963,8 @@
 22: func u64 process_id(void);
 25: func process_priority process_get_priority(void);
 29: func b32 process_set_priority(process_priority priority);
+32: func b32 process_is_unique(void);
+36: func b32 process_restart(void);
 33: func no_return void process_exit(i32 exit_code);
 37: func no_return void process_abort(void);
 
@@ -1594,26 +1602,42 @@
 67: func b32 version_to_str32(version ver, str32* dst);
 70: func b32 version_parse_cstr8(cstr8 src, version* out_ver);
 
-=== include\windowing\display.h ===
-11: typedef struct display_rect {
-18: typedef struct display_mode {
-25: typedef enum display_orientation {
-33: func b32 display_id_is_valid(display src);
-34: func display display_from_native_id(up native_id);
-35: func up display_to_native_id(display src);
-37: func sz display_get_count(void);
-38: func b32 display_get_id(sz idx, display* out_id);
-39: func display display_get_primary_id(void);
-40: func cstr8 display_get_name(display id);
-42: func b32 display_get_bounds(display id, display_rect* out_rect);
-43: func b32 display_get_usable_bounds(display id, display_rect* out_rect);
-45: func sz display_get_mode_count(display id);
-46: func b32 display_get_mode(display id, sz idx, display_mode* out_mode);
-47: func b32 display_get_current_mode(display id, display_mode* out_mode);
-48: func b32 display_get_desktop_mode(display id, display_mode* out_mode);
-50: func f32 display_get_refresh_rate(display id);
-51: func f32 display_get_content_scale(display id);
-52: func display_orientation display_get_orientation(display id);
+=== include\windowing\dialog.h ===
+8: typedef enum dialog_message_kind {
+14: typedef enum dialog_message_box_flag {
+22: typedef enum dialog_message_box_button_flag {
+27: typedef struct dialog_message_box_button {
+33: typedef struct dialog_message_box_color {
+39: typedef struct dialog_message_box_color_scheme {
+47: typedef struct dialog_message_box {
+56: typedef struct dialog_file_filter {
+61: typedef void dialog_file_callback(
+68: func b32 dialog_show_message(window owner, dialog_message_kind message_kind, cstr8 title, cstr8 message);
+74: func b32 dialog_show_message_box(window owner, const dialog_message_box* message_box, i32* out_button_id);
+76: func b32 dialog_open_file(window owner, const dialog_file_filter* filters, sz filter_count, cstr8 default_location, b32 allow_many, dialog_file_callback* callback, void* user_data);
+85: func b32 dialog_save_file(window owner, const dialog_file_filter* filters, sz filter_count, cstr8 default_location, dialog_file_callback* callback, void* user_data);
+93: func b32 dialog_open_folder(window owner, cstr8 default_location, b32 allow_many, dialog_file_callback* callback, void* user_data);
+
+=== include\windowing\monitor.h ===
+11: typedef struct monitor_rect {
+18: typedef struct monitor_mode {
+25: typedef enum monitor_orientation {
+33: func b32 monitor_id_is_valid(monitor src);
+34: func monitor monitor_from_native_id(up native_id);
+35: func up monitor_to_native_id(monitor src);
+37: func sz monitor_get_count(void);
+38: func b32 monitor_get_id(sz idx, monitor* out_id);
+39: func monitor monitor_get_primary_id(void);
+40: func cstr8 monitor_get_name(monitor id);
+42: func b32 monitor_get_bounds(monitor id, monitor_rect* out_rect);
+43: func b32 monitor_get_usable_bounds(monitor id, monitor_rect* out_rect);
+45: func sz monitor_get_mode_count(monitor id);
+46: func b32 monitor_get_mode(monitor id, sz idx, monitor_mode* out_mode);
+47: func b32 monitor_get_current_mode(monitor id, monitor_mode* out_mode);
+48: func b32 monitor_get_desktop_mode(monitor id, monitor_mode* out_mode);
+50: func f32 monitor_get_refresh_rate(monitor id);
+51: func f32 monitor_get_content_scale(monitor id);
+52: func monitor_orientation monitor_get_orientation(monitor id);
 
 === include\windowing\window.h ===
 12: func b32 window_id_is_valid(window src);
@@ -1638,5 +1662,6 @@
 38: func b32 window_focus(window id);
 40: func cstr8 window_get_title(window id);
 41: func b32 window_set_title(window id, cstr8 title);
-42: func b32 window_get_display_id(window id, display* out_display_id);
+42: func b32 window_get_monitor_id(window id, monitor* out_monitor_id);
+
 

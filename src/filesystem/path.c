@@ -13,7 +13,7 @@
 
 #if defined(PLATFORM_WINDOWS)
 #  include <direct.h>
-#elif defined(PLATFORM_UNIX) || defined(PLATFORM_ANDROID) || defined(PLATFORM_IOS)
+#elif defined(PLATFORM_UNIX)
 #  include <unistd.h>
 #endif
 
@@ -423,7 +423,7 @@ func path path_get_current(void) {
     TracyCZoneEnd(__tracy_zone_ctx);
     return path_empty_value();
   }
-#elif defined(PLATFORM_UNIX) || defined(PLATFORM_ANDROID) || defined(PLATFORM_IOS)
+#elif defined(PLATFORM_UNIX)
   if (getcwd(result.buf, size_of(result.buf)) == NULL) {
     TracyCZoneEnd(__tracy_zone_ctx);
     return path_empty_value();
@@ -449,7 +449,7 @@ func b32 path_set_current(const path* src) {
 #if defined(PLATFORM_WINDOWS)
   TracyCZoneEnd(__tracy_zone_ctx);
   return _chdir(src->buf) == 0 ? 1 : 0;
-#elif defined(PLATFORM_UNIX) || defined(PLATFORM_ANDROID) || defined(PLATFORM_IOS)
+#elif defined(PLATFORM_UNIX)
   TracyCZoneEnd(__tracy_zone_ctx);
   return chdir(src->buf) == 0 ? 1 : 0;
 #else
@@ -566,3 +566,4 @@ func timestamp path_get_last_write_time(const path* src) {
   TracyCZoneEnd(__tracy_zone_ctx);
   return timestamp_from_microseconds((i64)SDL_NS_TO_US(path_info.modify_time));
 }
+

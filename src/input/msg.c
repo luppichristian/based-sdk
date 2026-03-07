@@ -29,6 +29,7 @@ func void msg_notify_internal_listeners(const msg* src) {
 
 const_var i32 MSG_PAYLOAD_CODE = 0x42415345;
 const_var sz MSG_DEVICE_TRACK_CAP = 128;
+const_var u32 MSG_CATEGORY_USER_TYPE_COUNT = 0x1000u;
 #define MSG_HANDLER_CAP 64u
 
 typedef struct msg_handler_entry {
@@ -46,8 +47,113 @@ global_var u32 msg_handler_count = 0;
 global_var u64 msg_handler_next_id = 1;
 global_var msg_filter_fn msg_filter_current = NULL;
 global_var void* msg_filter_user_data = NULL;
+global_var b32 msg_user_spaces_ready = false;
+global_var u32 msg_user_space_bases[MSG_CATEGORY_MAX] = {0};
 
 func b32 msg_remove_handler(u64 handler_id);
+
+func b32 msg_category_is_valid(msg_category category) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
+  TracyCZoneEnd(__tracy_zone_ctx);
+  return category >= MSG_CATEGORY_CORE && category < MSG_CATEGORY_MAX;
+}
+
+func b32 msg_category_needs_user_space(msg_category category) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
+  TracyCZoneEnd(__tracy_zone_ctx);
+  return category > MSG_CATEGORY_CORE && category < MSG_CATEGORY_MAX;
+}
+
+func b32 msg_user_space_ensure(void) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
+  if (msg_user_spaces_ready) {
+    TracyCZoneEnd(__tracy_zone_ctx);
+    return true;
+  }
+
+  for (msg_category category = MSG_CATEGORY_GRAPHICS; category < MSG_CATEGORY_MAX; category += 1) {
+    u32 base_type = SDL_RegisterEvents((int)MSG_CATEGORY_USER_TYPE_COUNT);
+    if (base_type == (u32)-1) {
+      for (sz idx = 0; idx < MSG_CATEGORY_MAX; idx += 1) {
+        msg_user_space_bases[idx] = 0;
+      }
+      msg_user_spaces_ready = false;
+      TracyCZoneEnd(__tracy_zone_ctx);
+      return false;
+    }
+    msg_user_space_bases[(sz)category] = base_type;
+  }
+
+  msg_user_spaces_ready = true;
+  TracyCZoneEnd(__tracy_zone_ctx);
+  return true;
+}
+
+func b32 msg_user_space_get_sdl_type(msg_category category, u32 local_type, u32* out_sdl_type) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
+  if (out_sdl_type != NULL) {
+    *out_sdl_type = 0;
+  }
+
+  if (!msg_category_needs_user_space(category)) {
+    TracyCZoneEnd(__tracy_zone_ctx);
+    return false;
+  }
+  if (!msg_user_space_ensure()) {
+    TracyCZoneEnd(__tracy_zone_ctx);
+    return false;
+  }
+
+  u32 base_type = msg_user_space_bases[(sz)category];
+  u32 sdl_type = 0;
+  if (local_type >= base_type && local_type < (base_type + MSG_CATEGORY_USER_TYPE_COUNT)) {
+    sdl_type = local_type;
+  } else {
+    if (local_type >= MSG_CATEGORY_USER_TYPE_COUNT) {
+      TracyCZoneEnd(__tracy_zone_ctx);
+      return false;
+    }
+    sdl_type = base_type + local_type;
+  }
+
+  if (out_sdl_type != NULL) {
+    *out_sdl_type = sdl_type;
+  }
+  TracyCZoneEnd(__tracy_zone_ctx);
+  return true;
+}
+
+func b32 msg_user_space_decode_sdl_type(u32 sdl_type, msg_category* out_category, u32* out_local_type) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
+  if (out_category != NULL) {
+    *out_category = MSG_CATEGORY_CORE;
+  }
+  if (out_local_type != NULL) {
+    *out_local_type = sdl_type;
+  }
+
+  if (!msg_user_space_ensure()) {
+    TracyCZoneEnd(__tracy_zone_ctx);
+    return false;
+  }
+
+  for (msg_category category = MSG_CATEGORY_GRAPHICS; category < MSG_CATEGORY_MAX; category += 1) {
+    u32 base_type = msg_user_space_bases[(sz)category];
+    if (sdl_type >= base_type && sdl_type < (base_type + MSG_CATEGORY_USER_TYPE_COUNT)) {
+      if (out_category != NULL) {
+        *out_category = category;
+      }
+      if (out_local_type != NULL) {
+        *out_local_type = sdl_type - base_type;
+      }
+      TracyCZoneEnd(__tracy_zone_ctx);
+      return true;
+    }
+  }
+
+  TracyCZoneEnd(__tracy_zone_ctx);
+  return false;
+}
 
 func b32 msg_filter_accept(const msg* src) {
   TracyCZoneN(__tracy_zone_ctx, __func__, 1);
@@ -394,10 +500,10 @@ func b32 msg_from_sdl(const SDL_Event* src, msg* out_msg) {
     case SDL_EVENT_DISPLAY_DESKTOP_MODE_CHANGED:
     case SDL_EVENT_DISPLAY_CURRENT_MODE_CHANGED:
     case SDL_EVENT_DISPLAY_CONTENT_SCALE_CHANGED:
-      msg_core_fill_display(
+      msg_core_fill_monitor(
           out_msg,
-          &(msg_core_display_data) {
-              .display = display_from_native_id((up)src->display.displayID),
+          &(msg_core_monitor_data) {
+              .monitor = monitor_from_native_id((up)src->display.displayID),
               .data1 = (i32)src->display.data1,
               .data2 = (i32)src->display.data2,
           });
@@ -881,6 +987,14 @@ func b32 msg_from_sdl(const SDL_Event* src, msg* out_msg) {
       }
 
       if (src->type >= SDL_EVENT_USER) {
+        msg_category category = MSG_CATEGORY_CORE;
+        u32 local_type = src->type;
+        if (msg_user_space_decode_sdl_type(src->type, &category, &local_type)) {
+          out_msg->category = category;
+          out_msg->type = local_type;
+          TracyCZoneEnd(__tracy_zone_ctx);
+          return 1;
+        }
         TracyCZoneEnd(__tracy_zone_ctx);
         return 0;
       }
@@ -901,6 +1015,18 @@ func b32 msg_to_sdl_event(msg* src, SDL_Event* out_event) {
   *out_event = (SDL_Event) {0};
   out_event->type = src->type;
 
+  if (msg_category_needs_user_space(src->category)) {
+    u32 sdl_type = 0;
+    if (!msg_user_space_get_sdl_type(src->category, src->type, &sdl_type)) {
+      TracyCZoneEnd(__tracy_zone_ctx);
+      return 0;
+    }
+    out_event->user.type = sdl_type;
+    out_event->user.timestamp = (Uint64)src->timestamp;
+    TracyCZoneEnd(__tracy_zone_ctx);
+    return 1;
+  }
+
   if (src->type >= SDL_EVENT_USER) {
     out_event->user.type = (Uint32)src->type;
     out_event->user.timestamp = (Uint64)src->timestamp;
@@ -918,9 +1044,9 @@ func b32 msg_to_sdl_event(msg* src, SDL_Event* out_event) {
     case SDL_EVENT_DISPLAY_CONTENT_SCALE_CHANGED:
       out_event->display.type = (SDL_EventType)src->type;
       out_event->display.timestamp = (Uint64)src->timestamp;
-      out_event->display.displayID = (SDL_DisplayID)display_to_native_id(msg_core_get_display(src)->display);
-      out_event->display.data1 = (Sint32)msg_core_get_display(src)->data1;
-      out_event->display.data2 = (Sint32)msg_core_get_display(src)->data2;
+      out_event->display.displayID = (SDL_DisplayID)monitor_to_native_id(msg_core_get_monitor(src)->monitor);
+      out_event->display.data1 = (Sint32)msg_core_get_monitor(src)->data1;
+      out_event->display.data2 = (Sint32)msg_core_get_monitor(src)->data2;
       TracyCZoneEnd(__tracy_zone_ctx);
       return 1;
 
@@ -1511,6 +1637,10 @@ func b32 _msg_post(const msg* src, callsite site) {
 
   posted_msg = *src;
   posted_msg.post_site = site;
+  if (!msg_category_is_valid(posted_msg.category)) {
+    TracyCZoneEnd(__tracy_zone_ctx);
+    return 0;
+  }
 
   if (!msg_filter_accept(&posted_msg)) {
     TracyCZoneEnd(__tracy_zone_ctx);
@@ -1523,7 +1653,16 @@ func b32 _msg_post(const msg* src, callsite site) {
     return 0;
   }
 
-  if (posted_msg.type >= MSG_CORE_TYPE_USER) {
+  if (msg_category_needs_user_space(posted_msg.category) ||
+      (posted_msg.category == MSG_CATEGORY_CORE && posted_msg.type >= MSG_CORE_TYPE_USER)) {
+    u32 native_event_type = posted_msg.type;
+    if (msg_category_needs_user_space(posted_msg.category)) {
+      if (!msg_user_space_get_sdl_type(posted_msg.category, posted_msg.type, &native_event_type)) {
+        TracyCZoneEnd(__tracy_zone_ctx);
+        return 0;
+      }
+    }
+
     payload = (msg*)SDL_malloc(size_of(*payload));
     if (!payload) {
       thread_log_error("msg_post: payload alloc failed type=%u", posted_msg.type);
@@ -1533,7 +1672,7 @@ func b32 _msg_post(const msg* src, callsite site) {
     *payload = posted_msg;
 
     native_event = (SDL_Event) {0};
-    native_event.user.type = posted_msg.type;
+    native_event.user.type = native_event_type;
     native_event.user.timestamp = (Uint64)posted_msg.timestamp;
     native_event.user.code = (Sint32)MSG_PAYLOAD_CODE;
     native_event.user.data1 = payload;
@@ -1658,3 +1797,7 @@ func b32 msg_to_native(const msg* src, void* native_event) {
   TracyCZoneEnd(__tracy_zone_ctx);
   return msg_to_sdl_event((msg*)src, (SDL_Event*)native_event);
 }
+
+
+
+

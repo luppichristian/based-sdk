@@ -49,4 +49,5 @@ func void buffer_set8(buffer buff, u8 value);
 func void buffer_set16(buffer buff, u16 value);
 func void buffer_set32(buffer buff, u32 value);
 func void buffer_set64(buffer buff, u64 value);
+// Fills the entire buffer with zeros.
 func void buffer_zero(buffer buff);

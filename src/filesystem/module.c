@@ -12,7 +12,7 @@
 
 #if defined(PLATFORM_WINDOWS)
 #  include <windows.h>
-#elif defined(PLATFORM_UNIX) || defined(PLATFORM_ANDROID) || defined(PLATFORM_IOS)
+#elif defined(PLATFORM_UNIX)
 #  include <dlfcn.h>
 #endif
 
@@ -56,7 +56,7 @@ func void* mod_get_func(const mod* mod_ptr, cstr8 name) {
   cast_value.raw_symbol = raw_symbol;
   TracyCZoneEnd(__tracy_zone_ctx);
   return cast_value.resolved_func;
-#elif defined(PLATFORM_UNIX) || defined(PLATFORM_ANDROID) || defined(PLATFORM_IOS)
+#elif defined(PLATFORM_UNIX)
   void* raw_symbol = dlsym(mod_ptr->native_handle, name);
   union {
     void* raw_symbol;
@@ -78,10 +78,10 @@ func cstr8 mod_get_extension(void) {
 #if defined(PLATFORM_WINDOWS)
   TracyCZoneEnd(__tracy_zone_ctx);
   return ".dll";
-#elif defined(PLATFORM_MACOS) || defined(PLATFORM_IOS)
+#elif defined(PLATFORM_MACOS)
   TracyCZoneEnd(__tracy_zone_ctx);
   return ".dylib";
-#elif defined(PLATFORM_UNIX) || defined(PLATFORM_ANDROID)
+#elif defined(PLATFORM_UNIX)
   TracyCZoneEnd(__tracy_zone_ctx);
   return ".so";
 #else
@@ -105,7 +105,7 @@ func void mod_close(mod* mod_ptr) {
 
 #if defined(PLATFORM_WINDOWS)
   (void)FreeLibrary((HMODULE)mod_ptr->native_handle);
-#elif defined(PLATFORM_UNIX) || defined(PLATFORM_ANDROID) || defined(PLATFORM_IOS)
+#elif defined(PLATFORM_UNIX)
   (void)dlclose(mod_ptr->native_handle);
 #endif
 
@@ -133,7 +133,7 @@ func mod mod_open(const path* src) {
     return module_value;
   }
   module_value.native_handle = (void*)handle;
-#elif defined(PLATFORM_UNIX) || defined(PLATFORM_ANDROID) || defined(PLATFORM_IOS)
+#elif defined(PLATFORM_UNIX)
   void* handle = dlopen(src->buf, RTLD_NOW);
   if (handle == NULL) {
     TracyCZoneEnd(__tracy_zone_ctx);
@@ -178,3 +178,4 @@ func mod mod_open(const path* src) {
   TracyCZoneEnd(__tracy_zone_ctx);
   return module_value;
 }
+

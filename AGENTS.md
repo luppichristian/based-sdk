@@ -96,10 +96,12 @@ include/                      # public API headers
     sensor.h                  # sensor-device enumeration and identifier wrappers
     tablet.h                  # graphics-tablet enumeration and pen-state helpers
     touch.h                   # touch-device and finger query helpers
-  windowing/                  # SDL-backed display/window identifier and query wrappers
-    display.h                 # display identifiers plus display enumeration and bounds helpers
+  windowing/                  # SDL-backed monitor/window/dialog wrappers
+    dialog.h                  # native message-box and file/folder dialog wrappers
+    monitor.h                 # monitor identifiers plus monitor enumeration and bounds helpers
     window.h                  # window identifiers plus window enumeration and metadata helpers
-  processes/                  # process creation and lifecycle helpers
+  processes/                  # process creation, lifecycle, and platform-launch helpers
+    common_processes.h        # convenience launch helpers (browser, app, file manager, terminals)
     pipe.h                    # process-owned stdio pipe handles and pipe I/O helpers
     process.h                 # subprocess spawning, waiting, and output capture helpers
     process_current.h         # current-process identifier, priority, and termination helpers
@@ -188,3 +190,4 @@ Common utility macros from `include/basic/utility_defines.h`:
 - Range/alignment helpers: `in_range`, `in_bounds`, `is_pow2`, `align_up`, `align_down`.
 - Numeric helpers: `kb`, `mb`, `gb`, `tb`, `th`, `mil`, `bil`, `tril`.
 - Value helper: `swap`.
+

@@ -73,6 +73,9 @@ func dll_export void mod_quit(void);
 // Returns true on success, false on failure.
 func b32 entry_init(cmdline cmdline);
 
+// Returns the command line captured during the first successful entry_init().
+func cmdline entry_get_cmdline(void);
+
 // Common shutdown hook paired with entry_init().
 // Safe to call even if initialization failed.
 func void entry_quit(void);
@@ -84,5 +87,6 @@ func void entry_quit(void);
 // If you want, you can override the global ctx allocator.
 // By default its set to vmem_get_allocator().
 #ifdef OVERRIDE_GLOBAL_DEFAULT_ALLOCATOR
+// Returns the allocator used by global_ctx_init when no explicit allocator is provided.
 func allocator global_allocator_default();
 #endif

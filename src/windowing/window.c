@@ -5,6 +5,10 @@
 #include "../sdl3_include.h"
 #include "basic/profiler.h"
 
+// =========================================================================
+// Internal Helpers
+// =========================================================================
+
 func SDL_Window* window_resolve(window id) {
   TracyCZoneN(__tracy_zone_ctx, __func__, 1);
   if (!window_id_is_valid(id)) {
@@ -15,6 +19,10 @@ func SDL_Window* window_resolve(window id) {
   TracyCZoneEnd(__tracy_zone_ctx);
   return window_ptr;
 }
+
+// =========================================================================
+// Identifier Conversion Helpers
+// =========================================================================
 
 func b32 window_id_is_valid(window src) {
   TracyCZoneN(__tracy_zone_ctx, __func__, 1);
@@ -33,6 +41,10 @@ func up window_to_native_id(window src) {
   TracyCZoneEnd(__tracy_zone_ctx);
   return (up)src;
 }
+
+// =========================================================================
+// Global Window Enumeration
+// =========================================================================
 
 func sz window_get_count(void) {
   TracyCZoneN(__tracy_zone_ctx, __func__, 1);
@@ -69,6 +81,10 @@ func b32 window_get_id(sz idx, window* out_id) {
   return found;
 }
 
+// =========================================================================
+// Creation and Destruction
+// =========================================================================
+
 func b32 window_is_valid(window id) {
   TracyCZoneN(__tracy_zone_ctx, __func__, 1);
   TracyCZoneEnd(__tracy_zone_ctx);
@@ -101,6 +117,10 @@ func b32 window_destroy(window id) {
   return 1;
 }
 
+// =========================================================================
+// Visibility
+// =========================================================================
+
 func b32 window_show(window id) {
   TracyCZoneN(__tracy_zone_ctx, __func__, 1);
   SDL_Window* window_ptr = window_resolve(id);
@@ -126,6 +146,10 @@ func b32 window_hide(window id) {
   TracyCZoneEnd(__tracy_zone_ctx);
   return 1;
 }
+
+// =========================================================================
+// Position
+// =========================================================================
 
 func b32 window_move(window id, i32 xpos, i32 ypos) {
   TracyCZoneN(__tracy_zone_ctx, __func__, 1);
@@ -153,6 +177,10 @@ func b32 window_get_position(window id, i32* out_xpos, i32* out_ypos) {
   return 1;
 }
 
+// =========================================================================
+// Size
+// =========================================================================
+
 func b32 window_resize(window id, i32 width, i32 height) {
   TracyCZoneN(__tracy_zone_ctx, __func__, 1);
   SDL_Window* window_ptr = window_resolve(id);
@@ -179,6 +207,10 @@ func b32 window_get_size(window id, i32* out_width, i32* out_height) {
   return 1;
 }
 
+// =========================================================================
+// Fullscreen State
+// =========================================================================
+
 func b32 window_set_fullscreen(window id, b32 enabled) {
   TracyCZoneN(__tracy_zone_ctx, __func__, 1);
   SDL_Window* window_ptr = window_resolve(id);
@@ -204,6 +236,10 @@ func b32 window_is_fullscreen(window id) {
   TracyCZoneEnd(__tracy_zone_ctx);
   return result;
 }
+
+// =========================================================================
+// Window-State Controls
+// =========================================================================
 
 func b32 window_minimize(window id) {
   TracyCZoneN(__tracy_zone_ctx, __func__, 1);
@@ -257,6 +293,10 @@ func b32 window_focus(window id) {
   return 1;
 }
 
+// =========================================================================
+// Metadata
+// =========================================================================
+
 func cstr8 window_get_title(window id) {
   TracyCZoneN(__tracy_zone_ctx, __func__, 1);
   SDL_Window* window_ptr = window_resolve(id);
@@ -282,13 +322,13 @@ func b32 window_set_title(window id, cstr8 title) {
   return 1;
 }
 
-func b32 window_get_display_id(window id, display* out_display_id) {
+func b32 window_get_monitor_id(window id, monitor* out_monitor_id) {
   TracyCZoneN(__tracy_zone_ctx, __func__, 1);
   SDL_Window* window_ptr = window_resolve(id);
-  SDL_DisplayID native_display_id = 0;
+  SDL_DisplayID native_monitor_id = 0;
 
-  if (out_display_id) {
-    *out_display_id = NULL;
+  if (out_monitor_id) {
+    *out_monitor_id = NULL;
   }
 
   if (window_ptr == NULL) {
@@ -296,16 +336,18 @@ func b32 window_get_display_id(window id, display* out_display_id) {
     return 0;
   }
 
-  native_display_id = SDL_GetDisplayForWindow(window_ptr);
-  if (native_display_id == 0) {
+  native_monitor_id = SDL_GetDisplayForWindow(window_ptr);
+  if (native_monitor_id == 0) {
     TracyCZoneEnd(__tracy_zone_ctx);
     return 0;
   }
 
-  if (out_display_id) {
-    *out_display_id = display_from_native_id((up)native_display_id);
+  if (out_monitor_id) {
+    *out_monitor_id = monitor_from_native_id((up)native_monitor_id);
   }
 
   TracyCZoneEnd(__tracy_zone_ctx);
   return 1;
 }
+
+

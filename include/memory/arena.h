@@ -127,6 +127,7 @@ func void* _arena_realloc(
 // memory available for reuse. No blocks are released to the parent allocator.
 func void arena_clear(arena* arn);
 
+// Aggregate arena statistics.
 func sz arena_block_count(arena* arn);
 func sz arena_total_size(arena* arn);
 func sz arena_total_used(arena* arn);

@@ -19,7 +19,7 @@
 #  include <sys/resource.h>
 #  include <sys/sysinfo.h>
 #  include <unistd.h>
-#elif defined(PLATFORM_MACOS) || defined(PLATFORM_IOS)
+#elif defined(PLATFORM_MACOS)
 #  include <mach/mach.h>
 #  include <mach/task.h>
 #  include <sys/resource.h>
@@ -125,7 +125,7 @@ func b32 runtime_query_linux_cpu(runtime_cpu_sample* out_sample) {
   TracyCZoneEnd(__tracy_zone_ctx);
   return 1;
 }
-#elif defined(PLATFORM_MACOS) || defined(PLATFORM_IOS)
+#elif defined(PLATFORM_MACOS)
 typedef struct runtime_cpu_sample {
   u64 idle_ticks;
   u64 total_ticks;
@@ -287,7 +287,7 @@ func b32 system_runtime_query(system_runtime_info* out_info) {
   thread_log_trace("system_runtime_query: platform=linux mem_used=%zu", (size_t)out_info->memory_used);
   TracyCZoneEnd(__tracy_zone_ctx);
   return 1;
-#elif defined(PLATFORM_MACOS) || defined(PLATFORM_IOS)
+#elif defined(PLATFORM_MACOS)
   u64 total_memory = 0;
   sz total_size = size_of(total_memory);
   if (sysctlbyname("hw.memsize", &total_memory, &total_size, NULL, 0) == 0) {
@@ -344,3 +344,4 @@ func b32 system_runtime_query(system_runtime_info* out_info) {
   return 0;
 #endif
 }
+

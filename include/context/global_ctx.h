@@ -54,6 +54,7 @@ func b32 global_set_user_data(ctx_user_data_idx idx, void* user_data);
 func b32 global_set_user_data_access(ctx_user_data_idx idx, b8 has_access);
 func void global_set_user_data_access_all(b8 has_access);
 
+// Clears temporary allocators in the shared context.
 func void global_clear_temp(void);
 
 // Convenience wrapper for configuring the global effective log state.

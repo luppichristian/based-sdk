@@ -42,6 +42,9 @@ func b32 filemap_flush(filemap* map);
 // Releases the mapping and resets map to an empty value.
 func void filemap_close(filemap* map);
 
+// Returns 1 if map was opened with write permissions.
 func b32 filemap_is_writable(const filemap* map);
+// Marks a writable mapping as dirty so filemap_flush can persist updates.
 func void filemap_mark_dirty(filemap* map);
+// Returns the last filemap error reported by the current thread.
 func filemap_error filemap_get_last_error(void);

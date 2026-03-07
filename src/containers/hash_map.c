@@ -188,6 +188,10 @@ func void hash_map_clear(hash_map* map) {
   TracyCZoneEnd(__tracy_zone_ctx);
 }
 
+// =========================================================================
+// Capacity and Occupancy
+// =========================================================================
+
 func sz hash_map_count(hash_map const* map) {
   TracyCZoneN(__tracy_zone_ctx, __func__, 1);
   if (map == NULL) {
@@ -220,7 +224,7 @@ func f32 hash_map_load_factor(hash_map const* map) {
 }
 
 // =========================================================================
-// Operations
+// Key/Value Operations
 // =========================================================================
 
 func b32 hash_map_set(hash_map* map, u64 key, void* value) {

@@ -6,6 +6,7 @@
 #include "../basic/log.h"
 #include "../memory/arena.h"
 #include "../memory/heap.h"
+#include "../threads/mutex.h"
 
 // Fixed number of generic user-data slots available in each context.
 const_var sz CTX_USER_DATA_COUNT = 32;
@@ -39,8 +40,9 @@ typedef struct ctx {
 } ctx;
 
 // Initializes a context payload using main_allocator.
+// allocator_mutex is shared across the embedded allocators when non-NULL.
 // When use_log_mutex is true, the embedded log_state owns a mutex.
-func b32 ctx_init(ctx* context, allocator main_allocator, b32 use_log_mutex);
+func b32 ctx_init(ctx* context, allocator main_allocator, mutex allocator_mutex, b32 use_log_mutex);
 
 // Destroys a context payload and releases owned allocator resources.
 func void ctx_quit(ctx* context);
@@ -64,6 +66,8 @@ func heap* ctx_get_temp_heap(ctx* context);
 // Accesses one generic user-data slot.
 // Out-of-range access returns NULL / false.
 func void* ctx_get_user_data(ctx* context, ctx_user_data_idx idx);
+// Writes one generic user-data slot.
+// Out-of-range writes return false.
 func b32 ctx_set_user_data(ctx* context, ctx_user_data_idx idx, void* user_data);
 
 // Clears temporary allocators in the context.

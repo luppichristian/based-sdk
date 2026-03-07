@@ -14,11 +14,11 @@
 #if defined(PLATFORM_WINDOWS)
 #  define WIN32_LEAN_AND_MEAN
 #  include <windows.h>
-#elif defined(PLATFORM_UNIX) || defined(PLATFORM_ANDROID) || defined(PLATFORM_IOS)
+#elif defined(PLATFORM_UNIX)
 #  include <sys/types.h>
 #  include <sys/utsname.h>
 #  include <unistd.h>
-#  if defined(PLATFORM_MACOS) || defined(PLATFORM_IOS)
+#  if defined(PLATFORM_MACOS)
 #    include <pwd.h>
 #    include <sys/sysctl.h>
 #  else
@@ -80,9 +80,6 @@ func cstr8 system_architecture_name(void) {
 #elif defined(ARCH_SPARC)
   TracyCZoneEnd(__tracy_zone_ctx);
   return "sparc";
-#elif defined(ARCH_WASM)
-  TracyCZoneEnd(__tracy_zone_ctx);
-  return "wasm";
 #else
   TracyCZoneEnd(__tracy_zone_ctx);
   return "unknown";
@@ -175,7 +172,7 @@ func b32 system_info_query(system_info* out_info) {
   thread_log_trace("system_info_query: platform=windows arch=%s", out_info->architecture_name);
   TracyCZoneEnd(__tracy_zone_ctx);
   return 1;
-#elif defined(PLATFORM_UNIX) || defined(PLATFORM_ANDROID) || defined(PLATFORM_IOS)
+#elif defined(PLATFORM_UNIX)
   struct utsname uname_info;
   if (uname(&uname_info) == 0) {
     system_copy_string(out_info->os_name, size_of(out_info->os_name), uname_info.sysname);
@@ -225,3 +222,4 @@ func b32 system_info_query(system_info* out_info) {
   return 0;
 #endif
 }
+

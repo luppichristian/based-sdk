@@ -58,7 +58,7 @@ func void filesystem_info_set_windows_flags(pathinfo* info, DWORD attributes) {
   TracyCZoneEnd(__tracy_zone_ctx);
 }
 
-#elif defined(PLATFORM_UNIX) || defined(PLATFORM_ANDROID) || defined(PLATFORM_IOS)
+#elif defined(PLATFORM_UNIX)
 
 #  include <sys/stat.h>
 #  include <unistd.h>
@@ -178,7 +178,7 @@ func b32 pathinfo_get(const path* src, pathinfo* out_info) {
   info.access_time = filesystem_timestamp_from_filetime(attr_data.ftLastAccessTime);
   info.write_time = filesystem_timestamp_from_filetime(attr_data.ftLastWriteTime);
   filesystem_info_set_windows_flags(&info, attr_data.dwFileAttributes);
-#elif defined(PLATFORM_UNIX) || defined(PLATFORM_ANDROID) || defined(PLATFORM_IOS)
+#elif defined(PLATFORM_UNIX)
   struct stat stat_info;
   cstr8 name_ptr = NULL;
 
@@ -190,7 +190,7 @@ func b32 pathinfo_get(const path* src, pathinfo* out_info) {
   info.kind = filesystem_kind_from_mode(stat_info.st_mode);
   info.exists = 1;
   info.size = (sz)stat_info.st_size;
-#  if defined(PLATFORM_MACOS) || defined(PLATFORM_IOS)
+#  if defined(PLATFORM_MACOS)
   info.access_time = filesystem_timestamp_from_timespec(stat_info.st_atimespec);
   info.write_time = filesystem_timestamp_from_timespec(stat_info.st_mtimespec);
   info.create_time = filesystem_timestamp_from_timespec(stat_info.st_ctimespec);
@@ -230,3 +230,4 @@ func b32 pathinfo_get(const path* src, pathinfo* out_info) {
   TracyCZoneEnd(__tracy_zone_ctx);
   return 1;
 }
+

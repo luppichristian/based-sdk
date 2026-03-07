@@ -38,6 +38,7 @@ func void pathwatch_destroy(pathwatch* watcher);
 
 // Starts the background watch thread. Returns 1 on success, 0 otherwise.
 func b32 pathwatch_start(pathwatch* watcher);
+// Stops, pauses, resumes, or drains the watcher event stream.
 func b32 pathwatch_stop(pathwatch* watcher);
 func b32 pathwatch_pause(pathwatch* watcher);
 func b32 pathwatch_resume(pathwatch* watcher);

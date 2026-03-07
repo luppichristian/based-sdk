@@ -53,7 +53,8 @@ func b32 global_ctx_init(allocator main_allocator) {
 
     memset(&process_global_ctx, 0, size_of(process_global_ctx));
     process_global_ctx.mutex_handle = mutex_create();
-    if (!process_global_ctx.mutex_handle || !ctx_init(&process_global_ctx.shared_ctx, main_allocator, true)) {
+    if (!process_global_ctx.mutex_handle ||
+        !ctx_init(&process_global_ctx.shared_ctx, main_allocator, process_global_ctx.mutex_handle, true)) {
       if (process_global_ctx.mutex_handle) {
         mutex_destroy(process_global_ctx.mutex_handle);
       }

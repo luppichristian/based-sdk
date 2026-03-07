@@ -28,6 +28,13 @@ func process_priority process_get_priority(void);
 // Higher priorities may require elevated privileges on some platforms.
 func b32 process_set_priority(process_priority priority);
 
+// Returns 1 if this process currently appears to be the only live instance of its executable.
+func b32 process_is_unique(void);
+
+// Spawns a fresh instance of the current executable using the captured startup command line,
+// then exits the current process with code 0 on success.
+func b32 process_restart(void);
+
 // Terminates the current process with the provided exit code.
 // This does not return.
 func no_return void process_exit(i32 exit_code);

@@ -5,6 +5,10 @@
 #include "basic/assert.h"
 #include "basic/profiler.h"
 
+// =========================================================================
+// Internal Codepoint Helpers
+// =========================================================================
+
 func u32 c8_to_code(c8 chr) {
   TracyCZoneN(__tracy_zone_ctx, __func__, 1);
   TracyCZoneEnd(__tracy_zone_ctx);
@@ -139,6 +143,10 @@ func c8 char_code_nibble_to_hex(u8 nibble) {
   TracyCZoneEnd(__tracy_zone_ctx);
   return digits[nibble & 0x0FU];
 }
+
+// =========================================================================
+// Public API Generation
+// =========================================================================
 
 #define DEFINE_CHAR_FUNCS(PREFIX, TYPE, TO_CODE) \
   func b32 PREFIX##_is_alnum(TYPE chr) {         \

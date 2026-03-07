@@ -34,6 +34,7 @@ func sensor_kind sensor_get_kind(sensor id);
 // Returns the backend-specific non-portable sensor kind for id.
 func i32 sensor_get_non_portable_kind(sensor id);
 
+// Device lifecycle and sample retrieval.
 func b32 sensor_open(sensor id);
 func b32 sensor_close(sensor id);
 func b32 sensor_start(sensor id);

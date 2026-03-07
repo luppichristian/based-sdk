@@ -62,6 +62,7 @@ func void process_read_free(void* ptr);
 // Waits for the process to exit.
 // If block is false, this polls and returns false while the process is still running.
 func b32 process_wait(process prc, b32 block, i32* out_exit_code);
+// Waits up to timeout_ms for process exit.
 func b32 process_wait_timeout(process prc, i32 timeout_ms, i32* out_exit_code);
 
 // Requests termination of the process.

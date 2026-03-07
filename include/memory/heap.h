@@ -146,6 +146,7 @@ func void* _heap_realloc(
 // This effectively resets the heap to an empty state while keeping reserved memory.
 func void heap_clear(heap* hep);
 
+// Aggregate heap statistics.
 func sz heap_block_count(heap* hep);
 func sz heap_total_size(heap* hep);
 func sz heap_total_free(heap* hep);

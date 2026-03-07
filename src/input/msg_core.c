@@ -5,6 +5,10 @@
 #include "input/msg_core.h"
 #include "basic/profiler.h"
 
+// =========================================================================
+// Core Message Packing
+// =========================================================================
+
 func void msg_fill_core_raw(msg* src, u32 default_type, const void* core_data_ptr, sz core_data_size) {
   TracyCZoneN(__tracy_zone_ctx, __func__, 1);
   if (src == NULL || core_data_ptr == NULL || core_data_size > size_of(src->data)) {
@@ -70,7 +74,7 @@ func b32 msg_core_is_valid(const msg* src, b32 matches_type) {
            type == (type_d) || type == (type_e);                                        \
   }
 
-MSG_CORE_DEFINE_MATCHER_RANGE(msg_core_type_is_display, MSG_CORE_TYPE_DISPLAY_ORIENTATION, MSG_CORE_TYPE_DISPLAY_CONTENT_SCALE_CHANGED)
+MSG_CORE_DEFINE_MATCHER_RANGE(msg_core_type_is_monitor, MSG_CORE_TYPE_MONITOR_ORIENTATION, MSG_CORE_TYPE_MONITOR_CONTENT_SCALE_CHANGED)
 MSG_CORE_DEFINE_MATCHER_RANGE(msg_core_type_is_window, MSG_CORE_TYPE_WINDOW_SHOWN, MSG_CORE_TYPE_WINDOW_HDR_STATE_CHANGED)
 MSG_CORE_DEFINE_MATCHER_TWO(msg_core_type_is_keyboard_device, MSG_CORE_TYPE_KEYBOARD_ADDED, MSG_CORE_TYPE_KEYBOARD_REMOVED)
 MSG_CORE_DEFINE_MATCHER_TWO(msg_core_type_is_keyboard, MSG_CORE_TYPE_KEY_DOWN, MSG_CORE_TYPE_KEY_UP)
@@ -113,6 +117,10 @@ MSG_CORE_DEFINE_MATCHER_ONE(msg_core_type_is_log, MSG_CORE_TYPE_LOG)
 MSG_CORE_DEFINE_MATCHER_ONE(msg_core_type_is_assert, MSG_CORE_TYPE_ASSERT)
 MSG_CORE_DEFINE_MATCHER_ONE(msg_core_type_is_global_ctx, MSG_CORE_TYPE_GLOBAL_CTX)
 
+// =========================================================================
+// Typed Accessor Generation
+// =========================================================================
+
 #define MSG_CORE_DEFINE_ACCESSORS(data_type, fill_name, get_name, default_type_expr, matcher_name) \
   func void fill_name(msg* src, const data_type* core_data) {                                      \
     TracyCZoneN(__tracy_zone_ctx, __func__, 1);                                                     \
@@ -134,7 +142,7 @@ MSG_CORE_DEFINE_MATCHER_ONE(msg_core_type_is_global_ctx, MSG_CORE_TYPE_GLOBAL_CT
     return (data_type*)src->data;                                                                    \
   }
 
-MSG_CORE_DEFINE_ACCESSORS(msg_core_display_data, msg_core_fill_display, msg_core_get_display, MSG_CORE_TYPE_DISPLAY_ORIENTATION, msg_core_type_is_display)
+MSG_CORE_DEFINE_ACCESSORS(msg_core_monitor_data, msg_core_fill_monitor, msg_core_get_monitor, MSG_CORE_TYPE_MONITOR_ORIENTATION, msg_core_type_is_monitor)
 MSG_CORE_DEFINE_ACCESSORS(msg_core_window_data, msg_core_fill_window, msg_core_get_window, MSG_CORE_TYPE_WINDOW_SHOWN, msg_core_type_is_window)
 MSG_CORE_DEFINE_ACCESSORS(msg_core_keyboard_device_data, msg_core_fill_keyboard_device, msg_core_get_keyboard_device, MSG_CORE_TYPE_KEYBOARD_ADDED, msg_core_type_is_keyboard_device)
 MSG_CORE_DEFINE_ACCESSORS(msg_core_keyboard_data, msg_core_fill_keyboard, msg_core_get_keyboard, core_data->down ? MSG_CORE_TYPE_KEY_DOWN : MSG_CORE_TYPE_KEY_UP, msg_core_type_is_keyboard)
@@ -176,3 +184,5 @@ MSG_CORE_DEFINE_ACCESSORS(msg_core_pathwatch_data, msg_core_fill_pathwatch, msg_
 MSG_CORE_DEFINE_ACCESSORS(msg_core_log_data, msg_core_fill_log, msg_core_get_log, MSG_CORE_TYPE_LOG, msg_core_type_is_log)
 MSG_CORE_DEFINE_ACCESSORS(msg_core_assert_data, msg_core_fill_assert, msg_core_get_assert, MSG_CORE_TYPE_ASSERT, msg_core_type_is_assert)
 MSG_CORE_DEFINE_ACCESSORS(msg_core_global_ctx_data, msg_core_fill_global_ctx, msg_core_get_global_ctx, MSG_CORE_TYPE_GLOBAL_CTX, msg_core_type_is_global_ctx)
+
+

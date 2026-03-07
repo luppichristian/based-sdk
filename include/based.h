@@ -64,10 +64,12 @@
 #include "input/touch.h"
 
 // Include windowing modules.
-#include "windowing/display.h"
+#include "windowing/dialog.h"
+#include "windowing/monitor.h"
 #include "windowing/window.h"
 
 // Include process modules.
+#include "processes/common_processes.h"
 #include "processes/pipe.h"
 #include "processes/process.h"
 #include "processes/process_current.h"
@@ -121,3 +123,4 @@
 #  define LM2_NO_GENERICS
 #endif
 #include <lm2.h>
+

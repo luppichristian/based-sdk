@@ -11,7 +11,7 @@
 #include "../context/thread_ctx.h"
 #include "../filesystem/pathwatch.h"
 #include "../strings/cstrings.h"
-#include "../windowing/display.h"
+#include "../windowing/monitor.h"
 #include "../windowing/window.h"
 #include "camera.h"
 #include "devices.h"
@@ -35,13 +35,13 @@ typedef enum msg_core_type {
   MSG_CORE_TYPE_DID_ENTER_FOREGROUND = 0x106,
   MSG_CORE_TYPE_LOCALE_CHANGED = 0x107,
   MSG_CORE_TYPE_SYSTEM_THEME_CHANGED = 0x108,
-  MSG_CORE_TYPE_DISPLAY_ORIENTATION = 0x151,
-  MSG_CORE_TYPE_DISPLAY_ADDED = 0x152,
-  MSG_CORE_TYPE_DISPLAY_REMOVED = 0x153,
-  MSG_CORE_TYPE_DISPLAY_MOVED = 0x154,
-  MSG_CORE_TYPE_DISPLAY_DESKTOP_MODE_CHANGED = 0x155,
-  MSG_CORE_TYPE_DISPLAY_CURRENT_MODE_CHANGED = 0x156,
-  MSG_CORE_TYPE_DISPLAY_CONTENT_SCALE_CHANGED = 0x157,
+  MSG_CORE_TYPE_MONITOR_ORIENTATION = 0x151,
+  MSG_CORE_TYPE_MONITOR_ADDED = 0x152,
+  MSG_CORE_TYPE_MONITOR_REMOVED = 0x153,
+  MSG_CORE_TYPE_MONITOR_MOVED = 0x154,
+  MSG_CORE_TYPE_MONITOR_DESKTOP_MODE_CHANGED = 0x155,
+  MSG_CORE_TYPE_MONITOR_CURRENT_MODE_CHANGED = 0x156,
+  MSG_CORE_TYPE_MONITOR_CONTENT_SCALE_CHANGED = 0x157,
   MSG_CORE_TYPE_WINDOW_SHOWN = 0x202,
   MSG_CORE_TYPE_WINDOW_HIDDEN = 0x203,
   MSG_CORE_TYPE_WINDOW_EXPOSED = 0x204,
@@ -59,8 +59,8 @@ typedef enum msg_core_type {
   MSG_CORE_TYPE_WINDOW_CLOSE_REQUESTED = 0x210,
   MSG_CORE_TYPE_WINDOW_HIT_TEST = 0x211,
   MSG_CORE_TYPE_WINDOW_ICCPROF_CHANGED = 0x212,
-  MSG_CORE_TYPE_WINDOW_DISPLAY_CHANGED = 0x213,
-  MSG_CORE_TYPE_WINDOW_DISPLAY_SCALE_CHANGED = 0x214,
+  MSG_CORE_TYPE_WINDOW_MONITOR_CHANGED = 0x213,
+  MSG_CORE_TYPE_WINDOW_MONITOR_SCALE_CHANGED = 0x214,
   MSG_CORE_TYPE_WINDOW_SAFE_AREA_CHANGED = 0x215,
   MSG_CORE_TYPE_WINDOW_OCCLUDED = 0x216,
   MSG_CORE_TYPE_WINDOW_ENTER_FULLSCREEN = 0x217,
@@ -188,12 +188,12 @@ typedef enum msg_core_global_ctx_event_kind {
 #define MSG_LOG_TEXT_CAP    512
 #define MSG_ASSERT_TEXT_CAP 512
 
-// Display event payload.
-typedef struct msg_core_display_data {
-  display display;
+// monitor event payload.
+typedef struct msg_core_monitor_data {
+  monitor monitor;
   i32 data1;
   i32 data2;
-} msg_core_display_data;
+} msg_core_monitor_data;
 
 // Window event payload.
 typedef struct msg_core_window_data {
@@ -509,7 +509,7 @@ typedef struct msg_core_assert_data {
 } msg_core_assert_data;
 
 typedef union msg_core_data {
-  msg_core_display_data display;
+  msg_core_monitor_data monitor;
   msg_core_window_data window;
   msg_core_keyboard_device_data keyboard_device;
   msg_core_keyboard_data keyboard;
@@ -553,7 +553,8 @@ typedef union msg_core_data {
   msg_core_global_ctx_data global_ctx;
 } msg_core_data;
 
-func void msg_core_fill_display(msg* src, const msg_core_display_data* core_data);
+// Packs typed core payloads into a msg record.
+func void msg_core_fill_monitor(msg* src, const msg_core_monitor_data* core_data);
 func void msg_core_fill_window(msg* src, const msg_core_window_data* core_data);
 func void msg_core_fill_keyboard_device(msg* src, const msg_core_keyboard_device_data* core_data);
 func void msg_core_fill_keyboard(msg* src, const msg_core_keyboard_data* core_data);
@@ -596,7 +597,8 @@ func void msg_core_fill_log(msg* src, const msg_core_log_data* core_data);
 func void msg_core_fill_assert(msg* src, const msg_core_assert_data* core_data);
 func void msg_core_fill_global_ctx(msg* src, const msg_core_global_ctx_data* core_data);
 
-func msg_core_display_data* msg_core_get_display(msg* src);
+// Returns typed payload pointers for core messages, or NULL on category/type mismatch.
+func msg_core_monitor_data* msg_core_get_monitor(msg* src);
 func msg_core_window_data* msg_core_get_window(msg* src);
 func msg_core_keyboard_device_data* msg_core_get_keyboard_device(msg* src);
 func msg_core_keyboard_data* msg_core_get_keyboard(msg* src);
@@ -638,3 +640,6 @@ func msg_core_pathwatch_data* msg_core_get_pathwatch(msg* src);
 func msg_core_log_data* msg_core_get_log(msg* src);
 func msg_core_assert_data* msg_core_get_assert(msg* src);
 func msg_core_global_ctx_data* msg_core_get_global_ctx(msg* src);
+
+
+

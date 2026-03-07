@@ -12,6 +12,7 @@ typedef struct binary_tree_links {
   struct binary_tree_links* parent;
 } binary_tree_links;
 
+// Returns the left-most node in an in-order traversal.
 func force_inline void* binary_tree_first_inorder_ptr(void* root_ptr) {
   binary_tree_links* cursor = (binary_tree_links*)root_ptr;
   while (cursor != NULL && cursor->left != NULL) {
@@ -20,6 +21,7 @@ func force_inline void* binary_tree_first_inorder_ptr(void* root_ptr) {
   return cursor;
 }
 
+// Returns the next node in an in-order traversal.
 func force_inline void* binary_tree_next_inorder_ptr(void* root_ptr, void* node_ptr) {
   binary_tree_links* root_node = (binary_tree_links*)root_ptr;
   binary_tree_links* cursor = (binary_tree_links*)node_ptr;
@@ -46,6 +48,7 @@ func force_inline void* binary_tree_next_inorder_ptr(void* root_ptr, void* node_
   return NULL;
 }
 
+// Returns the first node in a post-order traversal.
 func force_inline void* binary_tree_first_postorder_ptr(void* root_ptr) {
   binary_tree_links* cursor = (binary_tree_links*)root_ptr;
   while (cursor != NULL && (cursor->left != NULL || cursor->right != NULL)) {
@@ -54,6 +57,7 @@ func force_inline void* binary_tree_first_postorder_ptr(void* root_ptr) {
   return cursor;
 }
 
+// Returns the next node in a post-order traversal.
 func force_inline void* binary_tree_next_postorder_ptr(void* root_ptr, void* node_ptr) {
   binary_tree_links* root_node = (binary_tree_links*)root_ptr;
   binary_tree_links* cursor = (binary_tree_links*)node_ptr;
@@ -75,6 +79,7 @@ func force_inline void* binary_tree_next_postorder_ptr(void* root_ptr, void* nod
   return cursor;
 }
 
+// Returns the next node in a pre-order traversal.
 func force_inline void* binary_tree_next_preorder_ptr(void* root_ptr, void* node_ptr) {
   binary_tree_links* root_node = (binary_tree_links*)root_ptr;
   binary_tree_links* cursor = (binary_tree_links*)node_ptr;
@@ -101,9 +106,11 @@ func force_inline void* binary_tree_next_preorder_ptr(void* root_ptr, void* node
   return NULL;
 }
 
+// Structural predicates.
 #define BINARY_TREE_IS_ROOT(node) ((node)->parent == nullptr)
 #define BINARY_TREE_IS_LEAF(node) ((node)->left == nullptr && (node)->right == nullptr)
 
+// Mutation helpers.
 #define BINARY_TREE_INSERT_LEFT(parent, node) expr_stmt( \
   (node)->parent = (parent);                              \
   (parent)->left = (node);)
@@ -156,6 +163,7 @@ func force_inline void* binary_tree_next_preorder_ptr(void* root_ptr, void* node
   _left->right = (node);                                    \
   (node)->parent = _left;)
 
+// Typed traversal macros.
 #define BINARY_TREE_FOREACH_PREORDER(root, it) \
   for (typeof(root) it = (root); (it) != nullptr; \
        (it) = (typeof(root))binary_tree_next_preorder_ptr((void*)(root), (void*)(it)))

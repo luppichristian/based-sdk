@@ -12,7 +12,7 @@
 // Default reserved growth size for each context-local allocator.
 const_var sz CTX_DEFAULT_BLOCK_SIZE = kb(64);
 
-func b32 ctx_init(ctx* context, allocator main_allocator, b32 use_log_mutex) {
+func b32 ctx_init(ctx* context, allocator main_allocator, mutex allocator_mutex, b32 use_log_mutex) {
   TracyCZoneN(__tracy_zone_ctx, __func__, 1);
   if (!context || !main_allocator.alloc_fn || context->is_init) {
     TracyCZoneEnd(__tracy_zone_ctx);
@@ -29,10 +29,10 @@ func b32 ctx_init(ctx* context, allocator main_allocator, b32 use_log_mutex) {
     return false;
   }
 
-  context->perm_arena = arena_create(main_allocator, NULL, CTX_DEFAULT_BLOCK_SIZE);
-  context->temp_arena = arena_create(main_allocator, NULL, CTX_DEFAULT_BLOCK_SIZE);
-  context->perm_heap = heap_create(main_allocator, NULL, CTX_DEFAULT_BLOCK_SIZE);
-  context->temp_heap = heap_create(main_allocator, NULL, CTX_DEFAULT_BLOCK_SIZE);
+  context->perm_arena = arena_create(main_allocator, allocator_mutex, CTX_DEFAULT_BLOCK_SIZE);
+  context->temp_arena = arena_create(main_allocator, allocator_mutex, CTX_DEFAULT_BLOCK_SIZE);
+  context->perm_heap = heap_create(main_allocator, allocator_mutex, CTX_DEFAULT_BLOCK_SIZE);
+  context->temp_heap = heap_create(main_allocator, allocator_mutex, CTX_DEFAULT_BLOCK_SIZE);
   context->is_init = true;
   thread_log_trace("ctx_init: context=%p use_log_mutex=%u", (void*)context, (u32)use_log_mutex);
   TracyCZoneEnd(__tracy_zone_ctx);
