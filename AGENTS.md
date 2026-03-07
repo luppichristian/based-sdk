@@ -80,6 +80,7 @@ include/                      # public API headers
     pathwatch.h               # efsw-backed directory watch wrapper that emits pathwatch messages
   input/                      # SDL-backed input APIs without exposing SDL in public headers
     bindings.h                # declarative key/mouse/gamepad combo bindings with per-key one-shot queries
+    camera.h                  # camera-device enumeration and identifier wrappers
     capture.h                 # input-capture keys and per-consumer one-shot state helpers
     clipboard.h               # clipboard text query and transfer helpers
     devices.h                 # device enumeration and shared input-device identifiers
@@ -89,8 +90,12 @@ include/                      # public API headers
     mouse.h                   # mouse state queries and coordinate conversion helpers
     msg.h                     # unified event/message system, queue polling, and prioritized post-handler registration
     msg_core.h                 # core-category message type and payload definitions used by msg.h
+    sensor.h                  # sensor-device enumeration and identifier wrappers
     tablet.h                  # graphics-tablet enumeration and pen-state helpers
     touch.h                   # touch-device and finger query helpers
+  windowing/                  # SDL-backed display/window identifier and query wrappers
+    display.h                 # display identifiers plus display enumeration and bounds helpers
+    window.h                  # window identifiers plus window enumeration and metadata helpers
   processes/                  # process creation and lifecycle helpers
     pipe.h                    # process-owned stdio pipe handles and pipe I/O helpers
     process.h                 # subprocess spawning, waiting, and output capture helpers
@@ -130,6 +135,7 @@ src/                          # module implementations
   memory/                     # implementations for memory/*
   filesystem/                 # implementations for filesystem/*
   input/                      # implementations for input/*
+  windowing/                  # implementations for windowing/*
   processes/                  # implementations for processes/*
   system/                     # implementations for system/*
   strings/                    # implementations for strings/*

@@ -4,6 +4,9 @@
 #pragma once
 
 #include "devices.h"
+#include "../windowing/window.h"
+
+typedef u32 pen_id;
 
 // =========================================================================
 // Tablet
@@ -21,15 +24,31 @@ typedef enum tablet_axis {
   TABLET_AXIS_COUNT = 7,
 } tablet_axis;
 
+typedef enum tablet_input_flag {
+  TABLET_INPUT_FLAG_NONE = 0,
+  TABLET_INPUT_FLAG_DOWN = (1u << 0),
+  TABLET_INPUT_FLAG_BUTTON_1 = (1u << 1),
+  TABLET_INPUT_FLAG_BUTTON_2 = (1u << 2),
+  TABLET_INPUT_FLAG_BUTTON_3 = (1u << 3),
+  TABLET_INPUT_FLAG_ERASER_TIP = (1u << 30),
+} tablet_input_flag;
+typedef u32 tablet_input_flags;
+
+typedef enum tablet_button {
+  TABLET_BUTTON_PRIMARY = 1,
+  TABLET_BUTTON_SECONDARY = 2,
+  TABLET_BUTTON_TERTIARY = 3,
+} tablet_button;
+
 // Last observed pen state reported by the tablet backend.
 typedef struct tablet_pen_state {
   device_id id;
-  u32 pen_id;
+  pen_id pen_id;
   b32 in_proximity;
   b32 touching;
   b32 eraser;
-  u32 input_mask;
-  u32 window_id;
+  tablet_input_flags input_mask;
+  window_id window_id;
   f32 x;
   f32 y;
   f32 axis_values[TABLET_AXIS_COUNT];

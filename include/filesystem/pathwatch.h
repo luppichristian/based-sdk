@@ -5,6 +5,9 @@
 
 #include "path.h"
 
+typedef i64 pathwatch_id;
+typedef i64 pathwatch_watch_id;
+
 typedef enum pathwatch_action {
   PATHWATCH_ACTION_CREATE = 1,
   PATHWATCH_ACTION_DELETE = 2,
@@ -13,8 +16,8 @@ typedef enum pathwatch_action {
 } pathwatch_action;
 
 typedef struct pathwatch_event {
-  i64 pathwatch_id;
-  i64 watch_id;
+  pathwatch_id pathwatch_id;
+  pathwatch_watch_id watch_id;
   pathwatch_action action;
   path watch_path;
   path item_path;
@@ -22,7 +25,7 @@ typedef struct pathwatch_event {
 } pathwatch_event;
 
 typedef struct pathwatch {
-  i64 id;
+  pathwatch_id id;
   void* native_handle;
 } pathwatch;
 
@@ -37,16 +40,16 @@ func void pathwatch_destroy(pathwatch* watcher);
 func b32 pathwatch_start(pathwatch* watcher);
 
 // Adds a watched directory. Returns a positive watch id on success, or a negative error code.
-func i64 pathwatch_add(pathwatch* watcher, const path* src, b32 recursive);
+func pathwatch_watch_id pathwatch_add(pathwatch* watcher, const path* src, b32 recursive);
 
 // Removes the watch identified by watch_id. Returns 1 on success, 0 otherwise.
-func b32 pathwatch_remove(pathwatch* watcher, i64 watch_id);
+func b32 pathwatch_remove(pathwatch* watcher, pathwatch_watch_id watch_id);
 
 // Removes the watch rooted at src. Returns 1 on success, 0 otherwise.
 func b32 pathwatch_remove_path(pathwatch* watcher, const path* src);
 
 // Returns the watched path associated with watch_id.
-func b32 pathwatch_get_path(i64 watch_id, path* out_watch_path);
+func b32 pathwatch_get_path(pathwatch_watch_id watch_id, path* out_watch_path);
 
 // Mirrors efsw follow-symlink behaviour. Returns 1 on success, 0 otherwise.
 func b32 pathwatch_follow_symlinks(pathwatch* watcher, b32 enabled);

@@ -20,9 +20,9 @@ const_var sz BINDING_MAX_GAMEPAD_BUTTONS = 8u;
 
 typedef struct binding_keyboard_combo {
   sz count;
-  u32 scancodes[BINDING_MAX_KEYS];
-  u16 required_mods;
-  u16 forbidden_mods;
+  keyboard_scancode scancodes[BINDING_MAX_KEYS];
+  keymod required_mods;
+  keymod forbidden_mods;
 } binding_keyboard_combo;
 
 typedef struct binding_mouse_combo {

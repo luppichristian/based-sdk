@@ -57,6 +57,20 @@ typedef enum gamepad_axis {
   GAMEPAD_AXIS_COUNT = 6,
 } gamepad_axis;
 
+typedef i32 gamepad_touchpad_index;
+typedef i32 gamepad_finger_index;
+
+typedef enum gamepad_sensor_kind {
+  GAMEPAD_SENSOR_KIND_INVALID = -1,
+  GAMEPAD_SENSOR_KIND_UNKNOWN = 0,
+  GAMEPAD_SENSOR_KIND_ACCEL = 1,
+  GAMEPAD_SENSOR_KIND_GYRO = 2,
+  GAMEPAD_SENSOR_KIND_ACCEL_L = 3,
+  GAMEPAD_SENSOR_KIND_GYRO_L = 4,
+  GAMEPAD_SENSOR_KIND_ACCEL_R = 5,
+  GAMEPAD_SENSOR_KIND_GYRO_R = 6,
+} gamepad_sensor_kind;
+
 // Returns the number of active gamepad slots.
 func sz gamepads_get_count(void);
 

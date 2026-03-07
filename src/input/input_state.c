@@ -83,11 +83,11 @@ func b32 input_state_capture(input_key key, input_state* out_state) {
 
   out_state->keyboard_available = keyboard_is_available();
   out_state->mouse_available = mouse_is_available();
-  out_state->keyboard_mods = keyboard_get_mods();
+  out_state->keyboard_mods = (u16)keyboard_get_mods();
 
   for (sz scancode_idx = 0; scancode_idx < INPUT_STATE_KEY_CAP; scancode_idx += 1) {
-    out_state->keyboard_down[scancode_idx] = keyboard_is_key_down(key, (u32)scancode_idx);
-    out_state->keyboard_repeat[scancode_idx] = keyboard_get_key_repeat_count(key, (u32)scancode_idx);
+    out_state->keyboard_down[scancode_idx] = keyboard_is_key_down(key, (keyboard_scancode)scancode_idx);
+    out_state->keyboard_repeat[scancode_idx] = keyboard_get_key_repeat_count(key, (keyboard_scancode)scancode_idx);
   }
 
   mouse_state local_state = mouse_get_state(key);
@@ -119,7 +119,7 @@ func void input_state_apply_keyboard_msg(input_state* src, const msg* event_msg)
 
   sz scancode_idx = (sz)msg_core_get_keyboard(event_msg_mut)->scancode;
   src->keyboard_available = 1;
-  src->keyboard_mods = msg_core_get_keyboard(event_msg_mut)->modifiers;
+  src->keyboard_mods = (u16)msg_core_get_keyboard(event_msg_mut)->modifiers;
 
   if (event_msg->type == MSG_CORE_TYPE_KEY_DOWN) {
     src->keyboard_down[scancode_idx] = 1;

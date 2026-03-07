@@ -19,6 +19,11 @@ typedef enum mouse_button {
   MOUSE_BUTTON_X2 = 5,
 } mouse_button;
 
+typedef enum mouse_wheel_direction {
+  MOUSE_WHEEL_DIRECTION_NORMAL = 0,
+  MOUSE_WHEEL_DIRECTION_FLIPPED = 1,
+} mouse_wheel_direction;
+
 // Mouse position plus a bitmask of currently pressed buttons.
 typedef struct mouse_state {
   f32 x;

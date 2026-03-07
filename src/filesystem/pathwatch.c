@@ -10,14 +10,14 @@
 #include <efsw/efsw.h>
 
 typedef struct pathwatch_binding {
-  i64 pathwatch_id;
+  pathwatch_id pathwatch_id;
   void* native_handle;
 } pathwatch_binding;
 
 typedef struct pathwatch_watch_binding {
-  i64 watch_id;
+  pathwatch_watch_id watch_id;
   i64 native_watch_id;
-  i64 pathwatch_id;
+  pathwatch_id pathwatch_id;
   void* native_handle;
   path watch_path;
 } pathwatch_watch_binding;
@@ -35,16 +35,16 @@ func pathwatch_watch_binding* pathwatch_watch_bindings(void) {
   return bindings;
 }
 
-func i64 pathwatch_next_id(void) {
-  local_persist i64 next_id = 1;
-  i64 value = next_id;
+func pathwatch_id pathwatch_next_id(void) {
+  local_persist pathwatch_id next_id = 1;
+  pathwatch_id value = next_id;
   next_id += 1;
   return value;
 }
 
-func i64 pathwatch_next_watch_id(void) {
-  local_persist i64 next_id = 1;
-  i64 value = next_id;
+func pathwatch_watch_id pathwatch_next_watch_id(void) {
+  local_persist pathwatch_watch_id next_id = 1;
+  pathwatch_watch_id value = next_id;
   next_id += 1;
   return value;
 }
@@ -60,7 +60,7 @@ func pathwatch_binding* pathwatch_find_binding(void* native_handle) {
   return NULL;
 }
 
-func b32 pathwatch_bind_create(i64 pathwatch_id, void* native_handle) {
+func b32 pathwatch_bind_create(pathwatch_id pathwatch_id, void* native_handle) {
   pathwatch_binding* bindings = pathwatch_bindings();
 
   for (sz item_idx = 0; item_idx < PATHWATCH_BINDING_CAP; item_idx += 1) {
@@ -81,7 +81,7 @@ func void pathwatch_bind_remove(void* native_handle) {
   }
 }
 
-func pathwatch_watch_binding* pathwatch_find_watch_binding_by_public_id(i64 watch_id) {
+func pathwatch_watch_binding* pathwatch_find_watch_binding_by_public_id(pathwatch_watch_id watch_id) {
   pathwatch_watch_binding* bindings = pathwatch_watch_bindings();
 
   for (sz item_idx = 0; item_idx < PATHWATCH_WATCH_BINDING_CAP; item_idx += 1) {
@@ -106,8 +106,8 @@ func pathwatch_watch_binding* pathwatch_find_watch_binding_by_native(
   return NULL;
 }
 
-func i64 pathwatch_watch_bind_create(
-    i64 pathwatch_id,
+func pathwatch_watch_id pathwatch_watch_bind_create(
+    pathwatch_id pathwatch_id,
     void* native_handle,
     i64 native_watch_id,
     const path* watch_path) {
@@ -115,7 +115,7 @@ func i64 pathwatch_watch_bind_create(
 
   for (sz item_idx = 0; item_idx < PATHWATCH_WATCH_BINDING_CAP; item_idx += 1) {
     if (bindings[item_idx].watch_id == 0) {
-      i64 watch_id = pathwatch_next_watch_id();
+      pathwatch_watch_id watch_id = pathwatch_next_watch_id();
       bindings[item_idx].watch_id = watch_id;
       bindings[item_idx].native_watch_id = native_watch_id;
       bindings[item_idx].pathwatch_id = pathwatch_id;
@@ -127,7 +127,7 @@ func i64 pathwatch_watch_bind_create(
   return 0;
 }
 
-func void pathwatch_watch_bind_remove(i64 watch_id) {
+func void pathwatch_watch_bind_remove(pathwatch_watch_id watch_id) {
   pathwatch_watch_binding* binding = pathwatch_find_watch_binding_by_public_id(watch_id);
   if (binding != NULL) {
     *binding = (pathwatch_watch_binding) {0};
@@ -142,7 +142,7 @@ func void pathwatch_watch_bind_remove_by_native(void* native_handle, i64 native_
   }
 }
 
-func void pathwatch_watch_bind_remove_all_for_watcher(i64 pathwatch_id, void* native_handle) {
+func void pathwatch_watch_bind_remove_all_for_watcher(pathwatch_id pathwatch_id, void* native_handle) {
   pathwatch_watch_binding* bindings = pathwatch_watch_bindings();
 
   for (sz item_idx = 0; item_idx < PATHWATCH_WATCH_BINDING_CAP; item_idx += 1) {
@@ -153,7 +153,7 @@ func void pathwatch_watch_bind_remove_all_for_watcher(i64 pathwatch_id, void* na
   }
 }
 
-func void pathwatch_watch_bind_remove_by_path(i64 pathwatch_id, void* native_handle, const path* src) {
+func void pathwatch_watch_bind_remove_by_path(pathwatch_id pathwatch_id, void* native_handle, const path* src) {
   pathwatch_watch_binding* bindings = pathwatch_watch_bindings();
   path normalized_src = src != NULL ? *src : path_from_cstr("");
   path_normalize(&normalized_src);
@@ -321,7 +321,7 @@ func b32 pathwatch_start(pathwatch* watcher) {
   return 1;
 }
 
-func i64 pathwatch_add(pathwatch* watcher, const path* src, b32 recursive) {
+func pathwatch_watch_id pathwatch_add(pathwatch* watcher, const path* src, b32 recursive) {
   if (watcher == NULL || watcher->native_handle == NULL || src == NULL) {
     return 0;
   }
@@ -340,7 +340,7 @@ func i64 pathwatch_add(pathwatch* watcher, const path* src, b32 recursive) {
     return 0;
   }
 
-  i64 watch_id = pathwatch_watch_bind_create(
+  pathwatch_watch_id watch_id = pathwatch_watch_bind_create(
       watcher->id,
       watcher->native_handle,
       (i64)native_watch_id,
@@ -351,7 +351,7 @@ func i64 pathwatch_add(pathwatch* watcher, const path* src, b32 recursive) {
   return watch_id;
 }
 
-func b32 pathwatch_remove(pathwatch* watcher, i64 watch_id) {
+func b32 pathwatch_remove(pathwatch* watcher, pathwatch_watch_id watch_id) {
   if (watcher == NULL || watcher->native_handle == NULL || watch_id <= 0) {
     return 0;
   }
@@ -378,7 +378,7 @@ func b32 pathwatch_remove_path(pathwatch* watcher, const path* src) {
   return 1;
 }
 
-func b32 pathwatch_get_path(i64 watch_id, path* out_watch_path) {
+func b32 pathwatch_get_path(pathwatch_watch_id watch_id, path* out_watch_path) {
   if (watch_id <= 0 || out_watch_path == NULL) {
     return 0;
   }

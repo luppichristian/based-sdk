@@ -6,6 +6,8 @@
 #include "../sdl3_include.h"
 #include <SDL3/SDL_hidapi.h>
 
+const_var u64 DEVICES_AUDIO_RECORDING_BIT = bit(63);
+
 func void devices_clear_name(c8* dst, sz capacity) {
   if (!dst || !capacity) {
     return;
@@ -74,10 +76,113 @@ func u64 devices_hash_path(cstr8 src) {
 
 func device_id devices_make_id(device_type type, u64 instance) {
   device_id result = {0};
-  assert(type >= DEVICE_TYPE_UNKNOWN && type <= DEVICE_TYPE_TOUCH);
+  assert(type >= DEVICE_TYPE_UNKNOWN && type <= DEVICE_TYPE_AUDIO);
   result.type = type;
   result.instance = instance;
   return result;
+}
+
+func u64 devices_audio_encode_instance(u64 native_id, audio_device_type audio_type) {
+  u64 encoded = native_id & ~DEVICES_AUDIO_RECORDING_BIT;
+  if (audio_type == AUDIO_DEVICE_TYPE_RECORDING) {
+    encoded |= DEVICES_AUDIO_RECORDING_BIT;
+  }
+  return encoded;
+}
+
+func u64 devices_audio_decode_native_id(u64 instance) {
+  return instance & ~DEVICES_AUDIO_RECORDING_BIT;
+}
+
+func b32 audio_device_type_is_valid(audio_device_type src) {
+  return src == AUDIO_DEVICE_TYPE_PLAYBACK || src == AUDIO_DEVICE_TYPE_RECORDING;
+}
+
+func cstr8 devices_get_audio_type_name(audio_device_type audio_type) {
+  switch (audio_type) {
+    case AUDIO_DEVICE_TYPE_PLAYBACK:
+      return "playback";
+    case AUDIO_DEVICE_TYPE_RECORDING:
+      return "recording";
+    case AUDIO_DEVICE_TYPE_UNKNOWN:
+    default:
+      return "unknown";
+  }
+}
+
+func audio_device_type devices_get_audio_device_type(device_id id) {
+  if (id.type != DEVICE_TYPE_AUDIO) {
+    return AUDIO_DEVICE_TYPE_UNKNOWN;
+  }
+
+  return (id.instance & DEVICES_AUDIO_RECORDING_BIT) != 0 ? AUDIO_DEVICE_TYPE_RECORDING : AUDIO_DEVICE_TYPE_PLAYBACK;
+}
+
+func device_id devices_make_audio_device_id(u64 native_id, audio_device_type audio_type) {
+  if (!audio_device_type_is_valid(audio_type)) {
+    return (device_id) {0};
+  }
+
+  return devices_make_id(DEVICE_TYPE_AUDIO, devices_audio_encode_instance(native_id, audio_type));
+}
+
+func u64 devices_get_audio_native_id(device_id id) {
+  if (id.type != DEVICE_TYPE_AUDIO) {
+    return 0;
+  }
+
+  return devices_audio_decode_native_id(id.instance);
+}
+
+func sz devices_get_audio_count_for_type(audio_device_type audio_type) {
+  int count = 0;
+
+  if (audio_type == AUDIO_DEVICE_TYPE_PLAYBACK) {
+    SDL_AudioDeviceID* ids = SDL_GetAudioPlaybackDevices(&count);
+    if (ids) {
+      SDL_free(ids);
+    }
+    return count > 0 ? (sz)count : 0;
+  }
+
+  if (audio_type == AUDIO_DEVICE_TYPE_RECORDING) {
+    SDL_AudioDeviceID* ids = SDL_GetAudioRecordingDevices(&count);
+    if (ids) {
+      SDL_free(ids);
+    }
+    return count > 0 ? (sz)count : 0;
+  }
+
+  return 0;
+}
+
+func b32 devices_get_audio_device(audio_device_type audio_type, sz index, device_id* out_id) {
+  int count = 0;
+  SDL_AudioDeviceID* ids = NULL;
+
+  if (out_id) {
+    *out_id = (device_id) {0};
+  }
+
+  if (audio_type == AUDIO_DEVICE_TYPE_PLAYBACK) {
+    ids = SDL_GetAudioPlaybackDevices(&count);
+  } else if (audio_type == AUDIO_DEVICE_TYPE_RECORDING) {
+    ids = SDL_GetAudioRecordingDevices(&count);
+  } else {
+    return 0;
+  }
+
+  b32 found = ids != NULL && index < (sz)count;
+
+  if (found && out_id) {
+    *out_id = devices_make_audio_device_id((u64)ids[index], audio_type);
+  }
+
+  if (ids) {
+    SDL_free(ids);
+  }
+
+  return found;
 }
 
 func b32 devices_try_fill_tablet_info(SDL_hid_device_info* entry, device_info* out_info) {
@@ -174,6 +279,8 @@ func cstr8 devices_get_type_name(device_type type) {
       return "tablet";
     case DEVICE_TYPE_TOUCH:
       return "touch";
+    case DEVICE_TYPE_AUDIO:
+      return "audio";
     case DEVICE_TYPE_UNKNOWN:
     default:
       return "unknown";
@@ -237,6 +344,9 @@ func sz devices_get_count(device_type type) {
 
       return total;
     }
+    case DEVICE_TYPE_AUDIO:
+      return devices_get_audio_count_for_type(AUDIO_DEVICE_TYPE_PLAYBACK) +
+             devices_get_audio_count_for_type(AUDIO_DEVICE_TYPE_RECORDING);
     case DEVICE_TYPE_UNKNOWN:
     default:
       return 0;
@@ -313,6 +423,13 @@ func b32 devices_get_device(device_type type, sz index, device_id* out_id) {
     }
     case DEVICE_TYPE_TABLET:
       return devices_find_tablet_by_idx(index, out_id);
+    case DEVICE_TYPE_AUDIO: {
+      sz playback_count = devices_get_audio_count_for_type(AUDIO_DEVICE_TYPE_PLAYBACK);
+      if (index < playback_count) {
+        return devices_get_audio_device(AUDIO_DEVICE_TYPE_PLAYBACK, index, out_id);
+      }
+      return devices_get_audio_device(AUDIO_DEVICE_TYPE_RECORDING, index - playback_count, out_id);
+    }
     case DEVICE_TYPE_UNKNOWN:
     default:
       assert(type == DEVICE_TYPE_UNKNOWN);
@@ -445,6 +562,39 @@ func b32 devices_get_info(device_id id, device_info* out_info) {
     }
     case DEVICE_TYPE_TABLET:
       return devices_find_tablet_info(id, out_info);
+    case DEVICE_TYPE_AUDIO: {
+      int audio_count = 0;
+      u64 native_id = devices_audio_decode_native_id(id.instance);
+      audio_device_type audio_type = devices_get_audio_device_type(id);
+      SDL_AudioDeviceID* ids = NULL;
+      b32 found = 0;
+
+      if (audio_type == AUDIO_DEVICE_TYPE_PLAYBACK) {
+        ids = SDL_GetAudioPlaybackDevices(&audio_count);
+      } else if (audio_type == AUDIO_DEVICE_TYPE_RECORDING) {
+        ids = SDL_GetAudioRecordingDevices(&audio_count);
+      } else {
+        return 0;
+      }
+
+      for (int index = 0; ids && index < audio_count; index += 1) {
+        if ((u64)ids[index] == native_id) {
+          found = 1;
+          if (out_info) {
+            out_info->connected = 1;
+            out_info->usage = (u16)audio_type;
+            devices_copy_cstring(out_info->name, size_of(out_info->name), SDL_GetAudioDeviceName(ids[index]));
+          }
+          break;
+        }
+      }
+
+      if (ids) {
+        SDL_free(ids);
+      }
+
+      return found;
+    }
     case DEVICE_TYPE_UNKNOWN:
     default:
       return 0;

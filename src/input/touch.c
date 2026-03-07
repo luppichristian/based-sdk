@@ -81,7 +81,7 @@ func b32 touch_get_finger(device_id id, sz index, touch_finger_state* out_finger
 
   fingers = SDL_GetTouchFingers((SDL_TouchID)id.instance, &count);
   if (fingers && index < (sz)count && fingers[index]) {
-    out_finger->id = (u64)fingers[index]->id;
+    out_finger->id = (finger_id)fingers[index]->id;
     out_finger->x = fingers[index]->x;
     out_finger->y = fingers[index]->y;
     out_finger->pressure = fingers[index]->pressure;

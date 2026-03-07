@@ -47,6 +47,7 @@
 
 // Include input modules.
 #include "input/bindings.h"
+#include "input/camera.h"
 #include "input/capture.h"
 #include "input/clipboard.h"
 #include "input/devices.h"
@@ -56,8 +57,13 @@
 #include "input/mouse.h"
 #include "input/msg.h"
 #include "input/msg_core.h"
+#include "input/sensor.h"
 #include "input/tablet.h"
 #include "input/touch.h"
+
+// Include windowing modules.
+#include "windowing/display.h"
+#include "windowing/window.h"
 
 // Include process modules.
 #include "processes/pipe.h"

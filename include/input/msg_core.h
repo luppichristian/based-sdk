@@ -9,14 +9,19 @@
 #include "../basic/primitive_types.h"
 #include "../filesystem/pathwatch.h"
 #include "../strings/cstrings.h"
+#include "../windowing/display.h"
+#include "../windowing/window.h"
+#include "../context/global_ctx.h"
+#include "../context/thread_ctx.h"
+#include "camera.h"
 #include "devices.h"
 #include "gamepads.h"
+#include "keyboard.h"
 #include "mouse.h"
+#include "sensor.h"
 #include "tablet.h"
-
-typedef struct msg msg;
-typedef struct ctx ctx;
-typedef struct global_ctx global_ctx;
+#include "touch.h"
+#include "msg.h"
 
 // Event types mirrored from the backend event system.
 typedef enum msg_core_type {
@@ -185,14 +190,14 @@ typedef enum msg_core_global_ctx_event_kind {
 
 // Display event payload.
 typedef struct msg_core_display_data {
-  u32 display_id;
+  display_id display_id;
   i32 data1;
   i32 data2;
 } msg_core_display_data;
 
 // Window event payload.
 typedef struct msg_core_window_data {
-  u32 window_id;
+  window_id window_id;
   i32 data1;
   i32 data2;
 } msg_core_window_data;
@@ -204,19 +209,19 @@ typedef struct msg_core_keyboard_device_data {
 
 // Key press and release payload.
 typedef struct msg_core_keyboard_data {
-  u32 window_id;
+  window_id window_id;
   device_id device;
-  u32 scancode;
-  i32 keycode;
-  u16 modifiers;
-  u16 raw;
+  keyboard_scancode scancode;
+  keyboard_keycode keycode;
+  keymod modifiers;
+  keyboard_raw_key raw;
   b32 down;
   b32 repeat;
 } msg_core_keyboard_data;
 
 // IME editing payload.
 typedef struct msg_core_text_editing_data {
-  u32 window_id;
+  window_id window_id;
   cstr8 text;
   i32 start;
   i32 length;
@@ -224,7 +229,7 @@ typedef struct msg_core_text_editing_data {
 
 // IME candidate list payload.
 typedef struct msg_core_text_editing_candidates_data {
-  u32 window_id;
+  window_id window_id;
   cstr8 const* candidates;
   i32 num_candidates;
   i32 selected_candidate;
@@ -233,7 +238,7 @@ typedef struct msg_core_text_editing_candidates_data {
 
 // Text input payload.
 typedef struct msg_core_text_input_data {
-  u32 window_id;
+  window_id window_id;
   cstr8 text;
 } msg_core_text_input_data;
 
@@ -244,7 +249,7 @@ typedef struct msg_core_mouse_device_data {
 
 // Mouse motion payload.
 typedef struct msg_core_mouse_motion_data {
-  u32 window_id;
+  window_id window_id;
   device_id device;
   u32 button_mask;
   f32 x;
@@ -255,7 +260,7 @@ typedef struct msg_core_mouse_motion_data {
 
 // Mouse button payload.
 typedef struct msg_core_mouse_button_data {
-  u32 window_id;
+  window_id window_id;
   device_id device;
   mouse_button button;
   b32 down;
@@ -266,11 +271,11 @@ typedef struct msg_core_mouse_button_data {
 
 // Mouse wheel payload.
 typedef struct msg_core_mouse_wheel_data {
-  u32 window_id;
+  window_id window_id;
   device_id device;
   f32 x;
   f32 y;
-  u32 direction;
+  mouse_wheel_direction direction;
   f32 mouse_x;
   f32 mouse_y;
 } msg_core_mouse_wheel_data;
@@ -299,7 +304,7 @@ typedef struct msg_core_joystick_ball_data {
 typedef struct msg_core_joystick_hat_data {
   device_id device;
   u8 hat;
-  u8 value;
+  joystick_hat_state value;
 } msg_core_joystick_hat_data;
 
 // Joystick button payload.
@@ -312,7 +317,7 @@ typedef struct msg_core_joystick_button_data {
 // Joystick battery payload.
 typedef struct msg_core_joystick_battery_data {
   device_id device;
-  i32 state;
+  battery_state state;
   i32 percent;
 } msg_core_joystick_battery_data;
 
@@ -338,8 +343,8 @@ typedef struct msg_core_gamepad_button_data {
 // Gamepad touchpad payload.
 typedef struct msg_core_gamepad_touchpad_data {
   device_id device;
-  i32 touchpad;
-  i32 finger;
+  gamepad_touchpad_index touchpad;
+  gamepad_finger_index finger;
   f32 x;
   f32 y;
   f32 pressure;
@@ -348,25 +353,24 @@ typedef struct msg_core_gamepad_touchpad_data {
 // Gamepad sensor payload.
 typedef struct msg_core_gamepad_sensor_data {
   device_id device;
-  i32 sensor;
+  gamepad_sensor_kind sensor;
   f32 data[3];
   u64 sensor_timestamp;
 } msg_core_gamepad_sensor_data;
 
 // Audio device payload.
 typedef struct msg_core_audio_device_data {
-  u32 audio_device_id;
-  b32 recording;
+  device_id device;
 } msg_core_audio_device_data;
 
 // Camera device payload.
 typedef struct msg_core_camera_device_data {
-  u32 camera_id;
+  camera_id camera_id;
 } msg_core_camera_device_data;
 
 // Render reset payload.
 typedef struct msg_core_render_data {
-  u32 window_id;
+  window_id window_id;
 } msg_core_render_data;
 
 // Touch device connection payload.
@@ -382,38 +386,38 @@ typedef struct msg_core_tablet_device_data {
 // Touch contact payload.
 typedef struct msg_core_touch_data {
   device_id device;
-  u64 finger_id;
+  finger_id finger_id;
   f32 x;
   f32 y;
   f32 dx;
   f32 dy;
   f32 pressure;
-  u32 window_id;
+  window_id window_id;
 } msg_core_touch_data;
 
 // Pen proximity payload.
 typedef struct msg_core_pen_proximity_data {
-  u32 window_id;
+  window_id window_id;
   device_id device;
-  u32 pen_id;
+  pen_id pen_id;
 } msg_core_pen_proximity_data;
 
 // Pen motion payload.
 typedef struct msg_core_pen_motion_data {
-  u32 window_id;
+  window_id window_id;
   device_id device;
-  u32 pen_id;
-  u32 pen_state;
+  pen_id pen_id;
+  tablet_input_flags pen_state;
   f32 x;
   f32 y;
 } msg_core_pen_motion_data;
 
 // Pen touch payload.
 typedef struct msg_core_pen_touch_data {
-  u32 window_id;
+  window_id window_id;
   device_id device;
-  u32 pen_id;
-  u32 pen_state;
+  pen_id pen_id;
+  tablet_input_flags pen_state;
   f32 x;
   f32 y;
   b32 eraser;
@@ -422,22 +426,22 @@ typedef struct msg_core_pen_touch_data {
 
 // Pen button payload.
 typedef struct msg_core_pen_button_data {
-  u32 window_id;
+  window_id window_id;
   device_id device;
-  u32 pen_id;
-  u32 pen_state;
+  pen_id pen_id;
+  tablet_input_flags pen_state;
   f32 x;
   f32 y;
-  u8 button;
+  tablet_button button;
   b32 down;
 } msg_core_pen_button_data;
 
 // Pen axis payload.
 typedef struct msg_core_pen_axis_data {
-  u32 window_id;
+  window_id window_id;
   device_id device;
-  u32 pen_id;
-  u32 pen_state;
+  pen_id pen_id;
+  tablet_input_flags pen_state;
   f32 x;
   f32 y;
   tablet_axis axis;
@@ -446,7 +450,7 @@ typedef struct msg_core_pen_axis_data {
 
 // Drag-and-drop payload.
 typedef struct msg_core_drop_data {
-  u32 window_id;
+  window_id window_id;
   f32 x;
   f32 y;
   cstr8 source;
@@ -462,7 +466,7 @@ typedef struct msg_core_clipboard_data {
 
 // Generic sensor payload.
 typedef struct msg_core_sensor_data {
-  u32 sensor_id;
+  sensor_id sensor_id;
   f32 data[6];
   u64 sensor_timestamp;
 } msg_core_sensor_data;
@@ -481,8 +485,8 @@ typedef struct msg_core_thread_ctx_data {
 
 typedef struct msg_core_pathwatch_data {
   msg_core_pathwatch_event_kind event_kind;
-  i64 pathwatch_id;
-  i64 watch_id;
+  pathwatch_id pathwatch_id;
+  pathwatch_watch_id watch_id;
   pathwatch_action action;
 } msg_core_pathwatch_data;
 

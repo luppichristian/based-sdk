@@ -32,6 +32,10 @@ typedef enum keymod {
   KEYMOD_GUI = KEYMOD_LGUI | KEYMOD_RGUI,
 } keymod;
 
+typedef u32 keyboard_scancode;
+typedef i32 keyboard_keycode;
+typedef u16 keyboard_raw_key;
+
 // Returns 1 if a keyboard backend is available, 0 otherwise.
 func b32 keyboard_is_available(void);
 
@@ -40,31 +44,31 @@ func b32 keyboard_get_primary_device_id(device_id* out_id);
 
 // Returns 1 if the key identified by scancode is currently pressed, 0 otherwise.
 // key selects the capture stream used by one-shot queries.
-func b32 keyboard_is_key_down(input_key key, u32 scancode);
+func b32 keyboard_is_key_down(input_key key, keyboard_scancode scancode);
 
 // Returns 1 if the key identified by scancode was pressed since last query for key, 0 otherwise.
-func b32 keyboard_is_key_pressed(input_key key, u32 scancode);
+func b32 keyboard_is_key_pressed(input_key key, keyboard_scancode scancode);
 
 // Returns 1 if the key identified by scancode was released since last query for key, 0 otherwise.
-func b32 keyboard_is_key_released(input_key key, u32 scancode);
+func b32 keyboard_is_key_released(input_key key, keyboard_scancode scancode);
 
 // Returns the current repeat-event count for scancode while held.
-func u32 keyboard_get_key_repeat_count(input_key key, u32 scancode);
+func u32 keyboard_get_key_repeat_count(input_key key, keyboard_scancode scancode);
 
 // Returns the current keyboard modifier bitmask.
-func u16 keyboard_get_mods(void);
+func keymod keyboard_get_mods(void);
 
 // Returns 1 when all required_mods are active in the current modifier state.
-func b32 keyboard_has_mods(u16 required_mods);
+func b32 keyboard_has_mods(keymod required_mods);
 
 // Returns 1 when required_mods are active and forbidden_mods are inactive.
-func b32 keyboard_has_mods_exact(u16 required_mods, u16 forbidden_mods);
+func b32 keyboard_has_mods_exact(keymod required_mods, keymod forbidden_mods);
 
 // Returns 1 when scancode is down and modifier requirements are satisfied.
-func b32 keyboard_is_key_down_mod(input_key key, u32 scancode, u16 required_mods, u16 forbidden_mods);
+func b32 keyboard_is_key_down_mod(input_key key, keyboard_scancode scancode, keymod required_mods, keymod forbidden_mods);
 
 // Resolves a keycode for scancode under the supplied modifier state.
-func u32 keyboard_get_keycode(u32 scancode, u16 modifiers, b32 key_event);
+func keyboard_keycode keyboard_get_keycode(keyboard_scancode scancode, keymod modifiers, b32 key_event);
 
 // Returns a backend-defined readable name for scancode.
-func cstr8 keyboard_get_scancode_name(u32 scancode);
+func cstr8 keyboard_get_scancode_name(keyboard_scancode scancode);

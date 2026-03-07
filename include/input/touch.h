@@ -5,6 +5,8 @@
 
 #include "devices.h"
 
+typedef u64 finger_id;
+
 // =========================================================================
 // Touch
 // =========================================================================
@@ -19,7 +21,7 @@ typedef enum touch_device_kind {
 
 // Current state for a single tracked finger.
 typedef struct touch_finger_state {
-  u64 id;
+  finger_id id;
   f32 x;
   f32 y;
   f32 pressure;

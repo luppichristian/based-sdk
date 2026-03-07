@@ -340,7 +340,7 @@ func b32 msg_from_sdl(const SDL_Event* src, msg* out_msg) {
       msg_core_fill_display(
           out_msg,
           &(msg_core_display_data) {
-              .display_id = (u32)src->display.displayID,
+              .display_id = display_from_native_id((u64)src->display.displayID),
               .data1 = (i32)src->display.data1,
               .data2 = (i32)src->display.data2,
           });
@@ -374,7 +374,7 @@ func b32 msg_from_sdl(const SDL_Event* src, msg* out_msg) {
       msg_core_fill_window(
           out_msg,
           &(msg_core_window_data) {
-              .window_id = (u32)src->window.windowID,
+              .window_id = window_from_native_id((u64)src->window.windowID),
               .data1 = (i32)src->window.data1,
               .data2 = (i32)src->window.data2,
           });
@@ -394,12 +394,12 @@ func b32 msg_from_sdl(const SDL_Event* src, msg* out_msg) {
       msg_core_fill_keyboard(
           out_msg,
           &(msg_core_keyboard_data) {
-              .window_id = (u32)src->key.windowID,
+              .window_id = window_from_native_id((u64)src->key.windowID),
               .device = {.type = DEVICE_TYPE_KEYBOARD, .instance = (u64)src->key.which},
-              .scancode = (u32)src->key.scancode,
-              .keycode = (i32)src->key.key,
-              .modifiers = (u16)src->key.mod,
-              .raw = (u16)src->key.raw,
+              .scancode = (keyboard_scancode)src->key.scancode,
+              .keycode = (keyboard_keycode)src->key.key,
+              .modifiers = (keymod)src->key.mod,
+              .raw = (keyboard_raw_key)src->key.raw,
               .down = src->key.down ? 1 : 0,
               .repeat = src->key.repeat ? 1 : 0,
       });
@@ -409,7 +409,7 @@ func b32 msg_from_sdl(const SDL_Event* src, msg* out_msg) {
       msg_core_fill_text_editing(
           out_msg,
           &(msg_core_text_editing_data) {
-              .window_id = (u32)src->edit.windowID,
+              .window_id = window_from_native_id((u64)src->edit.windowID),
               .text = src->edit.text,
               .start = (i32)src->edit.start,
               .length = (i32)src->edit.length,
@@ -420,7 +420,7 @@ func b32 msg_from_sdl(const SDL_Event* src, msg* out_msg) {
       msg_core_fill_text_editing_candidates(
           out_msg,
           &(msg_core_text_editing_candidates_data) {
-              .window_id = (u32)src->edit_candidates.windowID,
+              .window_id = window_from_native_id((u64)src->edit_candidates.windowID),
               .candidates = (cstr8 const*)src->edit_candidates.candidates,
               .num_candidates = (i32)src->edit_candidates.num_candidates,
               .selected_candidate = (i32)src->edit_candidates.selected_candidate,
@@ -432,7 +432,7 @@ func b32 msg_from_sdl(const SDL_Event* src, msg* out_msg) {
       msg_core_fill_text_input(
           out_msg,
           &(msg_core_text_input_data) {
-              .window_id = (u32)src->text.windowID,
+              .window_id = window_from_native_id((u64)src->text.windowID),
               .text = src->text.text,
           });
       return 1;
@@ -450,7 +450,7 @@ func b32 msg_from_sdl(const SDL_Event* src, msg* out_msg) {
       msg_core_fill_mouse_motion(
           out_msg,
           &(msg_core_mouse_motion_data) {
-              .window_id = (u32)src->motion.windowID,
+              .window_id = window_from_native_id((u64)src->motion.windowID),
               .device = {.type = DEVICE_TYPE_MOUSE, .instance = (u64)src->motion.which},
               .button_mask = (u32)src->motion.state,
               .x = src->motion.x,
@@ -465,7 +465,7 @@ func b32 msg_from_sdl(const SDL_Event* src, msg* out_msg) {
       msg_core_fill_mouse_button(
           out_msg,
           &(msg_core_mouse_button_data) {
-              .window_id = (u32)src->button.windowID,
+              .window_id = window_from_native_id((u64)src->button.windowID),
               .device = {.type = DEVICE_TYPE_MOUSE, .instance = (u64)src->button.which},
               .button = (mouse_button)src->button.button,
               .down = src->button.down ? 1 : 0,
@@ -479,11 +479,11 @@ func b32 msg_from_sdl(const SDL_Event* src, msg* out_msg) {
       msg_core_fill_mouse_wheel(
           out_msg,
           &(msg_core_mouse_wheel_data) {
-              .window_id = (u32)src->wheel.windowID,
+              .window_id = window_from_native_id((u64)src->wheel.windowID),
               .device = {.type = DEVICE_TYPE_MOUSE, .instance = (u64)src->wheel.which},
               .x = src->wheel.x,
               .y = src->wheel.y,
-              .direction = (u32)src->wheel.direction,
+              .direction = (mouse_wheel_direction)src->wheel.direction,
               .mouse_x = src->wheel.mouse_x,
               .mouse_y = src->wheel.mouse_y,
       });
@@ -526,7 +526,7 @@ func b32 msg_from_sdl(const SDL_Event* src, msg* out_msg) {
           &(msg_core_joystick_hat_data) {
               .device = {.type = DEVICE_TYPE_JOYSTICK, .instance = (u64)src->jhat.which},
               .hat = (u8)src->jhat.hat,
-              .value = (u8)src->jhat.value,
+              .value = (joystick_hat_state)src->jhat.value,
       });
       return 1;
 
@@ -546,7 +546,7 @@ func b32 msg_from_sdl(const SDL_Event* src, msg* out_msg) {
           out_msg,
           &(msg_core_joystick_battery_data) {
               .device = {.type = DEVICE_TYPE_JOYSTICK, .instance = (u64)src->jbattery.which},
-              .state = (i32)src->jbattery.state,
+              .state = (battery_state)src->jbattery.state,
               .percent = (i32)src->jbattery.percent,
       });
       return 1;
@@ -596,8 +596,8 @@ func b32 msg_from_sdl(const SDL_Event* src, msg* out_msg) {
           out_msg,
           &(msg_core_gamepad_touchpad_data) {
               .device = {.type = DEVICE_TYPE_GAMEPAD, .instance = (u64)src->gtouchpad.which},
-              .touchpad = (i32)src->gtouchpad.touchpad,
-              .finger = (i32)src->gtouchpad.finger,
+              .touchpad = (gamepad_touchpad_index)src->gtouchpad.touchpad,
+              .finger = (gamepad_finger_index)src->gtouchpad.finger,
               .x = src->gtouchpad.x,
               .y = src->gtouchpad.y,
               .pressure = src->gtouchpad.pressure,
@@ -609,7 +609,7 @@ func b32 msg_from_sdl(const SDL_Event* src, msg* out_msg) {
           out_msg,
           &(msg_core_gamepad_sensor_data) {
               .device = {.type = DEVICE_TYPE_GAMEPAD, .instance = (u64)src->gsensor.which},
-              .sensor = (i32)src->gsensor.sensor,
+              .sensor = (gamepad_sensor_kind)src->gsensor.sensor,
               .data = {src->gsensor.data[0], src->gsensor.data[1], src->gsensor.data[2]},
               .sensor_timestamp = (u64)src->gsensor.sensor_timestamp,
       });
@@ -621,8 +621,9 @@ func b32 msg_from_sdl(const SDL_Event* src, msg* out_msg) {
       msg_core_fill_audio_device(
           out_msg,
           &(msg_core_audio_device_data) {
-              .audio_device_id = (u32)src->adevice.which,
-              .recording = src->adevice.recording ? 1 : 0,
+              .device = devices_make_audio_device_id(
+                  (u64)src->adevice.which,
+                  src->adevice.recording ? AUDIO_DEVICE_TYPE_RECORDING : AUDIO_DEVICE_TYPE_PLAYBACK),
           });
       return 1;
 
@@ -633,7 +634,7 @@ func b32 msg_from_sdl(const SDL_Event* src, msg* out_msg) {
       msg_core_fill_camera_device(
           out_msg,
           &(msg_core_camera_device_data) {
-              .camera_id = (u32)src->cdevice.which,
+              .camera_id = camera_from_native_id((u64)src->cdevice.which),
           });
       return 1;
 
@@ -643,7 +644,7 @@ func b32 msg_from_sdl(const SDL_Event* src, msg* out_msg) {
       msg_core_fill_render(
           out_msg,
           &(msg_core_render_data) {
-              .window_id = (u32)src->render.windowID,
+              .window_id = window_from_native_id((u64)src->render.windowID),
           });
       return 1;
 
@@ -655,13 +656,13 @@ func b32 msg_from_sdl(const SDL_Event* src, msg* out_msg) {
           out_msg,
           &(msg_core_touch_data) {
               .device = {.type = DEVICE_TYPE_TOUCH, .instance = (u64)src->tfinger.touchID},
-              .finger_id = (u64)src->tfinger.fingerID,
+              .finger_id = (finger_id)src->tfinger.fingerID,
               .x = src->tfinger.x,
               .y = src->tfinger.y,
               .dx = src->tfinger.dx,
               .dy = src->tfinger.dy,
               .pressure = src->tfinger.pressure,
-              .window_id = (u32)src->tfinger.windowID,
+              .window_id = window_from_native_id((u64)src->tfinger.windowID),
       });
       return 1;
 
@@ -670,9 +671,9 @@ func b32 msg_from_sdl(const SDL_Event* src, msg* out_msg) {
       msg_core_fill_pen_proximity(
           out_msg,
           &(msg_core_pen_proximity_data) {
-              .window_id = (u32)src->pproximity.windowID,
+              .window_id = window_from_native_id((u64)src->pproximity.windowID),
               .device = {.type = DEVICE_TYPE_TABLET, .instance = (u64)src->pproximity.which},
-              .pen_id = (u32)src->pproximity.which,
+              .pen_id = (pen_id)src->pproximity.which,
       });
       return 1;
 
@@ -680,10 +681,10 @@ func b32 msg_from_sdl(const SDL_Event* src, msg* out_msg) {
       msg_core_fill_pen_motion(
           out_msg,
           &(msg_core_pen_motion_data) {
-              .window_id = (u32)src->pmotion.windowID,
+              .window_id = window_from_native_id((u64)src->pmotion.windowID),
               .device = {.type = DEVICE_TYPE_TABLET, .instance = (u64)src->pmotion.which},
-              .pen_id = (u32)src->pmotion.which,
-              .pen_state = (u32)src->pmotion.pen_state,
+              .pen_id = (pen_id)src->pmotion.which,
+              .pen_state = (tablet_input_flags)src->pmotion.pen_state,
               .x = src->pmotion.x,
               .y = src->pmotion.y,
       });
@@ -694,10 +695,10 @@ func b32 msg_from_sdl(const SDL_Event* src, msg* out_msg) {
       msg_core_fill_pen_touch(
           out_msg,
           &(msg_core_pen_touch_data) {
-              .window_id = (u32)src->ptouch.windowID,
+              .window_id = window_from_native_id((u64)src->ptouch.windowID),
               .device = {.type = DEVICE_TYPE_TABLET, .instance = (u64)src->ptouch.which},
-              .pen_id = (u32)src->ptouch.which,
-              .pen_state = (u32)src->ptouch.pen_state,
+              .pen_id = (pen_id)src->ptouch.which,
+              .pen_state = (tablet_input_flags)src->ptouch.pen_state,
               .x = src->ptouch.x,
               .y = src->ptouch.y,
               .eraser = src->ptouch.eraser ? 1 : 0,
@@ -710,13 +711,13 @@ func b32 msg_from_sdl(const SDL_Event* src, msg* out_msg) {
       msg_core_fill_pen_button(
           out_msg,
           &(msg_core_pen_button_data) {
-              .window_id = (u32)src->pbutton.windowID,
+              .window_id = window_from_native_id((u64)src->pbutton.windowID),
               .device = {.type = DEVICE_TYPE_TABLET, .instance = (u64)src->pbutton.which},
-              .pen_id = (u32)src->pbutton.which,
-              .pen_state = (u32)src->pbutton.pen_state,
+              .pen_id = (pen_id)src->pbutton.which,
+              .pen_state = (tablet_input_flags)src->pbutton.pen_state,
               .x = src->pbutton.x,
               .y = src->pbutton.y,
-              .button = (u8)src->pbutton.button,
+              .button = (tablet_button)src->pbutton.button,
               .down = src->pbutton.down ? 1 : 0,
       });
       return 1;
@@ -725,10 +726,10 @@ func b32 msg_from_sdl(const SDL_Event* src, msg* out_msg) {
       msg_core_fill_pen_axis(
           out_msg,
           &(msg_core_pen_axis_data) {
-              .window_id = (u32)src->paxis.windowID,
+              .window_id = window_from_native_id((u64)src->paxis.windowID),
               .device = {.type = DEVICE_TYPE_TABLET, .instance = (u64)src->paxis.which},
-              .pen_id = (u32)src->paxis.which,
-              .pen_state = (u32)src->paxis.pen_state,
+              .pen_id = (pen_id)src->paxis.which,
+              .pen_state = (tablet_input_flags)src->paxis.pen_state,
               .x = src->paxis.x,
               .y = src->paxis.y,
               .axis = (tablet_axis)src->paxis.axis,
@@ -744,7 +745,7 @@ func b32 msg_from_sdl(const SDL_Event* src, msg* out_msg) {
       msg_core_fill_drop(
           out_msg,
           &(msg_core_drop_data) {
-              .window_id = (u32)src->drop.windowID,
+              .window_id = window_from_native_id((u64)src->drop.windowID),
               .x = src->drop.x,
               .y = src->drop.y,
               .source = src->drop.source,
@@ -766,7 +767,7 @@ func b32 msg_from_sdl(const SDL_Event* src, msg* out_msg) {
       msg_core_fill_sensor(
           out_msg,
           &(msg_core_sensor_data) {
-              .sensor_id = (u32)src->sensor.which,
+              .sensor_id = sensor_from_native_id((u64)src->sensor.which),
               .data = {
                        src->sensor.data[0],
                        src->sensor.data[1],
@@ -820,7 +821,7 @@ func b32 msg_to_sdl_event(msg* src, SDL_Event* out_event) {
     case SDL_EVENT_DISPLAY_CONTENT_SCALE_CHANGED:
       out_event->display.type = (SDL_EventType)src->type;
       out_event->display.timestamp = (Uint64)src->timestamp;
-      out_event->display.displayID = (SDL_DisplayID)msg_core_get_display(src)->display_id;
+      out_event->display.displayID = (SDL_DisplayID)display_to_native_id(msg_core_get_display(src)->display_id);
       out_event->display.data1 = (Sint32)msg_core_get_display(src)->data1;
       out_event->display.data2 = (Sint32)msg_core_get_display(src)->data2;
       return 1;
@@ -852,7 +853,7 @@ func b32 msg_to_sdl_event(msg* src, SDL_Event* out_event) {
     case SDL_EVENT_WINDOW_HDR_STATE_CHANGED:
       out_event->window.type = (SDL_EventType)src->type;
       out_event->window.timestamp = (Uint64)src->timestamp;
-      out_event->window.windowID = (SDL_WindowID)msg_core_get_window(src)->window_id;
+      out_event->window.windowID = (SDL_WindowID)window_to_native_id(msg_core_get_window(src)->window_id);
       out_event->window.data1 = (Sint32)msg_core_get_window(src)->data1;
       out_event->window.data2 = (Sint32)msg_core_get_window(src)->data2;
       return 1;
@@ -868,7 +869,7 @@ func b32 msg_to_sdl_event(msg* src, SDL_Event* out_event) {
     case SDL_EVENT_KEY_UP:
       out_event->key.type = (SDL_EventType)src->type;
       out_event->key.timestamp = (Uint64)src->timestamp;
-      out_event->key.windowID = (SDL_WindowID)msg_core_get_keyboard(src)->window_id;
+      out_event->key.windowID = (SDL_WindowID)window_to_native_id(msg_core_get_keyboard(src)->window_id);
       out_event->key.which = (SDL_KeyboardID)msg_core_get_keyboard(src)->device.instance;
       out_event->key.scancode = (SDL_Scancode)msg_core_get_keyboard(src)->scancode;
       out_event->key.key = (SDL_Keycode)msg_core_get_keyboard(src)->keycode;
@@ -881,7 +882,7 @@ func b32 msg_to_sdl_event(msg* src, SDL_Event* out_event) {
     case SDL_EVENT_TEXT_EDITING:
       out_event->edit.type = (SDL_EventType)src->type;
       out_event->edit.timestamp = (Uint64)src->timestamp;
-      out_event->edit.windowID = (SDL_WindowID)msg_core_get_text_editing(src)->window_id;
+      out_event->edit.windowID = (SDL_WindowID)window_to_native_id(msg_core_get_text_editing(src)->window_id);
       out_event->edit.text = msg_core_get_text_editing(src)->text;
       out_event->edit.start = (Sint32)msg_core_get_text_editing(src)->start;
       out_event->edit.length = (Sint32)msg_core_get_text_editing(src)->length;
@@ -890,7 +891,7 @@ func b32 msg_to_sdl_event(msg* src, SDL_Event* out_event) {
     case SDL_EVENT_TEXT_EDITING_CANDIDATES:
       out_event->edit_candidates.type = (SDL_EventType)src->type;
       out_event->edit_candidates.timestamp = (Uint64)src->timestamp;
-      out_event->edit_candidates.windowID = (SDL_WindowID)msg_core_get_text_editing_candidates(src)->window_id;
+      out_event->edit_candidates.windowID = (SDL_WindowID)window_to_native_id(msg_core_get_text_editing_candidates(src)->window_id);
       out_event->edit_candidates.candidates = (const char* const*)msg_core_get_text_editing_candidates(src)->candidates;
       out_event->edit_candidates.num_candidates = (Sint32)msg_core_get_text_editing_candidates(src)->num_candidates;
       out_event->edit_candidates.selected_candidate = (Sint32)msg_core_get_text_editing_candidates(src)->selected_candidate;
@@ -900,7 +901,7 @@ func b32 msg_to_sdl_event(msg* src, SDL_Event* out_event) {
     case SDL_EVENT_TEXT_INPUT:
       out_event->text.type = (SDL_EventType)src->type;
       out_event->text.timestamp = (Uint64)src->timestamp;
-      out_event->text.windowID = (SDL_WindowID)msg_core_get_text_input(src)->window_id;
+      out_event->text.windowID = (SDL_WindowID)window_to_native_id(msg_core_get_text_input(src)->window_id);
       out_event->text.text = msg_core_get_text_input(src)->text;
       return 1;
 
@@ -919,7 +920,7 @@ func b32 msg_to_sdl_event(msg* src, SDL_Event* out_event) {
     case SDL_EVENT_MOUSE_MOTION:
       out_event->motion.type = (SDL_EventType)src->type;
       out_event->motion.timestamp = (Uint64)src->timestamp;
-      out_event->motion.windowID = (SDL_WindowID)msg_core_get_mouse_motion(src)->window_id;
+      out_event->motion.windowID = (SDL_WindowID)window_to_native_id(msg_core_get_mouse_motion(src)->window_id);
       out_event->motion.which = (SDL_MouseID)msg_core_get_mouse_motion(src)->device.instance;
       out_event->motion.state = (SDL_MouseButtonFlags)msg_core_get_mouse_motion(src)->button_mask;
       out_event->motion.x = msg_core_get_mouse_motion(src)->x;
@@ -932,7 +933,7 @@ func b32 msg_to_sdl_event(msg* src, SDL_Event* out_event) {
     case SDL_EVENT_MOUSE_BUTTON_UP:
       out_event->button.type = (SDL_EventType)src->type;
       out_event->button.timestamp = (Uint64)src->timestamp;
-      out_event->button.windowID = (SDL_WindowID)msg_core_get_mouse_button(src)->window_id;
+      out_event->button.windowID = (SDL_WindowID)window_to_native_id(msg_core_get_mouse_button(src)->window_id);
       out_event->button.which = (SDL_MouseID)msg_core_get_mouse_button(src)->device.instance;
       out_event->button.button = (Uint8)msg_core_get_mouse_button(src)->button;
       out_event->button.down = msg_core_get_mouse_button(src)->down != 0;
@@ -944,7 +945,7 @@ func b32 msg_to_sdl_event(msg* src, SDL_Event* out_event) {
     case SDL_EVENT_MOUSE_WHEEL:
       out_event->wheel.type = (SDL_EventType)src->type;
       out_event->wheel.timestamp = (Uint64)src->timestamp;
-      out_event->wheel.windowID = (SDL_WindowID)msg_core_get_mouse_wheel(src)->window_id;
+      out_event->wheel.windowID = (SDL_WindowID)window_to_native_id(msg_core_get_mouse_wheel(src)->window_id);
       out_event->wheel.which = (SDL_MouseID)msg_core_get_mouse_wheel(src)->device.instance;
       out_event->wheel.x = msg_core_get_mouse_wheel(src)->x;
       out_event->wheel.y = msg_core_get_mouse_wheel(src)->y;
@@ -1066,8 +1067,9 @@ func b32 msg_to_sdl_event(msg* src, SDL_Event* out_event) {
     case SDL_EVENT_AUDIO_DEVICE_FORMAT_CHANGED:
       out_event->adevice.type = (SDL_EventType)src->type;
       out_event->adevice.timestamp = (Uint64)src->timestamp;
-      out_event->adevice.which = (SDL_AudioDeviceID)msg_core_get_audio_device(src)->audio_device_id;
-      out_event->adevice.recording = msg_core_get_audio_device(src)->recording != 0;
+      out_event->adevice.which = (SDL_AudioDeviceID)devices_get_audio_native_id(msg_core_get_audio_device(src)->device);
+      out_event->adevice.recording =
+          devices_get_audio_device_type(msg_core_get_audio_device(src)->device) == AUDIO_DEVICE_TYPE_RECORDING;
       return 1;
 
     case SDL_EVENT_CAMERA_DEVICE_ADDED:
@@ -1076,7 +1078,7 @@ func b32 msg_to_sdl_event(msg* src, SDL_Event* out_event) {
     case SDL_EVENT_CAMERA_DEVICE_DENIED:
       out_event->cdevice.type = (SDL_EventType)src->type;
       out_event->cdevice.timestamp = (Uint64)src->timestamp;
-      out_event->cdevice.which = (SDL_CameraID)msg_core_get_camera_device(src)->camera_id;
+      out_event->cdevice.which = (SDL_CameraID)camera_to_native_id(msg_core_get_camera_device(src)->camera_id);
       return 1;
 
     case SDL_EVENT_RENDER_TARGETS_RESET:
@@ -1084,7 +1086,7 @@ func b32 msg_to_sdl_event(msg* src, SDL_Event* out_event) {
     case SDL_EVENT_RENDER_DEVICE_LOST:
       out_event->render.type = (SDL_EventType)src->type;
       out_event->render.timestamp = (Uint64)src->timestamp;
-      out_event->render.windowID = (SDL_WindowID)msg_core_get_render(src)->window_id;
+      out_event->render.windowID = (SDL_WindowID)window_to_native_id(msg_core_get_render(src)->window_id);
       return 1;
 
     case SDL_EVENT_FINGER_DOWN:
@@ -1100,21 +1102,21 @@ func b32 msg_to_sdl_event(msg* src, SDL_Event* out_event) {
       out_event->tfinger.dx = msg_core_get_touch(src)->dx;
       out_event->tfinger.dy = msg_core_get_touch(src)->dy;
       out_event->tfinger.pressure = msg_core_get_touch(src)->pressure;
-      out_event->tfinger.windowID = (SDL_WindowID)msg_core_get_touch(src)->window_id;
+      out_event->tfinger.windowID = (SDL_WindowID)window_to_native_id(msg_core_get_touch(src)->window_id);
       return 1;
 
     case SDL_EVENT_PEN_PROXIMITY_IN:
     case SDL_EVENT_PEN_PROXIMITY_OUT:
       out_event->pproximity.type = (SDL_EventType)src->type;
       out_event->pproximity.timestamp = (Uint64)src->timestamp;
-      out_event->pproximity.windowID = (SDL_WindowID)msg_core_get_pen_proximity(src)->window_id;
+      out_event->pproximity.windowID = (SDL_WindowID)window_to_native_id(msg_core_get_pen_proximity(src)->window_id);
       out_event->pproximity.which = (SDL_PenID)msg_core_get_pen_proximity(src)->pen_id;
       return 1;
 
     case SDL_EVENT_PEN_MOTION:
       out_event->pmotion.type = (SDL_EventType)src->type;
       out_event->pmotion.timestamp = (Uint64)src->timestamp;
-      out_event->pmotion.windowID = (SDL_WindowID)msg_core_get_pen_motion(src)->window_id;
+      out_event->pmotion.windowID = (SDL_WindowID)window_to_native_id(msg_core_get_pen_motion(src)->window_id);
       out_event->pmotion.which = (SDL_PenID)msg_core_get_pen_motion(src)->pen_id;
       out_event->pmotion.pen_state = (SDL_PenInputFlags)msg_core_get_pen_motion(src)->pen_state;
       out_event->pmotion.x = msg_core_get_pen_motion(src)->x;
@@ -1125,7 +1127,7 @@ func b32 msg_to_sdl_event(msg* src, SDL_Event* out_event) {
     case SDL_EVENT_PEN_UP:
       out_event->ptouch.type = (SDL_EventType)src->type;
       out_event->ptouch.timestamp = (Uint64)src->timestamp;
-      out_event->ptouch.windowID = (SDL_WindowID)msg_core_get_pen_touch(src)->window_id;
+      out_event->ptouch.windowID = (SDL_WindowID)window_to_native_id(msg_core_get_pen_touch(src)->window_id);
       out_event->ptouch.which = (SDL_PenID)msg_core_get_pen_touch(src)->pen_id;
       out_event->ptouch.pen_state = (SDL_PenInputFlags)msg_core_get_pen_touch(src)->pen_state;
       out_event->ptouch.x = msg_core_get_pen_touch(src)->x;
@@ -1138,7 +1140,7 @@ func b32 msg_to_sdl_event(msg* src, SDL_Event* out_event) {
     case SDL_EVENT_PEN_BUTTON_UP:
       out_event->pbutton.type = (SDL_EventType)src->type;
       out_event->pbutton.timestamp = (Uint64)src->timestamp;
-      out_event->pbutton.windowID = (SDL_WindowID)msg_core_get_pen_button(src)->window_id;
+      out_event->pbutton.windowID = (SDL_WindowID)window_to_native_id(msg_core_get_pen_button(src)->window_id);
       out_event->pbutton.which = (SDL_PenID)msg_core_get_pen_button(src)->pen_id;
       out_event->pbutton.pen_state = (SDL_PenInputFlags)msg_core_get_pen_button(src)->pen_state;
       out_event->pbutton.x = msg_core_get_pen_button(src)->x;
@@ -1150,7 +1152,7 @@ func b32 msg_to_sdl_event(msg* src, SDL_Event* out_event) {
     case SDL_EVENT_PEN_AXIS:
       out_event->paxis.type = (SDL_EventType)src->type;
       out_event->paxis.timestamp = (Uint64)src->timestamp;
-      out_event->paxis.windowID = (SDL_WindowID)msg_core_get_pen_axis(src)->window_id;
+      out_event->paxis.windowID = (SDL_WindowID)window_to_native_id(msg_core_get_pen_axis(src)->window_id);
       out_event->paxis.which = (SDL_PenID)msg_core_get_pen_axis(src)->pen_id;
       out_event->paxis.pen_state = (SDL_PenInputFlags)msg_core_get_pen_axis(src)->pen_state;
       out_event->paxis.x = msg_core_get_pen_axis(src)->x;
@@ -1171,7 +1173,7 @@ func b32 msg_to_sdl_event(msg* src, SDL_Event* out_event) {
     case SDL_EVENT_DROP_POSITION:
       out_event->drop.type = (SDL_EventType)src->type;
       out_event->drop.timestamp = (Uint64)src->timestamp;
-      out_event->drop.windowID = (SDL_WindowID)msg_core_get_drop(src)->window_id;
+      out_event->drop.windowID = (SDL_WindowID)window_to_native_id(msg_core_get_drop(src)->window_id);
       out_event->drop.x = msg_core_get_drop(src)->x;
       out_event->drop.y = msg_core_get_drop(src)->y;
       out_event->drop.source = msg_core_get_drop(src)->source;
@@ -1189,7 +1191,7 @@ func b32 msg_to_sdl_event(msg* src, SDL_Event* out_event) {
     case SDL_EVENT_SENSOR_UPDATE:
       out_event->sensor.type = (SDL_EventType)src->type;
       out_event->sensor.timestamp = (Uint64)src->timestamp;
-      out_event->sensor.which = (SDL_SensorID)msg_core_get_sensor(src)->sensor_id;
+      out_event->sensor.which = (SDL_SensorID)sensor_to_native_id(msg_core_get_sensor(src)->sensor_id);
       for (sz index = 0; index < count_of(msg_core_get_sensor(src)->data); index += 1) {
         out_event->sensor.data[index] = msg_core_get_sensor(src)->data[index];
       }
