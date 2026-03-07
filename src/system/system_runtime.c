@@ -5,6 +5,7 @@
 #include "basic/assert.h"
 #include "context/thread_ctx.h"
 #include "basic/env_defines.h"
+#include "basic/profiler.h"
 
 #include <stddef.h>
 #include <string.h>
@@ -38,14 +39,18 @@ typedef BOOL(WINAPI* get_process_memory_info_fn)(HANDLE process_handle,
                                                  DWORD counter_size);
 
 func u64 runtime_filetime_to_u64(FILETIME value) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
   ULARGE_INTEGER wide_value;
   wide_value.LowPart = value.dwLowDateTime;
   wide_value.HighPart = value.dwHighDateTime;
+  TracyCZoneEnd(__tracy_zone_ctx);
   return wide_value.QuadPart;
 }
 
 func b32 runtime_query_windows_cpu(runtime_cpu_sample* out_sample) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
   if (out_sample == NULL) {
+    TracyCZoneEnd(__tracy_zone_ctx);
     return 0;
   }
   assert(out_sample != NULL);
@@ -53,12 +58,14 @@ func b32 runtime_query_windows_cpu(runtime_cpu_sample* out_sample) {
   FILETIME kernel_time;
   FILETIME user_time;
   if (GetSystemTimes(&idle_time, &kernel_time, &user_time) == 0) {
+    TracyCZoneEnd(__tracy_zone_ctx);
     return 0;
   }
 
   out_sample->idle_ticks = runtime_filetime_to_u64(idle_time);
   out_sample->kernel_ticks = runtime_filetime_to_u64(kernel_time);
   out_sample->user_ticks = runtime_filetime_to_u64(user_time);
+  TracyCZoneEnd(__tracy_zone_ctx);
   return 1;
 }
 #elif defined(PLATFORM_LINUX)
@@ -68,18 +75,22 @@ typedef struct runtime_cpu_sample {
 } runtime_cpu_sample;
 
 func b32 runtime_query_linux_cpu(runtime_cpu_sample* out_sample) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
   if (out_sample == NULL) {
+    TracyCZoneEnd(__tracy_zone_ctx);
     return 0;
   }
   assert(out_sample != NULL);
   FILE* stat_file = fopen("/proc/stat", "r");
   if (stat_file == NULL) {
+    TracyCZoneEnd(__tracy_zone_ctx);
     return 0;
   }
 
   c8 line_buffer[256];
   if (fgets(line_buffer, size_of(line_buffer), stat_file) == NULL) {
     fclose(stat_file);
+    TracyCZoneEnd(__tracy_zone_ctx);
     return 0;
   }
   fclose(stat_file);
@@ -103,6 +114,7 @@ func b32 runtime_query_linux_cpu(runtime_cpu_sample* out_sample) {
                             &soft_irq_ticks,
                             &steal_ticks);
   if (parsed_count < 4) {
+    TracyCZoneEnd(__tracy_zone_ctx);
     return 0;
   }
 
@@ -110,6 +122,7 @@ func b32 runtime_query_linux_cpu(runtime_cpu_sample* out_sample) {
   out_sample->total_ticks = (u64)user_ticks + (u64)nice_ticks + (u64)system_ticks +
                             (u64)idle_ticks + (u64)io_wait_ticks + (u64)irq_ticks +
                             (u64)soft_irq_ticks + (u64)steal_ticks;
+  TracyCZoneEnd(__tracy_zone_ctx);
   return 1;
 }
 #elif defined(PLATFORM_MACOS) || defined(PLATFORM_IOS)
@@ -119,7 +132,9 @@ typedef struct runtime_cpu_sample {
 } runtime_cpu_sample;
 
 func b32 runtime_query_apple_cpu(runtime_cpu_sample* out_sample) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
   if (out_sample == NULL) {
+    TracyCZoneEnd(__tracy_zone_ctx);
     return 0;
   }
   assert(out_sample != NULL);
@@ -128,6 +143,7 @@ func b32 runtime_query_apple_cpu(runtime_cpu_sample* out_sample) {
   kern_return_t query_result =
       host_statistics(mach_host_self(), HOST_CPU_LOAD_INFO, (host_info_t)&load_info, &load_count);
   if (query_result != KERN_SUCCESS) {
+    TracyCZoneEnd(__tracy_zone_ctx);
     return 0;
   }
 
@@ -136,12 +152,15 @@ func b32 runtime_query_apple_cpu(runtime_cpu_sample* out_sample) {
                             (u64)load_info.cpu_ticks[CPU_STATE_SYSTEM] +
                             (u64)load_info.cpu_ticks[CPU_STATE_IDLE] +
                             (u64)load_info.cpu_ticks[CPU_STATE_NICE];
+  TracyCZoneEnd(__tracy_zone_ctx);
   return 1;
 }
 #endif
 
 func b32 system_runtime_query(system_runtime_info* out_info) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
   if (out_info == NULL) {
+    TracyCZoneEnd(__tracy_zone_ctx);
     return 0;
   }
   assert(out_info != NULL);
@@ -153,6 +172,7 @@ func b32 system_runtime_query(system_runtime_info* out_info) {
   memset(&memory_status, 0, size_of(memory_status));
   memory_status.dwLength = size_of(memory_status);
   if (GlobalMemoryStatusEx(&memory_status) == 0) {
+    TracyCZoneEnd(__tracy_zone_ctx);
     return 0;
   }
 
@@ -207,10 +227,12 @@ func b32 system_runtime_query(system_runtime_info* out_info) {
   }
 
   thread_log_trace("system_runtime_query: platform=windows mem_used=%zu", (size_t)out_info->memory_used);
+  TracyCZoneEnd(__tracy_zone_ctx);
   return 1;
 #elif defined(PLATFORM_LINUX)
   struct sysinfo sys_info;
   if (sysinfo(&sys_info) != 0) {
+    TracyCZoneEnd(__tracy_zone_ctx);
     return 0;
   }
 
@@ -263,6 +285,7 @@ func b32 system_runtime_query(system_runtime_info* out_info) {
   }
 
   thread_log_trace("system_runtime_query: platform=linux mem_used=%zu", (size_t)out_info->memory_used);
+  TracyCZoneEnd(__tracy_zone_ctx);
   return 1;
 #elif defined(PLATFORM_MACOS) || defined(PLATFORM_IOS)
   u64 total_memory = 0;
@@ -313,9 +336,11 @@ func b32 system_runtime_query(system_runtime_info* out_info) {
   }
 
   thread_log_trace("system_runtime_query: platform=apple mem_used=%zu", (size_t)out_info->memory_used);
+  TracyCZoneEnd(__tracy_zone_ctx);
   return 1;
 #else
   thread_log_warn("system_runtime_query: unsupported platform");
+  TracyCZoneEnd(__tracy_zone_ctx);
   return 0;
 #endif
 }

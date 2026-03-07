@@ -41,4 +41,3 @@ func b32 display_get_bounds(display id, display_rect* out_rect);
 
 // Writes the usable display bounds into out_rect. Returns 1 on success, 0 otherwise.
 func b32 display_get_usable_bounds(display id, display_rect* out_rect);
-

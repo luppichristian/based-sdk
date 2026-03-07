@@ -6,6 +6,7 @@
 #include "context/thread_ctx.h"
 #include "input/msg.h"
 #include "input/msg_core.h"
+#include "basic/profiler.h"
 
 #include <efsw/efsw.h>
 
@@ -26,83 +27,105 @@ const_var sz PATHWATCH_BINDING_CAP = 64;
 const_var sz PATHWATCH_WATCH_BINDING_CAP = 1024;
 
 func pathwatch_binding* pathwatch_bindings(void) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
   local_persist pathwatch_binding bindings[PATHWATCH_BINDING_CAP] = {0};
+  TracyCZoneEnd(__tracy_zone_ctx);
   return bindings;
 }
 
 func pathwatch_watch_binding* pathwatch_watch_bindings(void) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
   local_persist pathwatch_watch_binding bindings[PATHWATCH_WATCH_BINDING_CAP] = {0};
+  TracyCZoneEnd(__tracy_zone_ctx);
   return bindings;
 }
 
 func pathwatch_id pathwatch_next_id(void) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
   local_persist pathwatch_id next_id = 1;
   pathwatch_id value = next_id;
   next_id += 1;
+  TracyCZoneEnd(__tracy_zone_ctx);
   return value;
 }
 
 func pathwatch_watch_id pathwatch_next_watch_id(void) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
   local_persist pathwatch_watch_id next_id = 1;
   pathwatch_watch_id value = next_id;
   next_id += 1;
+  TracyCZoneEnd(__tracy_zone_ctx);
   return value;
 }
 
 func pathwatch_binding* pathwatch_find_binding(void* native_handle) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
   pathwatch_binding* bindings = pathwatch_bindings();
 
   for (sz item_idx = 0; item_idx < PATHWATCH_BINDING_CAP; item_idx += 1) {
     if (bindings[item_idx].native_handle == native_handle) {
+      TracyCZoneEnd(__tracy_zone_ctx);
       return &bindings[item_idx];
     }
   }
+  TracyCZoneEnd(__tracy_zone_ctx);
   return NULL;
 }
 
 func b32 pathwatch_bind_create(pathwatch_id pathwatch_id, void* native_handle) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
   pathwatch_binding* bindings = pathwatch_bindings();
 
   for (sz item_idx = 0; item_idx < PATHWATCH_BINDING_CAP; item_idx += 1) {
     if (bindings[item_idx].native_handle == NULL) {
       bindings[item_idx].native_handle = native_handle;
       bindings[item_idx].pathwatch_id = pathwatch_id;
+      TracyCZoneEnd(__tracy_zone_ctx);
       return 1;
     }
   }
+  TracyCZoneEnd(__tracy_zone_ctx);
   return 0;
 }
 
 func void pathwatch_bind_remove(void* native_handle) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
   pathwatch_binding* binding = pathwatch_find_binding(native_handle);
   if (binding != NULL) {
     binding->native_handle = NULL;
     binding->pathwatch_id = 0;
   }
+  TracyCZoneEnd(__tracy_zone_ctx);
 }
 
 func pathwatch_watch_binding* pathwatch_find_watch_binding_by_public_id(pathwatch_watch_id watch_id) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
   pathwatch_watch_binding* bindings = pathwatch_watch_bindings();
 
   for (sz item_idx = 0; item_idx < PATHWATCH_WATCH_BINDING_CAP; item_idx += 1) {
     if (bindings[item_idx].watch_id == watch_id) {
+      TracyCZoneEnd(__tracy_zone_ctx);
       return &bindings[item_idx];
     }
   }
+  TracyCZoneEnd(__tracy_zone_ctx);
   return NULL;
 }
 
 func pathwatch_watch_binding* pathwatch_find_watch_binding_by_native(
     void* native_handle,
     i64 native_watch_id) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
   pathwatch_watch_binding* bindings = pathwatch_watch_bindings();
 
   for (sz item_idx = 0; item_idx < PATHWATCH_WATCH_BINDING_CAP; item_idx += 1) {
     if (bindings[item_idx].native_handle == native_handle &&
         bindings[item_idx].native_watch_id == native_watch_id) {
+      TracyCZoneEnd(__tracy_zone_ctx);
       return &bindings[item_idx];
     }
   }
+  TracyCZoneEnd(__tracy_zone_ctx);
   return NULL;
 }
 
@@ -111,6 +134,7 @@ func pathwatch_watch_id pathwatch_watch_bind_create(
     void* native_handle,
     i64 native_watch_id,
     const path* watch_path) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
   pathwatch_watch_binding* bindings = pathwatch_watch_bindings();
 
   for (sz item_idx = 0; item_idx < PATHWATCH_WATCH_BINDING_CAP; item_idx += 1) {
@@ -121,28 +145,35 @@ func pathwatch_watch_id pathwatch_watch_bind_create(
       bindings[item_idx].pathwatch_id = pathwatch_id;
       bindings[item_idx].native_handle = native_handle;
       bindings[item_idx].watch_path = watch_path != NULL ? *watch_path : path_from_cstr("");
+      TracyCZoneEnd(__tracy_zone_ctx);
       return watch_id;
     }
   }
+  TracyCZoneEnd(__tracy_zone_ctx);
   return 0;
 }
 
 func void pathwatch_watch_bind_remove(pathwatch_watch_id watch_id) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
   pathwatch_watch_binding* binding = pathwatch_find_watch_binding_by_public_id(watch_id);
   if (binding != NULL) {
     *binding = (pathwatch_watch_binding) {0};
   }
+  TracyCZoneEnd(__tracy_zone_ctx);
 }
 
 func void pathwatch_watch_bind_remove_by_native(void* native_handle, i64 native_watch_id) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
   pathwatch_watch_binding* binding =
       pathwatch_find_watch_binding_by_native(native_handle, native_watch_id);
   if (binding != NULL) {
     *binding = (pathwatch_watch_binding) {0};
   }
+  TracyCZoneEnd(__tracy_zone_ctx);
 }
 
 func void pathwatch_watch_bind_remove_all_for_watcher(pathwatch_id pathwatch_id, void* native_handle) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
   pathwatch_watch_binding* bindings = pathwatch_watch_bindings();
 
   for (sz item_idx = 0; item_idx < PATHWATCH_WATCH_BINDING_CAP; item_idx += 1) {
@@ -151,9 +182,11 @@ func void pathwatch_watch_bind_remove_all_for_watcher(pathwatch_id pathwatch_id,
       bindings[item_idx] = (pathwatch_watch_binding) {0};
     }
   }
+  TracyCZoneEnd(__tracy_zone_ctx);
 }
 
 func void pathwatch_watch_bind_remove_by_path(pathwatch_id pathwatch_id, void* native_handle, const path* src) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
   pathwatch_watch_binding* bindings = pathwatch_watch_bindings();
   path normalized_src = src != NULL ? *src : path_from_cstr("");
   path_normalize(&normalized_src);
@@ -170,19 +203,26 @@ func void pathwatch_watch_bind_remove_by_path(pathwatch_id pathwatch_id, void* n
       }
     }
   }
+  TracyCZoneEnd(__tracy_zone_ctx);
 }
 
 func pathwatch_action pathwatch_map_action(enum efsw_action action) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
   switch (action) {
     case EFSW_ADD:
+      TracyCZoneEnd(__tracy_zone_ctx);
       return PATHWATCH_ACTION_CREATE;
     case EFSW_DELETE:
+      TracyCZoneEnd(__tracy_zone_ctx);
       return PATHWATCH_ACTION_DELETE;
     case EFSW_MODIFIED:
+      TracyCZoneEnd(__tracy_zone_ctx);
       return PATHWATCH_ACTION_MODIFY;
     case EFSW_MOVED:
+      TracyCZoneEnd(__tracy_zone_ctx);
       return PATHWATCH_ACTION_MOVE;
     default:
+      TracyCZoneEnd(__tracy_zone_ctx);
       return PATHWATCH_ACTION_MODIFY;
   }
 }
@@ -195,6 +235,7 @@ func void pathwatch_dispatch(
     enum efsw_action action,
     cstr8 old_file_ptr,
     void* user_data) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
   (void)dir_ptr;
   (void)file_ptr;
   (void)old_file_ptr;
@@ -202,12 +243,14 @@ func void pathwatch_dispatch(
 
   pathwatch_binding* binding = pathwatch_find_binding(native_handle);
   if (binding == NULL) {
+    TracyCZoneEnd(__tracy_zone_ctx);
     return;
   }
 
   pathwatch_watch_binding* watch_binding =
       pathwatch_find_watch_binding_by_native(native_handle, (i64)native_watch_id);
   if (watch_binding == NULL) {
+    TracyCZoneEnd(__tracy_zone_ctx);
     return;
   }
 
@@ -221,16 +264,19 @@ func void pathwatch_dispatch(
   };
   msg_core_fill_pathwatch(&event_msg, &pathwatch_data);
   (void)msg_post(&event_msg);
+  TracyCZoneEnd(__tracy_zone_ctx);
 }
 
 func void pathwatch_dispatch_missed(
     efsw_watcher native_handle,
     efsw_watchid native_watch_id,
     cstr8 dir_ptr) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
   (void)dir_ptr;
 
   pathwatch_binding* binding = pathwatch_find_binding(native_handle);
   if (binding == NULL) {
+    TracyCZoneEnd(__tracy_zone_ctx);
     return;
   }
 
@@ -247,9 +293,11 @@ func void pathwatch_dispatch_missed(
   };
   msg_core_fill_pathwatch(&event_msg, &pathwatch_data);
   (void)msg_post(&event_msg);
+  TracyCZoneEnd(__tracy_zone_ctx);
 }
 
 func pathwatch pathwatch_create(b32 use_generic_mode) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
   pathwatch watcher = {0};
   watcher.id = pathwatch_next_id();
   watcher.native_handle = efsw_create(use_generic_mode ? 1 : 0);
@@ -261,6 +309,7 @@ func pathwatch pathwatch_create(b32 use_generic_mode) {
     watcher.id = 0;
     watcher.native_handle = NULL;
     thread_log_error("pathwatch_create: failed");
+    TracyCZoneEnd(__tracy_zone_ctx);
     return watcher;
   }
 
@@ -282,11 +331,14 @@ func pathwatch pathwatch_create(b32 use_generic_mode) {
     thread_log_trace("pathwatch_create: id=%lld", (long long)watcher.id);
   }
 
+  TracyCZoneEnd(__tracy_zone_ctx);
   return watcher;
 }
 
 func void pathwatch_destroy(pathwatch* watcher) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
   if (watcher == NULL || watcher->native_handle == NULL) {
+    TracyCZoneEnd(__tracy_zone_ctx);
     return;
   }
   assert(watcher != NULL);
@@ -300,6 +352,7 @@ func void pathwatch_destroy(pathwatch* watcher) {
   };
   msg_core_fill_object_lifecycle(&lifecycle_msg, &lifecycle_data);
   if (!msg_post(&lifecycle_msg)) {
+    TracyCZoneEnd(__tracy_zone_ctx);
     return;
   }
 
@@ -309,20 +362,26 @@ func void pathwatch_destroy(pathwatch* watcher) {
   thread_log_trace("pathwatch_destroy: id=%lld", (long long)watcher->id);
   watcher->id = 0;
   watcher->native_handle = NULL;
+  TracyCZoneEnd(__tracy_zone_ctx);
 }
 
 func b32 pathwatch_start(pathwatch* watcher) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
   if (watcher == NULL || watcher->native_handle == NULL) {
+    TracyCZoneEnd(__tracy_zone_ctx);
     return 0;
   }
   assert(watcher->id > 0);
 
   efsw_watch((efsw_watcher)watcher->native_handle);
+  TracyCZoneEnd(__tracy_zone_ctx);
   return 1;
 }
 
 func pathwatch_watch_id pathwatch_add(pathwatch* watcher, const path* src, b32 recursive) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
   if (watcher == NULL || watcher->native_handle == NULL || src == NULL) {
+    TracyCZoneEnd(__tracy_zone_ctx);
     return 0;
   }
   assert(src->buf[0] != '\0');
@@ -337,6 +396,7 @@ func pathwatch_watch_id pathwatch_add(pathwatch* watcher, const path* src, b32 r
       watcher,
       pathwatch_dispatch_missed);
   if (native_watch_id <= 0) {
+    TracyCZoneEnd(__tracy_zone_ctx);
     return 0;
   }
 
@@ -348,69 +408,88 @@ func pathwatch_watch_id pathwatch_add(pathwatch* watcher, const path* src, b32 r
   if (watch_id > 0) {
     thread_log_trace("pathwatch_add: watcher=%lld watch=%lld path=%s", (long long)watcher->id, (long long)watch_id, src->buf);
   }
+  TracyCZoneEnd(__tracy_zone_ctx);
   return watch_id;
 }
 
 func b32 pathwatch_remove(pathwatch* watcher, pathwatch_watch_id watch_id) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
   if (watcher == NULL || watcher->native_handle == NULL || watch_id <= 0) {
+    TracyCZoneEnd(__tracy_zone_ctx);
     return 0;
   }
 
   pathwatch_watch_binding* binding = pathwatch_find_watch_binding_by_public_id(watch_id);
   if (binding == NULL || binding->pathwatch_id != watcher->id ||
       binding->native_handle != watcher->native_handle) {
+    TracyCZoneEnd(__tracy_zone_ctx);
     return 0;
   }
 
   efsw_removewatch_byid((efsw_watcher)watcher->native_handle, (efsw_watchid)binding->native_watch_id);
   pathwatch_watch_bind_remove(watch_id);
   thread_log_trace("pathwatch_remove: watcher=%lld watch=%lld", (long long)watcher->id, (long long)watch_id);
+  TracyCZoneEnd(__tracy_zone_ctx);
   return 1;
 }
 
 func b32 pathwatch_remove_path(pathwatch* watcher, const path* src) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
   if (watcher == NULL || watcher->native_handle == NULL || src == NULL) {
+    TracyCZoneEnd(__tracy_zone_ctx);
     return 0;
   }
 
   efsw_removewatch((efsw_watcher)watcher->native_handle, src->buf);
   pathwatch_watch_bind_remove_by_path(watcher->id, watcher->native_handle, src);
+  TracyCZoneEnd(__tracy_zone_ctx);
   return 1;
 }
 
 func b32 pathwatch_get_path(pathwatch_watch_id watch_id, path* out_watch_path) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
   if (watch_id <= 0 || out_watch_path == NULL) {
+    TracyCZoneEnd(__tracy_zone_ctx);
     return 0;
   }
 
   pathwatch_watch_binding* binding = pathwatch_find_watch_binding_by_public_id(watch_id);
   if (binding == NULL) {
+    TracyCZoneEnd(__tracy_zone_ctx);
     return 0;
   }
 
   *out_watch_path = binding->watch_path;
+  TracyCZoneEnd(__tracy_zone_ctx);
   return 1;
 }
 
 func b32 pathwatch_follow_symlinks(pathwatch* watcher, b32 enabled) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
   if (watcher == NULL || watcher->native_handle == NULL) {
+    TracyCZoneEnd(__tracy_zone_ctx);
     return 0;
   }
 
   efsw_follow_symlinks((efsw_watcher)watcher->native_handle, enabled ? 1 : 0);
+  TracyCZoneEnd(__tracy_zone_ctx);
   return 1;
 }
 
 func b32 pathwatch_allow_out_of_scope_links(pathwatch* watcher, b32 enabled) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
   if (watcher == NULL || watcher->native_handle == NULL) {
+    TracyCZoneEnd(__tracy_zone_ctx);
     return 0;
   }
 
   efsw_allow_outofscopelinks((efsw_watcher)watcher->native_handle, enabled ? 1 : 0);
+  TracyCZoneEnd(__tracy_zone_ctx);
   return 1;
 }
 
 func cstr8 pathwatch_get_last_error(void) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
+  TracyCZoneEnd(__tracy_zone_ctx);
   return efsw_getlasterror();
 }
-

@@ -638,4 +638,3 @@ func msg_core_pathwatch_data* msg_core_get_pathwatch(msg* src);
 func msg_core_log_data* msg_core_get_log(msg* src);
 func msg_core_assert_data* msg_core_get_assert(msg* src);
 func msg_core_global_ctx_data* msg_core_get_global_ctx(msg* src);
-

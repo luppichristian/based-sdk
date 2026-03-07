@@ -5,6 +5,7 @@
 #include "basic/assert.h"
 #include "context/thread_ctx.h"
 #include "basic/env_defines.h"
+#include "basic/profiler.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -30,13 +31,16 @@ typedef LONG(WINAPI* rtl_get_version_fn)(void* version_info);
 #endif
 
 func void system_copy_string(c8* dst_ptr, sz dst_cap, cstr8 src_ptr) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
   if (dst_ptr == NULL || dst_cap == 0) {
+    TracyCZoneEnd(__tracy_zone_ctx);
     return;
   }
   assert(dst_cap > 0);
 
   dst_ptr[0] = '\0';
   if (src_ptr == NULL) {
+    TracyCZoneEnd(__tracy_zone_ctx);
     return;
   }
 
@@ -47,37 +51,51 @@ func void system_copy_string(c8* dst_ptr, sz dst_cap, cstr8 src_ptr) {
 
   memcpy(dst_ptr, src_ptr, src_len);
   dst_ptr[src_len] = '\0';
+  TracyCZoneEnd(__tracy_zone_ctx);
 }
 
 func cstr8 system_architecture_name(void) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
 #if defined(ARCH_X86_64)
+  TracyCZoneEnd(__tracy_zone_ctx);
   return "x86_64";
 #elif defined(ARCH_X86)
+  TracyCZoneEnd(__tracy_zone_ctx);
   return "x86";
 #elif defined(ARCH_ARM64)
+  TracyCZoneEnd(__tracy_zone_ctx);
   return "arm64";
 #elif defined(ARCH_ARM)
+  TracyCZoneEnd(__tracy_zone_ctx);
   return "arm";
 #elif defined(ARCH_RISCV)
+  TracyCZoneEnd(__tracy_zone_ctx);
   return "riscv";
 #elif defined(ARCH_POWERPC)
+  TracyCZoneEnd(__tracy_zone_ctx);
   return "powerpc";
 #elif defined(ARCH_MIPS)
+  TracyCZoneEnd(__tracy_zone_ctx);
   return "mips";
 #elif defined(ARCH_SPARC)
+  TracyCZoneEnd(__tracy_zone_ctx);
   return "sparc";
 #elif defined(ARCH_WASM)
+  TracyCZoneEnd(__tracy_zone_ctx);
   return "wasm";
 #else
+  TracyCZoneEnd(__tracy_zone_ctx);
   return "unknown";
 #endif
 }
 
 #if defined(PLATFORM_WINDOWS)
 func void system_query_windows_version(system_info* out_info) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
   HMODULE module_handle = GetModuleHandleA("ntdll.dll");
   if (module_handle == NULL) {
     system_copy_string(out_info->os_name, size_of(out_info->os_name), "Windows");
+    TracyCZoneEnd(__tracy_zone_ctx);
     return;
   }
 
@@ -85,6 +103,7 @@ func void system_query_windows_version(system_info* out_info) {
       (rtl_get_version_fn)GetProcAddress(module_handle, "RtlGetVersion");
   if (get_version == NULL) {
     system_copy_string(out_info->os_name, size_of(out_info->os_name), "Windows");
+    TracyCZoneEnd(__tracy_zone_ctx);
     return;
   }
 
@@ -94,6 +113,7 @@ func void system_query_windows_version(system_info* out_info) {
 
   if (get_version(&version_info) != 0) {
     system_copy_string(out_info->os_name, size_of(out_info->os_name), "Windows");
+    TracyCZoneEnd(__tracy_zone_ctx);
     return;
   }
 
@@ -104,11 +124,14 @@ func void system_query_windows_version(system_info* out_info) {
                (unsigned long)version_info.dwMajorVersion,
                (unsigned long)version_info.dwMinorVersion,
                (unsigned long)version_info.dwBuildNumber);
+  TracyCZoneEnd(__tracy_zone_ctx);
 }
 #endif
 
 func b32 system_info_query(system_info* out_info) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
   if (out_info == NULL) {
+    TracyCZoneEnd(__tracy_zone_ctx);
     return 0;
   }
   assert(out_info != NULL);
@@ -150,6 +173,7 @@ func b32 system_info_query(system_info* out_info) {
   }
 
   thread_log_trace("system_info_query: platform=windows arch=%s", out_info->architecture_name);
+  TracyCZoneEnd(__tracy_zone_ctx);
   return 1;
 #elif defined(PLATFORM_UNIX) || defined(PLATFORM_ANDROID) || defined(PLATFORM_IOS)
   struct utsname uname_info;
@@ -191,11 +215,13 @@ func b32 system_info_query(system_info* out_info) {
   }
 
   thread_log_trace("system_info_query: platform=unix arch=%s", out_info->architecture_name);
+  TracyCZoneEnd(__tracy_zone_ctx);
   return 1;
 #else
   system_copy_string(out_info->os_name, size_of(out_info->os_name), "unknown");
   system_copy_string(out_info->os_version, size_of(out_info->os_version), "unknown");
   thread_log_warn("system_info_query: unknown platform");
+  TracyCZoneEnd(__tracy_zone_ctx);
   return 0;
 #endif
 }

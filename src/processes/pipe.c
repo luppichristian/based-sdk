@@ -7,9 +7,12 @@
 #include "input/msg.h"
 #include "input/msg_core.h"
 #include "../sdl3_include.h"
+#include "basic/profiler.h"
 
 func pipe pipe_stdin(process prc) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
   if (!prc) {
+    TracyCZoneEnd(__tracy_zone_ctx);
     return NULL;
   }
   assert(prc != NULL);
@@ -24,14 +27,18 @@ func pipe pipe_stdin(process prc) {
                                                        .object_ptr = pip,
                                                    });
     if (!msg_post(&lifecycle_msg)) {
+      TracyCZoneEnd(__tracy_zone_ctx);
       return NULL;
     }
   }
+  TracyCZoneEnd(__tracy_zone_ctx);
   return pip;
 }
 
 func pipe pipe_stdout(process prc) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
   if (!prc) {
+    TracyCZoneEnd(__tracy_zone_ctx);
     return NULL;
   }
   assert(prc != NULL);
@@ -46,20 +53,25 @@ func pipe pipe_stdout(process prc) {
                                                        .object_ptr = pip,
                                                    });
     if (!msg_post(&lifecycle_msg)) {
+      TracyCZoneEnd(__tracy_zone_ctx);
       return NULL;
     }
   }
+  TracyCZoneEnd(__tracy_zone_ctx);
   return pip;
 }
 
 func pipe pipe_stderr(process prc) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
   if (!prc) {
+    TracyCZoneEnd(__tracy_zone_ctx);
     return NULL;
   }
   assert(prc != NULL);
 
   SDL_PropertiesID props = SDL_GetProcessProperties((SDL_Process*)prc);
   if (!props) {
+    TracyCZoneEnd(__tracy_zone_ctx);
     return NULL;
   }
 
@@ -73,44 +85,59 @@ func pipe pipe_stderr(process prc) {
                                                        .object_ptr = pip,
                                                    });
     if (!msg_post(&lifecycle_msg)) {
+      TracyCZoneEnd(__tracy_zone_ctx);
       return NULL;
     }
   }
+  TracyCZoneEnd(__tracy_zone_ctx);
   return pip;
 }
 
 func b32 pipe_is_valid(pipe pip) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
+  TracyCZoneEnd(__tracy_zone_ctx);
   return pip != NULL;
 }
 
 func sz pipe_read(pipe pip, void* ptr, sz size) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
   if (!pip || !ptr || !size) {
+    TracyCZoneEnd(__tracy_zone_ctx);
     return 0;
   }
   assert(size > 0);
 
+  TracyCZoneEnd(__tracy_zone_ctx);
   return (sz)SDL_ReadIO((SDL_IOStream*)pip, ptr, (size_t)size);
 }
 
 func sz pipe_write(pipe pip, const void* ptr, sz size) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
   if (!pip || !ptr || !size) {
+    TracyCZoneEnd(__tracy_zone_ctx);
     return 0;
   }
   assert(size > 0);
 
+  TracyCZoneEnd(__tracy_zone_ctx);
   return (sz)SDL_WriteIO((SDL_IOStream*)pip, ptr, (size_t)size);
 }
 
 func b32 pipe_flush(pipe pip) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
   if (!pip) {
+    TracyCZoneEnd(__tracy_zone_ctx);
     return 0;
   }
 
+  TracyCZoneEnd(__tracy_zone_ctx);
   return SDL_FlushIO((SDL_IOStream*)pip);
 }
 
 func void pipe_close(pipe pip) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
   if (!pip) {
+    TracyCZoneEnd(__tracy_zone_ctx);
     return;
   }
 
@@ -122,10 +149,11 @@ func void pipe_close(pipe pip) {
                                                      .object_ptr = pip,
                                                  });
   if (!msg_post(&lifecycle_msg)) {
+    TracyCZoneEnd(__tracy_zone_ctx);
     return;
   }
 
   thread_log_trace("pipe_close: pipe=%p", pip);
   SDL_CloseIO((SDL_IOStream*)pip);
+  TracyCZoneEnd(__tracy_zone_ctx);
 }
-

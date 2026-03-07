@@ -9,6 +9,7 @@
 #include "threads/atomics.h"
 #include "../sdl3_include.h"
 #include "basic/utility_defines.h"
+#include "basic/profiler.h"
 #include <stdlib.h>
 
 // =========================================================================
@@ -24,7 +25,9 @@ global_var atomic_i32 assert_mutex_init = {0};
 // =========================================================================
 
 func mutex assert_lock_get(void) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
   if (atomic_i32_get(&assert_mutex_init) == 2) {
+    TracyCZoneEnd(__tracy_zone_ctx);
     return assert_mutex;
   }
 
@@ -33,6 +36,7 @@ func mutex assert_lock_get(void) {
     assert_mutex = mutex_create();
     atomic_fence_release();
     atomic_i32_set(&assert_mutex_init, 2);
+    TracyCZoneEnd(__tracy_zone_ctx);
     return assert_mutex;
   }
 
@@ -41,16 +45,20 @@ func mutex assert_lock_get(void) {
   }
 
   atomic_fence_acquire();
+  TracyCZoneEnd(__tracy_zone_ctx);
   return assert_mutex;
 }
 
 func void assert_log_msg(cstr8 msg, callsite site) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
   _log(thread_get_log_state(), LOG_LEVEL_FATAL, site, "Assertion failed: %s", msg);
+  TracyCZoneEnd(__tracy_zone_ctx);
 }
 
 // Returns: 0 = ignore, 1 = breakpoint, 2 = quit.
 // Defaults to quit if the message box cannot be displayed.
 func i32 assert_dialog(cstr8 msg, callsite site) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
   str8_long buf = {0};
   cstr8_format(buf, size_of(buf), "Assertion failed: %s\n\nin %s() at %s:%u", msg, site.function, site.filename, site.line);
 
@@ -72,6 +80,7 @@ func i32 assert_dialog(cstr8 msg, callsite site) {
 
   int btn_id = 2;
   SDL_ShowMessageBox(&data, &btn_id);
+  TracyCZoneEnd(__tracy_zone_ctx);
   return (i32)btn_id;
 }
 
@@ -80,7 +89,9 @@ func i32 assert_dialog(cstr8 msg, callsite site) {
 // =========================================================================
 
 func void assert_set_mode(assert_mode mode) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
   if (mode < ASSERT_MODE_DEBUG || mode > ASSERT_MODE_IGNORE) {
+    TracyCZoneEnd(__tracy_zone_ctx);
     return;
   }
   assert(mode >= ASSERT_MODE_DEBUG && mode <= ASSERT_MODE_IGNORE);
@@ -92,10 +103,13 @@ func void assert_set_mode(assert_mode mode) {
   if (lock) {
     mutex_unlock(lock);
   }
+  TracyCZoneEnd(__tracy_zone_ctx);
 }
 
 func void _assert(b32 condition, cstr8 cond_msg, callsite site) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
   if (condition) {
+    TracyCZoneEnd(__tracy_zone_ctx);
     return;
   }
   if (cond_msg == NULL) {
@@ -122,6 +136,7 @@ func void _assert(b32 condition, cstr8 cond_msg, callsite site) {
   strncpy(assert_data.text, cond_msg != NULL ? cond_msg : "", MSG_ASSERT_TEXT_CAP);
   msg_core_fill_assert(&assert_msg, &assert_data);
   if (!msg_post(&assert_msg)) {
+    TracyCZoneEnd(__tracy_zone_ctx);
     return;
   }
 
@@ -145,6 +160,7 @@ func void _assert(b32 condition, cstr8 cond_msg, callsite site) {
     case ASSERT_MODE_IGNORE:
       break;
   }
+  TracyCZoneEnd(__tracy_zone_ctx);
 }
 
 void _lm2_custom_assert(

@@ -3,10 +3,10 @@
 
 #pragma once
 
+#include "../memory/allocator.h"
 #include "../utils/cmdline.h"
 #include "env_defines.h"
 #include "primitive_types.h"
-#include "../memory/allocator.h"
 
 // =========================================================================
 // Application Entry Points

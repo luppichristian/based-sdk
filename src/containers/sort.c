@@ -5,6 +5,7 @@
 #include "basic/assert.h"
 #include "context/thread_ctx.h"
 #include "memory/scratch.h"
+#include "basic/profiler.h"
 #include <string.h>
 
 typedef struct sort_range {
@@ -13,15 +14,21 @@ typedef struct sort_range {
 } sort_range;
 
 func void* sort_elem_ptr(u8* base_ptr, sz idx, sz elem_size) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
+  TracyCZoneEnd(__tracy_zone_ctx);
   return base_ptr + (idx * elem_size);
 }
 
 func const void* sort_elem_ptr_const(const u8* base_ptr, sz idx, sz elem_size) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
+  TracyCZoneEnd(__tracy_zone_ctx);
   return base_ptr + (idx * elem_size);
 }
 
 func void sort_swap_bytes(void* lhs_ptr, void* rhs_ptr, sz elem_size) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
   if (lhs_ptr == rhs_ptr) {
+    TracyCZoneEnd(__tracy_zone_ctx);
     return;
   }
 
@@ -33,6 +40,7 @@ func void sort_swap_bytes(void* lhs_ptr, void* rhs_ptr, sz elem_size) {
     lhs_bytes[byte_idx] = rhs_bytes[byte_idx];
     rhs_bytes[byte_idx] = tmp_byte;
   }
+  TracyCZoneEnd(__tracy_zone_ctx);
 }
 
 func b32 sort_is_invalid_input(
@@ -40,17 +48,21 @@ func b32 sort_is_invalid_input(
     sz elem_count,
     sz elem_size,
     sort_compare_fn* compare) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
   if (elem_count < 2) {
+    TracyCZoneEnd(__tracy_zone_ctx);
     return 0;
   }
 
   if (!ptr || !compare || !elem_size) {
+    TracyCZoneEnd(__tracy_zone_ctx);
     return 1;
   }
   assert(ptr != NULL);
   assert(compare != NULL);
   assert(elem_size > 0);
 
+  TracyCZoneEnd(__tracy_zone_ctx);
   return 0;
 }
 
@@ -61,6 +73,7 @@ func sz sort_partition(
     sz elem_size,
     sort_compare_fn* compare,
     void* user_data) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
   sz piv_idx = beg_idx + ((end_idx - beg_idx) / 2);
   sz lst_idx = end_idx - 1;
   sort_swap_bytes(
@@ -85,6 +98,7 @@ func sz sort_partition(
       sort_elem_ptr(base_ptr, stw_idx, elem_size),
       sort_elem_ptr(base_ptr, lst_idx, elem_size),
       elem_size);
+  TracyCZoneEnd(__tracy_zone_ctx);
   return stw_idx;
 }
 
@@ -95,7 +109,9 @@ func void sort_quick_recursive(
     sz elem_size,
     sort_compare_fn* compare,
     void* user_data) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
   if ((end_idx - beg_idx) < 2) {
+    TracyCZoneEnd(__tracy_zone_ctx);
     return;
   }
 
@@ -103,6 +119,7 @@ func void sort_quick_recursive(
 
   sort_quick_recursive(base_ptr, beg_idx, piv_idx, elem_size, compare, user_data);
   sort_quick_recursive(base_ptr, piv_idx + 1, end_idx, elem_size, compare, user_data);
+  TracyCZoneEnd(__tracy_zone_ctx);
 }
 
 func void sort_merge_ranges(
@@ -114,6 +131,7 @@ func void sort_merge_ranges(
     sz elem_size,
     sort_compare_fn* compare,
     void* user_data) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
   sz lhs_idx = left_idx;
   sz rhs_idx = mid_idx;
   sz out_idx = left_idx;
@@ -153,10 +171,13 @@ func void sort_merge_ranges(
       sort_elem_ptr(base_ptr, left_idx, elem_size),
       sort_elem_ptr(tmp_ptr, left_idx, elem_size),
       (right_idx - left_idx) * elem_size);
+  TracyCZoneEnd(__tracy_zone_ctx);
 }
 
 func sz sort_radix32_partition(u32* ptr, sz beg_idx, sz end_idx, u32 bit_mask) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
   if ((end_idx - beg_idx) < 2) {
+    TracyCZoneEnd(__tracy_zone_ctx);
     return beg_idx;
   }
 
@@ -184,11 +205,14 @@ func sz sort_radix32_partition(u32* ptr, sz beg_idx, sz end_idx, u32 bit_mask) {
     }
   }
 
+  TracyCZoneEnd(__tracy_zone_ctx);
   return lhs_idx;
 }
 
 func void sort_radix32_recursive(u32* ptr, sz beg_idx, sz end_idx, i32 bit_idx) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
   if ((end_idx - beg_idx) < 2 || bit_idx < 0) {
+    TracyCZoneEnd(__tracy_zone_ctx);
     return;
   }
 
@@ -196,10 +220,13 @@ func void sort_radix32_recursive(u32* ptr, sz beg_idx, sz end_idx, i32 bit_idx) 
   sz mid_idx = sort_radix32_partition(ptr, beg_idx, end_idx, bit_mask);
   sort_radix32_recursive(ptr, beg_idx, mid_idx, bit_idx - 1);
   sort_radix32_recursive(ptr, mid_idx, end_idx, bit_idx - 1);
+  TracyCZoneEnd(__tracy_zone_ctx);
 }
 
 func sz sort_radix64_partition(u64* ptr, sz beg_idx, sz end_idx, u64 bit_mask) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
   if ((end_idx - beg_idx) < 2) {
+    TracyCZoneEnd(__tracy_zone_ctx);
     return beg_idx;
   }
 
@@ -227,11 +254,14 @@ func sz sort_radix64_partition(u64* ptr, sz beg_idx, sz end_idx, u64 bit_mask) {
     }
   }
 
+  TracyCZoneEnd(__tracy_zone_ctx);
   return lhs_idx;
 }
 
 func void sort_radix64_recursive(u64* ptr, sz beg_idx, sz end_idx, i32 bit_idx) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
   if ((end_idx - beg_idx) < 2 || bit_idx < 0) {
+    TracyCZoneEnd(__tracy_zone_ctx);
     return;
   }
 
@@ -239,6 +269,7 @@ func void sort_radix64_recursive(u64* ptr, sz beg_idx, sz end_idx, i32 bit_idx) 
   sz mid_idx = sort_radix64_partition(ptr, beg_idx, end_idx, bit_mask);
   sort_radix64_recursive(ptr, beg_idx, mid_idx, bit_idx - 1);
   sort_radix64_recursive(ptr, mid_idx, end_idx, bit_idx - 1);
+  TracyCZoneEnd(__tracy_zone_ctx);
 }
 
 func b32 sort_check(
@@ -247,11 +278,14 @@ func b32 sort_check(
     sz elem_size,
     sort_compare_fn* compare,
     void* user_data) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
   if (elem_count < 2) {
+    TracyCZoneEnd(__tracy_zone_ctx);
     return 1;
   }
 
   if (!ptr || !compare || !elem_size) {
+    TracyCZoneEnd(__tracy_zone_ctx);
     return 0;
   }
   assert(ptr != NULL);
@@ -262,10 +296,12 @@ func b32 sort_check(
     const void* lhs_ptr = sort_elem_ptr_const(base_ptr, idx - 1, elem_size);
     const void* rhs_ptr = sort_elem_ptr_const(base_ptr, idx, elem_size);
     if (compare(lhs_ptr, rhs_ptr, user_data) > 0) {
+      TracyCZoneEnd(__tracy_zone_ctx);
       return 0;
     }
   }
 
+  TracyCZoneEnd(__tracy_zone_ctx);
   return 1;
 }
 
@@ -275,11 +311,14 @@ func sz sort_bubble(
     sz elem_size,
     sort_compare_fn* compare,
     void* user_data) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
   if (elem_count < 2) {
+    TracyCZoneEnd(__tracy_zone_ctx);
     return elem_count;
   }
 
   if (sort_is_invalid_input(ptr, elem_count, elem_size, compare)) {
+    TracyCZoneEnd(__tracy_zone_ctx);
     return 0;
   }
 
@@ -299,6 +338,7 @@ func sz sort_bubble(
     }
   }
 
+  TracyCZoneEnd(__tracy_zone_ctx);
   return elem_count;
 }
 
@@ -309,12 +349,15 @@ func sz sort_quick(
     sort_compare_fn* compare,
     void* user_data,
     allocator allocator) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
   (void)allocator;
   if (elem_count < 2) {
+    TracyCZoneEnd(__tracy_zone_ctx);
     return elem_count;
   }
 
   if (sort_is_invalid_input(ptr, elem_count, elem_size, compare)) {
+    TracyCZoneEnd(__tracy_zone_ctx);
     return 0;
   }
 
@@ -322,11 +365,13 @@ func sz sort_quick(
   arena* temp_arena = thread_get_temp_arena();
   if (temp_arena == NULL) {
     sort_quick_recursive(base_ptr, 0, elem_count, elem_size, compare, user_data);
+    TracyCZoneEnd(__tracy_zone_ctx);
     return elem_count;
   }
 
   if (elem_count > (((sz)-1) / size_of(sort_range))) {
     sort_quick_recursive(base_ptr, 0, elem_count, elem_size, compare, user_data);
+    TracyCZoneEnd(__tracy_zone_ctx);
     return elem_count;
   }
 
@@ -335,6 +380,7 @@ func sz sort_quick(
   if (!stack_ptr) {
     scratch_end(&temp_scope);
     sort_quick_recursive(base_ptr, 0, elem_count, elem_size, compare, user_data);
+    TracyCZoneEnd(__tracy_zone_ctx);
     return elem_count;
   }
 
@@ -382,6 +428,7 @@ func sz sort_quick(
   }
 
   scratch_end(&temp_scope);
+  TracyCZoneEnd(__tracy_zone_ctx);
   return elem_count;
 }
 
@@ -392,21 +439,26 @@ func sz sort_merge(
     sort_compare_fn* compare,
     void* user_data,
     allocator allocator) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
   (void)allocator;
   if (elem_count < 2) {
+    TracyCZoneEnd(__tracy_zone_ctx);
     return elem_count;
   }
 
   if (sort_is_invalid_input(ptr, elem_count, elem_size, compare)) {
+    TracyCZoneEnd(__tracy_zone_ctx);
     return 0;
   }
 
   arena* temp_arena = thread_get_temp_arena();
   if (temp_arena == NULL) {
+    TracyCZoneEnd(__tracy_zone_ctx);
     return sort_quick(ptr, elem_count, elem_size, compare, user_data, allocator);
   }
 
   if (elem_count > (((sz)-1) / elem_size)) {
+    TracyCZoneEnd(__tracy_zone_ctx);
     return sort_quick(ptr, elem_count, elem_size, compare, user_data, allocator);
   }
 
@@ -415,6 +467,7 @@ func sz sort_merge(
   u8* tmp_ptr = (u8*)arena_alloc(temp_arena, temp_size, align_of(u8));
   if (!tmp_ptr) {
     scratch_end(&temp_scope);
+    TracyCZoneEnd(__tracy_zone_ctx);
     return sort_quick(ptr, elem_count, elem_size, compare, user_data, allocator);
   }
 
@@ -462,6 +515,7 @@ func sz sort_merge(
   }
 
   scratch_end(&temp_scope);
+  TracyCZoneEnd(__tracy_zone_ctx);
   return elem_count;
 }
 
@@ -471,11 +525,14 @@ func sz sort_selection(
     sz elem_size,
     sort_compare_fn* compare,
     void* user_data) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
   if (elem_count < 2) {
+    TracyCZoneEnd(__tracy_zone_ctx);
     return elem_count;
   }
 
   if (sort_is_invalid_input(ptr, elem_count, elem_size, compare)) {
+    TracyCZoneEnd(__tracy_zone_ctx);
     return 0;
   }
 
@@ -498,6 +555,7 @@ func sz sort_selection(
     }
   }
 
+  TracyCZoneEnd(__tracy_zone_ctx);
   return elem_count;
 }
 
@@ -507,11 +565,14 @@ func sz sort_insertion(
     sz elem_size,
     sort_compare_fn* compare,
     void* user_data) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
   if (elem_count < 2) {
+    TracyCZoneEnd(__tracy_zone_ctx);
     return elem_count;
   }
 
   if (sort_is_invalid_input(ptr, elem_count, elem_size, compare)) {
+    TracyCZoneEnd(__tracy_zone_ctx);
     return 0;
   }
 
@@ -530,31 +591,40 @@ func sz sort_insertion(
     }
   }
 
+  TracyCZoneEnd(__tracy_zone_ctx);
   return elem_count;
 }
 
 func sz sort_radix32(u32* ptr, sz elem_count) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
   if (elem_count < 2) {
+    TracyCZoneEnd(__tracy_zone_ctx);
     return elem_count;
   }
 
   if (!ptr) {
+    TracyCZoneEnd(__tracy_zone_ctx);
     return 0;
   }
 
   sort_radix32_recursive(ptr, 0, elem_count, 31);
+  TracyCZoneEnd(__tracy_zone_ctx);
   return elem_count;
 }
 
 func sz sort_radix64(u64* ptr, sz elem_count) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
   if (elem_count < 2) {
+    TracyCZoneEnd(__tracy_zone_ctx);
     return elem_count;
   }
 
   if (!ptr) {
+    TracyCZoneEnd(__tracy_zone_ctx);
     return 0;
   }
 
   sort_radix64_recursive(ptr, 0, elem_count, 63);
+  TracyCZoneEnd(__tracy_zone_ctx);
   return elem_count;
 }

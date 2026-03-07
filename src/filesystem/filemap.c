@@ -10,6 +10,7 @@
 #include "filesystem/file.h"
 #include "input/msg.h"
 #include "input/msg_core.h"
+#include "basic/profiler.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -28,42 +29,55 @@
 #endif
 
 func filemap filemap_empty(void) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
   filemap map;
   memset(&map, 0, size_of(map));
   map.source_path = path_from_cstr("");
+  TracyCZoneEnd(__tracy_zone_ctx);
   return map;
 }
 
 func allocator filemap_allocator_resolve(void) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
   allocator alloc = thread_get_allocator();
   if (alloc.alloc_fn != NULL && alloc.dealloc_fn != NULL) {
+    TracyCZoneEnd(__tracy_zone_ctx);
     return alloc;
   }
+  TracyCZoneEnd(__tracy_zone_ctx);
   return global_get_allocator();
 }
 
 func b32 filemap_is_open(const filemap* map) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
   if (map == NULL) {
+    TracyCZoneEnd(__tracy_zone_ctx);
     return 0;
   }
 
   if (map->native_file != NULL) {
+    TracyCZoneEnd(__tracy_zone_ctx);
     return 1;
   }
 
+  TracyCZoneEnd(__tracy_zone_ctx);
   return map->uses_fallback_copy && map->source_path.buf[0] != '\0' ? 1 : 0;
 }
 
 func b32 filemap_flush(filemap* map) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
   if (!filemap_is_open(map)) {
+    TracyCZoneEnd(__tracy_zone_ctx);
     return 0;
   }
 
   if (!map->writable) {
+    TracyCZoneEnd(__tracy_zone_ctx);
     return 1;
   }
 
   if (!map->dirty) {
+    TracyCZoneEnd(__tracy_zone_ctx);
     return 1;
   }
   assert(map->source_path.buf[0] != '\0');
@@ -71,38 +85,48 @@ func b32 filemap_flush(filemap* map) {
   if (map->uses_fallback_copy) {
     buffer data = buffer_from(map->data_ptr, map->data_size);
     if (!file_write_all(&map->source_path, data)) {
+      TracyCZoneEnd(__tracy_zone_ctx);
       return 0;
     }
     map->dirty = 0;
+    TracyCZoneEnd(__tracy_zone_ctx);
     return 1;
   }
 
 #if defined(PLATFORM_WINDOWS)
   if (map->data_ptr != NULL && map->data_size > 0 && !FlushViewOfFile(map->data_ptr, (SIZE_T)map->data_size)) {
+    TracyCZoneEnd(__tracy_zone_ctx);
     return 0;
   }
 
   if (map->native_file != NULL && !FlushFileBuffers((HANDLE)map->native_file)) {
+    TracyCZoneEnd(__tracy_zone_ctx);
     return 0;
   }
   map->dirty = 0;
+  TracyCZoneEnd(__tracy_zone_ctx);
   return 1;
 #elif defined(PLATFORM_UNIX) || defined(PLATFORM_ANDROID) || defined(PLATFORM_IOS)
   if (map->data_ptr != NULL && map->data_size > 0) {
     if (msync(map->data_ptr, map->data_size, MS_SYNC) != 0) {
+      TracyCZoneEnd(__tracy_zone_ctx);
       return 0;
     }
   }
   map->dirty = 0;
+  TracyCZoneEnd(__tracy_zone_ctx);
   return 1;
 #else
+  TracyCZoneEnd(__tracy_zone_ctx);
   return 1;
 #endif
 }
 
 func void filemap_close(filemap* map) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
   allocator alloc = filemap_allocator_resolve();
   if (map == NULL) {
+    TracyCZoneEnd(__tracy_zone_ctx);
     return;
   }
   assert(map->data_size == 0 || map->source_path.buf[0] != '\0');
@@ -115,6 +139,7 @@ func void filemap_close(filemap* map) {
                                                      .object_ptr = map,
                                                  });
   if (!msg_post(&lifecycle_msg)) {
+    TracyCZoneEnd(__tracy_zone_ctx);
     return;
   }
 
@@ -128,6 +153,7 @@ func void filemap_close(filemap* map) {
     }
     thread_log_trace("filemap_close: fallback path=%s", map->source_path.buf);
     *map = filemap_empty();
+    TracyCZoneEnd(__tracy_zone_ctx);
     return;
   }
 
@@ -155,13 +181,16 @@ func void filemap_close(filemap* map) {
 
   *map = filemap_empty();
   thread_log_trace("filemap_close: mapped");
+  TracyCZoneEnd(__tracy_zone_ctx);
 }
 
 func filemap filemap_open(const path* src, filemap_access access) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
   allocator alloc = filemap_allocator_resolve();
   filemap map = filemap_empty();
 
   if (src == NULL || !file_exists(src)) {
+    TracyCZoneEnd(__tracy_zone_ctx);
     return map;
   }
   assert(access == FILEMAP_ACCESS_READ || access == FILEMAP_ACCESS_READ_WRITE || access == FILEMAP_ACCESS_COPY_ON_WRITE);
@@ -196,17 +225,20 @@ func filemap filemap_open(const path* src, filemap_access access) {
       FILE_ATTRIBUTE_NORMAL,
       NULL);
   if (file_handle == INVALID_HANDLE_VALUE) {
+    TracyCZoneEnd(__tracy_zone_ctx);
     return filemap_empty();
   }
 
   if (!GetFileSizeEx(file_handle, &file_size)) {
     CloseHandle(file_handle);
+    TracyCZoneEnd(__tracy_zone_ctx);
     return filemap_empty();
   }
 
   map.native_file = file_handle;
   map.data_size = (sz)file_size.QuadPart;
   if (map.data_size == 0) {
+    TracyCZoneEnd(__tracy_zone_ctx);
     return map;
   }
 
@@ -219,6 +251,7 @@ func filemap filemap_open(const path* src, filemap_access access) {
       NULL);
   if (mapping_handle == NULL) {
     filemap_close(&map);
+    TracyCZoneEnd(__tracy_zone_ctx);
     return filemap_empty();
   }
 
@@ -226,6 +259,7 @@ func filemap filemap_open(const path* src, filemap_access access) {
   map.data_ptr = MapViewOfFile(mapping_handle, view_access, 0, 0, (SIZE_T)map.data_size);
   if (map.data_ptr == NULL) {
     filemap_close(&map);
+    TracyCZoneEnd(__tracy_zone_ctx);
     return filemap_empty();
   }
 
@@ -238,9 +272,11 @@ func filemap filemap_open(const path* src, filemap_access access) {
                                                  });
   if (!msg_post(&lifecycle_msg)) {
     filemap_close(&map);
+    TracyCZoneEnd(__tracy_zone_ctx);
     return filemap_empty();
   }
   thread_log_trace("filemap_open: windows path=%s size=%zu writable=%u", src->buf, (size_t)map.data_size, (u32)map.writable);
+  TracyCZoneEnd(__tracy_zone_ctx);
   return map;
 #elif defined(PLATFORM_UNIX) || defined(PLATFORM_ANDROID) || defined(PLATFORM_IOS)
   i32 open_flags = O_RDONLY;
@@ -260,23 +296,27 @@ func filemap filemap_open(const path* src, filemap_access access) {
 
   file_desc = open(src->buf, open_flags);
   if (file_desc < 0) {
+    TracyCZoneEnd(__tracy_zone_ctx);
     return filemap_empty();
   }
 
   if (fstat(file_desc, &stat_info) != 0) {
     close(file_desc);
+    TracyCZoneEnd(__tracy_zone_ctx);
     return filemap_empty();
   }
 
   map.native_file = (void*)(up)(file_desc + 1);
   map.data_size = (sz)stat_info.st_size;
   if (map.data_size == 0) {
+    TracyCZoneEnd(__tracy_zone_ctx);
     return map;
   }
 
   map.data_ptr = mmap(NULL, map.data_size, prot_flags, map_flags, file_desc, 0);
   if (map.data_ptr == MAP_FAILED) {
     filemap_close(&map);
+    TracyCZoneEnd(__tracy_zone_ctx);
     return filemap_empty();
   }
 
@@ -290,14 +330,17 @@ func filemap filemap_open(const path* src, filemap_access access) {
                                                  });
   if (!msg_post(&lifecycle_msg)) {
     filemap_close(&map);
+    TracyCZoneEnd(__tracy_zone_ctx);
     return filemap_empty();
   }
   thread_log_trace("filemap_open: unix path=%s size=%zu writable=%u", src->buf, (size_t)map.data_size, (u32)map.writable);
+  TracyCZoneEnd(__tracy_zone_ctx);
   return map;
 #else
   buffer file_data = {0};
 
   if (!file_read_all(src, &alloc, &file_data)) {
+    TracyCZoneEnd(__tracy_zone_ctx);
     return filemap_empty();
   }
   map.data_ptr = file_data.ptr;
@@ -312,10 +355,11 @@ func filemap filemap_open(const path* src, filemap_access access) {
                                                  });
   if (!msg_post(&lifecycle_msg)) {
     filemap_close(&map);
+    TracyCZoneEnd(__tracy_zone_ctx);
     return filemap_empty();
   }
   thread_log_trace("filemap_open: fallback path=%s size=%zu writable=%u", src->buf, (size_t)map.data_size, (u32)map.writable);
+  TracyCZoneEnd(__tracy_zone_ctx);
   return map;
 #endif
 }
-

@@ -24,11 +24,11 @@
 // Tracy include
 // =========================================================================
 
-// If TRACY_ENABLE is undefined, tracy will replace all function calls with stubs.
+// Respect build-system definitions and only enable Tracy when profiling is on.
 #if BASED_PROFILER_ENABLED
-#  define TRACY_ENABLE
-#else
-#  undef TRACY_ENABLE
+#  if !defined(TRACY_ENABLE)
+#    define TRACY_ENABLE 1
+#  endif
 #endif
 
 // Set max callstack depth

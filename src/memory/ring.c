@@ -6,6 +6,7 @@
 #include "context/thread_ctx.h"
 #include "input/msg.h"
 #include "input/msg_core.h"
+#include "basic/profiler.h"
 #include <string.h>
 
 // =========================================================================
@@ -13,6 +14,7 @@
 // =========================================================================
 
 func ring ring_create(void* ptr, sz capacity, mutex opt_mutex) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
   ring rng;
   memset(&rng, 0, size_of(rng));
   rng.ptr = (u8*)ptr;
@@ -29,16 +31,20 @@ func ring ring_create(void* ptr, sz capacity, mutex opt_mutex) {
     memset(&rng, 0, size_of(rng));
   }
   thread_log_trace("ring_create: capacity=%zu", (size_t)capacity);
+  TracyCZoneEnd(__tracy_zone_ctx);
   return rng;
 }
 
 func ring ring_create_mutexed(void* ptr, sz capacity) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
   ring rng = ring_create(ptr, capacity, mutex_create());
   rng.mutex_owned = 1;
+  TracyCZoneEnd(__tracy_zone_ctx);
   return rng;
 }
 
 func ring ring_create_alloc(allocator parent_alloc, sz capacity, mutex opt_mutex) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
   ring rng;
   memset(&rng, 0, size_of(rng));
   rng.parent = parent_alloc;
@@ -62,17 +68,22 @@ func ring ring_create_alloc(allocator parent_alloc, sz capacity, mutex opt_mutex
     memset(&rng, 0, size_of(rng));
   }
   thread_log_trace("ring_create_alloc: capacity=%zu", (size_t)capacity);
+  TracyCZoneEnd(__tracy_zone_ctx);
   return rng;
 }
 
 func ring ring_create_alloc_mutexed(allocator parent_alloc, sz capacity) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
   ring rng = ring_create_alloc(parent_alloc, capacity, mutex_create());
   rng.mutex_owned = 1;
+  TracyCZoneEnd(__tracy_zone_ctx);
   return rng;
 }
 
 func void ring_destroy(ring* rng) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
   if (rng == NULL) {
+    TracyCZoneEnd(__tracy_zone_ctx);
     return;
   }
   assert(rng != NULL);
@@ -85,6 +96,7 @@ func void ring_destroy(ring* rng) {
                                                      .object_ptr = rng,
                                                  });
   if (!msg_post(&lifecycle_msg)) {
+    TracyCZoneEnd(__tracy_zone_ctx);
     return;
   }
 
@@ -110,6 +122,7 @@ func void ring_destroy(ring* rng) {
   rng->opt_mutex = NULL;
   rng->mutex_owned = 0;
   thread_log_trace("ring_destroy: rng=%p", (void*)rng);
+  TracyCZoneEnd(__tracy_zone_ctx);
 }
 
 // =========================================================================
@@ -117,7 +130,9 @@ func void ring_destroy(ring* rng) {
 // =========================================================================
 
 func sz ring_size(ring* rng) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
   if (rng == NULL) {
+    TracyCZoneEnd(__tracy_zone_ctx);
     return 0;
   }
   if (rng->opt_mutex) {
@@ -127,11 +142,14 @@ func sz ring_size(ring* rng) {
   if (rng->opt_mutex) {
     mutex_unlock(rng->opt_mutex);
   }
+  TracyCZoneEnd(__tracy_zone_ctx);
   return result;
 }
 
 func sz ring_space(ring* rng) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
   if (rng == NULL) {
+    TracyCZoneEnd(__tracy_zone_ctx);
     return 0;
   }
   if (rng->opt_mutex) {
@@ -141,6 +159,7 @@ func sz ring_space(ring* rng) {
   if (rng->opt_mutex) {
     mutex_unlock(rng->opt_mutex);
   }
+  TracyCZoneEnd(__tracy_zone_ctx);
   return result;
 }
 
@@ -151,6 +170,7 @@ func sz ring_space(ring* rng) {
 // Copies byte_count bytes starting at ring_offset (wrapping at rng->capacity)
 // into dst. Does not update any ring state.
 func void ring_copy_out(ring* rng, sz ring_offset, void* dst, sz byte_count) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
   sz to_end = rng->capacity - ring_offset;
   u8* out_bytes = (u8*)dst;
   if (byte_count <= to_end) {
@@ -159,11 +179,13 @@ func void ring_copy_out(ring* rng, sz ring_offset, void* dst, sz byte_count) {
     memcpy(out_bytes, rng->ptr + ring_offset, to_end);
     memcpy(out_bytes + to_end, rng->ptr, byte_count - to_end);
   }
+  TracyCZoneEnd(__tracy_zone_ctx);
 }
 
 // Copies byte_count bytes from src into the ring starting at ring_offset
 // (wrapping at rng->capacity). Does not update any ring state.
 func void ring_copy_in(ring* rng, sz ring_offset, void* src, sz byte_count) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
   sz to_end = rng->capacity - ring_offset;
   u8* src_bytes = (u8*)src;
   if (byte_count <= to_end) {
@@ -172,6 +194,7 @@ func void ring_copy_in(ring* rng, sz ring_offset, void* src, sz byte_count) {
     memcpy(rng->ptr + ring_offset, src_bytes, to_end);
     memcpy(rng->ptr, src_bytes + to_end, byte_count - to_end);
   }
+  TracyCZoneEnd(__tracy_zone_ctx);
 }
 
 // =========================================================================
@@ -179,7 +202,9 @@ func void ring_copy_in(ring* rng, sz ring_offset, void* src, sz byte_count) {
 // =========================================================================
 
 func sz ring_write(ring* rng, void* data, sz size) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
   if (rng == NULL || data == NULL || size == 0 || rng->capacity == 0 || rng->ptr == NULL) {
+    TracyCZoneEnd(__tracy_zone_ctx);
     return 0;
   }
   if (rng->opt_mutex) {
@@ -196,11 +221,14 @@ func sz ring_write(ring* rng, void* data, sz size) {
   if (rng->opt_mutex) {
     mutex_unlock(rng->opt_mutex);
   }
+  TracyCZoneEnd(__tracy_zone_ctx);
   return write_sz;
 }
 
 func sz ring_read(ring* rng, void* out, sz size) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
   if (rng == NULL || out == NULL || size == 0 || rng->capacity == 0 || rng->ptr == NULL) {
+    TracyCZoneEnd(__tracy_zone_ctx);
     return 0;
   }
   if (rng->opt_mutex) {
@@ -217,11 +245,14 @@ func sz ring_read(ring* rng, void* out, sz size) {
   if (rng->opt_mutex) {
     mutex_unlock(rng->opt_mutex);
   }
+  TracyCZoneEnd(__tracy_zone_ctx);
   return read_sz;
 }
 
 func sz ring_peek(ring* rng, void* out, sz size) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
   if (rng == NULL || out == NULL || size == 0 || rng->capacity == 0 || rng->ptr == NULL) {
+    TracyCZoneEnd(__tracy_zone_ctx);
     return 0;
   }
   if (rng->opt_mutex) {
@@ -236,11 +267,14 @@ func sz ring_peek(ring* rng, void* out, sz size) {
   if (rng->opt_mutex) {
     mutex_unlock(rng->opt_mutex);
   }
+  TracyCZoneEnd(__tracy_zone_ctx);
   return peek_sz;
 }
 
 func sz ring_skip(ring* rng, sz size) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
   if (rng == NULL || size == 0 || rng->capacity == 0) {
+    TracyCZoneEnd(__tracy_zone_ctx);
     return 0;
   }
   if (rng->opt_mutex) {
@@ -256,6 +290,7 @@ func sz ring_skip(ring* rng, sz size) {
   if (rng->opt_mutex) {
     mutex_unlock(rng->opt_mutex);
   }
+  TracyCZoneEnd(__tracy_zone_ctx);
   return skip_sz;
 }
 
@@ -264,7 +299,9 @@ func sz ring_skip(ring* rng, sz size) {
 // =========================================================================
 
 func void ring_clear(ring* rng) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
   if (rng == NULL) {
+    TracyCZoneEnd(__tracy_zone_ctx);
     return;
   }
   if (rng->opt_mutex) {
@@ -278,5 +315,5 @@ func void ring_clear(ring* rng) {
   if (rng->opt_mutex) {
     mutex_unlock(rng->opt_mutex);
   }
+  TracyCZoneEnd(__tracy_zone_ctx);
 }
-

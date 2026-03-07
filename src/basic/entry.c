@@ -12,6 +12,7 @@
 #include "input/msg_core.h"
 #include "memory/vmem.h"
 #include "../sdl3_include.h"
+#include "basic/profiler.h"
 
 #include <stdlib.h>
 
@@ -43,6 +44,7 @@ thread_local global_var entry_thread_state entry_thread = {0};
 // =========================================================================
 
 func b32 entry_init(cmdline cmdline) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
   (void)cmdline;
 
 #ifdef OVERRIDE_GLOBAL_DEFAULT_ALLOCATOR
@@ -54,6 +56,7 @@ func b32 entry_init(cmdline cmdline) {
   if (entry_shared.sdl_init_depth == 0) {
     if (!SDL_WasInit(0)) {
       if (!SDL_Init(0)) {
+        TracyCZoneEnd(__tracy_zone_ctx);
         return false;
       }
       thread_log_trace("entry_init: SDL initialized");
@@ -67,6 +70,7 @@ func b32 entry_init(cmdline cmdline) {
   if (entry_shared.global_ctx_init_depth == 0) {
     if (!global_ctx_is_init()) {
       if (!global_ctx_init(default_global_allocator)) {
+        TracyCZoneEnd(__tracy_zone_ctx);
         return false;
       }
 
@@ -81,6 +85,7 @@ func b32 entry_init(cmdline cmdline) {
   if (entry_thread.thread_ctx_init_depth == 0) {
     if (!thread_ctx_is_init()) {
       if (!thread_ctx_init(global_get_allocator())) {
+        TracyCZoneEnd(__tracy_zone_ctx);
         return false;
       }
 
@@ -93,10 +98,12 @@ func b32 entry_init(cmdline cmdline) {
   }
   entry_thread.thread_ctx_init_depth += 1;
 
+  TracyCZoneEnd(__tracy_zone_ctx);
   return true;
 }
 
 func void entry_quit(void) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
   if (entry_thread.thread_ctx_init_depth > 0) {
     entry_thread.thread_ctx_init_depth -= 1;
     if (entry_thread.thread_ctx_init_depth == 0 && entry_thread.owns_thread_ctx) {
@@ -123,6 +130,7 @@ func void entry_quit(void) {
       entry_shared.owns_sdl = false;
     }
   }
+  TracyCZoneEnd(__tracy_zone_ctx);
 }
 
 // =========================================================================
@@ -135,16 +143,21 @@ global_var b32 app_entry_initialized = false;
 global_var b32 app_callbacks_started = false;
 
 func SDL_AppResult app_result_to_sdl_result(app_result result) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
   switch (result) {
     case APP_RESULT_CONTINUE:
+      TracyCZoneEnd(__tracy_zone_ctx);
       return SDL_APP_CONTINUE;
     case APP_RESULT_SUCCESS:
+      TracyCZoneEnd(__tracy_zone_ctx);
       return SDL_APP_SUCCESS;
     case APP_RESULT_FAIL:
     case APP_RESULT_MAX:
+      TracyCZoneEnd(__tracy_zone_ctx);
       return SDL_APP_FAILURE;
   }
 
+  TracyCZoneEnd(__tracy_zone_ctx);
   return SDL_APP_FAILURE;
 }
 
@@ -223,22 +236,27 @@ int main(int argc, char** argv) {
 global_var b32 module_entry_initialized = false;
 
 func dll_export b32 mod_init(void) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
   cmdline empty_cmdline = cmdline_build(0, NULL);
 
   module_entry_initialized = false;
 
   if (!entry_init(empty_cmdline)) {
+    TracyCZoneEnd(__tracy_zone_ctx);
     return false;
   }
   module_entry_initialized = true;
+  TracyCZoneEnd(__tracy_zone_ctx);
   return true;
 }
 
 func dll_export void mod_quit(void) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
   if (module_entry_initialized) {
     entry_quit();
     module_entry_initialized = false;
   }
+  TracyCZoneEnd(__tracy_zone_ctx);
 }
 
 #endif

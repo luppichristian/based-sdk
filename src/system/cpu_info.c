@@ -5,6 +5,7 @@
 #include "basic/assert.h"
 #include "context/thread_ctx.h"
 #include "basic/env_defines.h"
+#include "basic/profiler.h"
 
 #include <stddef.h>
 #include <string.h>
@@ -24,13 +25,16 @@
 #endif
 
 func void cpu_copy_string(c8* dst_ptr, sz dst_cap, cstr8 src_ptr) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
   if (dst_ptr == NULL || dst_cap == 0) {
+    TracyCZoneEnd(__tracy_zone_ctx);
     return;
   }
   assert(dst_cap > 0);
 
   dst_ptr[0] = '\0';
   if (src_ptr == NULL) {
+    TracyCZoneEnd(__tracy_zone_ctx);
     return;
   }
 
@@ -41,25 +45,32 @@ func void cpu_copy_string(c8* dst_ptr, sz dst_cap, cstr8 src_ptr) {
 
   memcpy(dst_ptr, src_ptr, src_len);
   dst_ptr[src_len] = '\0';
+  TracyCZoneEnd(__tracy_zone_ctx);
 }
 
 func u32 cpu_query_logical_cores(void) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
 #if defined(PLATFORM_WINDOWS)
   SYSTEM_INFO native_info;
   GetNativeSystemInfo(&native_info);
+  TracyCZoneEnd(__tracy_zone_ctx);
   return (u32)native_info.dwNumberOfProcessors;
 #elif defined(PLATFORM_UNIX) || defined(PLATFORM_ANDROID) || defined(PLATFORM_IOS)
   sp core_count = (sp)sysconf(_SC_NPROCESSORS_ONLN);
   if (core_count > 0) {
+    TracyCZoneEnd(__tracy_zone_ctx);
     return (u32)core_count;
   }
+  TracyCZoneEnd(__tracy_zone_ctx);
   return 1;
 #else
+  TracyCZoneEnd(__tracy_zone_ctx);
   return 1;
 #endif
 }
 
 func void cpu_set_compile_time_fallback(cpu_info* out_info) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
 #if defined(ARCH_64)
   out_info->supports_64bit = 1;
 #endif
@@ -81,16 +92,20 @@ func void cpu_set_compile_time_fallback(cpu_info* out_info) {
 #if defined(__ARM_FEATURE_CRC32)
   out_info->instruction_sets.crc32 = 1;
 #endif
+  TracyCZoneEnd(__tracy_zone_ctx);
 }
 
 #if defined(ARCH_X86) || defined(ARCH_X86_64)
 func b32 cpu_read_cpuid(u32 leaf_id, u32 subleaf_id, i32 out_regs[4]) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
   if (out_regs == NULL) {
+    TracyCZoneEnd(__tracy_zone_ctx);
     return 0;
   }
   assert(out_regs != NULL);
 #  if defined(COMPILER_MSVC)
   __cpuidex(out_regs, (i32)leaf_id, (i32)subleaf_id);
+  TracyCZoneEnd(__tracy_zone_ctx);
   return 1;
 #  elif defined(COMPILER_GCC) || defined(COMPILER_CLANG) || defined(COMPILER_APPLE_CLANG)
   u32 eax_reg = 0;
@@ -98,23 +113,28 @@ func b32 cpu_read_cpuid(u32 leaf_id, u32 subleaf_id, i32 out_regs[4]) {
   u32 ecx_reg = 0;
   u32 edx_reg = 0;
   if (__get_cpuid_count(leaf_id, subleaf_id, &eax_reg, &ebx_reg, &ecx_reg, &edx_reg) == 0) {
+    TracyCZoneEnd(__tracy_zone_ctx);
     return 0;
   }
   out_regs[0] = (i32)eax_reg;
   out_regs[1] = (i32)ebx_reg;
   out_regs[2] = (i32)ecx_reg;
   out_regs[3] = (i32)edx_reg;
+  TracyCZoneEnd(__tracy_zone_ctx);
   return 1;
 #  else
   (void)leaf_id;
   (void)subleaf_id;
   (void)out_regs;
+  TracyCZoneEnd(__tracy_zone_ctx);
   return 0;
 #  endif
 }
 
 func void cpu_fill_x86_strings(cpu_info* out_info) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
   if (out_info == NULL) {
+    TracyCZoneEnd(__tracy_zone_ctx);
     return;
   }
   assert(out_info != NULL);
@@ -130,9 +150,11 @@ func void cpu_fill_x86_strings(cpu_info* out_info) {
 
   i32 ext_regs[4];
   if (!cpu_read_cpuid(0x80000000U, 0, ext_regs)) {
+    TracyCZoneEnd(__tracy_zone_ctx);
     return;
   }
   if ((u32)ext_regs[0] < 0x80000004U) {
+    TracyCZoneEnd(__tracy_zone_ctx);
     return;
   }
 
@@ -145,15 +167,19 @@ func void cpu_fill_x86_strings(cpu_info* out_info) {
   cpu_read_cpuid(0x80000004U, 0, &brand_regs[8]);
   memcpy(brand_name, brand_regs, 48);
   cpu_copy_string(out_info->brand_name, size_of(out_info->brand_name), brand_name);
+  TracyCZoneEnd(__tracy_zone_ctx);
 }
 
 func void cpu_fill_x86_features(cpu_info* out_info) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
   if (out_info == NULL) {
+    TracyCZoneEnd(__tracy_zone_ctx);
     return;
   }
   assert(out_info != NULL);
   i32 base_regs[4];
   if (!cpu_read_cpuid(1, 0, base_regs)) {
+    TracyCZoneEnd(__tracy_zone_ctx);
     return;
   }
 
@@ -187,11 +213,14 @@ func void cpu_fill_x86_features(cpu_info* out_info) {
   if (cpu_read_cpuid(0x80000001U, 0, long_mode_regs)) {
     out_info->supports_64bit = (((u32)long_mode_regs[3]) & (1U << 29U)) != 0U;
   }
+  TracyCZoneEnd(__tracy_zone_ctx);
 }
 #endif
 
 func b32 cpu_info_query(cpu_info* out_info) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
   if (out_info == NULL) {
+    TracyCZoneEnd(__tracy_zone_ctx);
     return 0;
   }
   assert(out_info != NULL);
@@ -207,5 +236,6 @@ func b32 cpu_info_query(cpu_info* out_info) {
 #endif
 
   thread_log_trace("cpu_info_query: cores=%u cache_line=%u", out_info->logical_core_count, out_info->cache_line_bytes);
+  TracyCZoneEnd(__tracy_zone_ctx);
   return 1;
 }

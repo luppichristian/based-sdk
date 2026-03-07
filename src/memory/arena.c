@@ -7,6 +7,7 @@
 #include "input/msg.h"
 #include "input/msg_core.h"
 #include "basic/utility_defines.h"
+#include "basic/profiler.h"
 #include <string.h>
 
 // =========================================================================
@@ -14,13 +15,16 @@
 // =========================================================================
 
 func void arena_block_setup(arena_block* blk, sz size, b8 owned) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
   blk->next = NULL;
   blk->size = size;
   blk->used = size_of(arena_block);
   blk->owned = owned;
+  TracyCZoneEnd(__tracy_zone_ctx);
 }
 
 func void arena_chain_block(arena* arn, arena_block* blk) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
   if (arn->blocks_tail) {
     arn->blocks_tail->next = blk;
     arn->blocks_tail = blk;
@@ -28,19 +32,23 @@ func void arena_chain_block(arena* arn, arena_block* blk) {
     arn->blocks_head = blk;
     arn->blocks_tail = blk;
   }
+  TracyCZoneEnd(__tracy_zone_ctx);
 }
 
 // Attempts to bump-allocate size bytes aligned to align from blk.
 // Returns the aligned pointer on success, NULL if the block has no room.
 func void* arena_block_alloc(arena_block* blk, sz size, sz align) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
   u8* base = (u8*)blk + blk->used;
   sz pad = (sz)(align_up((up)base, align) - (up)base);
   u8* aligned = base + pad;
   sz avail = blk->size - blk->used;
   if (pad > avail || size > avail - pad) {
+    TracyCZoneEnd(__tracy_zone_ctx);
     return NULL;
   }
   blk->used += pad + size;
+  TracyCZoneEnd(__tracy_zone_ctx);
   return aligned;
 }
 
@@ -49,14 +57,18 @@ func void* arena_block_alloc(arena_block* blk, sz size, sz align) {
 // =========================================================================
 
 func void* arena_alloc_callback(void* user_data, callsite site, sz size) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
   arena* arn = (arena*)user_data;
+  TracyCZoneEnd(__tracy_zone_ctx);
   return _arena_alloc(arn, size, size_of(void*), site);
 }
 
 func void arena_dealloc_callback(void* user_data, callsite site, void* ptr) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
   (void)user_data;
   (void)site;
   (void)ptr;
+  TracyCZoneEnd(__tracy_zone_ctx);
 }
 
 func void* arena_realloc_callback(
@@ -65,7 +77,9 @@ func void* arena_realloc_callback(
     void* ptr,
     sz old_size,
     sz new_size) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
   arena* arn = (arena*)user_data;
+  TracyCZoneEnd(__tracy_zone_ctx);
   return _arena_realloc(arn, ptr, old_size, new_size, size_of(void*), site);
 }
 
@@ -74,6 +88,7 @@ func void* arena_realloc_callback(
 // =========================================================================
 
 func arena arena_create(allocator parent_alloc, mutex opt_mutex, sz default_block_sz) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
   arena arn;
   memset(&arn, 0, size_of(arn));
   arn.parent = parent_alloc;
@@ -90,17 +105,22 @@ func arena arena_create(allocator parent_alloc, mutex opt_mutex, sz default_bloc
     memset(&arn, 0, size_of(arn));
   }
   thread_log_trace("arena_create: block_sz=%zu", (size_t)default_block_sz);
+  TracyCZoneEnd(__tracy_zone_ctx);
   return arn;
 }
 
 func arena arena_create_mutexed(allocator parent_alloc, sz default_block_sz) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
   arena arn = arena_create(parent_alloc, mutex_create(), default_block_sz);
   arn.mutex_owned = 1;
+  TracyCZoneEnd(__tracy_zone_ctx);
   return arn;
 }
 
 func void arena_destroy(arena* arn) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
   if (arn == NULL) {
+    TracyCZoneEnd(__tracy_zone_ctx);
     return;
   }
   assert(arn != NULL);
@@ -113,6 +133,7 @@ func void arena_destroy(arena* arn) {
                                                      .object_ptr = arn,
                                                  });
   if (!msg_post(&lifecycle_msg)) {
+    TracyCZoneEnd(__tracy_zone_ctx);
     return;
   }
 
@@ -144,14 +165,17 @@ func void arena_destroy(arena* arn) {
   arn->opt_mutex = NULL;
   arn->mutex_owned = 0;
   thread_log_trace("arena_destroy: arn=%p", (void*)arn);
+  TracyCZoneEnd(__tracy_zone_ctx);
 }
 
 func allocator arena_get_allocator(arena* arn) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
   allocator alloc;
   alloc.user_data = arn;
   alloc.alloc_fn = arena_alloc_callback;
   alloc.dealloc_fn = arena_dealloc_callback;
   alloc.realloc_fn = arena_realloc_callback;
+  TracyCZoneEnd(__tracy_zone_ctx);
   return alloc;
 }
 
@@ -160,7 +184,9 @@ func allocator arena_get_allocator(arena* arn) {
 // =========================================================================
 
 func void arena_add_block(arena* arn, void* ptr, sz size) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
   if (arn == NULL || ptr == NULL || size <= size_of(arena_block)) {
+    TracyCZoneEnd(__tracy_zone_ctx);
     return;
   }
   assert(arn != NULL);
@@ -175,10 +201,13 @@ func void arena_add_block(arena* arn, void* ptr, sz size) {
   if (arn->opt_mutex) {
     mutex_unlock(arn->opt_mutex);
   }
+  TracyCZoneEnd(__tracy_zone_ctx);
 }
 
 func b32 arena_remove_block(arena* arn, void* ptr) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
   if (arn == NULL || ptr == NULL) {
+    TracyCZoneEnd(__tracy_zone_ctx);
     return 0;
   }
   if (arn->opt_mutex) {
@@ -210,6 +239,7 @@ func b32 arena_remove_block(arena* arn, void* ptr) {
     mutex_unlock(arn->opt_mutex);
   }
 
+  TracyCZoneEnd(__tracy_zone_ctx);
   return found;
 }
 
@@ -218,7 +248,9 @@ func b32 arena_remove_block(arena* arn, void* ptr) {
 // =========================================================================
 
 func void* _arena_alloc(arena* arn, sz size, sz align, callsite site) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
   if (arn == NULL || size == 0 || align == 0) {
+    TracyCZoneEnd(__tracy_zone_ctx);
     return NULL;
   }
   assert(align > 0);
@@ -249,6 +281,7 @@ func void* _arena_alloc(arena* arn, sz size, sz align, callsite site) {
     mutex_unlock(arn->opt_mutex);
   }
 
+  TracyCZoneEnd(__tracy_zone_ctx);
   return result;
 }
 
@@ -259,7 +292,9 @@ func void* _arena_realloc(
     sz new_size,
     sz align,
     callsite site) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
   if (!ptr) {
+    TracyCZoneEnd(__tracy_zone_ctx);
     return _arena_alloc(arn, new_size, align, site);
   }
 
@@ -302,6 +337,7 @@ func void* _arena_realloc(
     }
   }
 
+  TracyCZoneEnd(__tracy_zone_ctx);
   return result;
 }
 
@@ -310,7 +346,9 @@ func void* _arena_realloc(
 // =========================================================================
 
 func void arena_clear(arena* arn) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
   if (arn == NULL) {
+    TracyCZoneEnd(__tracy_zone_ctx);
     return;
   }
   if (arn->opt_mutex) {
@@ -326,5 +364,5 @@ func void arena_clear(arena* arn) {
   if (arn->opt_mutex) {
     mutex_unlock(arn->opt_mutex);
   }
+  TracyCZoneEnd(__tracy_zone_ctx);
 }
-

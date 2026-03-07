@@ -34,4 +34,3 @@ func cstr8 camera_get_name(camera id);
 
 // Returns the camera physical position for id.
 func camera_position camera_get_position(camera id);
-

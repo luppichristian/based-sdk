@@ -3,15 +3,18 @@
 
 #include "memory/scratch.h"
 #include "basic/assert.h"
+#include "basic/profiler.h"
 
 // =========================================================================
 // Create / Destroy
 // =========================================================================
 
 func scratch scratch_begin(arena* arn) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
   scratch scr;
   if (arn == NULL) {
     scr = (scratch) {0};
+    TracyCZoneEnd(__tracy_zone_ctx);
     return scr;
   }
   assert(arn != NULL);
@@ -28,11 +31,14 @@ func scratch scratch_begin(arena* arn) {
     mutex_unlock(arn->opt_mutex);
   }
 
+  TracyCZoneEnd(__tracy_zone_ctx);
   return scr;
 }
 
 func void scratch_end(scratch* scr) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
   if (scr == NULL || scr->arn == NULL) {
+    TracyCZoneEnd(__tracy_zone_ctx);
     return;
   }
   assert(scr != NULL);
@@ -65,4 +71,5 @@ func void scratch_end(scratch* scr) {
   if (arn->opt_mutex) {
     mutex_unlock(arn->opt_mutex);
   }
+  TracyCZoneEnd(__tracy_zone_ctx);
 }

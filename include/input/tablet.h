@@ -68,4 +68,3 @@ func b32 tablet_get_last_pen_state(tablet_pen_state* out_state);
 
 // Reads a raw HID report from id into dst. Returns 1 on success, 0 otherwise.
 func b32 tablet_read_hid_report(device_id id, void* dst, sz capacity, sz* out_size, i32 timeout_ms);
-

@@ -3,9 +3,12 @@
 
 #include "input/msg.h"
 #include "input/msg_core.h"
+#include "basic/profiler.h"
 
 func void msg_fill_core_raw(msg* src, u32 default_type, const void* core_data_ptr, sz core_data_size) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
   if (src == NULL || core_data_ptr == NULL || core_data_size > size_of(src->data)) {
+    TracyCZoneEnd(__tracy_zone_ctx);
     return;
   }
 
@@ -22,35 +25,49 @@ func void msg_fill_core_raw(msg* src, u32 default_type, const void* core_data_pt
   for (sz byte_idx = 0; byte_idx < core_data_size; byte_idx += 1) {
     src->data[byte_idx] = src_bytes[byte_idx];
   }
+  TracyCZoneEnd(__tracy_zone_ctx);
 }
 
 func b32 msg_core_is_valid(const msg* src, b32 matches_type) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
+  TracyCZoneEnd(__tracy_zone_ctx);
   return src != NULL && src->category == MSG_CATEGORY_CORE && matches_type;
 }
 
 #define MSG_CORE_DEFINE_MATCHER_RANGE(func_name, min_type, max_type) \
   func b32 func_name(u32 type) {                                     \
+    TracyCZoneN(__tracy_zone_ctx, __func__, 1);                      \
+    TracyCZoneEnd(__tracy_zone_ctx);                                 \
     return type >= (min_type) && type <= (max_type);                 \
   }
 
 #define MSG_CORE_DEFINE_MATCHER_ONE(func_name, type_value) \
   func b32 func_name(u32 type) {                           \
+    TracyCZoneN(__tracy_zone_ctx, __func__, 1);            \
+    TracyCZoneEnd(__tracy_zone_ctx);                       \
     return type == (type_value);                           \
   }
 
 #define MSG_CORE_DEFINE_MATCHER_TWO(func_name, type_a, type_b) \
   func b32 func_name(u32 type) {                               \
+    TracyCZoneN(__tracy_zone_ctx, __func__, 1);                \
+    TracyCZoneEnd(__tracy_zone_ctx);                           \
     return type == (type_a) || type == (type_b);               \
   }
 
 #define MSG_CORE_DEFINE_MATCHER_THREE(func_name, type_a, type_b, type_c) \
   func b32 func_name(u32 type) {                                         \
+    TracyCZoneN(__tracy_zone_ctx, __func__, 1);                          \
+    TracyCZoneEnd(__tracy_zone_ctx);                                     \
     return type == (type_a) || type == (type_b) || type == (type_c);     \
   }
 
-#define MSG_CORE_DEFINE_MATCHER_FIVE(func_name, type_a, type_b, type_c, type_d, type_e)                      \
-  func b32 func_name(u32 type) {                                                                             \
-    return type == (type_a) || type == (type_b) || type == (type_c) || type == (type_d) || type == (type_e); \
+#define MSG_CORE_DEFINE_MATCHER_FIVE(func_name, type_a, type_b, type_c, type_d, type_e) \
+  func b32 func_name(u32 type) {                                                        \
+    TracyCZoneN(__tracy_zone_ctx, __func__, 1);                                         \
+    TracyCZoneEnd(__tracy_zone_ctx);                                                    \
+    return type == (type_a) || type == (type_b) || type == (type_c) ||                  \
+           type == (type_d) || type == (type_e);                                        \
   }
 
 MSG_CORE_DEFINE_MATCHER_RANGE(msg_core_type_is_display, MSG_CORE_TYPE_DISPLAY_ORIENTATION, MSG_CORE_TYPE_DISPLAY_CONTENT_SCALE_CHANGED)
@@ -98,17 +115,23 @@ MSG_CORE_DEFINE_MATCHER_ONE(msg_core_type_is_global_ctx, MSG_CORE_TYPE_GLOBAL_CT
 
 #define MSG_CORE_DEFINE_ACCESSORS(data_type, fill_name, get_name, default_type_expr, matcher_name) \
   func void fill_name(msg* src, const data_type* core_data) {                                      \
-    if (core_data == NULL) {                                                                       \
-      return;                                                                                      \
-    }                                                                                              \
-    msg_fill_core_raw(src, (default_type_expr), core_data, size_of(*core_data));                   \
-  }                                                                                                \
-                                                                                                   \
-  func data_type* get_name(msg* src) {                                                             \
+    TracyCZoneN(__tracy_zone_ctx, __func__, 1);                                                     \
+    if (core_data == NULL) {                                                                         \
+      TracyCZoneEnd(__tracy_zone_ctx);                                                               \
+      return;                                                                                         \
+    }                                                                                                \
+    msg_fill_core_raw(src, (default_type_expr), core_data, size_of(*core_data));                    \
+    TracyCZoneEnd(__tracy_zone_ctx);                                                                 \
+  }                                                                                                  \
+                                                                                                     \
+  func data_type* get_name(msg* src) {                                                               \
+    TracyCZoneN(__tracy_zone_ctx, __func__, 1);                                                     \
     if (!msg_core_is_valid(src, matcher_name(src != NULL ? src->type : MSG_CORE_TYPE_NONE))) {     \
-      return NULL;                                                                                 \
-    }                                                                                              \
-    return (data_type*)src->data;                                                                  \
+      TracyCZoneEnd(__tracy_zone_ctx);                                                               \
+      return NULL;                                                                                   \
+    }                                                                                                \
+    TracyCZoneEnd(__tracy_zone_ctx);                                                                 \
+    return (data_type*)src->data;                                                                    \
   }
 
 MSG_CORE_DEFINE_ACCESSORS(msg_core_display_data, msg_core_fill_display, msg_core_get_display, MSG_CORE_TYPE_DISPLAY_ORIENTATION, msg_core_type_is_display)

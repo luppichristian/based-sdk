@@ -7,33 +7,44 @@
 #include "input/msg.h"
 #include "input/msg_core.h"
 #include "../sdl3_include.h"
+#include "basic/profiler.h"
 
 // Returns true if options matches process_options_default().
 func b32 process_options_is_default(process_options options) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
+  TracyCZoneEnd(__tracy_zone_ctx);
   return !options.pipe_stdin && !options.pipe_stdout && !options.pipe_stderr &&
          !options.stderr_to_stdout && !options.background;
 }
 
 func process_options process_options_default(void) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
   process_options options = {0};
+  TracyCZoneEnd(__tracy_zone_ctx);
   return options;
 }
 
 func process_options process_options_captured(void) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
   process_options options = {0};
   options.pipe_stdout = 1;
   options.stderr_to_stdout = 1;
+  TracyCZoneEnd(__tracy_zone_ctx);
   return options;
 }
 
 func process _process_create(cstr8 const* args, callsite site) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
+  TracyCZoneEnd(__tracy_zone_ctx);
   return _process_create_with(args, process_options_default(), site);
 }
 
 func process _process_create_with(cstr8 const* args, process_options options, callsite site) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
   (void)site;
 
   if (!args || !args[0]) {
+    TracyCZoneEnd(__tracy_zone_ctx);
     return NULL;
   }
   assert(args[0][0] != '\0');
@@ -46,6 +57,7 @@ func process _process_create_with(cstr8 const* args, process_options options, ca
                                                      .object_ptr = NULL,
                                                  });
   if (!msg_post(&lifecycle_msg)) {
+    TracyCZoneEnd(__tracy_zone_ctx);
     return NULL;
   }
 
@@ -56,11 +68,13 @@ func process _process_create_with(cstr8 const* args, process_options options, ca
     } else {
       thread_log_trace("process_create: '%s' options=default", args[0]);
     }
+    TracyCZoneEnd(__tracy_zone_ctx);
     return prc;
   }
 
   SDL_PropertiesID props = SDL_CreateProperties();
   if (!props) {
+    TracyCZoneEnd(__tracy_zone_ctx);
     return NULL;
   }
 
@@ -88,28 +102,37 @@ func process _process_create_with(cstr8 const* args, process_options options, ca
   } else {
     thread_log_trace("process_create_with: '%s'", args[0]);
   }
+  TracyCZoneEnd(__tracy_zone_ctx);
   return prc;
 }
 
 func b32 process_is_valid(process prc) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
+  TracyCZoneEnd(__tracy_zone_ctx);
   return prc != NULL;
 }
 
 func u64 process_get_id(process prc) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
   if (!prc) {
+    TracyCZoneEnd(__tracy_zone_ctx);
     return 0;
   }
 
   SDL_PropertiesID props = SDL_GetProcessProperties((SDL_Process*)prc);
   if (!props) {
+    TracyCZoneEnd(__tracy_zone_ctx);
     return 0;
   }
 
+  TracyCZoneEnd(__tracy_zone_ctx);
   return (u64)SDL_GetNumberProperty(props, SDL_PROP_PROCESS_PID_NUMBER, 0);
 }
 
 func void* process_read(process prc, sz* out_size, i32* out_exit_code) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
   if (!prc) {
+    TracyCZoneEnd(__tracy_zone_ctx);
     return NULL;
   }
   assert(process_is_valid(prc));
@@ -128,15 +151,20 @@ func void* process_read(process prc, sz* out_size, i32* out_exit_code) {
     *out_exit_code = (i32)exit_code;
   }
 
+  TracyCZoneEnd(__tracy_zone_ctx);
   return data;
 }
 
 func void process_read_free(void* ptr) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
   SDL_free(ptr);
+  TracyCZoneEnd(__tracy_zone_ctx);
 }
 
 func b32 process_wait(process prc, b32 block, i32* out_exit_code) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
   if (!prc) {
+    TracyCZoneEnd(__tracy_zone_ctx);
     return 0;
   }
   assert(block == 0 || block == 1);
@@ -151,20 +179,26 @@ func b32 process_wait(process prc, b32 block, i32* out_exit_code) {
   }
   thread_log_trace("process_wait: prc=%p finished=%u", prc, (u32)finished);
 
+  TracyCZoneEnd(__tracy_zone_ctx);
   return finished;
 }
 
 func b32 process_kill(process prc, b32 force) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
   if (!prc) {
+    TracyCZoneEnd(__tracy_zone_ctx);
     return 0;
   }
   assert(force == 0 || force == 1);
 
+  TracyCZoneEnd(__tracy_zone_ctx);
   return SDL_KillProcess((SDL_Process*)prc, force != 0);
 }
 
 func void process_destroy(process prc) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
   if (!prc) {
+    TracyCZoneEnd(__tracy_zone_ctx);
     return;
   }
 
@@ -176,10 +210,11 @@ func void process_destroy(process prc) {
                                                      .object_ptr = prc,
                                                  });
   if (!msg_post(&lifecycle_msg)) {
+    TracyCZoneEnd(__tracy_zone_ctx);
     return;
   }
 
   thread_log_trace("process_destroy: prc=%p", prc);
   SDL_DestroyProcess((SDL_Process*)prc);
+  TracyCZoneEnd(__tracy_zone_ctx);
 }
-

@@ -32,4 +32,3 @@ func sensor_kind sensor_get_kind(sensor id);
 
 // Returns the backend-specific non-portable sensor kind for id.
 func i32 sensor_get_non_portable_kind(sensor id);
-

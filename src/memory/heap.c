@@ -7,6 +7,7 @@
 #include "input/msg.h"
 #include "input/msg_core.h"
 #include "basic/utility_defines.h"
+#include "basic/profiler.h"
 #include <string.h>
 
 // =========================================================================
@@ -27,20 +28,25 @@ typedef union heap_chunk_ref {
 // Writes the chunk back-pointer into the padding bytes just before user_ptr.
 // Recoverable with heap_read_back_ref on the same pointer.
 func void heap_write_back_ref(void* user_ptr, heap_chunk* chunk) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
   heap_chunk_ref ref;
   ref.ptr = chunk;
   memcpy((u8*)user_ptr - HEAP_BACK_REF_SZ, ref.bytes, HEAP_BACK_REF_SZ);
+  TracyCZoneEnd(__tracy_zone_ctx);
 }
 
 // Reads the chunk back-pointer from the bytes just before user_ptr.
 func heap_chunk* heap_read_back_ref(void* user_ptr) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
   heap_chunk_ref ref;
   memcpy(ref.bytes, (u8*)user_ptr - HEAP_BACK_REF_SZ, HEAP_BACK_REF_SZ);
+  TracyCZoneEnd(__tracy_zone_ctx);
   return ref.ptr;
 }
 
 // Removes chunk from the free list. Returns 1 if found and removed, 0 otherwise.
 func b32 heap_free_list_remove(heap* hep, heap_chunk* chunk) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
   heap_chunk* prev = NULL;
   heap_chunk* cur = hep->free_head;
   while (cur) {
@@ -51,22 +57,26 @@ func b32 heap_free_list_remove(heap* hep, heap_chunk* chunk) {
         hep->free_head = cur->next_free;
       }
       cur->next_free = NULL;
+      TracyCZoneEnd(__tracy_zone_ctx);
       return 1;
     }
     prev = cur;
     cur = cur->next_free;
   }
+  TracyCZoneEnd(__tracy_zone_ctx);
   return 0;
 }
 
 // Initializes a block header and carves its remaining space into a single free chunk.
 func void heap_block_setup(heap* hep, heap_block* blk, sz size, b8 owned) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
   blk->next = NULL;
   blk->size = size;
   blk->owned = owned;
 
   sz body = size - size_of(heap_block);
   if (body <= size_of(heap_chunk)) {
+    TracyCZoneEnd(__tracy_zone_ctx);
     return;
   }
 
@@ -77,10 +87,12 @@ func void heap_block_setup(heap* hep, heap_block* blk, sz size, b8 owned) {
   chunk->align_pad = 0;
   chunk->is_free = 1;
   hep->free_head = chunk;
+  TracyCZoneEnd(__tracy_zone_ctx);
 }
 
 // Appends a block to the heap's block chain (does not modify the free list).
 func void heap_chain_block(heap* hep, heap_block* blk) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
   if (hep->blocks_tail) {
     hep->blocks_tail->next = blk;
     hep->blocks_tail = blk;
@@ -88,12 +100,14 @@ func void heap_chain_block(heap* hep, heap_block* blk) {
     hep->blocks_head = blk;
     hep->blocks_tail = blk;
   }
+  TracyCZoneEnd(__tracy_zone_ctx);
 }
 
 // First-fit allocation from the current free list.
 // eff_align must be >= HEAP_BACK_REF_SZ so the back-pointer always fits.
 // Returns the user pointer on success, NULL on failure.
 func void* heap_try_alloc(heap* hep, sz size, sz eff_align) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
   heap_chunk* prev = NULL;
   heap_chunk* chunk = hep->free_head;
 
@@ -134,12 +148,14 @@ func void* heap_try_alloc(heap* hep, sz size, sz eff_align) {
       chunk->is_free = 0;
       chunk->next_free = NULL;
       heap_write_back_ref(usr, chunk);
+      TracyCZoneEnd(__tracy_zone_ctx);
       return usr;
     }
 
     prev = chunk;
     chunk = chunk->next_free;
   }
+  TracyCZoneEnd(__tracy_zone_ctx);
   return NULL;
 }
 
@@ -148,13 +164,17 @@ func void* heap_try_alloc(heap* hep, sz size, sz eff_align) {
 // =========================================================================
 
 func void* heap_alloc_callback(void* user_data, callsite site, sz size) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
   heap* hap = (heap*)user_data;
+  TracyCZoneEnd(__tracy_zone_ctx);
   return _heap_alloc(hap, size, size_of(void*), site);
 }
 
 func void heap_dealloc_callback(void* user_data, callsite site, void* ptr) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
   heap* hap = (heap*)user_data;
   _heap_dealloc(hap, ptr, site);
+  TracyCZoneEnd(__tracy_zone_ctx);
 }
 
 func void* heap_realloc_callback(
@@ -163,7 +183,9 @@ func void* heap_realloc_callback(
     void* ptr,
     sz old_size,
     sz new_size) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
   heap* hap = (heap*)user_data;
+  TracyCZoneEnd(__tracy_zone_ctx);
   return _heap_realloc(hap, ptr, old_size, new_size, size_of(void*), site);
 }
 
@@ -172,6 +194,7 @@ func void* heap_realloc_callback(
 // =========================================================================
 
 func heap heap_create(allocator parent_alloc, mutex opt_mutex, sz default_block_sz) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
   heap hep;
   memset(&hep, 0, size_of(hep));
   hep.parent = parent_alloc;
@@ -188,17 +211,22 @@ func heap heap_create(allocator parent_alloc, mutex opt_mutex, sz default_block_
     memset(&hep, 0, size_of(hep));
   }
   thread_log_trace("heap_create: block_sz=%zu", (size_t)default_block_sz);
+  TracyCZoneEnd(__tracy_zone_ctx);
   return hep;
 }
 
 func heap heap_create_mutexed(allocator parent_alloc, sz default_block_sz) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
   heap hep = heap_create(parent_alloc, mutex_create(), default_block_sz);
   hep.mutex_owned = 1;
+  TracyCZoneEnd(__tracy_zone_ctx);
   return hep;
 }
 
 func void heap_destroy(heap* hep) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
   if (hep == NULL) {
+    TracyCZoneEnd(__tracy_zone_ctx);
     return;
   }
   assert(hep != NULL);
@@ -211,6 +239,7 @@ func void heap_destroy(heap* hep) {
                                                      .object_ptr = hep,
                                                  });
   if (!msg_post(&lifecycle_msg)) {
+    TracyCZoneEnd(__tracy_zone_ctx);
     return;
   }
 
@@ -243,14 +272,17 @@ func void heap_destroy(heap* hep) {
   hep->opt_mutex = NULL;
   hep->mutex_owned = 0;
   thread_log_trace("heap_destroy: hep=%p", (void*)hep);
+  TracyCZoneEnd(__tracy_zone_ctx);
 }
 
 func allocator heap_get_allocator(heap* hep) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
   allocator alloc;
   alloc.user_data = hep;
   alloc.alloc_fn = heap_alloc_callback;
   alloc.dealloc_fn = heap_dealloc_callback;
   alloc.realloc_fn = heap_realloc_callback;
+  TracyCZoneEnd(__tracy_zone_ctx);
   return alloc;
 }
 
@@ -259,7 +291,9 @@ func allocator heap_get_allocator(heap* hep) {
 // =========================================================================
 
 func void heap_add_block(heap* hep, void* ptr, sz size) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
   if (hep == NULL || ptr == NULL || size <= size_of(heap_block)) {
+    TracyCZoneEnd(__tracy_zone_ctx);
     return;
   }
   if (hep->opt_mutex) {
@@ -273,10 +307,13 @@ func void heap_add_block(heap* hep, void* ptr, sz size) {
   if (hep->opt_mutex) {
     mutex_unlock(hep->opt_mutex);
   }
+  TracyCZoneEnd(__tracy_zone_ctx);
 }
 
 func b32 heap_remove_block(heap* hep, void* ptr) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
   if (hep == NULL || ptr == NULL) {
+    TracyCZoneEnd(__tracy_zone_ctx);
     return 0;
   }
   if (hep->opt_mutex) {
@@ -317,6 +354,7 @@ func b32 heap_remove_block(heap* hep, void* ptr) {
     mutex_unlock(hep->opt_mutex);
   }
 
+  TracyCZoneEnd(__tracy_zone_ctx);
   return found;
 }
 
@@ -325,7 +363,9 @@ func b32 heap_remove_block(heap* hep, void* ptr) {
 // =========================================================================
 
 func void* _heap_alloc(heap* hep, sz size, sz align, callsite site) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
   if (hep == NULL || size == 0 || align == 0) {
+    TracyCZoneEnd(__tracy_zone_ctx);
     return NULL;
   }
   assert(align > 0);
@@ -353,12 +393,15 @@ func void* _heap_alloc(heap* hep, sz size, sz align, callsite site) {
     mutex_unlock(hep->opt_mutex);
   }
 
+  TracyCZoneEnd(__tracy_zone_ctx);
   return result;
 }
 
 func void _heap_dealloc(heap* hep, void* ptr, callsite site) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
   (void)site;
   if (hep == NULL || !ptr) {
+    TracyCZoneEnd(__tracy_zone_ctx);
     return;
   }
 
@@ -387,6 +430,7 @@ func void _heap_dealloc(heap* hep, void* ptr, callsite site) {
   if (hep->opt_mutex) {
     mutex_unlock(hep->opt_mutex);
   }
+  TracyCZoneEnd(__tracy_zone_ctx);
 }
 
 func void* _heap_realloc(
@@ -396,7 +440,9 @@ func void* _heap_realloc(
     sz new_size,
     sz align,
     callsite site) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
   if (!ptr) {
+    TracyCZoneEnd(__tracy_zone_ctx);
     return _heap_alloc(hep, new_size, align, site);
   }
 
@@ -438,6 +484,7 @@ func void* _heap_realloc(
     }
   }
 
+  TracyCZoneEnd(__tracy_zone_ctx);
   return result;
 }
 
@@ -446,7 +493,9 @@ func void* _heap_realloc(
 // =========================================================================
 
 func void heap_clear(heap* hep) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
   if (hep == NULL) {
+    TracyCZoneEnd(__tracy_zone_ctx);
     return;
   }
   if (hep->opt_mutex) {
@@ -473,5 +522,5 @@ func void heap_clear(heap* hep) {
   if (hep->opt_mutex) {
     mutex_unlock(hep->opt_mutex);
   }
+  TracyCZoneEnd(__tracy_zone_ctx);
 }
-
