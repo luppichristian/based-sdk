@@ -65,3 +65,6 @@ func b32 version_to_str16(version ver, str16* dst);
 
 // Writes the formatted version into a bounded UTF-32 string. Returns 1 on success.
 func b32 version_to_str32(version ver, str32* dst);
+
+// Parses \"major.minor.patch\".
+func b32 version_parse_cstr8(cstr8 src, version* out_ver);

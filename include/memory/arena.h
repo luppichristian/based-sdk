@@ -126,3 +126,8 @@ func void* _arena_realloc(
 // Resets the cursor of every block back to its post-header position, making all
 // memory available for reuse. No blocks are released to the parent allocator.
 func void arena_clear(arena* arn);
+
+func sz arena_block_count(arena* arn);
+func sz arena_total_size(arena* arn);
+func sz arena_total_used(arena* arn);
+func sz arena_total_free(arena* arn);

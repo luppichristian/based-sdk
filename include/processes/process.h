@@ -19,6 +19,9 @@ typedef struct process_options {
   b32 pipe_stderr;
   b32 stderr_to_stdout;
   b32 background;
+  cstr8 cwd;
+  cstr8 const* envp;
+  i32 timeout_ms;
 } process_options;
 
 // Returns the default spawn options:
@@ -59,6 +62,7 @@ func void process_read_free(void* ptr);
 // Waits for the process to exit.
 // If block is false, this polls and returns false while the process is still running.
 func b32 process_wait(process prc, b32 block, i32* out_exit_code);
+func b32 process_wait_timeout(process prc, i32 timeout_ms, i32* out_exit_code);
 
 // Requests termination of the process.
 // If force is false, the OS is asked to terminate it gracefully when possible.

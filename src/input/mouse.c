@@ -160,6 +160,67 @@ func b32 mouse_is_button_released(input_key key, u8 button) {
   return 1;
 }
 
+func b32 mouse_set_cursor_visible(b32 visible) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
+  b32 result = visible != 0 ? (b32)SDL_ShowCursor() : (b32)SDL_HideCursor();
+  TracyCZoneEnd(__tracy_zone_ctx);
+  return result != 0 ? 1 : 0;
+}
+
+func b32 mouse_is_cursor_visible(void) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
+  b32 result = SDL_CursorVisible();
+  TracyCZoneEnd(__tracy_zone_ctx);
+  return result;
+}
+
+func b32 mouse_set_capture(b32 enabled) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
+  b32 result = SDL_CaptureMouse(enabled != 0);
+  TracyCZoneEnd(__tracy_zone_ctx);
+  return result;
+}
+
+func b32 mouse_is_captured(void) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
+  SDL_Window* focus_window = SDL_GetMouseFocus();
+  if (focus_window == NULL) {
+    TracyCZoneEnd(__tracy_zone_ctx);
+    return 0;
+  }
+
+  SDL_WindowFlags window_flags = SDL_GetWindowFlags(focus_window);
+  b32 result = (window_flags & SDL_WINDOW_MOUSE_CAPTURE) != 0 ? 1 : 0;
+  TracyCZoneEnd(__tracy_zone_ctx);
+  return result;
+}
+
+func b32 mouse_set_relative_mode(b32 enabled) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
+  SDL_Window* focus_window = SDL_GetMouseFocus();
+  if (focus_window == NULL) {
+    TracyCZoneEnd(__tracy_zone_ctx);
+    return 0;
+  }
+
+  b32 result = SDL_SetWindowRelativeMouseMode(focus_window, enabled != 0) ? 1 : 0;
+  TracyCZoneEnd(__tracy_zone_ctx);
+  return result;
+}
+
+func b32 mouse_is_relative_mode(void) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
+  SDL_Window* focus_window = SDL_GetMouseFocus();
+  if (focus_window == NULL) {
+    TracyCZoneEnd(__tracy_zone_ctx);
+    return 0;
+  }
+
+  b32 result = SDL_GetWindowRelativeMouseMode(focus_window) ? 1 : 0;
+  TracyCZoneEnd(__tracy_zone_ctx);
+  return result;
+}
+
 func void mouse_internal_on_msg(msg* src) {
   TracyCZoneN(__tracy_zone_ctx, __func__, 1);
   if (src == NULL || (src->type != MSG_CORE_TYPE_MOUSE_BUTTON_DOWN && src->type != MSG_CORE_TYPE_MOUSE_BUTTON_UP)) {

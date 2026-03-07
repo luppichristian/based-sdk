@@ -15,29 +15,38 @@ typedef struct display_rect {
   i32 height;
 } display_rect;
 
-// Returns 1 if src refers to a concrete display id, 0 otherwise.
+typedef struct display_mode {
+  i32 width;
+  i32 height;
+  u32 pixel_format;
+  f32 refresh_rate;
+} display_mode;
+
+typedef enum display_orientation {
+  DISPLAY_ORIENTATION_UNKNOWN = 0,
+  DISPLAY_ORIENTATION_LANDSCAPE = 1,
+  DISPLAY_ORIENTATION_LANDSCAPE_FLIPPED = 2,
+  DISPLAY_ORIENTATION_PORTRAIT = 3,
+  DISPLAY_ORIENTATION_PORTRAIT_FLIPPED = 4,
+} display_orientation;
+
 func b32 display_id_is_valid(display src);
-
-// Builds a display from a backend-native display identifier.
 func display display_from_native_id(up native_id);
-
-// Returns the backend-native display identifier encoded in src.
 func up display_to_native_id(display src);
 
-// Returns the number of currently known displays.
 func sz display_get_count(void);
-
-// Writes the display id at index into out_id. Returns 1 on success, 0 otherwise.
 func b32 display_get_id(sz idx, display* out_id);
-
-// Returns the primary display id, or an invalid id on failure.
 func display display_get_primary_id(void);
-
-// Returns a backend-defined display name for id, or NULL when unavailable.
 func cstr8 display_get_name(display id);
 
-// Writes the full display bounds into out_rect. Returns 1 on success, 0 otherwise.
 func b32 display_get_bounds(display id, display_rect* out_rect);
-
-// Writes the usable display bounds into out_rect. Returns 1 on success, 0 otherwise.
 func b32 display_get_usable_bounds(display id, display_rect* out_rect);
+
+func sz display_get_mode_count(display id);
+func b32 display_get_mode(display id, sz idx, display_mode* out_mode);
+func b32 display_get_current_mode(display id, display_mode* out_mode);
+func b32 display_get_desktop_mode(display id, display_mode* out_mode);
+
+func f32 display_get_refresh_rate(display id);
+func f32 display_get_content_scale(display id);
+func display_orientation display_get_orientation(display id);

@@ -38,6 +38,10 @@ func void pathwatch_destroy(pathwatch* watcher);
 
 // Starts the background watch thread. Returns 1 on success, 0 otherwise.
 func b32 pathwatch_start(pathwatch* watcher);
+func b32 pathwatch_stop(pathwatch* watcher);
+func b32 pathwatch_pause(pathwatch* watcher);
+func b32 pathwatch_resume(pathwatch* watcher);
+func i32 pathwatch_drain(void);
 
 // Adds a watched directory. Returns a positive watch id on success, or a negative error code.
 func pathwatch_watch_id pathwatch_add(pathwatch* watcher, const path* src, b32 recursive);

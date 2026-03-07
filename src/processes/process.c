@@ -14,7 +14,8 @@ func b32 process_options_is_default(process_options options) {
   TracyCZoneN(__tracy_zone_ctx, __func__, 1);
   TracyCZoneEnd(__tracy_zone_ctx);
   return !options.pipe_stdin && !options.pipe_stdout && !options.pipe_stderr &&
-         !options.stderr_to_stdout && !options.background;
+         !options.stderr_to_stdout && !options.background && options.cwd == NULL &&
+         options.envp == NULL && options.timeout_ms == 0;
 }
 
 func process_options process_options_default(void) {
@@ -181,6 +182,30 @@ func b32 process_wait(process prc, b32 block, i32* out_exit_code) {
 
   TracyCZoneEnd(__tracy_zone_ctx);
   return finished;
+}
+
+func b32 process_wait_timeout(process prc, i32 timeout_ms, i32* out_exit_code) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
+  if (!prc || timeout_ms < 0) {
+    TracyCZoneEnd(__tracy_zone_ctx);
+    return 0;
+  }
+
+  u64 start_ticks = SDL_GetTicks();
+  i32 exit_code = 0;
+  while (!process_wait(prc, 0, &exit_code)) {
+    if ((i32)(SDL_GetTicks() - start_ticks) >= timeout_ms) {
+      TracyCZoneEnd(__tracy_zone_ctx);
+      return 0;
+    }
+    SDL_Delay(1);
+  }
+
+  if (out_exit_code != NULL) {
+    *out_exit_code = exit_code;
+  }
+  TracyCZoneEnd(__tracy_zone_ctx);
+  return 1;
 }
 
 func b32 process_kill(process prc, b32 force) {

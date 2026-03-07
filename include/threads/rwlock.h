@@ -45,3 +45,9 @@ func b32 rwlock_try_read_lock(rwlock rw);
 // Tries to acquire the write lock without blocking.
 // Returns true if the lock was acquired, false if any thread currently holds the lock.
 func b32 rwlock_try_write_lock(rwlock rw);
+
+// Tries to acquire a read lock until timeout_ms expires.
+func b32 rwlock_timed_read_lock(rwlock rw, i32 timeout_ms);
+
+// Tries to acquire a write lock until timeout_ms expires.
+func b32 rwlock_timed_write_lock(rwlock rw, i32 timeout_ms);

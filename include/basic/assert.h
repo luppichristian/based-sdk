@@ -36,6 +36,8 @@ typedef enum assert_mode {
   ASSERT_MODE_IGNORE,  // Ignores the assertion, does nothing.
 } assert_mode;
 
+typedef void (*assert_hook_fn)(assert_mode mode, cstr8 msg, callsite site, void* user_data);
+
 // Define default assert mode if not defined by the user.
 #ifndef ASSERT_MODE_DEFAULT
 #  ifdef BUILD_DEBUG
@@ -47,3 +49,9 @@ typedef enum assert_mode {
 
 // Set the desired assert mode at runtime. By default, it is set to ASSERT_MODE_DEFAULT.
 func void assert_set_mode(assert_mode mode);
+
+// Returns the current runtime assertion mode.
+func assert_mode assert_get_mode(void);
+
+// Sets an optional assertion hook called for every failed assertion.
+func void assert_set_hook(assert_hook_fn hook_fn, void* user_data);

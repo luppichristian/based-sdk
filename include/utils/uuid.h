@@ -69,3 +69,6 @@ func b32 uuid_to_str16(uuid value, str16* dst);
 
 // Writes canonical lowercase text into a bounded UTF-32 string. Returns 1 on success.
 func b32 uuid_to_str32(uuid value, str32* dst);
+
+// Generates a random UUIDv4.
+func uuid uuid_generate_v4(void);

@@ -234,3 +234,28 @@ func b32 version_to_str32(version ver, str32* dst) {
   TracyCZoneEnd(__tracy_zone_ctx);
   return success;
 }
+
+func b32 version_parse_cstr8(cstr8 src, version* out_ver) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
+  if (src == NULL || out_ver == NULL) {
+    TracyCZoneEnd(__tracy_zone_ctx);
+    return 0;
+  }
+
+  unsigned int major = 0;
+  unsigned int minor = 0;
+  unsigned int patch = 0;
+  if (!cstr8_scan(src, "%u.%u.%u", &major, &minor, &patch)) {
+    TracyCZoneEnd(__tracy_zone_ctx);
+    return 0;
+  }
+
+  if (major > 0xFFU || minor > 0xFFU || patch > 0xFFFFU) {
+    TracyCZoneEnd(__tracy_zone_ctx);
+    return 0;
+  }
+
+  *out_ver = version_make((u8)major, (u8)minor, (u16)patch);
+  TracyCZoneEnd(__tracy_zone_ctx);
+  return 1;
+}

@@ -11,6 +11,14 @@ typedef enum filemap_access {
   FILEMAP_ACCESS_COPY_ON_WRITE = 3,
 } filemap_access;
 
+typedef enum filemap_error {
+  FILEMAP_ERROR_NONE = 0,
+  FILEMAP_ERROR_INVALID_ARGUMENT = 1,
+  FILEMAP_ERROR_OPEN_FAILED = 2,
+  FILEMAP_ERROR_MAP_FAILED = 3,
+  FILEMAP_ERROR_IO_FAILED = 4,
+} filemap_error;
+
 typedef struct filemap {
   void* data_ptr;
   sz data_size;
@@ -33,3 +41,7 @@ func b32 filemap_flush(filemap* map);
 
 // Releases the mapping and resets map to an empty value.
 func void filemap_close(filemap* map);
+
+func b32 filemap_is_writable(const filemap* map);
+func void filemap_mark_dirty(filemap* map);
+func filemap_error filemap_get_last_error(void);

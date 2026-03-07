@@ -34,6 +34,9 @@ func sz pipe_read(pipe pip, void* ptr, sz size);
 // Writes up to size bytes to a pipe.
 // Returns the number of bytes written.
 func sz pipe_write(pipe pip, const void* ptr, sz size);
+func sz pipe_read_nonblocking(pipe pip, void* ptr, sz size);
+func sz pipe_write_nonblocking(pipe pip, const void* ptr, sz size);
+func b32 pipe_poll_readable(pipe pip, i32 timeout_ms);
 
 // Flushes buffered data for a writable pipe.
 func b32 pipe_flush(pipe pip);

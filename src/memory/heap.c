@@ -524,3 +524,63 @@ func void heap_clear(heap* hep) {
   }
   TracyCZoneEnd(__tracy_zone_ctx);
 }
+
+func sz heap_block_count(heap* hep) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
+  if (hep == NULL) {
+    TracyCZoneEnd(__tracy_zone_ctx);
+    return 0;
+  }
+  if (hep->opt_mutex) {
+    mutex_lock(hep->opt_mutex);
+  }
+  sz count = 0;
+  for (heap_block* blk = hep->blocks_head; blk != NULL; blk = blk->next) {
+    count += 1;
+  }
+  if (hep->opt_mutex) {
+    mutex_unlock(hep->opt_mutex);
+  }
+  TracyCZoneEnd(__tracy_zone_ctx);
+  return count;
+}
+
+func sz heap_total_size(heap* hep) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
+  if (hep == NULL) {
+    TracyCZoneEnd(__tracy_zone_ctx);
+    return 0;
+  }
+  if (hep->opt_mutex) {
+    mutex_lock(hep->opt_mutex);
+  }
+  sz total = 0;
+  for (heap_block* blk = hep->blocks_head; blk != NULL; blk = blk->next) {
+    total += blk->size;
+  }
+  if (hep->opt_mutex) {
+    mutex_unlock(hep->opt_mutex);
+  }
+  TracyCZoneEnd(__tracy_zone_ctx);
+  return total;
+}
+
+func sz heap_total_free(heap* hep) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
+  if (hep == NULL) {
+    TracyCZoneEnd(__tracy_zone_ctx);
+    return 0;
+  }
+  if (hep->opt_mutex) {
+    mutex_lock(hep->opt_mutex);
+  }
+  sz total = 0;
+  for (heap_chunk* chunk = hep->free_head; chunk != NULL; chunk = chunk->next_free) {
+    total += chunk->size;
+  }
+  if (hep->opt_mutex) {
+    mutex_unlock(hep->opt_mutex);
+  }
+  TracyCZoneEnd(__tracy_zone_ctx);
+  return total;
+}

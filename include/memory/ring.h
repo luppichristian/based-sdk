@@ -63,6 +63,7 @@ func sz ring_size(ring* rng);
 
 // Returns the number of bytes that can be written before the ring is full.
 func sz ring_space(ring* rng);
+func sz ring_capacity(ring* rng);
 
 // =========================================================================
 // I/O
@@ -86,6 +87,14 @@ func sz ring_peek(ring* rng, void* out, sz size);
 // Advances the read cursor by up to size bytes without copying any data.
 // Returns the number of bytes actually skipped.
 func sz ring_skip(ring* rng, sz size);
+
+// Reserves a contiguous writable span and returns its pointer/size.
+func void* ring_reserve_write(ring* rng, sz* out_size);
+func b32 ring_commit_write(ring* rng, sz size);
+
+// Reserves a contiguous readable span and returns its pointer/size.
+func const void* ring_reserve_read(ring* rng, sz* out_size);
+func b32 ring_commit_read(ring* rng, sz size);
 
 // =========================================================================
 // Lifecycle

@@ -366,3 +366,85 @@ func void arena_clear(arena* arn) {
   }
   TracyCZoneEnd(__tracy_zone_ctx);
 }
+
+func sz arena_block_count(arena* arn) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
+  if (arn == NULL) {
+    TracyCZoneEnd(__tracy_zone_ctx);
+    return 0;
+  }
+  if (arn->opt_mutex) {
+    mutex_lock(arn->opt_mutex);
+  }
+  sz count = 0;
+  for (arena_block* blk = arn->blocks_head; blk != NULL; blk = blk->next) {
+    count += 1;
+  }
+  if (arn->opt_mutex) {
+    mutex_unlock(arn->opt_mutex);
+  }
+  TracyCZoneEnd(__tracy_zone_ctx);
+  return count;
+}
+
+func sz arena_total_size(arena* arn) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
+  if (arn == NULL) {
+    TracyCZoneEnd(__tracy_zone_ctx);
+    return 0;
+  }
+  if (arn->opt_mutex) {
+    mutex_lock(arn->opt_mutex);
+  }
+  sz total = 0;
+  for (arena_block* blk = arn->blocks_head; blk != NULL; blk = blk->next) {
+    total += blk->size;
+  }
+  if (arn->opt_mutex) {
+    mutex_unlock(arn->opt_mutex);
+  }
+  TracyCZoneEnd(__tracy_zone_ctx);
+  return total;
+}
+
+func sz arena_total_used(arena* arn) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
+  if (arn == NULL) {
+    TracyCZoneEnd(__tracy_zone_ctx);
+    return 0;
+  }
+  if (arn->opt_mutex) {
+    mutex_lock(arn->opt_mutex);
+  }
+  sz total = 0;
+  for (arena_block* blk = arn->blocks_head; blk != NULL; blk = blk->next) {
+    total += blk->used > size_of(arena_block) ? blk->used - size_of(arena_block) : 0;
+  }
+  if (arn->opt_mutex) {
+    mutex_unlock(arn->opt_mutex);
+  }
+  TracyCZoneEnd(__tracy_zone_ctx);
+  return total;
+}
+
+func sz arena_total_free(arena* arn) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
+  if (arn == NULL) {
+    TracyCZoneEnd(__tracy_zone_ctx);
+    return 0;
+  }
+  if (arn->opt_mutex) {
+    mutex_lock(arn->opt_mutex);
+  }
+  sz total = 0;
+  for (arena_block* blk = arn->blocks_head; blk != NULL; blk = blk->next) {
+    if (blk->size > blk->used) {
+      total += blk->size - blk->used;
+    }
+  }
+  if (arn->opt_mutex) {
+    mutex_unlock(arn->opt_mutex);
+  }
+  TracyCZoneEnd(__tracy_zone_ctx);
+  return total;
+}

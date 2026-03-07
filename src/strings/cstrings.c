@@ -532,6 +532,86 @@ func b32 cstr8_to_f64(cstr8 str, f64* out) {
   return 1;
 }
 
+func cstr8_tokenizer cstr8_tokenizer_make(cstr8 src, cstr8 delim) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
+  cstr8_tokenizer tok = {0};
+  tok.src = src != NULL ? src : "";
+  tok.delim = delim != NULL ? delim : "";
+  tok.cursor = 0;
+  TracyCZoneEnd(__tracy_zone_ctx);
+  return tok;
+}
+
+func b32 cstr8_tokenizer_next(cstr8_tokenizer* tok, c8* out_buf, sz out_cap) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
+  if (tok == NULL || out_buf == NULL || out_cap == 0) {
+    TracyCZoneEnd(__tracy_zone_ctx);
+    return 0;
+  }
+
+  sz src_len = cstr8_len(tok->src);
+  sz delim_len = cstr8_len(tok->delim);
+  if (tok->cursor > src_len) {
+    TracyCZoneEnd(__tracy_zone_ctx);
+    return 0;
+  }
+
+  if (tok->cursor == src_len) {
+    out_buf[0] = '\0';
+    tok->cursor = src_len + 1;
+    TracyCZoneEnd(__tracy_zone_ctx);
+    return 1;
+  }
+
+  sz start = tok->cursor;
+  sz end = src_len;
+  if (delim_len > 0) {
+    cstr8 found = cstr8_find(tok->src + start, tok->delim);
+    if (found != NULL) {
+      end = start + (sz)(found - (tok->src + start));
+      tok->cursor = end + delim_len;
+    } else {
+      tok->cursor = src_len;
+    }
+  } else {
+    tok->cursor = src_len;
+  }
+
+  sz token_len = end - start;
+  if (token_len >= out_cap) {
+    token_len = out_cap - 1;
+  }
+  memcpy(out_buf, tok->src + start, token_len);
+  out_buf[token_len] = '\0';
+  TracyCZoneEnd(__tracy_zone_ctx);
+  return 1;
+}
+
+func sz cstr8_join(c8* dst, sz dst_cap, cstr8 const* parts, sz part_count, cstr8 delim) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
+  if (dst == NULL || dst_cap == 0) {
+    TracyCZoneEnd(__tracy_zone_ctx);
+    return 0;
+  }
+  dst[0] = '\0';
+  if (parts == NULL || part_count == 0) {
+    TracyCZoneEnd(__tracy_zone_ctx);
+    return 0;
+  }
+
+  sz delim_len = cstr8_len(delim != NULL ? delim : "");
+  sz total_len = 0;
+  for (sz part_idx = 0; part_idx < part_count; part_idx++) {
+    if (part_idx > 0 && delim_len > 0) {
+      total_len = cstr8_cat(dst, dst_cap, delim);
+    }
+    total_len = cstr8_cat(dst, dst_cap, parts[part_idx] != NULL ? parts[part_idx] : "");
+  }
+
+  TracyCZoneEnd(__tracy_zone_ctx);
+  return total_len;
+}
+
 // =========================================================================
 // cstr16 — Helpers for ASCII narrowing (for parsing)
 // =========================================================================

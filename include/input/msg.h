@@ -63,6 +63,7 @@ typedef struct msg {
 } msg;
 
 typedef msg_handler_result (*msg_handler_fn)(msg* src, msg_handler_stage stage, void* user_data);
+typedef b32 (*msg_filter_fn)(const msg* src, void* user_data);
 
 typedef struct msg_handler_desc {
   // Required.
@@ -90,6 +91,9 @@ func b32 msg_wait(msg* out_msg);
 
 // Waits up to timeout_ms on the process-global queue and writes the next message to out_msg.
 func b32 msg_wait_timeout(msg* out_msg, i32 timeout_ms);
+func b32 msg_peek(msg* out_msg);
+func i32 msg_count(u32 type_min, u32 type_max);
+func void msg_flush(u32 type_min, u32 type_max);
 
 // Posts src into the process-global queue. Returns 1 on success, 0 otherwise.
 // Suitable for cross-thread producers that need to signal the consumer thread.
@@ -106,6 +110,7 @@ func b32 msg_remove_handler(u64 handler_id);
 
 // Removes all registered message handlers.
 func void msg_clear_handlers(void);
+func void msg_set_filter(msg_filter_fn filter_fn, void* user_data);
 
 // Converts a backend-native event object into a msg. Returns 1 on success, 0 otherwise.
 func b32 msg_from_native(const void* native_event, msg* out_msg);

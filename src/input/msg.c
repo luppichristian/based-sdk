@@ -44,8 +44,21 @@ typedef struct msg_handler_entry {
 global_var msg_handler_entry msg_handler_entries[MSG_HANDLER_CAP] = {0};
 global_var u32 msg_handler_count = 0;
 global_var u64 msg_handler_next_id = 1;
+global_var msg_filter_fn msg_filter_current = NULL;
+global_var void* msg_filter_user_data = NULL;
 
 func b32 msg_remove_handler(u64 handler_id);
+
+func b32 msg_filter_accept(const msg* src) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
+  if (msg_filter_current == NULL || src == NULL) {
+    TracyCZoneEnd(__tracy_zone_ctx);
+    return 1;
+  }
+  b32 result = msg_filter_current(src, msg_filter_user_data);
+  TracyCZoneEnd(__tracy_zone_ctx);
+  return result;
+}
 
 func u64 msg_hash_path(cstr8 src) {
   TracyCZoneN(__tracy_zone_ctx, __func__, 1);
@@ -1338,15 +1351,26 @@ func b32 msg_poll(msg* out_msg) {
   SDL_Event native_event;
 
   msg_refresh_synthetic_device_msgs();
-  if (!out_msg || !SDL_PollEvent(&native_event) || !msg_from_sdl(&native_event, out_msg)) {
+  if (!out_msg) {
     TracyCZoneEnd(__tracy_zone_ctx);
     return 0;
   }
   assert(out_msg != NULL);
 
-  msg_notify_internal_listeners(out_msg);
+  while (SDL_PollEvent(&native_event)) {
+    if (!msg_from_sdl(&native_event, out_msg)) {
+      continue;
+    }
+    if (!msg_filter_accept(out_msg)) {
+      continue;
+    }
+    msg_notify_internal_listeners(out_msg);
+    TracyCZoneEnd(__tracy_zone_ctx);
+    return 1;
+  }
+
   TracyCZoneEnd(__tracy_zone_ctx);
-  return 1;
+  return 0;
 }
 
 func b32 msg_wait(msg* out_msg) {
@@ -1360,20 +1384,33 @@ func b32 msg_wait(msg* out_msg) {
   assert(out_msg != NULL);
 
   msg_refresh_synthetic_device_msgs();
-  if (SDL_PollEvent(&native_event) && msg_from_sdl(&native_event, out_msg)) {
+  while (SDL_PollEvent(&native_event)) {
+    if (!msg_from_sdl(&native_event, out_msg)) {
+      continue;
+    }
+    if (!msg_filter_accept(out_msg)) {
+      continue;
+    }
     msg_notify_internal_listeners(out_msg);
     TracyCZoneEnd(__tracy_zone_ctx);
     return 1;
   }
 
-  if (!SDL_WaitEvent(&native_event) || !msg_from_sdl(&native_event, out_msg)) {
+  for (;;) {
+    if (!SDL_WaitEvent(&native_event)) {
+      TracyCZoneEnd(__tracy_zone_ctx);
+      return 0;
+    }
+    if (!msg_from_sdl(&native_event, out_msg)) {
+      continue;
+    }
+    if (!msg_filter_accept(out_msg)) {
+      continue;
+    }
+    msg_notify_internal_listeners(out_msg);
     TracyCZoneEnd(__tracy_zone_ctx);
-    return 0;
+    return 1;
   }
-
-  msg_notify_internal_listeners(out_msg);
-  TracyCZoneEnd(__tracy_zone_ctx);
-  return 1;
 }
 
 func b32 msg_wait_timeout(msg* out_msg, i32 timeout_ms) {
@@ -1391,13 +1428,20 @@ func b32 msg_wait_timeout(msg* out_msg, i32 timeout_ms) {
   assert(out_msg != NULL);
 
   msg_refresh_synthetic_device_msgs();
-  if (SDL_PollEvent(&native_event) && msg_from_sdl(&native_event, out_msg)) {
+  while (SDL_PollEvent(&native_event)) {
+    if (!msg_from_sdl(&native_event, out_msg)) {
+      continue;
+    }
+    if (!msg_filter_accept(out_msg)) {
+      continue;
+    }
     msg_notify_internal_listeners(out_msg);
     TracyCZoneEnd(__tracy_zone_ctx);
     return 1;
   }
 
-  if (!SDL_WaitEventTimeout(&native_event, (Sint32)timeout_ms) || !msg_from_sdl(&native_event, out_msg)) {
+  if (!SDL_WaitEventTimeout(&native_event, (Sint32)timeout_ms) || !msg_from_sdl(&native_event, out_msg) ||
+      !msg_filter_accept(out_msg)) {
     TracyCZoneEnd(__tracy_zone_ctx);
     return 0;
   }
@@ -1405,6 +1449,52 @@ func b32 msg_wait_timeout(msg* out_msg, i32 timeout_ms) {
   msg_notify_internal_listeners(out_msg);
   TracyCZoneEnd(__tracy_zone_ctx);
   return 1;
+}
+
+func b32 msg_peek(msg* out_msg) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
+  SDL_Event native_event = {0};
+  if (out_msg == NULL) {
+    TracyCZoneEnd(__tracy_zone_ctx);
+    return 0;
+  }
+
+  if (SDL_PeepEvents(&native_event, 1, SDL_PEEKEVENT, SDL_EVENT_FIRST, SDL_EVENT_LAST) <= 0) {
+    TracyCZoneEnd(__tracy_zone_ctx);
+    return 0;
+  }
+
+  if (!msg_from_sdl(&native_event, out_msg) || !msg_filter_accept(out_msg)) {
+    TracyCZoneEnd(__tracy_zone_ctx);
+    return 0;
+  }
+
+  TracyCZoneEnd(__tracy_zone_ctx);
+  return 1;
+}
+
+func i32 msg_count(u32 type_min, u32 type_max) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
+  if (type_min > type_max) {
+    u32 temp = type_min;
+    type_min = type_max;
+    type_max = temp;
+  }
+
+  i32 count = SDL_PeepEvents(NULL, 0, SDL_PEEKEVENT, type_min, type_max);
+  TracyCZoneEnd(__tracy_zone_ctx);
+  return count;
+}
+
+func void msg_flush(u32 type_min, u32 type_max) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
+  if (type_min > type_max) {
+    u32 temp = type_min;
+    type_min = type_max;
+    type_max = temp;
+  }
+  SDL_FlushEvents(type_min, type_max);
+  TracyCZoneEnd(__tracy_zone_ctx);
 }
 
 func b32 _msg_post(const msg* src, callsite site) {
@@ -1421,6 +1511,11 @@ func b32 _msg_post(const msg* src, callsite site) {
 
   posted_msg = *src;
   posted_msg.post_site = site;
+
+  if (!msg_filter_accept(&posted_msg)) {
+    TracyCZoneEnd(__tracy_zone_ctx);
+    return 0;
+  }
 
   if (!msg_dispatch_handlers(&posted_msg, MSG_HANDLER_STAGE_BEFORE_POST)) {
     thread_log_trace("msg_post: cancelled type=%u", posted_msg.type);
@@ -1534,6 +1629,13 @@ func void msg_clear_handlers(void) {
   msg_handler_count = 0;
   msg_handler_next_id = 1;
   thread_log_trace("msg_clear_handlers");
+  TracyCZoneEnd(__tracy_zone_ctx);
+}
+
+func void msg_set_filter(msg_filter_fn filter_fn, void* user_data) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
+  msg_filter_current = filter_fn;
+  msg_filter_user_data = user_data;
   TracyCZoneEnd(__tracy_zone_ctx);
 }
 

@@ -5,6 +5,7 @@
 
 #include "capture.h"
 #include "devices.h"
+#include "../windowing/window.h"
 
 // =========================================================================
 // Keyboard
@@ -72,3 +73,8 @@ func keyboard_keycode keyboard_get_keycode(keyboard_scancode scancode, keymod mo
 
 // Returns a backend-defined readable name for scancode.
 func cstr8 keyboard_get_scancode_name(keyboard_scancode scancode);
+
+func b32 keyboard_start_text_input(window opt_window);
+func b32 keyboard_stop_text_input(window opt_window);
+func b32 keyboard_is_text_input_active(window opt_window);
+func b32 keyboard_set_text_input_area(window opt_window, i32 xpos, i32 ypos, i32 width, i32 height);

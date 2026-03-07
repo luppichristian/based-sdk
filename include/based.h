@@ -10,6 +10,7 @@
 #include "basic/env_defines.h"
 #include "basic/intrinsics.h"
 #include "basic/keyword_defines.h"
+#include "basic/log.h"
 #include "basic/primitive_types.h"
 #include "basic/profiler.h"
 #include "basic/utility_defines.h"
@@ -108,11 +109,8 @@
 #include "threads/thread_current.h"
 #include "threads/thread_group.h"
 
-// Olib, my library for working with file formats...
 #include <olib.h>
 
-// libmath2, my library for math utilities and functions...
-// Should be complete with everything needed.
 #ifndef LM2_ENABLE_UNPREFIXED_NAMES
 #  define LM2_ENABLE_UNPREFIXED_NAMES
 #endif

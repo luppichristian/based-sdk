@@ -27,6 +27,8 @@ NOTE: For now you can skip tests
 - Variable and parameter names should generally be at least 3 characters to satisfy the active tidy rules.
 - Functions that have a name that starts with `_` means that they should be called by users with the implemented convenience macro so that we can pass it callsite info. Look at `codespace.h` `CALLSITE_HERE` define.
 - `include/based.h` is the umbrella header, you should always keep it up to date when creating public header files.
+- Keep `api_index.txt` up to date whenever public headers/API signatures/macros change.
+- Every implemented function in `src/` must be integrated with Tracy profiling. Follow the existing implementation pattern: start each function with `TracyCZoneN(__tracy_zone_ctx, __func__, 1);` and close with `TracyCZoneEnd(__tracy_zone_ctx);`, including all early-return/error paths so every begun zone is ended exactly once.
 
 ## Project Layout
 

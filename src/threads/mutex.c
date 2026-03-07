@@ -85,6 +85,26 @@ func b32 mutex_trylock(mutex mtx) {
   return SDL_TryLockMutex((SDL_Mutex*)mtx);
 }
 
+func b32 mutex_timed_lock(mutex mtx, i32 timeout_ms) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
+  if (mtx == NULL || timeout_ms < 0) {
+    TracyCZoneEnd(__tracy_zone_ctx);
+    return 0;
+  }
+
+  u64 start_ticks = SDL_GetTicks();
+  while (!mutex_trylock(mtx)) {
+    if ((i32)(SDL_GetTicks() - start_ticks) >= timeout_ms) {
+      TracyCZoneEnd(__tracy_zone_ctx);
+      return 0;
+    }
+    SDL_Delay(1);
+  }
+
+  TracyCZoneEnd(__tracy_zone_ctx);
+  return 1;
+}
+
 func void mutex_unlock(mutex mtx) {
   TracyCZoneN(__tracy_zone_ctx, __func__, 1);
   if (mtx == NULL) {

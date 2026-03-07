@@ -4,6 +4,7 @@
 #pragma once
 
 #include "../basic/primitive_types.h"
+#include "../memory/buffer.h"
 #include "../strings/cstrings.h"
 
 typedef void* camera;
@@ -34,3 +35,9 @@ func cstr8 camera_get_name(camera id);
 
 // Returns the camera physical position for id.
 func camera_position camera_get_position(camera id);
+
+func b32 camera_open(camera id);
+func b32 camera_close(camera id);
+func b32 camera_start(camera id);
+func b32 camera_stop(camera id);
+func b32 camera_read(camera id, buffer* out_frame);

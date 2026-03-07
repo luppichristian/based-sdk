@@ -13,6 +13,8 @@
 typedef struct pathwatch_binding {
   pathwatch_id pathwatch_id;
   void* native_handle;
+  b32 started;
+  b32 paused;
 } pathwatch_binding;
 
 typedef struct pathwatch_watch_binding {
@@ -80,6 +82,8 @@ func b32 pathwatch_bind_create(pathwatch_id pathwatch_id, void* native_handle) {
     if (bindings[item_idx].native_handle == NULL) {
       bindings[item_idx].native_handle = native_handle;
       bindings[item_idx].pathwatch_id = pathwatch_id;
+      bindings[item_idx].started = 0;
+      bindings[item_idx].paused = 0;
       TracyCZoneEnd(__tracy_zone_ctx);
       return 1;
     }
@@ -94,6 +98,8 @@ func void pathwatch_bind_remove(void* native_handle) {
   if (binding != NULL) {
     binding->native_handle = NULL;
     binding->pathwatch_id = 0;
+    binding->started = 0;
+    binding->paused = 0;
   }
   TracyCZoneEnd(__tracy_zone_ctx);
 }
@@ -246,6 +252,10 @@ func void pathwatch_dispatch(
     TracyCZoneEnd(__tracy_zone_ctx);
     return;
   }
+  if (binding->paused || !binding->started) {
+    TracyCZoneEnd(__tracy_zone_ctx);
+    return;
+  }
 
   pathwatch_watch_binding* watch_binding =
       pathwatch_find_watch_binding_by_native(native_handle, (i64)native_watch_id);
@@ -276,6 +286,10 @@ func void pathwatch_dispatch_missed(
 
   pathwatch_binding* binding = pathwatch_find_binding(native_handle);
   if (binding == NULL) {
+    TracyCZoneEnd(__tracy_zone_ctx);
+    return;
+  }
+  if (binding->paused || !binding->started) {
     TracyCZoneEnd(__tracy_zone_ctx);
     return;
   }
@@ -374,8 +388,74 @@ func b32 pathwatch_start(pathwatch* watcher) {
   assert(watcher->id > 0);
 
   efsw_watch((efsw_watcher)watcher->native_handle);
+  pathwatch_binding* binding = pathwatch_find_binding(watcher->native_handle);
+  if (binding != NULL) {
+    binding->started = 1;
+    binding->paused = 0;
+  }
   TracyCZoneEnd(__tracy_zone_ctx);
   return 1;
+}
+
+func b32 pathwatch_stop(pathwatch* watcher) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
+  if (watcher == NULL || watcher->native_handle == NULL) {
+    TracyCZoneEnd(__tracy_zone_ctx);
+    return 0;
+  }
+
+  pathwatch_watch_bind_remove_all_for_watcher(watcher->id, watcher->native_handle);
+  pathwatch_binding* binding = pathwatch_find_binding(watcher->native_handle);
+  if (binding != NULL) {
+    binding->started = 0;
+    binding->paused = 0;
+  }
+  TracyCZoneEnd(__tracy_zone_ctx);
+  return 1;
+}
+
+func b32 pathwatch_pause(pathwatch* watcher) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
+  if (watcher == NULL || watcher->native_handle == NULL) {
+    TracyCZoneEnd(__tracy_zone_ctx);
+    return 0;
+  }
+
+  pathwatch_binding* binding = pathwatch_find_binding(watcher->native_handle);
+  if (binding == NULL) {
+    TracyCZoneEnd(__tracy_zone_ctx);
+    return 0;
+  }
+
+  binding->paused = 1;
+  TracyCZoneEnd(__tracy_zone_ctx);
+  return 1;
+}
+
+func b32 pathwatch_resume(pathwatch* watcher) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
+  if (watcher == NULL || watcher->native_handle == NULL) {
+    TracyCZoneEnd(__tracy_zone_ctx);
+    return 0;
+  }
+
+  pathwatch_binding* binding = pathwatch_find_binding(watcher->native_handle);
+  if (binding == NULL) {
+    TracyCZoneEnd(__tracy_zone_ctx);
+    return 0;
+  }
+
+  binding->paused = 0;
+  TracyCZoneEnd(__tracy_zone_ctx);
+  return 1;
+}
+
+func i32 pathwatch_drain(void) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
+  i32 count = msg_count(MSG_CORE_TYPE_PATHWATCH, MSG_CORE_TYPE_PATHWATCH);
+  msg_flush(MSG_CORE_TYPE_PATHWATCH, MSG_CORE_TYPE_PATHWATCH);
+  TracyCZoneEnd(__tracy_zone_ctx);
+  return count;
 }
 
 func pathwatch_watch_id pathwatch_add(pathwatch* watcher, const path* src, b32 recursive) {

@@ -277,6 +277,29 @@ func void str8_beautify(str8* str) {
   TracyCZoneEnd(__tracy_zone_ctx);
 }
 
+func b32 str8_split_next(cstr8_tokenizer* tok, str8* out_token) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
+  if (tok == NULL || out_token == NULL || out_token->ptr == NULL || out_token->cap == 0) {
+    TracyCZoneEnd(__tracy_zone_ctx);
+    return 0;
+  }
+  b32 result = cstr8_tokenizer_next(tok, out_token->ptr, out_token->cap);
+  out_token->size = cstr8_len(out_token->ptr);
+  TracyCZoneEnd(__tracy_zone_ctx);
+  return result;
+}
+
+func b32 str8_join(str8* dst, cstr8 const* parts, sz part_count, cstr8 delim) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
+  if (dst == NULL || dst->ptr == NULL || dst->cap == 0) {
+    TracyCZoneEnd(__tracy_zone_ctx);
+    return 0;
+  }
+  dst->size = cstr8_join(dst->ptr, dst->cap, parts, part_count, delim);
+  TracyCZoneEnd(__tracy_zone_ctx);
+  return 1;
+}
+
 // =========================================================================
 // str16
 // =========================================================================

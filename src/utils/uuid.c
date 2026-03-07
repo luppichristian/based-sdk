@@ -9,6 +9,8 @@
 #include "basic/profiler.h"
 
 #include <string.h>
+#include <stdlib.h>
+#include <time.h>
 
 func uuid uuid_zero(void) {
   TracyCZoneN(__tracy_zone_ctx, __func__, 1);
@@ -287,4 +289,24 @@ func b32 uuid_to_str32(uuid value, str32* dst) {
   dst->size = cstr32_len(dst->ptr);
   TracyCZoneEnd(__tracy_zone_ctx);
   return success;
+}
+
+func uuid uuid_generate_v4(void) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
+  local_persist b32 seeded = 0;
+  if (!seeded) {
+    srand((unsigned int)time(NULL));
+    seeded = 1;
+  }
+
+  uuid value = {0};
+  for (sz idx = 0; idx < count_of(value.bytes); idx++) {
+    value.bytes[idx] = (u8)(rand() & 0xFF);
+  }
+
+  // RFC 4122 variant + version 4.
+  value.bytes[6] = (u8)((value.bytes[6] & 0x0FU) | 0x40U);
+  value.bytes[8] = (u8)((value.bytes[8] & 0x3FU) | 0x80U);
+  TracyCZoneEnd(__tracy_zone_ctx);
+  return value;
 }

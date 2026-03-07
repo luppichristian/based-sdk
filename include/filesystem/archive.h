@@ -67,3 +67,9 @@ func b32 archive_add_file(archive* arc, const path* archive_path, const path* di
 
 // Iterates every entry in arc until callback returns 0 or the list ends.
 func b32 archive_iterate(const archive* arc, archive_iterate_callback* callback, void* user_data);
+
+// Queries metadata for one entry.
+func b32 archive_get_entry_info(const archive* arc, const path* src, archive_entry_info* out_info);
+
+// Returns a non-owning data span for an in-memory entry.
+func b32 archive_get_entry_data(const archive* arc, const path* src, buffer* out_data);

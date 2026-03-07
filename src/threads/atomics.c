@@ -19,6 +19,31 @@ static_assert(size_of(atomic_u32) == size_of(SDL_AtomicU32));
 static_assert(size_of(atomic_i64) == size_of(_Atomic int64_t));
 static_assert(size_of(atomic_u64) == size_of(_Atomic uint64_t));
 
+func memory_order atomic_map_order(atomic_memory_order order) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
+  switch (order) {
+    case ATOMIC_MEMORY_ORDER_RELAXED:
+      TracyCZoneEnd(__tracy_zone_ctx);
+      return memory_order_relaxed;
+    case ATOMIC_MEMORY_ORDER_CONSUME:
+      TracyCZoneEnd(__tracy_zone_ctx);
+      return memory_order_consume;
+    case ATOMIC_MEMORY_ORDER_ACQUIRE:
+      TracyCZoneEnd(__tracy_zone_ctx);
+      return memory_order_acquire;
+    case ATOMIC_MEMORY_ORDER_RELEASE:
+      TracyCZoneEnd(__tracy_zone_ctx);
+      return memory_order_release;
+    case ATOMIC_MEMORY_ORDER_ACQ_REL:
+      TracyCZoneEnd(__tracy_zone_ctx);
+      return memory_order_acq_rel;
+    case ATOMIC_MEMORY_ORDER_SEQ_CST:
+    default:
+      TracyCZoneEnd(__tracy_zone_ctx);
+      return memory_order_seq_cst;
+  }
+}
+
 // =========================================================================
 // atomic_i32
 // =========================================================================
@@ -34,6 +59,17 @@ func i32 atomic_i32_get(atomic_i32* atom) {
   return SDL_GetAtomicInt((SDL_AtomicInt*)(void*)atom);
 }
 
+func i32 atomic_i32_get_explicit(atomic_i32* atom, atomic_memory_order order) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
+  if (atom == NULL) {
+    TracyCZoneEnd(__tracy_zone_ctx);
+    return 0;
+  }
+  i32 result = (i32)atomic_load_explicit((_Atomic int32_t*)(void*)atom, atomic_map_order(order));
+  TracyCZoneEnd(__tracy_zone_ctx);
+  return result;
+}
+
 func i32 atomic_i32_set(atomic_i32* atom, i32 val) {
   TracyCZoneN(__tracy_zone_ctx, __func__, 1);
   if (atom == NULL) {
@@ -43,6 +79,18 @@ func i32 atomic_i32_set(atomic_i32* atom, i32 val) {
   assert(atom != NULL);
   TracyCZoneEnd(__tracy_zone_ctx);
   return (i32)SDL_SetAtomicInt((SDL_AtomicInt*)(void*)atom, (int)val);
+}
+
+func i32 atomic_i32_set_explicit(atomic_i32* atom, i32 val, atomic_memory_order order) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
+  if (atom == NULL) {
+    TracyCZoneEnd(__tracy_zone_ctx);
+    return 0;
+  }
+  i32 expected = (i32)atomic_load_explicit((_Atomic int32_t*)(void*)atom, memory_order_relaxed);
+  atomic_store_explicit((_Atomic int32_t*)(void*)atom, (int32_t)val, atomic_map_order(order));
+  TracyCZoneEnd(__tracy_zone_ctx);
+  return expected;
 }
 
 func b32 atomic_i32_cmpex(atomic_i32* atom, i32* expected, i32 desired) {
@@ -71,6 +119,39 @@ func i32 atomic_i32_add(atomic_i32* atom, i32 delta) {
   assert(atom != NULL);
   TracyCZoneEnd(__tracy_zone_ctx);
   return (i32)SDL_AddAtomicInt((SDL_AtomicInt*)(void*)atom, (int)delta);
+}
+
+func i32 atomic_i32_and(atomic_i32* atom, i32 mask) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
+  if (atom == NULL) {
+    TracyCZoneEnd(__tracy_zone_ctx);
+    return 0;
+  }
+  i32 result = (i32)atomic_fetch_and((_Atomic int32_t*)(void*)atom, (int32_t)mask);
+  TracyCZoneEnd(__tracy_zone_ctx);
+  return result;
+}
+
+func i32 atomic_i32_or(atomic_i32* atom, i32 mask) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
+  if (atom == NULL) {
+    TracyCZoneEnd(__tracy_zone_ctx);
+    return 0;
+  }
+  i32 result = (i32)atomic_fetch_or((_Atomic int32_t*)(void*)atom, (int32_t)mask);
+  TracyCZoneEnd(__tracy_zone_ctx);
+  return result;
+}
+
+func i32 atomic_i32_xor(atomic_i32* atom, i32 mask) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
+  if (atom == NULL) {
+    TracyCZoneEnd(__tracy_zone_ctx);
+    return 0;
+  }
+  i32 result = (i32)atomic_fetch_xor((_Atomic int32_t*)(void*)atom, (int32_t)mask);
+  TracyCZoneEnd(__tracy_zone_ctx);
+  return result;
 }
 
 func i32 atomic_i32_sub(atomic_i32* atom, i32 delta) {
@@ -130,6 +211,17 @@ func u32 atomic_u32_get(atomic_u32* atom) {
   return (u32)SDL_GetAtomicU32((SDL_AtomicU32*)(void*)atom);
 }
 
+func u32 atomic_u32_get_explicit(atomic_u32* atom, atomic_memory_order order) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
+  if (atom == NULL) {
+    TracyCZoneEnd(__tracy_zone_ctx);
+    return 0;
+  }
+  u32 result = (u32)atomic_load_explicit((_Atomic uint32_t*)(void*)atom, atomic_map_order(order));
+  TracyCZoneEnd(__tracy_zone_ctx);
+  return result;
+}
+
 func u32 atomic_u32_set(atomic_u32* atom, u32 val) {
   TracyCZoneN(__tracy_zone_ctx, __func__, 1);
   if (atom == NULL) {
@@ -139,6 +231,18 @@ func u32 atomic_u32_set(atomic_u32* atom, u32 val) {
   assert(atom != NULL);
   TracyCZoneEnd(__tracy_zone_ctx);
   return (u32)SDL_SetAtomicU32((SDL_AtomicU32*)(void*)atom, (Uint32)val);
+}
+
+func u32 atomic_u32_set_explicit(atomic_u32* atom, u32 val, atomic_memory_order order) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
+  if (atom == NULL) {
+    TracyCZoneEnd(__tracy_zone_ctx);
+    return 0;
+  }
+  u32 expected = (u32)atomic_load_explicit((_Atomic uint32_t*)(void*)atom, memory_order_relaxed);
+  atomic_store_explicit((_Atomic uint32_t*)(void*)atom, (uint32_t)val, atomic_map_order(order));
+  TracyCZoneEnd(__tracy_zone_ctx);
+  return expected;
 }
 
 func b32 atomic_u32_cmpex(atomic_u32* atom, u32* expected, u32 desired) {
@@ -189,6 +293,39 @@ func u32 atomic_u32_sub(atomic_u32* atom, u32 delta) {
   return old;
 }
 
+func u32 atomic_u32_and(atomic_u32* atom, u32 mask) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
+  if (atom == NULL) {
+    TracyCZoneEnd(__tracy_zone_ctx);
+    return 0;
+  }
+  u32 result = (u32)atomic_fetch_and((_Atomic uint32_t*)(void*)atom, (uint32_t)mask);
+  TracyCZoneEnd(__tracy_zone_ctx);
+  return result;
+}
+
+func u32 atomic_u32_or(atomic_u32* atom, u32 mask) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
+  if (atom == NULL) {
+    TracyCZoneEnd(__tracy_zone_ctx);
+    return 0;
+  }
+  u32 result = (u32)atomic_fetch_or((_Atomic uint32_t*)(void*)atom, (uint32_t)mask);
+  TracyCZoneEnd(__tracy_zone_ctx);
+  return result;
+}
+
+func u32 atomic_u32_xor(atomic_u32* atom, u32 mask) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
+  if (atom == NULL) {
+    TracyCZoneEnd(__tracy_zone_ctx);
+    return 0;
+  }
+  u32 result = (u32)atomic_fetch_xor((_Atomic uint32_t*)(void*)atom, (uint32_t)mask);
+  TracyCZoneEnd(__tracy_zone_ctx);
+  return result;
+}
+
 func b32 atomic_u32_eq(atomic_u32* atom, u32 val) {
   TracyCZoneN(__tracy_zone_ctx, __func__, 1);
   TracyCZoneEnd(__tracy_zone_ctx);
@@ -235,6 +372,17 @@ func i64 atomic_i64_get(atomic_i64* atom) {
   return (i64)atomic_load((_Atomic int64_t*)(void*)atom);
 }
 
+func i64 atomic_i64_get_explicit(atomic_i64* atom, atomic_memory_order order) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
+  if (atom == NULL) {
+    TracyCZoneEnd(__tracy_zone_ctx);
+    return 0;
+  }
+  i64 result = (i64)atomic_load_explicit((_Atomic int64_t*)(void*)atom, atomic_map_order(order));
+  TracyCZoneEnd(__tracy_zone_ctx);
+  return result;
+}
+
 func i64 atomic_i64_set(atomic_i64* atom, i64 val) {
   TracyCZoneN(__tracy_zone_ctx, __func__, 1);
   if (atom == NULL) {
@@ -244,6 +392,18 @@ func i64 atomic_i64_set(atomic_i64* atom, i64 val) {
   assert(atom != NULL);
   TracyCZoneEnd(__tracy_zone_ctx);
   return (i64)atomic_exchange((_Atomic int64_t*)(void*)atom, (int64_t)val);
+}
+
+func i64 atomic_i64_set_explicit(atomic_i64* atom, i64 val, atomic_memory_order order) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
+  if (atom == NULL) {
+    TracyCZoneEnd(__tracy_zone_ctx);
+    return 0;
+  }
+  i64 expected = (i64)atomic_load_explicit((_Atomic int64_t*)(void*)atom, memory_order_relaxed);
+  atomic_store_explicit((_Atomic int64_t*)(void*)atom, (int64_t)val, atomic_map_order(order));
+  TracyCZoneEnd(__tracy_zone_ctx);
+  return expected;
 }
 
 func b32 atomic_i64_cmpex(atomic_i64* atom, i64* expected, i64 desired) {
@@ -284,6 +444,39 @@ func i64 atomic_i64_sub(atomic_i64* atom, i64 delta) {
   assert(atom != NULL);
   TracyCZoneEnd(__tracy_zone_ctx);
   return (i64)atomic_fetch_sub((_Atomic int64_t*)(void*)atom, (int64_t)delta);
+}
+
+func i64 atomic_i64_and(atomic_i64* atom, i64 mask) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
+  if (atom == NULL) {
+    TracyCZoneEnd(__tracy_zone_ctx);
+    return 0;
+  }
+  i64 result = (i64)atomic_fetch_and((_Atomic int64_t*)(void*)atom, (int64_t)mask);
+  TracyCZoneEnd(__tracy_zone_ctx);
+  return result;
+}
+
+func i64 atomic_i64_or(atomic_i64* atom, i64 mask) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
+  if (atom == NULL) {
+    TracyCZoneEnd(__tracy_zone_ctx);
+    return 0;
+  }
+  i64 result = (i64)atomic_fetch_or((_Atomic int64_t*)(void*)atom, (int64_t)mask);
+  TracyCZoneEnd(__tracy_zone_ctx);
+  return result;
+}
+
+func i64 atomic_i64_xor(atomic_i64* atom, i64 mask) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
+  if (atom == NULL) {
+    TracyCZoneEnd(__tracy_zone_ctx);
+    return 0;
+  }
+  i64 result = (i64)atomic_fetch_xor((_Atomic int64_t*)(void*)atom, (int64_t)mask);
+  TracyCZoneEnd(__tracy_zone_ctx);
+  return result;
 }
 
 func b32 atomic_i64_eq(atomic_i64* atom, i64 val) {
@@ -332,6 +525,17 @@ func u64 atomic_u64_get(atomic_u64* atom) {
   return (u64)atomic_load((_Atomic uint64_t*)(void*)atom);
 }
 
+func u64 atomic_u64_get_explicit(atomic_u64* atom, atomic_memory_order order) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
+  if (atom == NULL) {
+    TracyCZoneEnd(__tracy_zone_ctx);
+    return 0;
+  }
+  u64 result = (u64)atomic_load_explicit((_Atomic uint64_t*)(void*)atom, atomic_map_order(order));
+  TracyCZoneEnd(__tracy_zone_ctx);
+  return result;
+}
+
 func u64 atomic_u64_set(atomic_u64* atom, u64 val) {
   TracyCZoneN(__tracy_zone_ctx, __func__, 1);
   if (atom == NULL) {
@@ -341,6 +545,18 @@ func u64 atomic_u64_set(atomic_u64* atom, u64 val) {
   assert(atom != NULL);
   TracyCZoneEnd(__tracy_zone_ctx);
   return (u64)atomic_exchange((_Atomic uint64_t*)(void*)atom, (uint64_t)val);
+}
+
+func u64 atomic_u64_set_explicit(atomic_u64* atom, u64 val, atomic_memory_order order) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
+  if (atom == NULL) {
+    TracyCZoneEnd(__tracy_zone_ctx);
+    return 0;
+  }
+  u64 expected = (u64)atomic_load_explicit((_Atomic uint64_t*)(void*)atom, memory_order_relaxed);
+  atomic_store_explicit((_Atomic uint64_t*)(void*)atom, (uint64_t)val, atomic_map_order(order));
+  TracyCZoneEnd(__tracy_zone_ctx);
+  return expected;
 }
 
 func b32 atomic_u64_cmpex(atomic_u64* atom, u64* expected, u64 desired) {
@@ -381,6 +597,39 @@ func u64 atomic_u64_sub(atomic_u64* atom, u64 delta) {
   assert(atom != NULL);
   TracyCZoneEnd(__tracy_zone_ctx);
   return (u64)atomic_fetch_sub((_Atomic uint64_t*)(void*)atom, (uint64_t)delta);
+}
+
+func u64 atomic_u64_and(atomic_u64* atom, u64 mask) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
+  if (atom == NULL) {
+    TracyCZoneEnd(__tracy_zone_ctx);
+    return 0;
+  }
+  u64 result = (u64)atomic_fetch_and((_Atomic uint64_t*)(void*)atom, (uint64_t)mask);
+  TracyCZoneEnd(__tracy_zone_ctx);
+  return result;
+}
+
+func u64 atomic_u64_or(atomic_u64* atom, u64 mask) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
+  if (atom == NULL) {
+    TracyCZoneEnd(__tracy_zone_ctx);
+    return 0;
+  }
+  u64 result = (u64)atomic_fetch_or((_Atomic uint64_t*)(void*)atom, (uint64_t)mask);
+  TracyCZoneEnd(__tracy_zone_ctx);
+  return result;
+}
+
+func u64 atomic_u64_xor(atomic_u64* atom, u64 mask) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
+  if (atom == NULL) {
+    TracyCZoneEnd(__tracy_zone_ctx);
+    return 0;
+  }
+  u64 result = (u64)atomic_fetch_xor((_Atomic uint64_t*)(void*)atom, (uint64_t)mask);
+  TracyCZoneEnd(__tracy_zone_ctx);
+  return result;
 }
 
 func b32 atomic_u64_eq(atomic_u64* atom, u64 val) {

@@ -9,26 +9,34 @@
 
 typedef void* window;
 
-// Returns 1 if src refers to a concrete window id, 0 otherwise.
 func b32 window_id_is_valid(window src);
-
-// Builds a window from a backend-native window identifier.
 func window window_from_native_id(up native_id);
-
-// Returns the backend-native window identifier encoded in src.
 func up window_to_native_id(window src);
 
-// Returns the number of currently known windows.
 func sz window_get_count(void);
-
-// Writes the window id at index into out_id. Returns 1 on success, 0 otherwise.
 func b32 window_get_id(sz idx, window* out_id);
-
-// Returns 1 when id maps to an existing window, 0 otherwise.
 func b32 window_is_valid(window id);
 
-// Returns a backend-defined title for id, or NULL when unavailable.
-func cstr8 window_get_title(window id);
+func window window_create(cstr8 title, i32 width, i32 height, u64 flags);
+func b32 window_destroy(window id);
 
-// Writes the display currently associated with id into out_display_id. Returns 1 on success, 0 otherwise.
+func b32 window_show(window id);
+func b32 window_hide(window id);
+
+func b32 window_move(window id, i32 xpos, i32 ypos);
+func b32 window_get_position(window id, i32* out_xpos, i32* out_ypos);
+
+func b32 window_resize(window id, i32 width, i32 height);
+func b32 window_get_size(window id, i32* out_width, i32* out_height);
+
+func b32 window_set_fullscreen(window id, b32 enabled);
+func b32 window_is_fullscreen(window id);
+
+func b32 window_minimize(window id);
+func b32 window_maximize(window id);
+func b32 window_restore(window id);
+func b32 window_focus(window id);
+
+func cstr8 window_get_title(window id);
+func b32 window_set_title(window id, cstr8 title);
 func b32 window_get_display_id(window id, display* out_display_id);

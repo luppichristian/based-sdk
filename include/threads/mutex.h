@@ -30,6 +30,9 @@ func void mutex_lock(mutex mtx);
 // Returns true if the lock was acquired, false if the mutex is already held by another thread.
 func b32 mutex_trylock(mutex mtx);
 
+// Tries to lock the mutex until timeout_ms expires.
+func b32 mutex_timed_lock(mutex mtx, i32 timeout_ms);
+
 // Unlocks the given mutex.
 // The mutex must be locked by the current thread before calling this function.
 func void mutex_unlock(mutex mtx);

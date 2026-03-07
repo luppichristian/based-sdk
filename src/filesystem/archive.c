@@ -526,6 +526,49 @@ func b32 archive_iterate(const archive* arc, archive_iterate_callback* callback,
   return 1;
 }
 
+func b32 archive_get_entry_info(const archive* arc, const path* src, archive_entry_info* out_info) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
+  if (arc == NULL || src == NULL || out_info == NULL) {
+    TracyCZoneEnd(__tracy_zone_ctx);
+    return 0;
+  }
+  sz item_idx = archive_find_idx(arc, src);
+  if (item_idx == SZ_MAX) {
+    TracyCZoneEnd(__tracy_zone_ctx);
+    return 0;
+  }
+  archive_entry const* ent = &arc->entries[item_idx];
+  out_info->item_path = ent->item_path;
+  out_info->data_size = ent->data_size;
+  out_info->is_directory = ent->is_directory;
+  TracyCZoneEnd(__tracy_zone_ctx);
+  return 1;
+}
+
+func b32 archive_get_entry_data(const archive* arc, const path* src, buffer* out_data) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
+  if (arc == NULL || src == NULL || out_data == NULL) {
+    TracyCZoneEnd(__tracy_zone_ctx);
+    return 0;
+  }
+  out_data->ptr = NULL;
+  out_data->size = 0;
+  sz item_idx = archive_find_idx(arc, src);
+  if (item_idx == SZ_MAX) {
+    TracyCZoneEnd(__tracy_zone_ctx);
+    return 0;
+  }
+  archive_entry const* ent = &arc->entries[item_idx];
+  if (ent->is_directory) {
+    TracyCZoneEnd(__tracy_zone_ctx);
+    return 0;
+  }
+  out_data->ptr = ent->data_ptr;
+  out_data->size = ent->data_size;
+  TracyCZoneEnd(__tracy_zone_ctx);
+  return 1;
+}
+
 func b32 archive_load_file(archive* arc, const path* src) {
   TracyCZoneN(__tracy_zone_ctx, __func__, 1);
 #if BASED_ARCHIVE_HAS_MINIZ

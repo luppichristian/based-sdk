@@ -124,6 +124,8 @@ func sz str8_replace(str8* str, cstr8 from, cstr8 rep);
 
 // Lowercases all ASCII letters in str in place, then capitalizes the first character.
 func void str8_beautify(str8* str);
+func b32 str8_split_next(cstr8_tokenizer* tok, str8* out_token);
+func b32 str8_join(str8* dst, cstr8 const* parts, sz part_count, cstr8 delim);
 
 // =========================================================================
 // str16 — Variable-length UTF-16 string

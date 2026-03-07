@@ -163,6 +163,23 @@ func sz ring_space(ring* rng) {
   return result;
 }
 
+func sz ring_capacity(ring* rng) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
+  if (rng == NULL) {
+    TracyCZoneEnd(__tracy_zone_ctx);
+    return 0;
+  }
+  if (rng->opt_mutex) {
+    mutex_lock(rng->opt_mutex);
+  }
+  sz result = rng->capacity;
+  if (rng->opt_mutex) {
+    mutex_unlock(rng->opt_mutex);
+  }
+  TracyCZoneEnd(__tracy_zone_ctx);
+  return result;
+}
+
 // =========================================================================
 // Internal Copy Helper
 // =========================================================================
@@ -292,6 +309,124 @@ func sz ring_skip(ring* rng, sz size) {
   }
   TracyCZoneEnd(__tracy_zone_ctx);
   return skip_sz;
+}
+
+func void* ring_reserve_write(ring* rng, sz* out_size) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
+  if (out_size != NULL) {
+    *out_size = 0;
+  }
+  if (rng == NULL || out_size == NULL || rng->ptr == NULL || rng->capacity == 0) {
+    TracyCZoneEnd(__tracy_zone_ctx);
+    return NULL;
+  }
+  if (rng->opt_mutex) {
+    mutex_lock(rng->opt_mutex);
+  }
+
+  sz space = rng->capacity - rng->count;
+  sz contiguous = 0;
+  if (space > 0) {
+    if (rng->write_pos >= rng->read_pos) {
+      contiguous = rng->capacity - rng->write_pos;
+    } else {
+      contiguous = rng->read_pos - rng->write_pos;
+    }
+    if (contiguous > space) {
+      contiguous = space;
+    }
+  }
+
+  void* result = contiguous > 0 ? rng->ptr + rng->write_pos : NULL;
+  *out_size = contiguous;
+
+  if (rng->opt_mutex) {
+    mutex_unlock(rng->opt_mutex);
+  }
+  TracyCZoneEnd(__tracy_zone_ctx);
+  return result;
+}
+
+func b32 ring_commit_write(ring* rng, sz size) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
+  if (rng == NULL || size == 0 || rng->capacity == 0) {
+    TracyCZoneEnd(__tracy_zone_ctx);
+    return 0;
+  }
+  if (rng->opt_mutex) {
+    mutex_lock(rng->opt_mutex);
+  }
+
+  sz space = rng->capacity - rng->count;
+  if (size > space) {
+    if (rng->opt_mutex) {
+      mutex_unlock(rng->opt_mutex);
+    }
+    TracyCZoneEnd(__tracy_zone_ctx);
+    return 0;
+  }
+
+  rng->write_pos = (rng->write_pos + size) % rng->capacity;
+  rng->count += size;
+  if (rng->opt_mutex) {
+    mutex_unlock(rng->opt_mutex);
+  }
+  TracyCZoneEnd(__tracy_zone_ctx);
+  return 1;
+}
+
+func const void* ring_reserve_read(ring* rng, sz* out_size) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
+  if (out_size != NULL) {
+    *out_size = 0;
+  }
+  if (rng == NULL || out_size == NULL || rng->ptr == NULL || rng->count == 0) {
+    TracyCZoneEnd(__tracy_zone_ctx);
+    return NULL;
+  }
+  if (rng->opt_mutex) {
+    mutex_lock(rng->opt_mutex);
+  }
+
+  sz contiguous = rng->count;
+  if (rng->read_pos + contiguous > rng->capacity) {
+    contiguous = rng->capacity - rng->read_pos;
+  }
+  *out_size = contiguous;
+  const void* result = contiguous > 0 ? rng->ptr + rng->read_pos : NULL;
+
+  if (rng->opt_mutex) {
+    mutex_unlock(rng->opt_mutex);
+  }
+  TracyCZoneEnd(__tracy_zone_ctx);
+  return result;
+}
+
+func b32 ring_commit_read(ring* rng, sz size) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
+  if (rng == NULL || size == 0 || rng->capacity == 0) {
+    TracyCZoneEnd(__tracy_zone_ctx);
+    return 0;
+  }
+  if (rng->opt_mutex) {
+    mutex_lock(rng->opt_mutex);
+  }
+
+  if (size > rng->count) {
+    if (rng->opt_mutex) {
+      mutex_unlock(rng->opt_mutex);
+    }
+    TracyCZoneEnd(__tracy_zone_ctx);
+    return 0;
+  }
+
+  rng->read_pos = (rng->read_pos + size) % rng->capacity;
+  rng->count -= size;
+  if (rng->opt_mutex) {
+    mutex_unlock(rng->opt_mutex);
+  }
+  TracyCZoneEnd(__tracy_zone_ctx);
+  return 1;
 }
 
 // =========================================================================

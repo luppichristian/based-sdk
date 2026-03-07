@@ -413,3 +413,54 @@ func void pool_clear(pool* pol) {
   }
   TracyCZoneEnd(__tracy_zone_ctx);
 }
+
+func sz pool_block_count(pool* pol) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
+  if (pol == NULL) {
+    TracyCZoneEnd(__tracy_zone_ctx);
+    return 0;
+  }
+  if (pol->opt_mutex) {
+    mutex_lock(pol->opt_mutex);
+  }
+  sz count = 0;
+  for (pool_block* blk = pol->blocks_head; blk != NULL; blk = blk->next) {
+    count += 1;
+  }
+  if (pol->opt_mutex) {
+    mutex_unlock(pol->opt_mutex);
+  }
+  TracyCZoneEnd(__tracy_zone_ctx);
+  return count;
+}
+
+func sz pool_slot_size(pool* pol) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
+  if (pol == NULL) {
+    TracyCZoneEnd(__tracy_zone_ctx);
+    return 0;
+  }
+  sz result = pol->object_size;
+  TracyCZoneEnd(__tracy_zone_ctx);
+  return result;
+}
+
+func sz pool_free_count(pool* pol) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
+  if (pol == NULL) {
+    TracyCZoneEnd(__tracy_zone_ctx);
+    return 0;
+  }
+  if (pol->opt_mutex) {
+    mutex_lock(pol->opt_mutex);
+  }
+  sz count = 0;
+  for (void* slot = pol->free_head; slot != NULL; slot = pool_slot_read_next(slot)) {
+    count += 1;
+  }
+  if (pol->opt_mutex) {
+    mutex_unlock(pol->opt_mutex);
+  }
+  TracyCZoneEnd(__tracy_zone_ctx);
+  return count;
+}

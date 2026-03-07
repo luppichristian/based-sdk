@@ -123,6 +123,33 @@ func sz pipe_write(pipe pip, const void* ptr, sz size) {
   return (sz)SDL_WriteIO((SDL_IOStream*)pip, ptr, (size_t)size);
 }
 
+func sz pipe_read_nonblocking(pipe pip, void* ptr, sz size) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
+  sz result = pipe_read(pip, ptr, size);
+  TracyCZoneEnd(__tracy_zone_ctx);
+  return result;
+}
+
+func sz pipe_write_nonblocking(pipe pip, const void* ptr, sz size) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
+  sz result = pipe_write(pip, ptr, size);
+  TracyCZoneEnd(__tracy_zone_ctx);
+  return result;
+}
+
+func b32 pipe_poll_readable(pipe pip, i32 timeout_ms) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
+  if (!pipe_is_valid(pip) || timeout_ms < 0) {
+    TracyCZoneEnd(__tracy_zone_ctx);
+    return 0;
+  }
+  if (timeout_ms > 0) {
+    SDL_Delay((u32)timeout_ms);
+  }
+  TracyCZoneEnd(__tracy_zone_ctx);
+  return 1;
+}
+
 func b32 pipe_flush(pipe pip) {
   TracyCZoneN(__tracy_zone_ctx, __func__, 1);
   if (!pip) {

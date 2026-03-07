@@ -5,6 +5,7 @@
 #include "basic/assert.h"
 #include "input/msg.h"
 #include "input/msg_core.h"
+#include "windowing/window.h"
 #include "../sdl3_include.h"
 #include "basic/profiler.h"
 
@@ -173,6 +174,51 @@ func cstr8 keyboard_get_scancode_name(keyboard_scancode scancode) {
   TracyCZoneN(__tracy_zone_ctx, __func__, 1);
   TracyCZoneEnd(__tracy_zone_ctx);
   return SDL_GetScancodeName((SDL_Scancode)scancode);
+}
+
+func b32 keyboard_start_text_input(window opt_window) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
+  SDL_Window* window_ptr = NULL;
+  if (window_id_is_valid(opt_window)) {
+    window_ptr = SDL_GetWindowFromID((SDL_WindowID)window_to_native_id(opt_window));
+  }
+  b32 result = SDL_StartTextInput(window_ptr);
+  TracyCZoneEnd(__tracy_zone_ctx);
+  return result;
+}
+
+func b32 keyboard_stop_text_input(window opt_window) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
+  SDL_Window* window_ptr = NULL;
+  if (window_id_is_valid(opt_window)) {
+    window_ptr = SDL_GetWindowFromID((SDL_WindowID)window_to_native_id(opt_window));
+  }
+  b32 result = SDL_StopTextInput(window_ptr);
+  TracyCZoneEnd(__tracy_zone_ctx);
+  return result;
+}
+
+func b32 keyboard_is_text_input_active(window opt_window) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
+  SDL_Window* window_ptr = NULL;
+  if (window_id_is_valid(opt_window)) {
+    window_ptr = SDL_GetWindowFromID((SDL_WindowID)window_to_native_id(opt_window));
+  }
+  b32 result = SDL_TextInputActive(window_ptr) ? 1 : 0;
+  TracyCZoneEnd(__tracy_zone_ctx);
+  return result;
+}
+
+func b32 keyboard_set_text_input_area(window opt_window, i32 xpos, i32 ypos, i32 width, i32 height) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
+  SDL_Window* window_ptr = NULL;
+  if (window_id_is_valid(opt_window)) {
+    window_ptr = SDL_GetWindowFromID((SDL_WindowID)window_to_native_id(opt_window));
+  }
+  SDL_Rect area = {.x = xpos, .y = ypos, .w = width, .h = height};
+  b32 result = SDL_SetTextInputArea(window_ptr, &area, 0);
+  TracyCZoneEnd(__tracy_zone_ctx);
+  return result;
 }
 
 func void keyboard_internal_on_msg(msg* src) {

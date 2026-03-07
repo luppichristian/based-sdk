@@ -128,3 +128,43 @@ func b32 rwlock_try_write_lock(rwlock rw) {
   TracyCZoneEnd(__tracy_zone_ctx);
   return SDL_TryLockRWLockForWriting((SDL_RWLock*)rw);
 }
+
+func b32 rwlock_timed_read_lock(rwlock rw, i32 timeout_ms) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
+  if (rw == NULL || timeout_ms < 0) {
+    TracyCZoneEnd(__tracy_zone_ctx);
+    return 0;
+  }
+
+  u64 start_ticks = SDL_GetTicks();
+  while (!rwlock_try_read_lock(rw)) {
+    if ((i32)(SDL_GetTicks() - start_ticks) >= timeout_ms) {
+      TracyCZoneEnd(__tracy_zone_ctx);
+      return 0;
+    }
+    SDL_Delay(1);
+  }
+
+  TracyCZoneEnd(__tracy_zone_ctx);
+  return 1;
+}
+
+func b32 rwlock_timed_write_lock(rwlock rw, i32 timeout_ms) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
+  if (rw == NULL || timeout_ms < 0) {
+    TracyCZoneEnd(__tracy_zone_ctx);
+    return 0;
+  }
+
+  u64 start_ticks = SDL_GetTicks();
+  while (!rwlock_try_write_lock(rw)) {
+    if ((i32)(SDL_GetTicks() - start_ticks) >= timeout_ms) {
+      TracyCZoneEnd(__tracy_zone_ctx);
+      return 0;
+    }
+    SDL_Delay(1);
+  }
+
+  TracyCZoneEnd(__tracy_zone_ctx);
+  return 1;
+}

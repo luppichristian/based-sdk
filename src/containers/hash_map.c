@@ -90,6 +90,28 @@ func b32 hash_map_rehash(hash_map* map, sz new_cap) {
   return 1;
 }
 
+func b32 hash_map_reserve(hash_map* map, sz min_cap) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
+  if (map == NULL) {
+    TracyCZoneEnd(__tracy_zone_ctx);
+    return 0;
+  }
+
+  sz target_cap = map->cap > 0 ? map->cap : 16;
+  while (target_cap < min_cap) {
+    target_cap *= 2;
+  }
+
+  if (target_cap <= map->cap) {
+    TracyCZoneEnd(__tracy_zone_ctx);
+    return 1;
+  }
+
+  b32 result = hash_map_rehash(map, target_cap);
+  TracyCZoneEnd(__tracy_zone_ctx);
+  return result;
+}
+
 // Find the slot for key in map->slots; returns a pointer to the slot or NULL.
 func hash_map_slot* hash_map_find_slot(hash_map* map, u64 key) {
   TracyCZoneN(__tracy_zone_ctx, __func__, 1);
@@ -166,6 +188,37 @@ func void hash_map_clear(hash_map* map) {
   TracyCZoneEnd(__tracy_zone_ctx);
 }
 
+func sz hash_map_count(hash_map const* map) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
+  if (map == NULL) {
+    TracyCZoneEnd(__tracy_zone_ctx);
+    return 0;
+  }
+  TracyCZoneEnd(__tracy_zone_ctx);
+  return map->count;
+}
+
+func sz hash_map_capacity(hash_map const* map) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
+  if (map == NULL) {
+    TracyCZoneEnd(__tracy_zone_ctx);
+    return 0;
+  }
+  TracyCZoneEnd(__tracy_zone_ctx);
+  return map->cap;
+}
+
+func f32 hash_map_load_factor(hash_map const* map) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
+  if (map == NULL || map->cap == 0) {
+    TracyCZoneEnd(__tracy_zone_ctx);
+    return 0.0f;
+  }
+  f32 result = (f32)map->count / (f32)map->cap;
+  TracyCZoneEnd(__tracy_zone_ctx);
+  return result;
+}
+
 // =========================================================================
 // Operations
 // =========================================================================
@@ -180,7 +233,7 @@ func b32 hash_map_set(hash_map* map, u64 key, void* value) {
 
   // Rehash before inserting once load reaches 75%.
   if (map->count >= map->cap - (map->cap / 4)) {
-    if (!hash_map_rehash(map, map->cap * 2)) {
+    if (!hash_map_reserve(map, map->cap * 2)) {
       TracyCZoneEnd(__tracy_zone_ctx);
       return 0;
     }

@@ -55,3 +55,10 @@ func b32 mouse_is_button_pressed(input_key key, u8 button);
 
 // Returns 1 if button was released since last query for key, 0 otherwise.
 func b32 mouse_is_button_released(input_key key, u8 button);
+
+func b32 mouse_set_cursor_visible(b32 visible);
+func b32 mouse_is_cursor_visible(void);
+func b32 mouse_set_capture(b32 enabled);
+func b32 mouse_is_captured(void);
+func b32 mouse_set_relative_mode(b32 enabled);
+func b32 mouse_is_relative_mode(void);

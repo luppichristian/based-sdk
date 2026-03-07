@@ -33,15 +33,26 @@ typedef struct atomic_ptr {
   void* val;
 } atomic_ptr;
 
+typedef enum atomic_memory_order {
+  ATOMIC_MEMORY_ORDER_RELAXED = 0,
+  ATOMIC_MEMORY_ORDER_CONSUME = 1,
+  ATOMIC_MEMORY_ORDER_ACQUIRE = 2,
+  ATOMIC_MEMORY_ORDER_RELEASE = 3,
+  ATOMIC_MEMORY_ORDER_ACQ_REL = 4,
+  ATOMIC_MEMORY_ORDER_SEQ_CST = 5,
+} atomic_memory_order;
+
 // =========================================================================
 // atomic_i32
 // =========================================================================
 
 // Atomically loads and returns the current value.
 func i32 atomic_i32_get(atomic_i32* atom);
+func i32 atomic_i32_get_explicit(atomic_i32* atom, atomic_memory_order order);
 
 // Atomically replaces the value with val and returns the previous value.
 func i32 atomic_i32_set(atomic_i32* atom, i32 val);
+func i32 atomic_i32_set_explicit(atomic_i32* atom, i32 val, atomic_memory_order order);
 
 // If the current value equals *expected, replaces it with desired and returns true.
 // On failure, writes the current value into *expected and returns false.
@@ -50,6 +61,9 @@ func b32 atomic_i32_cmpex(atomic_i32* atom, i32* expected, i32 desired);
 
 // Atomically adds delta and returns the value before the addition.
 func i32 atomic_i32_add(atomic_i32* atom, i32 delta);
+func i32 atomic_i32_and(atomic_i32* atom, i32 mask);
+func i32 atomic_i32_or(atomic_i32* atom, i32 mask);
+func i32 atomic_i32_xor(atomic_i32* atom, i32 mask);
 
 // Atomically subtracts delta and returns the value before the subtraction.
 func i32 atomic_i32_sub(atomic_i32* atom, i32 delta);
@@ -68,9 +82,11 @@ func b32 atomic_i32_gte(atomic_i32* atom, i32 val);
 
 // Atomically loads and returns the current value.
 func u32 atomic_u32_get(atomic_u32* atom);
+func u32 atomic_u32_get_explicit(atomic_u32* atom, atomic_memory_order order);
 
 // Atomically replaces the value with val and returns the previous value.
 func u32 atomic_u32_set(atomic_u32* atom, u32 val);
+func u32 atomic_u32_set_explicit(atomic_u32* atom, u32 val, atomic_memory_order order);
 
 // If the current value equals *expected, replaces it with desired and returns true.
 // On failure, writes the current value into *expected and returns false.
@@ -79,6 +95,9 @@ func b32 atomic_u32_cmpex(atomic_u32* atom, u32* expected, u32 desired);
 
 // Atomically adds delta and returns the value before the addition.
 func u32 atomic_u32_add(atomic_u32* atom, u32 delta);
+func u32 atomic_u32_and(atomic_u32* atom, u32 mask);
+func u32 atomic_u32_or(atomic_u32* atom, u32 mask);
+func u32 atomic_u32_xor(atomic_u32* atom, u32 mask);
 
 // Atomically subtracts delta and returns the value before the subtraction.
 func u32 atomic_u32_sub(atomic_u32* atom, u32 delta);
@@ -97,9 +116,11 @@ func b32 atomic_u32_gte(atomic_u32* atom, u32 val);
 
 // Atomically loads and returns the current value.
 func i64 atomic_i64_get(atomic_i64* atom);
+func i64 atomic_i64_get_explicit(atomic_i64* atom, atomic_memory_order order);
 
 // Atomically replaces the value with val and returns the previous value.
 func i64 atomic_i64_set(atomic_i64* atom, i64 val);
+func i64 atomic_i64_set_explicit(atomic_i64* atom, i64 val, atomic_memory_order order);
 
 // If the current value equals *expected, replaces it with desired and returns true.
 // On failure, writes the current value into *expected and returns false.
@@ -107,6 +128,9 @@ func b32 atomic_i64_cmpex(atomic_i64* atom, i64* expected, i64 desired);
 
 // Atomically adds delta and returns the value before the addition.
 func i64 atomic_i64_add(atomic_i64* atom, i64 delta);
+func i64 atomic_i64_and(atomic_i64* atom, i64 mask);
+func i64 atomic_i64_or(atomic_i64* atom, i64 mask);
+func i64 atomic_i64_xor(atomic_i64* atom, i64 mask);
 
 // Atomically subtracts delta and returns the value before the subtraction.
 func i64 atomic_i64_sub(atomic_i64* atom, i64 delta);
@@ -125,9 +149,11 @@ func b32 atomic_i64_gte(atomic_i64* atom, i64 val);
 
 // Atomically loads and returns the current value.
 func u64 atomic_u64_get(atomic_u64* atom);
+func u64 atomic_u64_get_explicit(atomic_u64* atom, atomic_memory_order order);
 
 // Atomically replaces the value with val and returns the previous value.
 func u64 atomic_u64_set(atomic_u64* atom, u64 val);
+func u64 atomic_u64_set_explicit(atomic_u64* atom, u64 val, atomic_memory_order order);
 
 // If the current value equals *expected, replaces it with desired and returns true.
 // On failure, writes the current value into *expected and returns false.
@@ -135,6 +161,9 @@ func b32 atomic_u64_cmpex(atomic_u64* atom, u64* expected, u64 desired);
 
 // Atomically adds delta and returns the value before the addition.
 func u64 atomic_u64_add(atomic_u64* atom, u64 delta);
+func u64 atomic_u64_and(atomic_u64* atom, u64 mask);
+func u64 atomic_u64_or(atomic_u64* atom, u64 mask);
+func u64 atomic_u64_xor(atomic_u64* atom, u64 mask);
 
 // Atomically subtracts delta and returns the value before the subtraction.
 func u64 atomic_u64_sub(atomic_u64* atom, u64 delta);

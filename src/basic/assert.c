@@ -19,6 +19,8 @@
 global_var assert_mode assert_mode_current = ASSERT_MODE_DEFAULT;
 global_var mutex assert_mutex = NULL;
 global_var atomic_i32 assert_mutex_init = {0};
+global_var assert_hook_fn assert_hook_current = NULL;
+global_var void* assert_hook_user_data = NULL;
 
 // =========================================================================
 // Internal helpers
@@ -106,6 +108,34 @@ func void assert_set_mode(assert_mode mode) {
   TracyCZoneEnd(__tracy_zone_ctx);
 }
 
+func assert_mode assert_get_mode(void) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
+  mutex lock = assert_lock_get();
+  if (lock) {
+    mutex_lock(lock);
+  }
+  assert_mode mode = assert_mode_current;
+  if (lock) {
+    mutex_unlock(lock);
+  }
+  TracyCZoneEnd(__tracy_zone_ctx);
+  return mode;
+}
+
+func void assert_set_hook(assert_hook_fn hook_fn, void* user_data) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
+  mutex lock = assert_lock_get();
+  if (lock) {
+    mutex_lock(lock);
+  }
+  assert_hook_current = hook_fn;
+  assert_hook_user_data = user_data;
+  if (lock) {
+    mutex_unlock(lock);
+  }
+  TracyCZoneEnd(__tracy_zone_ctx);
+}
+
 func void _assert(b32 condition, cstr8 cond_msg, callsite site) {
   TracyCZoneN(__tracy_zone_ctx, __func__, 1);
   if (condition) {
@@ -127,6 +157,17 @@ func void _assert(b32 condition, cstr8 cond_msg, callsite site) {
     mutex_unlock(lock);
   }
 
+  assert_hook_fn hook_fn = NULL;
+  void* hook_user_data = NULL;
+  if (lock) {
+    mutex_lock(lock);
+  }
+  hook_fn = assert_hook_current;
+  hook_user_data = assert_hook_user_data;
+  if (lock) {
+    mutex_unlock(lock);
+  }
+
   msg assert_msg = {0};
   assert_msg.type = MSG_CORE_TYPE_ASSERT;
   msg_core_assert_data assert_data = {
@@ -138,6 +179,10 @@ func void _assert(b32 condition, cstr8 cond_msg, callsite site) {
   if (!msg_post(&assert_msg)) {
     TracyCZoneEnd(__tracy_zone_ctx);
     return;
+  }
+
+  if (hook_fn != NULL) {
+    hook_fn(mode, cond_msg, site, hook_user_data);
   }
 
   switch (mode) {

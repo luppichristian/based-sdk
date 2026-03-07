@@ -101,3 +101,7 @@ func b32 gamepads_has_axis(sz slot_idx, gamepad_axis axis);
 
 // Returns the cached signed axis value for axis.
 func i16 gamepads_get_axis(input_key key, sz slot_idx, gamepad_axis axis);
+func b32 gamepads_set_rumble(sz slot_idx, u16 low_freq, u16 high_freq, u32 duration_ms);
+func b32 gamepads_set_led(sz slot_idx, u8 red, u8 green, u8 blue);
+func b32 gamepads_set_axis_deadzone(sz slot_idx, gamepad_axis axis, i16 deadzone);
+func i16 gamepads_get_axis_deadzone(sz slot_idx, gamepad_axis axis);
