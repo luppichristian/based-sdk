@@ -57,8 +57,8 @@ typedef enum gamepad_axis {
   GAMEPAD_AXIS_COUNT = 6,
 } gamepad_axis;
 
-typedef i32 gamepad_touchpad_index;
-typedef i32 gamepad_finger_index;
+typedef i32 gamepad_touchpad_idx;
+typedef i32 gamepad_finger_idx;
 
 typedef enum gamepad_sensor_kind {
   GAMEPAD_SENSOR_KIND_INVALID = -1,

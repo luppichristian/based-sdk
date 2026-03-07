@@ -169,7 +169,7 @@ func path path_join_cstr(const path* lhs, cstr8 rhs) {
     cstr8_append_char(result.buf, size_of(result.buf), '/');
   }
 
-  cstr8_concat(result.buf, size_of(result.buf), rhs);
+  cstr8_cat(result.buf, size_of(result.buf), rhs);
   path_normalize(&result);
   return result;
 }

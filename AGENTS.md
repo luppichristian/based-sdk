@@ -177,8 +177,8 @@ Related core helper macros from `include/basic/` that are used pervasively:
 
 Common utility macros from `include/basic/utility_defines.h`:
 
-- Token/string helpers: `stringify`, `stringify_exp`, `concat`, `concat_exp`, `multiline_literal`.
-- Expression/array helpers: `expression`, `count_of`, `size_of_each`.
+- Token/string helpers: `strfy`, `strfy_exp`, `cat`, `cat_exp`, `multiline_literal`.
+- Expression/array helpers: `expr`, `count_of`, `size_of_each`.
 - Bit helpers: `bit`, `bit_is_set`, `bit_set`, `bit_unset`, `bit_toggle`.
 - Layout helpers: `field_sizeof`, `offset_of`, `container_of`.
 - Range/alignment helpers: `in_range`, `in_bounds`, `is_pow2`, `align_up`, `align_down`.

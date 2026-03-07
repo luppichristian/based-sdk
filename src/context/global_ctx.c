@@ -14,8 +14,8 @@ global_var atomic_i32 process_global_ctx_init = {0};
 thread_local global_var b8 global_user_data_access[CTX_USER_DATA_COUNT] = {0};
 
 func void global_user_data_access_set_all_local(b8 has_access) {
-  for (sz index = 0; index < CTX_USER_DATA_COUNT; index += 1) {
-    global_user_data_access[index] = has_access ? true : false;
+  for (sz idx = 0; idx < CTX_USER_DATA_COUNT; idx += 1) {
+    global_user_data_access[idx] = has_access ? true : false;
   }
 }
 
@@ -175,19 +175,19 @@ func heap* global_get_temp_heap(void) {
   return ctx_get_temp_heap(global_ctx_get_shared());
 }
 
-func void* global_get_user_data(ctx_user_data_idx index) {
+func void* global_get_user_data(ctx_user_data_idx idx) {
   global_ctx* wrapper = global_ctx_get();
-  if (!wrapper || index >= CTX_USER_DATA_COUNT) {
+  if (!wrapper || idx >= CTX_USER_DATA_COUNT) {
     return NULL;
   }
-  assert(index < CTX_USER_DATA_COUNT);
+  assert(idx < CTX_USER_DATA_COUNT);
 
   if (wrapper->mutex_handle) {
     mutex_lock(wrapper->mutex_handle);
   }
 
-  b32 has_access = global_user_data_access[index] != 0;
-  void* user_data = has_access ? wrapper->shared_ctx.user_data[index] : NULL;
+  b32 has_access = global_user_data_access[idx] != 0;
+  void* user_data = has_access ? wrapper->shared_ctx.user_data[idx] : NULL;
 
   if (wrapper->mutex_handle) {
     mutex_unlock(wrapper->mutex_handle);
@@ -196,20 +196,20 @@ func void* global_get_user_data(ctx_user_data_idx index) {
   return user_data;
 }
 
-func b32 global_set_user_data(ctx_user_data_idx index, void* user_data) {
+func b32 global_set_user_data(ctx_user_data_idx idx, void* user_data) {
   global_ctx* wrapper = global_ctx_get();
-  if (!wrapper || index >= CTX_USER_DATA_COUNT) {
+  if (!wrapper || idx >= CTX_USER_DATA_COUNT) {
     return false;
   }
-  assert(index < CTX_USER_DATA_COUNT);
+  assert(idx < CTX_USER_DATA_COUNT);
 
   if (wrapper->mutex_handle) {
     mutex_lock(wrapper->mutex_handle);
   }
 
-  b32 has_access = global_user_data_access[index] != 0;
+  b32 has_access = global_user_data_access[idx] != 0;
   if (has_access) {
-    wrapper->shared_ctx.user_data[index] = user_data;
+    wrapper->shared_ctx.user_data[idx] = user_data;
   }
 
   if (wrapper->mutex_handle) {
@@ -219,18 +219,18 @@ func b32 global_set_user_data(ctx_user_data_idx index, void* user_data) {
   return has_access;
 }
 
-func b32 global_has_user_data_access(ctx_user_data_idx index) {
-  if (!global_ctx_get() || index >= CTX_USER_DATA_COUNT) {
+func b32 global_has_user_data_access(ctx_user_data_idx idx) {
+  if (!global_ctx_get() || idx >= CTX_USER_DATA_COUNT) {
     return false;
   }
-  return global_user_data_access[index] != 0;
+  return global_user_data_access[idx] != 0;
 }
 
-func b32 global_set_user_data_access(ctx_user_data_idx index, b8 has_access) {
-  if (!global_ctx_get() || index >= CTX_USER_DATA_COUNT) {
+func b32 global_set_user_data_access(ctx_user_data_idx idx, b8 has_access) {
+  if (!global_ctx_get() || idx >= CTX_USER_DATA_COUNT) {
     return false;
   }
-  global_user_data_access[index] = has_access ? true : false;
+  global_user_data_access[idx] = has_access ? true : false;
   return true;
 }
 
@@ -256,4 +256,3 @@ func void global_log_begin_frame(void) {
 func log_frame* global_log_end_frame(u32 severity_mask) {
   return log_state_end_frame(global_get_log_state(), severity_mask);
 }
-

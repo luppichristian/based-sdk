@@ -83,21 +83,21 @@ func heap* ctx_get_temp_heap(ctx* context) {
   return ctx_is_init(context) ? &context->temp_heap : NULL;
 }
 
-func void* ctx_get_user_data(ctx* context, ctx_user_data_idx index) {
-  if (!ctx_is_init(context) || index >= CTX_USER_DATA_COUNT) {
+func void* ctx_get_user_data(ctx* context, ctx_user_data_idx idx) {
+  if (!ctx_is_init(context) || idx >= CTX_USER_DATA_COUNT) {
     return NULL;
   }
-  assert(index < CTX_USER_DATA_COUNT);
-  return context->user_data[index];
+  assert(idx < CTX_USER_DATA_COUNT);
+  return context->user_data[idx];
 }
 
-func b32 ctx_set_user_data(ctx* context, ctx_user_data_idx index, void* user_data) {
-  if (!ctx_is_init(context) || index >= CTX_USER_DATA_COUNT) {
+func b32 ctx_set_user_data(ctx* context, ctx_user_data_idx idx, void* user_data) {
+  if (!ctx_is_init(context) || idx >= CTX_USER_DATA_COUNT) {
     return false;
   }
-  assert(index < CTX_USER_DATA_COUNT);
+  assert(idx < CTX_USER_DATA_COUNT);
 
-  context->user_data[index] = user_data;
+  context->user_data[idx] = user_data;
   return true;
 }
 

@@ -3,8 +3,8 @@
 
 #pragma once
 
-#include "devices.h"
 #include "../windowing/window.h"
+#include "devices.h"
 
 typedef u32 pen_id;
 
@@ -60,8 +60,8 @@ func b32 tablet_is_available(void);
 // Returns the number of currently known tablet devices.
 func sz tablet_get_count(void);
 
-// Writes the tablet device id at index into out_id. Returns 1 on success, 0 otherwise.
-func b32 tablet_get_device_id(sz index, device_id* out_id);
+// Writes the tablet device id at idx into out_id. Returns 1 on success, 0 otherwise.
+func b32 tablet_get_device_id(sz idx, device_id* out_id);
 
 // Writes the latest cached pen state into out_state. Returns 1 on success, 0 otherwise.
 func b32 tablet_get_last_pen_state(tablet_pen_state* out_state);

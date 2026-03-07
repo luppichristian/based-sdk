@@ -126,7 +126,7 @@ func sz cstr8_copy_n(c8* dst, sz dst_size, cstr8 src, sz cnt) {
   return copy_len;
 }
 
-func sz cstr8_concat(c8* dst, sz dst_cap, cstr8 src) {
+func sz cstr8_cat(c8* dst, sz dst_cap, cstr8 src) {
   if (dst_cap == 0) {
     return 0;
   }
@@ -181,7 +181,7 @@ func b32 cstr8_append_format(c8* dst, sz dst_cap, cstr8 fmt, ...) {
   }
   va_list args;
   va_start(args, fmt);
-  int result = vsnprintf(dst + len, dst_cap - len, fmt, args);
+  int result = cstr8_format(dst + len, dst_cap - len, fmt, args);
   va_end(args);
   return (result >= 0 && (sz)result < dst_cap - len) ? 1 : 0;
 }
@@ -191,7 +191,7 @@ func b32 cstr8_append_vformat(c8* dst, sz dst_cap, cstr8 fmt, va_list args) {
   if (len >= dst_cap) {
     return 0;
   }
-  int result = vsnprintf(dst + len, dst_cap - len, fmt, args);
+  int result = cstr8_vformat(dst + len, dst_cap - len, fmt, args);
   return (result >= 0 && (sz)result < dst_cap - len) ? 1 : 0;
 }
 
@@ -551,7 +551,7 @@ func sz cstr16_copy_n(c16* dst, sz dst_size, cstr16 src, sz cnt) {
   return copy_len;
 }
 
-func sz cstr16_concat(c16* dst, sz dst_cap, cstr16 src) {
+func sz cstr16_cat(c16* dst, sz dst_cap, cstr16 src) {
   if (dst_cap == 0) {
     return 0;
   }
@@ -922,7 +922,7 @@ func sz cstr32_copy_n(c32* dst, sz dst_size, cstr32 src, sz cnt) {
   return copy_len;
 }
 
-func sz cstr32_concat(c32* dst, sz dst_cap, cstr32 src) {
+func sz cstr32_cat(c32* dst, sz dst_cap, cstr32 src) {
   if (dst_cap == 0) {
     return 0;
   }

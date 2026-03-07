@@ -17,7 +17,7 @@ func sz cstr8_len(cstr8 str);
 // Returns 1 if str is empty (first byte is null), 0 otherwise.
 func b32 cstr8_is_empty(cstr8 str);
 
-// Sets str to the empty string (writes a null terminator at index 0).
+// Sets str to the empty string (writes a null terminator at idx 0).
 func void cstr8_clear(c8* str);
 
 // Lexicographically compares lhs and rhs. Returns 0 if equal, <0 or >0 otherwise.
@@ -37,7 +37,7 @@ func sz cstr8_copy(c8* dst, sz dst_size, cstr8 src);
 func sz cstr8_copy_n(c8* dst, sz dst_size, cstr8 src, sz cnt);
 
 // Appends src to dst. Returns the new length, or the original length if dst_cap was too small.
-func sz cstr8_concat(c8* dst, sz dst_cap, cstr8 src);
+func sz cstr8_cat(c8* dst, sz dst_cap, cstr8 src);
 
 // Appends a single character to dst. Returns the new length, or original length if dst_cap was too small.
 func sz cstr8_append_char(c8* dst, sz dst_cap, c8 chr);
@@ -136,7 +136,7 @@ func sz cstr16_len(cstr16 str);
 // Returns 1 if str is empty (first unit is null), 0 otherwise.
 func b32 cstr16_is_empty(cstr16 str);
 
-// Sets str to the empty string (writes a null terminator at index 0).
+// Sets str to the empty string (writes a null terminator at idx 0).
 func void cstr16_clear(c16* str);
 
 // Lexicographically compares lhs and rhs. Returns 0 if equal, <0 or >0 otherwise.
@@ -156,7 +156,7 @@ func sz cstr16_copy(c16* dst, sz dst_size, cstr16 src);
 func sz cstr16_copy_n(c16* dst, sz dst_size, cstr16 src, sz cnt);
 
 // Appends src to dst. Returns the new length, or the original length if dst_cap was too small.
-func sz cstr16_concat(c16* dst, sz dst_cap, cstr16 src);
+func sz cstr16_cat(c16* dst, sz dst_cap, cstr16 src);
 
 // Appends a single code unit to dst. Returns the new length, or original length if dst_cap was too small.
 func sz cstr16_append_char(c16* dst, sz dst_cap, c16 chr);
@@ -238,7 +238,7 @@ func sz cstr32_len(cstr32 str);
 // Returns 1 if str is empty (first unit is null), 0 otherwise.
 func b32 cstr32_is_empty(cstr32 str);
 
-// Sets str to the empty string (writes a null terminator at index 0).
+// Sets str to the empty string (writes a null terminator at idx 0).
 func void cstr32_clear(c32* str);
 
 // Lexicographically compares lhs and rhs. Returns 0 if equal, <0 or >0 otherwise.
@@ -258,7 +258,7 @@ func sz cstr32_copy(c32* dst, sz dst_size, cstr32 src);
 func sz cstr32_copy_n(c32* dst, sz dst_size, cstr32 src, sz cnt);
 
 // Appends src to dst. Returns the new length, or the original length if dst_cap was too small.
-func sz cstr32_concat(c32* dst, sz dst_cap, cstr32 src);
+func sz cstr32_cat(c32* dst, sz dst_cap, cstr32 src);
 
 // Appends a single codepoint to dst. Returns the new length, or original length if dst_cap was too small.
 func sz cstr32_append_char(c32* dst, sz dst_cap, c32 chr);

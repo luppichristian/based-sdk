@@ -63,8 +63,8 @@ func heap* ctx_get_temp_heap(ctx* context);
 
 // Accesses one generic user-data slot.
 // Out-of-range access returns NULL / false.
-func void* ctx_get_user_data(ctx* context, ctx_user_data_idx index);
-func b32 ctx_set_user_data(ctx* context, ctx_user_data_idx index, void* user_data);
+func void* ctx_get_user_data(ctx* context, ctx_user_data_idx idx);
+func b32 ctx_set_user_data(ctx* context, ctx_user_data_idx idx, void* user_data);
 
 // Clears temporary allocators in the context.
 func void ctx_clear_temp(ctx* context);

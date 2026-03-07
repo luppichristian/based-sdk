@@ -20,13 +20,13 @@ func sz cmdline_get_count(cmdline cmdl);
 // Returns 1 if the command line contains no entries, 0 otherwise.
 func b32 cmdline_is_empty(cmdline cmdl);
 
-// Returns argv[index], or NULL if index is out of range.
-func cstr8 cmdline_get_arg(cmdline cmdl, sz index);
+// Returns argv[idx], or NULL if idx is out of range.
+func cstr8 cmdline_get_arg(cmdline cmdl, sz idx);
 
 // Returns argv[0], or NULL if no entries are present.
 func cstr8 cmdline_get_program(cmdline cmdl);
 
-// Searches for an exact argument match. Writes the index on success when out_idx is non-NULL.
+// Searches for an exact argument match. Writes the idx on success when out_idx is non-NULL.
 func b32 cmdline_find(cmdline cmdl, cstr8 arg, sz* out_idx);
 
 // Returns 1 if any argument exactly matches arg, 0 otherwise.

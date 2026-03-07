@@ -92,11 +92,11 @@ func cstr8 devices_get_audio_type_name(audio_device_type audio_type);
 // Returns the number of devices of type currently known to the backend.
 func sz devices_get_count(device_type type);
 
-// Writes the device id at index into out_id. Returns 1 on success, 0 otherwise.
-func b32 devices_get_device(device_type type, sz index, device_id* out_id);
+// Writes the device id at idx into out_id. Returns 1 on success, 0 otherwise.
+func b32 devices_get_device(device_type type, sz idx, device_id* out_id);
 
-// Writes the audio device id at index for audio_type into out_id. Returns 1 on success, 0 otherwise.
-func b32 devices_get_audio_device(audio_device_type audio_type, sz index, device_id* out_id);
+// Writes the audio device id at idx for audio_type into out_id. Returns 1 on success, 0 otherwise.
+func b32 devices_get_audio_device(audio_device_type audio_type, sz idx, device_id* out_id);
 
 // Returns the encoded audio device direction for id.
 func audio_device_type devices_get_audio_device_type(device_id id);

@@ -46,16 +46,16 @@ func b32 msg_remove_handler(u64 handler_id);
 
 func u64 msg_hash_path(cstr8 src) {
   u64 hash_value = 1469598103934665603ULL;
-  sz index = 0;
+  sz idx = 0;
 
   if (!src) {
     return 0;
   }
 
-  while (src[index]) {
-    hash_value ^= (u8)src[index];
+  while (src[idx]) {
+    hash_value ^= (u8)src[idx];
     hash_value *= 1099511628211ULL;
-    index += 1;
+    idx += 1;
   }
 
   return hash_value;
@@ -263,12 +263,12 @@ func b32 msg_dispatch_handlers(msg* posted_msg, msg_handler_stage stage) {
     dispatch_count = dispatch_cap;
   }
 
-  for (u32 index = 0; index < dispatch_count; index += 1) {
-    dispatch_entries[index] = msg_handler_entries[index];
+  for (u32 idx = 0; idx < dispatch_count; idx += 1) {
+    dispatch_entries[idx] = msg_handler_entries[idx];
   }
 
-  for (u32 index = 0; index < dispatch_count; index += 1) {
-    msg_handler_entry* entry = &dispatch_entries[index];
+  for (u32 idx = 0; idx < dispatch_count; idx += 1) {
+    msg_handler_entry* entry = &dispatch_entries[idx];
 
     if (entry->handler_fn == NULL) {
       continue;
@@ -596,8 +596,8 @@ func b32 msg_from_sdl(const SDL_Event* src, msg* out_msg) {
           out_msg,
           &(msg_core_gamepad_touchpad_data) {
               .device = {.type = DEVICE_TYPE_GAMEPAD, .instance = (u64)src->gtouchpad.which},
-              .touchpad = (gamepad_touchpad_index)src->gtouchpad.touchpad,
-              .finger = (gamepad_finger_index)src->gtouchpad.finger,
+              .touchpad = (gamepad_touchpad_idx)src->gtouchpad.touchpad,
+              .finger = (gamepad_finger_idx)src->gtouchpad.finger,
               .x = src->gtouchpad.x,
               .y = src->gtouchpad.y,
               .pressure = src->gtouchpad.pressure,
@@ -1192,8 +1192,8 @@ func b32 msg_to_sdl_event(msg* src, SDL_Event* out_event) {
       out_event->sensor.type = (SDL_EventType)src->type;
       out_event->sensor.timestamp = (Uint64)src->timestamp;
       out_event->sensor.which = (SDL_SensorID)sensor_to_native_id(msg_core_get_sensor(src)->sensor_id);
-      for (sz index = 0; index < count_of(msg_core_get_sensor(src)->data); index += 1) {
-        out_event->sensor.data[index] = msg_core_get_sensor(src)->data[index];
+      for (sz idx = 0; idx < count_of(msg_core_get_sensor(src)->data); idx += 1) {
+        out_event->sensor.data[idx] = msg_core_get_sensor(src)->data[idx];
       }
       out_event->sensor.sensor_timestamp = (Uint64)msg_core_get_sensor(src)->sensor_timestamp;
       return 1;
@@ -1358,12 +1358,12 @@ func b32 msg_remove_handler(u64 handler_id) {
   }
   assert(handler_id != 0);
 
-  for (u32 index = 0; index < msg_handler_count; index += 1) {
-    if (msg_handler_entries[index].handler_id != handler_id) {
+  for (u32 idx = 0; idx < msg_handler_count; idx += 1) {
+    if (msg_handler_entries[idx].handler_id != handler_id) {
       continue;
     }
 
-    for (u32 move_idx = index + 1; move_idx < msg_handler_count; move_idx += 1) {
+    for (u32 move_idx = idx + 1; move_idx < msg_handler_count; move_idx += 1) {
       msg_handler_entries[move_idx - 1] = msg_handler_entries[move_idx];
     }
 
@@ -1377,8 +1377,8 @@ func b32 msg_remove_handler(u64 handler_id) {
 }
 
 func void msg_clear_handlers(void) {
-  for (u32 index = 0; index < msg_handler_count; index += 1) {
-    msg_handler_entries[index] = (msg_handler_entry) {0};
+  for (u32 idx = 0; idx < msg_handler_count; idx += 1) {
+    msg_handler_entries[idx] = (msg_handler_entry) {0};
   }
 
   msg_handler_count = 0;

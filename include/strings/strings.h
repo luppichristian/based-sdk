@@ -74,7 +74,7 @@ func void str8_clear(str8* str);
 func sz str8_copy(str8* str, cstr8 src);
 
 // Appends src to str. Returns the new length, or original length if cap was too small.
-func sz str8_concat(str8* str, cstr8 src);
+func sz str8_cat(str8* str, cstr8 src);
 
 // Appends a single character to str. Returns the new length, or original length if cap was too small.
 func sz str8_append_char(str8* str, c8 chr);
@@ -192,7 +192,7 @@ func void str16_clear(str16* str);
 func sz str16_copy(str16* str, cstr16 src);
 
 // Appends src to str. Returns the new length, or original length if cap was too small.
-func sz str16_concat(str16* str, cstr16 src);
+func sz str16_cat(str16* str, cstr16 src);
 
 // Appends a single code unit to str. Returns the new length, or original length if cap was too small.
 func sz str16_append_char(str16* str, c16 chr);
@@ -298,7 +298,7 @@ func void str32_clear(str32* str);
 func sz str32_copy(str32* str, cstr32 src);
 
 // Appends src to str. Returns the new length, or original length if cap was too small.
-func sz str32_concat(str32* str, cstr32 src);
+func sz str32_cat(str32* str, cstr32 src);
 
 // Appends a single codepoint to str. Returns the new length, or original length if cap was too small.
 func sz str32_append_char(str32* str, c32 chr);

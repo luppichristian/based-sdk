@@ -99,8 +99,8 @@ func sz str8_copy(str8* str, cstr8 src) {
   return str->size;
 }
 
-func sz str8_concat(str8* str, cstr8 src) {
-  str->size = cstr8_concat(str->ptr, str->cap, src);
+func sz str8_cat(str8* str, cstr8 src) {
+  str->size = cstr8_cat(str->ptr, str->cap, src);
   return str->size;
 }
 
@@ -292,8 +292,8 @@ func sz str16_copy(str16* str, cstr16 src) {
   return str->size;
 }
 
-func sz str16_concat(str16* str, cstr16 src) {
-  str->size = cstr16_concat(str->ptr, str->cap, src);
+func sz str16_cat(str16* str, cstr16 src) {
+  str->size = cstr16_cat(str->ptr, str->cap, src);
   return str->size;
 }
 
@@ -451,8 +451,8 @@ func sz str32_copy(str32* str, cstr32 src) {
   return str->size;
 }
 
-func sz str32_concat(str32* str, cstr32 src) {
-  str->size = cstr32_concat(str->ptr, str->cap, src);
+func sz str32_cat(str32* str, cstr32 src) {
+  str->size = cstr32_cat(str->ptr, str->cap, src);
   return str->size;
 }
 

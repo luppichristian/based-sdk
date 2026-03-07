@@ -14,8 +14,8 @@ func u32 crc32_update(u32 crc, const void* data, sz size) {
   }
   assert(size == 0 || data != NULL);
   const u8* bytes = (const u8*)data;
-  for (sz index = 0; index < size; index++) {
-    crc ^= (u32)bytes[index];
+  for (sz idx = 0; idx < size; idx++) {
+    crc ^= (u32)bytes[idx];
     for (u32 bit_idx = 0; bit_idx < 8U; bit_idx++) {
       if ((crc & 1U) != 0U) {
         crc = (crc >> 1U) ^ 0xEDB88320U;
@@ -45,8 +45,8 @@ func u64 crc64_update(u64 crc, const void* data, sz size) {
   }
   assert(size == 0 || data != NULL);
   const u8* bytes = (const u8*)data;
-  for (sz index = 0; index < size; index++) {
-    crc ^= (u64)bytes[index] << 56U;
+  for (sz idx = 0; idx < size; idx++) {
+    crc ^= (u64)bytes[idx] << 56U;
     for (u32 bit_idx = 0; bit_idx < 8U; bit_idx++) {
       if ((crc & 0x8000000000000000ULL) != 0ULL) {
         crc = (crc << 1U) ^ 0x42F0E1EBA9EA3693ULL;

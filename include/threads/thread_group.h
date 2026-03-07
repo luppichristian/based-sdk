@@ -11,15 +11,15 @@
 // =========================================================================
 
 // Entry-point for a thread group member.
-// index is the thread's zero-based position within the group.
+// idx is the thread's zero-based position within the group.
 // arg   is the shared user argument passed to thread_group_create.
-typedef i32 (*thread_group_func)(u32 index, void* arg);
+typedef i32 (*thread_group_func)(u32 idx, void* arg);
 
 // Per-thread context stored alongside each thread handle. Internal — do not access directly.
 typedef struct {
   thread_group_func entry;
   void* arg;
-  u32 index;
+  u32 idx;
 } thread_group_slot;
 
 // A fixed-size group of threads all running the same entry function.
@@ -30,12 +30,12 @@ typedef struct {
   u32 count;
 } thread_group;
 
-// Creates a group of count threads, all executing entry(index, arg).
-// Threads start immediately; index runs from 0 to count-1.
+// Creates a group of count threads, all executing entry(idx, arg).
+// Threads start immediately; idx runs from 0 to count-1.
 // Returns the group by value; check with thread_group_is_valid on failure.
 func thread_group _thread_group_create(u32 count, thread_group_func entry, void* arg, callsite site);
 
-// Like thread_group_create, but each thread is named "<base_name>[<index>]".
+// Like thread_group_create, but each thread is named "<base_name>[<idx>]".
 // Names are visible in debuggers and profilers.
 func thread_group _thread_group_create_named(
     u32 count,
@@ -61,12 +61,12 @@ func b32 thread_group_is_valid(thread_group* group);
 // Returns the number of threads in the group.
 func u32 thread_group_get_count(thread_group* group);
 
-// Returns the thread handle at the given index, or NULL if the index is out of range.
-func thread thread_group_get(thread_group* group, u32 index);
+// Returns the thread handle at the given idx, or NULL if the idx is out of range.
+func thread thread_group_get(thread_group* group, u32 idx);
 
 // Blocks until every thread in the group has finished.
 // If out_exit_codes is non-NULL it must point to an array of at least thread_group_get_count() i32s;
-// each element is written with the corresponding thread's exit code in index order.
+// each element is written with the corresponding thread's exit code in idx order.
 // Returns true if all joins succeeded, false otherwise.
 func b32 thread_group_join_all(thread_group* group, i32* out_exit_codes);
 

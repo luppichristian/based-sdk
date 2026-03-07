@@ -39,6 +39,7 @@ func mutex assert_lock_get(void) {
   while (atomic_i32_get(&assert_mutex_init) != 2) {
     atomic_pause();
   }
+
   atomic_fence_acquire();
   return assert_mutex;
 }

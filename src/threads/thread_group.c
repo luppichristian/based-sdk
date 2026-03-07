@@ -15,8 +15,8 @@ func i32 thread_group_wrapper(void* raw) {
   if (slot == NULL || slot->entry == NULL) {
     return 0;
   }
-  assert(slot->index < U32_MAX);
-  return slot->entry(slot->index, slot->arg);
+  assert(slot->idx < U32_MAX);
+  return slot->entry(slot->idx, slot->arg);
 }
 
 func allocator thread_group_allocator_resolve(void) {
@@ -59,7 +59,7 @@ func thread_group create_impl(u32 count, thread_group_func entry, void* arg, cst
   for (u32 idx = 0; idx < count; idx += 1) {
     group.slots[idx].entry = entry;
     group.slots[idx].arg = arg;
-    group.slots[idx].index = idx;
+    group.slots[idx].idx = idx;
 
     if (base_name != NULL) {
       str8_medium name_buf = {0};
@@ -159,11 +159,11 @@ func u32 thread_group_get_count(thread_group* group) {
   return group ? group->count : 0;
 }
 
-func thread thread_group_get(thread_group* group, u32 index) {
-  if (!group || index >= group->count) {
+func thread thread_group_get(thread_group* group, u32 idx) {
+  if (!group || idx >= group->count) {
     return NULL;
   }
-  return group->threads[index];
+  return group->threads[idx];
 }
 
 func b32 thread_group_join_all(thread_group* group, i32* out_exit_codes) {
@@ -195,4 +195,3 @@ func void thread_group_detach_all(thread_group* group) {
     group->threads[idx] = NULL;
   }
 }
-

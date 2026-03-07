@@ -24,7 +24,7 @@ func u64 window_to_native_id(window_id src);
 func sz window_get_count(void);
 
 // Writes the window id at index into out_id. Returns 1 on success, 0 otherwise.
-func b32 window_get_id(sz index, window_id* out_id);
+func b32 window_get_id(sz idx, window_id* out_id);
 
 // Returns 1 when id maps to an existing window, 0 otherwise.
 func b32 window_is_valid(window_id id);

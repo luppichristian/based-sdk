@@ -29,17 +29,17 @@ func sz sensor_get_count(void) {
   return count > 0 ? (sz)count : 0;
 }
 
-func b32 sensor_get_id(sz index, sensor_id* out_id) {
+func b32 sensor_get_id(sz idx, sensor_id* out_id) {
   int count = 0;
   SDL_SensorID* ids = SDL_GetSensors(&count);
-  b32 found = ids != NULL && index < (sz)count;
+  b32 found = ids != NULL && idx < (sz)count;
 
   if (out_id) {
     *out_id = (sensor_id) {0};
   }
 
   if (found && out_id) {
-    *out_id = sensor_from_native_id((u64)ids[index]);
+    *out_id = sensor_from_native_id((u64)ids[idx]);
   }
 
   if (ids) {

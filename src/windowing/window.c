@@ -29,17 +29,17 @@ func sz window_get_count(void) {
   return count > 0 ? (sz)count : 0;
 }
 
-func b32 window_get_id(sz index, window_id* out_id) {
+func b32 window_get_id(sz idx, window_id* out_id) {
   int count = 0;
   SDL_Window** windows = SDL_GetWindows(&count);
-  b32 found = windows != NULL && index < (sz)count && windows[index] != NULL;
+  b32 found = windows != NULL && idx < (sz)count && windows[idx] != NULL;
 
   if (out_id) {
     *out_id = (window_id) {0};
   }
 
   if (found && out_id) {
-    *out_id = window_from_native_id((u64)SDL_GetWindowID(windows[index]));
+    *out_id = window_from_native_id((u64)SDL_GetWindowID(windows[idx]));
   }
 
   if (windows) {

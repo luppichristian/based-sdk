@@ -20,10 +20,10 @@ func sz touch_get_count(void) {
   return count > 0 ? (sz)count : 0;
 }
 
-func b32 touch_get_device_id(sz index, device_id* out_id) {
+func b32 touch_get_device_id(sz idx, device_id* out_id) {
   int count = 0;
   SDL_TouchID* ids = SDL_GetTouchDevices(&count);
-  b32 found = ids && index < (sz)count;
+  b32 found = ids && idx < (sz)count;
 
   if (out_id) {
     *out_id = (device_id) {0};
@@ -31,7 +31,7 @@ func b32 touch_get_device_id(sz index, device_id* out_id) {
 
   if (found && out_id) {
     out_id->type = DEVICE_TYPE_TOUCH;
-    out_id->instance = (u64)ids[index];
+    out_id->instance = (u64)ids[idx];
   }
 
   if (ids) {
@@ -65,7 +65,7 @@ func sz touch_get_finger_count(device_id id) {
   return count > 0 ? (sz)count : 0;
 }
 
-func b32 touch_get_finger(device_id id, sz index, touch_finger_state* out_finger) {
+func b32 touch_get_finger(device_id id, sz idx, touch_finger_state* out_finger) {
   int count = 0;
   SDL_Finger** fingers = NULL;
   b32 found = 0;
@@ -80,11 +80,11 @@ func b32 touch_get_finger(device_id id, sz index, touch_finger_state* out_finger
   assert(out_finger != NULL);
 
   fingers = SDL_GetTouchFingers((SDL_TouchID)id.instance, &count);
-  if (fingers && index < (sz)count && fingers[index]) {
-    out_finger->id = (finger_id)fingers[index]->id;
-    out_finger->x = fingers[index]->x;
-    out_finger->y = fingers[index]->y;
-    out_finger->pressure = fingers[index]->pressure;
+  if (fingers && idx < (sz)count && fingers[idx]) {
+    out_finger->id = (finger_id)fingers[idx]->id;
+    out_finger->x = fingers[idx]->x;
+    out_finger->y = fingers[idx]->y;
+    out_finger->pressure = fingers[idx]->pressure;
     found = 1;
   }
 

@@ -23,8 +23,8 @@ func u64 sensor_to_native_id(sensor_id src);
 // Returns the number of currently known sensor devices.
 func sz sensor_get_count(void);
 
-// Writes the sensor id at index into out_id. Returns 1 on success, 0 otherwise.
-func b32 sensor_get_id(sz index, sensor_id* out_id);
+// Writes the sensor id at idx into out_id. Returns 1 on success, 0 otherwise.
+func b32 sensor_get_id(sz idx, sensor_id* out_id);
 
 // Returns a backend-defined sensor name for id, or NULL when unavailable.
 func cstr8 sensor_get_name(sensor_id id);

@@ -26,10 +26,10 @@ func uuid uuid_from_bytes(const u8* bytes) {
 
 func uuid uuid_from_u64(u64 upper, u64 lower) {
   uuid value = {0};
-  for (sz index = 0; index < 8; index++) {
-    u32 shift = (u32)(56U - (u32)index * 8U);
-    value.bytes[index] = (u8)((upper >> shift) & 0xFFU);
-    value.bytes[index + 8] = (u8)((lower >> shift) & 0xFFU);
+  for (sz idx = 0; idx < 8; idx++) {
+    u32 shift = (u32)(56U - (u32)idx * 8U);
+    value.bytes[idx] = (u8)((upper >> shift) & 0xFFU);
+    value.bytes[idx + 8] = (u8)((lower >> shift) & 0xFFU);
   }
   return value;
 }
@@ -44,23 +44,23 @@ func void uuid_get_bytes(uuid value, u8* dst) {
 
 func u64 uuid_get_upper(uuid value) {
   u64 result = 0;
-  for (sz index = 0; index < 8; index++) {
-    result = (result << 8U) | (u64)value.bytes[index];
+  for (sz idx = 0; idx < 8; idx++) {
+    result = (result << 8U) | (u64)value.bytes[idx];
   }
   return result;
 }
 
 func u64 uuid_get_lower(uuid value) {
   u64 result = 0;
-  for (sz index = 8; index < 16; index++) {
-    result = (result << 8U) | (u64)value.bytes[index];
+  for (sz idx = 8; idx < 16; idx++) {
+    result = (result << 8U) | (u64)value.bytes[idx];
   }
   return result;
 }
 
 func b32 uuid_is_zero(uuid value) {
-  for (sz index = 0; index < count_of(value.bytes); index++) {
-    if (value.bytes[index] != 0U) {
+  for (sz idx = 0; idx < count_of(value.bytes); idx++) {
+    if (value.bytes[idx] != 0U) {
       return 0;
     }
   }

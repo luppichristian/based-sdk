@@ -14,72 +14,72 @@
 // All operations are O(1) except COUNT, which is O(n).
 
 // RING_LIST_EMPTY checks if the list is empty.
-#define RING_LIST_EMPTY(head) expression((head) == nullptr)
+#define RING_LIST_EMPTY(head) expr((head) == nullptr)
 
 // RING_LIST_COUNT counts the number of nodes by traversing the full circle.
-#define RING_LIST_COUNT(head, count) expression({ \
-  (count) = 0;                                    \
-  auto _node = (head);                            \
-  if (_node != nullptr) {                         \
-    do {                                          \
-      (count)++;                                  \
-      _node = _node->next;                        \
-    } while (_node != (head));                    \
-  }                                               \
+#define RING_LIST_COUNT(head, count) expr({ \
+  (count) = 0;                              \
+  auto _node = (head);                      \
+  if (_node != nullptr) {                   \
+    do {                                    \
+      (count)++;                            \
+      _node = _node->next;                  \
+    } while (_node != (head));              \
+  }                                         \
 })
 
 // RING_LIST_HEAD returns the head node of the list.
-#define RING_LIST_HEAD(head) expression((head))
+#define RING_LIST_HEAD(head) expr((head))
 
 // RING_LIST_TAIL returns the tail node (head->prev) of the list.
-#define RING_LIST_TAIL(head) expression((head) != nullptr ? (head)->prev : nullptr)
+#define RING_LIST_TAIL(head) expr((head) != nullptr ? (head)->prev : nullptr)
 
 // RING_LIST_PUSH_FRONT adds a node at the front; the node becomes the new head.
-#define RING_LIST_PUSH_FRONT(head, node) expression({ \
-  if ((head) == nullptr) {                            \
-    (node)->next = (node);                            \
-    (node)->prev = (node);                            \
-  } else {                                            \
-    (node)->next = (head);                            \
-    (node)->prev = (head)->prev;                      \
-    (head)->prev->next = (node);                      \
-    (head)->prev = (node);                            \
-  }                                                   \
-  (head) = (node);                                    \
+#define RING_LIST_PUSH_FRONT(head, node) expr({ \
+  if ((head) == nullptr) {                      \
+    (node)->next = (node);                      \
+    (node)->prev = (node);                      \
+  } else {                                      \
+    (node)->next = (head);                      \
+    (node)->prev = (head)->prev;                \
+    (head)->prev->next = (node);                \
+    (head)->prev = (node);                      \
+  }                                             \
+  (head) = (node);                              \
 })
 
 // RING_LIST_PUSH_BACK adds a node at the back (just before head).
-#define RING_LIST_PUSH_BACK(head, node) expression({ \
-  if ((head) == nullptr) {                           \
-    (node)->next = (node);                           \
-    (node)->prev = (node);                           \
-    (head) = (node);                                 \
-  } else {                                           \
-    (node)->next = (head);                           \
-    (node)->prev = (head)->prev;                     \
-    (head)->prev->next = (node);                     \
-    (head)->prev = (node);                           \
-  }                                                  \
+#define RING_LIST_PUSH_BACK(head, node) expr({ \
+  if ((head) == nullptr) {                     \
+    (node)->next = (node);                     \
+    (node)->prev = (node);                     \
+    (head) = (node);                           \
+  } else {                                     \
+    (node)->next = (head);                     \
+    (node)->prev = (head)->prev;               \
+    (head)->prev->next = (node);               \
+    (head)->prev = (node);                     \
+  }                                            \
 })
 
 // RING_LIST_POP_FRONT removes the head node and returns it; head advances to the next node.
-#define RING_LIST_POP_FRONT(head, node) expression({ \
-  (node) = (head);                                   \
-  if ((head) != nullptr) {                           \
-    if ((head)->next == (head)) {                    \
-      (head) = nullptr;                              \
-    } else {                                         \
-      (node)->next->prev = (node)->prev;             \
-      (node)->prev->next = (node)->next;             \
-      (head) = (node)->next;                         \
-    }                                                \
-    (node)->next = nullptr;                          \
-    (node)->prev = nullptr;                          \
-  }                                                  \
+#define RING_LIST_POP_FRONT(head, node) expr({ \
+  (node) = (head);                             \
+  if ((head) != nullptr) {                     \
+    if ((head)->next == (head)) {              \
+      (head) = nullptr;                        \
+    } else {                                   \
+      (node)->next->prev = (node)->prev;       \
+      (node)->prev->next = (node)->next;       \
+      (head) = (node)->next;                   \
+    }                                          \
+    (node)->next = nullptr;                    \
+    (node)->prev = nullptr;                    \
+  }                                            \
 })
 
 // RING_LIST_POP_BACK removes the tail node (head->prev) and returns it.
-#define RING_LIST_POP_BACK(head, node) expression({      \
+#define RING_LIST_POP_BACK(head, node) expr({            \
   (node) = ((head) != nullptr ? (head)->prev : nullptr); \
   if ((node) != nullptr) {                               \
     if ((head)->next == (head)) {                        \
@@ -94,34 +94,34 @@
 })
 
 // RING_LIST_REMOVE removes an arbitrary node from the list.
-#define RING_LIST_REMOVE(head, node) expression({ \
-  if ((node)->next == (node)) {                   \
-    (head) = nullptr;                             \
-  } else {                                        \
-    (node)->prev->next = (node)->next;            \
-    (node)->next->prev = (node)->prev;            \
-    if ((head) == (node)) (head) = (node)->next;  \
-  }                                               \
-  (node)->next = nullptr;                         \
-  (node)->prev = nullptr;                         \
+#define RING_LIST_REMOVE(head, node) expr({      \
+  if ((node)->next == (node)) {                  \
+    (head) = nullptr;                            \
+  } else {                                       \
+    (node)->prev->next = (node)->next;           \
+    (node)->next->prev = (node)->prev;           \
+    if ((head) == (node)) (head) = (node)->next; \
+  }                                              \
+  (node)->next = nullptr;                        \
+  (node)->prev = nullptr;                        \
 })
 
 // RING_LIST_INSERT_AFTER inserts 'node' immediately after 'after'.
-#define RING_LIST_INSERT_AFTER(head, after, node) expression({ \
-  (node)->prev = (after);                                      \
-  (node)->next = (after)->next;                                \
-  (after)->next->prev = (node);                                \
-  (after)->next = (node);                                      \
+#define RING_LIST_INSERT_AFTER(head, after, node) expr({ \
+  (node)->prev = (after);                                \
+  (node)->next = (after)->next;                          \
+  (after)->next->prev = (node);                          \
+  (after)->next = (node);                                \
 })
 
 // RING_LIST_INSERT_BEFORE inserts 'node' immediately before 'before'.
 // If 'before' is the current head, 'node' becomes the new head.
-#define RING_LIST_INSERT_BEFORE(head, before, node) expression({ \
-  (node)->next = (before);                                       \
-  (node)->prev = (before)->prev;                                 \
-  (before)->prev->next = (node);                                 \
-  (before)->prev = (node);                                       \
-  if ((head) == (before)) (head) = (node);                       \
+#define RING_LIST_INSERT_BEFORE(head, before, node) expr({ \
+  (node)->next = (before);                                 \
+  (node)->prev = (before)->prev;                           \
+  (before)->prev->next = (node);                           \
+  (before)->prev = (node);                                 \
+  if ((head) == (before)) (head) = (node);                 \
 })
 
 // RING_LIST_FOREACH iterates forward over every node starting from head.

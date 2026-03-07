@@ -555,7 +555,7 @@ func void _log(log_state* state, log_level level, callsite site, cstr8 fmt, ...)
   str8_large buf = {0};
   va_list args;
   va_start(args, fmt);
-  vsnprintf(buf, size_of(buf), fmt, args);
+  cstr8_vformat(buf, size_of(buf), fmt, args);
   va_end(args);
 
   msg log_msg = {0};
@@ -565,7 +565,7 @@ func void _log(log_state* state, log_level level, callsite site, cstr8 fmt, ...)
       .level = level,
       .source_site = site,
   };
-  snprintf(log_data.text, size_of(log_data.text), "%s", buf);
+  cstr8_format(log_data.text, size_of(log_data.text), "%s", buf);
   msg_core_fill_log(&log_msg, &log_data);
   if (!msg_post(&log_msg)) {
     return;
@@ -574,4 +574,3 @@ func void _log(log_state* state, log_level level, callsite site, cstr8 fmt, ...)
   log_state_store_msg(resolved, level, site, buf);
   log_emit(level, site, buf);
 }
-

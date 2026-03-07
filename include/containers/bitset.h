@@ -27,15 +27,15 @@
 
 // BITSET_SET — set the bit at index idx.
 #define BITSET_SET(arr, idx) \
-  expression(((arr)[(idx) / 64] |= (1ULL << ((idx) % 64))))
+  expr(((arr)[(idx) / 64] |= (1ULL << ((idx) % 64))))
 
 // BITSET_CLEAR — clear the bit at index idx.
 #define BITSET_CLEAR(arr, idx) \
-  expression(((arr)[(idx) / 64] &= ~(1ULL << ((idx) % 64))))
+  expr(((arr)[(idx) / 64] &= ~(1ULL << ((idx) % 64))))
 
 // BITSET_TOGGLE — toggle the bit at index idx.
 #define BITSET_TOGGLE(arr, idx) \
-  expression(((arr)[(idx) / 64] ^= (1ULL << ((idx) % 64))))
+  expr(((arr)[(idx) / 64] ^= (1ULL << ((idx) % 64))))
 
 // BITSET_TEST — evaluates to non-zero if the bit at index idx is set.
 #define BITSET_TEST(arr, idx) \
@@ -46,14 +46,14 @@
 // =========================================================================
 
 // BITSET_CLEAR_ALL — clear every bit across all word_count words.
-#define BITSET_CLEAR_ALL(arr, word_count) expression({ \
+#define BITSET_CLEAR_ALL(arr, word_count) expr({       \
   for (sz _wrd = 0; _wrd < (sz)(word_count); _wrd++) { \
     (arr)[_wrd] = 0ULL;                                \
   }                                                    \
 })
 
 // BITSET_SET_ALL — set every bit across all word_count words.
-#define BITSET_SET_ALL(arr, word_count) expression({   \
+#define BITSET_SET_ALL(arr, word_count) expr({         \
   for (sz _wrd = 0; _wrd < (sz)(word_count); _wrd++) { \
     (arr)[_wrd] = ~0ULL;                               \
   }                                                    \
@@ -65,35 +65,35 @@
 
 // BITSET_COUNT — store the total number of set bits across all words into out.
 // out must be an i32 lvalue.
-#define BITSET_COUNT(arr, word_count, out) expression({ \
-  (out) = 0;                                            \
-  for (sz _wrd = 0; _wrd < (sz)(word_count); _wrd++) {  \
-    (out) += popcount_u64((arr)[_wrd]);                 \
-  }                                                     \
+#define BITSET_COUNT(arr, word_count, out) expr({      \
+  (out) = 0;                                           \
+  for (sz _wrd = 0; _wrd < (sz)(word_count); _wrd++) { \
+    (out) += popcount_u64((arr)[_wrd]);                \
+  }                                                    \
 })
 
 // BITSET_FIRST_SET — store the index of the lowest set bit into out, or -1 if none.
 // out must be an i32 lvalue.
-#define BITSET_FIRST_SET(arr, word_count, out) expression({ \
-  (out) = -1;                                               \
-  for (sz _wrd = 0; _wrd < (sz)(word_count); _wrd++) {      \
-    if ((arr)[_wrd] != 0ULL) {                              \
-      (out) = (i32)(_wrd * 64U) + ctz_u64((arr)[_wrd]);     \
-      break;                                                \
-    }                                                       \
-  }                                                         \
+#define BITSET_FIRST_SET(arr, word_count, out) expr({   \
+  (out) = -1;                                           \
+  for (sz _wrd = 0; _wrd < (sz)(word_count); _wrd++) {  \
+    if ((arr)[_wrd] != 0ULL) {                          \
+      (out) = (i32)(_wrd * 64U) + ctz_u64((arr)[_wrd]); \
+      break;                                            \
+    }                                                   \
+  }                                                     \
 })
 
 // BITSET_FIRST_CLEAR — store the index of the lowest clear bit into out, or -1 if none.
 // out must be an i32 lvalue.
-#define BITSET_FIRST_CLEAR(arr, word_count, out) expression({ \
-  (out) = -1;                                                 \
-  for (sz _wrd = 0; _wrd < (sz)(word_count); _wrd++) {        \
-    if (~(arr)[_wrd] != 0ULL) {                               \
-      (out) = (i32)(_wrd * 64U) + ctz_u64(~(arr)[_wrd]);      \
-      break;                                                  \
-    }                                                         \
-  }                                                           \
+#define BITSET_FIRST_CLEAR(arr, word_count, out) expr({  \
+  (out) = -1;                                            \
+  for (sz _wrd = 0; _wrd < (sz)(word_count); _wrd++) {   \
+    if (~(arr)[_wrd] != 0ULL) {                          \
+      (out) = (i32)(_wrd * 64U) + ctz_u64(~(arr)[_wrd]); \
+      break;                                             \
+    }                                                    \
+  }                                                      \
 })
 
 // =========================================================================

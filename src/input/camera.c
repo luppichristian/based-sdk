@@ -29,17 +29,17 @@ func sz camera_get_count(void) {
   return count > 0 ? (sz)count : 0;
 }
 
-func b32 camera_get_id(sz index, camera_id* out_id) {
+func b32 camera_get_id(sz idx, camera_id* out_id) {
   int count = 0;
   SDL_CameraID* ids = SDL_GetCameras(&count);
-  b32 found = ids != NULL && index < (sz)count;
+  b32 found = ids != NULL && idx < (sz)count;
 
   if (out_id) {
     *out_id = (camera_id) {0};
   }
 
   if (found && out_id) {
-    *out_id = camera_from_native_id((u64)ids[index]);
+    *out_id = camera_from_native_id((u64)ids[idx]);
   }
 
   if (ids) {

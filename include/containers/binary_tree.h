@@ -15,37 +15,37 @@
 // (e.g. red-black trees) implemented on top of this header.
 
 // BINARY_TREE_IS_ROOT checks if a node has no parent (i.e. it is the tree root).
-#define BINARY_TREE_IS_ROOT(node) expression((node)->parent == nullptr)
+#define BINARY_TREE_IS_ROOT(node) expr((node)->parent == nullptr)
 
 // BINARY_TREE_IS_LEAF checks if a node has no children.
 #define BINARY_TREE_IS_LEAF(node) \
-  expression((node)->left == nullptr && (node)->right == nullptr)
+  expr((node)->left == nullptr && (node)->right == nullptr)
 
 // BINARY_TREE_INSERT_LEFT sets node as the left child of parent.
 // The previous left child is orphaned; the caller is responsible for it.
-#define BINARY_TREE_INSERT_LEFT(parent, node) expression({ \
-  (node)->parent = (parent);                               \
-  (parent)->left = (node);                                 \
+#define BINARY_TREE_INSERT_LEFT(parent, node) expr({ \
+  (node)->parent = (parent);                         \
+  (parent)->left = (node);                           \
 })
 
 // BINARY_TREE_INSERT_RIGHT sets node as the right child of parent.
 // The previous right child is orphaned; the caller is responsible for it.
-#define BINARY_TREE_INSERT_RIGHT(parent, node) expression({ \
-  (node)->parent = (parent);                                \
-  (parent)->right = (node);                                 \
+#define BINARY_TREE_INSERT_RIGHT(parent, node) expr({ \
+  (node)->parent = (parent);                          \
+  (parent)->right = (node);                           \
 })
 
 // BINARY_TREE_REMOVE detaches node from its parent. The node's own subtree is unmodified.
 // If node is the root, *root_ptr is set to nullptr.
-#define BINARY_TREE_REMOVE(root_ptr, node) expression({ \
-  if ((node)->parent == nullptr) {                      \
-    *(root_ptr) = nullptr;                              \
-  } else if ((node) == (node)->parent->left) {          \
-    (node)->parent->left = nullptr;                     \
-  } else {                                              \
-    (node)->parent->right = nullptr;                    \
-  }                                                     \
-  (node)->parent = nullptr;                             \
+#define BINARY_TREE_REMOVE(root_ptr, node) expr({ \
+  if ((node)->parent == nullptr) {                \
+    *(root_ptr) = nullptr;                        \
+  } else if ((node) == (node)->parent->left) {    \
+    (node)->parent->left = nullptr;               \
+  } else {                                        \
+    (node)->parent->right = nullptr;              \
+  }                                               \
+  (node)->parent = nullptr;                       \
 })
 
 // BINARY_TREE_ROTATE_LEFT performs a left rotation around node.
@@ -57,7 +57,7 @@
 //        /   \    /    \
 //       b     c  a      b
 //
-#define BINARY_TREE_ROTATE_LEFT(root_ptr, node) expression({  \
+#define BINARY_TREE_ROTATE_LEFT(root_ptr, node) expr({        \
   auto _right = (node)->right;                                \
   (node)->right = _right->left;                               \
   if (_right->left != nullptr) _right->left->parent = (node); \
@@ -81,7 +81,7 @@
 //   /  \                  /   \
 //  a    b                b     c
 //
-#define BINARY_TREE_ROTATE_RIGHT(root_ptr, node) expression({ \
+#define BINARY_TREE_ROTATE_RIGHT(root_ptr, node) expr({       \
   auto _left = (node)->left;                                  \
   (node)->left = _left->right;                                \
   if (_left->right != nullptr) _left->right->parent = (node); \

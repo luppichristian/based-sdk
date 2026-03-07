@@ -30,7 +30,7 @@ func u64 display_to_native_id(display_id src);
 func sz display_get_count(void);
 
 // Writes the display id at index into out_id. Returns 1 on success, 0 otherwise.
-func b32 display_get_id(sz index, display_id* out_id);
+func b32 display_get_id(sz idx, display_id* out_id);
 
 // Returns the primary display id, or an invalid id on failure.
 func display_id display_get_primary_id(void);

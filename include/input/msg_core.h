@@ -7,21 +7,21 @@
 #include "../basic/codespace.h"
 #include "../basic/log.h"
 #include "../basic/primitive_types.h"
+#include "../context/global_ctx.h"
+#include "../context/thread_ctx.h"
 #include "../filesystem/pathwatch.h"
 #include "../strings/cstrings.h"
 #include "../windowing/display.h"
 #include "../windowing/window.h"
-#include "../context/global_ctx.h"
-#include "../context/thread_ctx.h"
 #include "camera.h"
 #include "devices.h"
 #include "gamepads.h"
 #include "keyboard.h"
 #include "mouse.h"
+#include "msg.h"
 #include "sensor.h"
 #include "tablet.h"
 #include "touch.h"
-#include "msg.h"
 
 // Event types mirrored from the backend event system.
 typedef enum msg_core_type {
@@ -343,8 +343,8 @@ typedef struct msg_core_gamepad_button_data {
 // Gamepad touchpad payload.
 typedef struct msg_core_gamepad_touchpad_data {
   device_id device;
-  gamepad_touchpad_index touchpad;
-  gamepad_finger_index finger;
+  gamepad_touchpad_idx touchpad;
+  gamepad_finger_idx finger;
   f32 x;
   f32 y;
   f32 pressure;

@@ -56,12 +56,12 @@ func heap* thread_get_temp_heap(void) {
   return ctx_get_temp_heap(thread_ctx_get());
 }
 
-func void* thread_get_user_data(ctx_user_data_idx index) {
-  return ctx_get_user_data(thread_ctx_get(), index);
+func void* thread_get_user_data(ctx_user_data_idx idx) {
+  return ctx_get_user_data(thread_ctx_get(), idx);
 }
 
-func b32 thread_set_user_data(ctx_user_data_idx index, void* user_data) {
-  return ctx_set_user_data(thread_ctx_get(), index, user_data);
+func b32 thread_set_user_data(ctx_user_data_idx idx, void* user_data) {
+  return ctx_set_user_data(thread_ctx_get(), idx, user_data);
 }
 
 func void thread_clear_temp(void) {
@@ -138,4 +138,3 @@ func void thread_ctx_quit(void) {
   thread_log_trace("thread_ctx_quit: thread_id=%llu", (unsigned long long)thread_id());
   ctx_quit(&thread_ctx);
 }
-

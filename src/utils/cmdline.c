@@ -25,12 +25,12 @@ func b32 cmdline_is_empty(cmdline cmdl) {
   return cmdl.count == 0 ? 1 : 0;
 }
 
-func cstr8 cmdline_get_arg(cmdline cmdl, sz index) {
-  if (index >= cmdl.count || cmdl.args == NULL) {
+func cstr8 cmdline_get_arg(cmdline cmdl, sz idx) {
+  if (idx >= cmdl.count || cmdl.args == NULL) {
     return NULL;
   }
-  assert(index < cmdl.count);
-  return cmdl.args[index];
+  assert(idx < cmdl.count);
+  return cmdl.args[idx];
 }
 
 func cstr8 cmdline_get_program(cmdline cmdl) {
@@ -43,11 +43,11 @@ func b32 cmdline_find(cmdline cmdl, cstr8 arg, sz* out_idx) {
   }
   assert(arg[0] != '\0');
 
-  for (sz index = 0; index < cmdl.count; index++) {
-    cstr8 value = cmdline_get_arg(cmdl, index);
+  for (sz idx = 0; idx < cmdl.count; idx++) {
+    cstr8 value = cmdline_get_arg(cmdl, idx);
     if (value != NULL && cstr8_cmp(value, arg) == 0) {
       if (out_idx != NULL) {
-        *out_idx = index;
+        *out_idx = idx;
       }
       return 1;
     }
@@ -70,14 +70,14 @@ func cstr8 cmdline_get_option(cmdline cmdl, cstr8 name) {
     return NULL;
   }
 
-  for (sz index = 1; index < cmdl.count; index++) {
-    cstr8 value = cmdline_get_arg(cmdl, index);
+  for (sz idx = 1; idx < cmdl.count; idx++) {
+    cstr8 value = cmdline_get_arg(cmdl, idx);
     if (value == NULL) {
       continue;
     }
 
     if (cstr8_cmp(value, name) == 0) {
-      return cmdline_get_arg(cmdl, index + 1);
+      return cmdline_get_arg(cmdl, idx + 1);
     }
 
     if (cstr8_cmp_n(value, name, name_len) == 0 && value[name_len] == '=') {

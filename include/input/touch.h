@@ -33,8 +33,8 @@ func b32 touch_is_available(void);
 // Returns the number of currently known touch devices.
 func sz touch_get_count(void);
 
-// Writes the touch device id at index into out_id. Returns 1 on success, 0 otherwise.
-func b32 touch_get_device_id(sz index, device_id* out_id);
+// Writes the touch device id at idx into out_id. Returns 1 on success, 0 otherwise.
+func b32 touch_get_device_id(sz idx, device_id* out_id);
 
 // Returns the backend-reported kind for id.
 func touch_device_kind touch_get_device_kind(device_id id);
@@ -42,5 +42,5 @@ func touch_device_kind touch_get_device_kind(device_id id);
 // Returns the number of active fingers currently tracked for id.
 func sz touch_get_finger_count(device_id id);
 
-// Writes the finger state at index into out_finger. Returns 1 on success, 0 otherwise.
-func b32 touch_get_finger(device_id id, sz index, touch_finger_state* out_finger);
+// Writes the finger state at idx into out_finger. Returns 1 on success, 0 otherwise.
+func b32 touch_get_finger(device_id id, sz idx, touch_finger_state* out_finger);

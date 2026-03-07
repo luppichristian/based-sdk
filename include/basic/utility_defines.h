@@ -9,10 +9,10 @@
 /* General-purpose utility macros used throughout the project.
 
 Stringification and token-pasting:
-- 'stringify(x)'                    turns x into a string literal without expanding macros.
-- 'stringify_exp(x)'                turns x into a string literal after macro expansion.
-- 'concat(x, y)'                    pastes two tokens together without expanding macros.
-- 'concat_exp(x, y)'                pastes two tokens together after macro expansion.
+- 'strfy(x)'                    turns x into a string literal without expanding macros.
+- 'strfy_exp(x)'                turns x into a string literal after macro expansion.
+- 'cat(x, y)'                    pastes two tokens together without expanding macros.
+- 'cat_exp(x, y)'                pastes two tokens together after macro expansion.
 - 'expression(x)'                   evaluates x as an expression.
 
 Array utilities:
@@ -28,7 +28,7 @@ Bit utilities:
 - 'bit_toggle(bits, b)'             toggles bit b in bits.
 
 Struct / pointer utilities:
-- 'field_sizeof(type, field)'       size in bytes of a field within a struct.
+- 'size_of_field(type, field)'       size in bytes of a field within a struct.
 - 'offset_of(type, field)'          byte offset of a field within a struct.
 - 'container_of(ptr, type, field)'  pointer to the enclosing struct given a pointer to one of its fields.
 
@@ -62,20 +62,20 @@ Big numeric utilities (powers of 1000):
 // Stringification and Token-Pasting
 // =========================================================================
 
-// stringify — converts x to a string literal without expanding macros.
-#define stringify(x) #x
+// strfy — converts x to a string literal without expanding macros.
+#define strfy(x) #x
 
-// stringify_exp — converts x to a string literal after macro expansion.
-#define stringify_exp(x) stringify(x)
+// strfy_exp — converts x to a string literal after macro expansion.
+#define strfy_exp(x) strfy(x)
 
-// concat — pastes two tokens together without expanding macros.
-#define concat(x, y) x##y
+// cat — pastes two tokens together without expanding macros.
+#define cat(x, y) x##y
 
-// concat_exp — pastes two tokens together after macro expansion.
-#define concat_exp(x, y) concat(x, y)
+// cat_exp — pastes two tokens together after macro expansion.
+#define cat_exp(x, y) cat(x, y)
 
-// expression — evaluates x as an expression, ensuring it is not treated as a statement.
-#define expression(x) \
+// expr — evaluates x as an expression, ensuring it is not treated as a statement.
+#define expr(x) \
   do { (void)(x); } while (0)
 
 // =========================================================================
@@ -89,7 +89,7 @@ Big numeric utilities (powers of 1000):
 #define size_of_each(x) size_of((x)[0])
 
 // multiline_literal — converts a multi-line token sequence into a string literal.
-#define multiline_literal(...) stringify_exp(__VA_ARGS__)
+#define multiline_literal(...) strfy_exp(__VA_ARGS__)
 
 // =========================================================================
 // Bit Utilities
@@ -114,8 +114,11 @@ Big numeric utilities (powers of 1000):
 // Struct / Pointer Utilities
 // =========================================================================
 
-// field_sizeof — size in bytes of a field within a struct.
-#define field_sizeof(type, field) size_of(((type*)0)->field)
+// field_of - get field of a structure.
+#define field_of(type, field) ((type*)0)->field
+
+// size_of_field — size in bytes of a field within a struct.
+#define size_of_field(type, field) size_of(field_of(type, field))
 
 // offset_of — byte offset of a field within a struct.
 #define offset_of(type, field) offsetof(type, field)
@@ -139,18 +142,18 @@ Big numeric utilities (powers of 1000):
 
 // swap — swaps the values of a and b using a temporary of the given type.
 // Note: type must be provided explicitly; a and b must not have side effects.
-#define swap(type, a, b) expression({ \
-  type _swap_tmp = (a);               \
-  (a) = (b);                          \
-  (b) = _swap_tmp;                    \
+#define swap(type, a, b) expr({ \
+  type _swap_tmp = (a);         \
+  (a) = (b);                    \
+  (b) = _swap_tmp;              \
 })
 
 // refswap — swaps the values pointed to by a_ptr and b_ptr using a temporary of the given type.
 // Note: type must be provided explicitly; pointers must be valid and non-null.
-#define refswap(type, a_ptr, b_ptr) expression({ \
-  type _refswap_tmp = *(a_ptr);                  \
-  *(a_ptr) = *(b_ptr);                           \
-  *(b_ptr) = _refswap_tmp;                       \
+#define refswap(type, a_ptr, b_ptr) expr({ \
+  type _refswap_tmp = *(a_ptr);            \
+  *(a_ptr) = *(b_ptr);                     \
+  *(b_ptr) = _refswap_tmp;                 \
 })
 
 // =========================================================================

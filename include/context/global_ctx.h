@@ -46,12 +46,12 @@ func heap* global_get_temp_heap(void);
 // User-data access is protected by per-thread permissions.
 // By default, the thread that initializes global_ctx has access to every slot;
 // other threads start with no access.
-func b32 global_has_user_data_access(ctx_user_data_idx index);
-func void* global_get_user_data(ctx_user_data_idx index);
-func b32 global_set_user_data(ctx_user_data_idx index, void* user_data);
+func b32 global_has_user_data_access(ctx_user_data_idx idx);
+func void* global_get_user_data(ctx_user_data_idx idx);
+func b32 global_set_user_data(ctx_user_data_idx idx, void* user_data);
 
 // Permission helpers for the calling thread.
-func b32 global_set_user_data_access(ctx_user_data_idx index, b8 has_access);
+func b32 global_set_user_data_access(ctx_user_data_idx idx, b8 has_access);
 func void global_set_user_data_access_all(b8 has_access);
 
 func void global_clear_temp(void);

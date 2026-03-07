@@ -28,8 +28,8 @@ func u64 camera_to_native_id(camera_id src);
 // Returns the number of currently known camera devices.
 func sz camera_get_count(void);
 
-// Writes the camera id at index into out_id. Returns 1 on success, 0 otherwise.
-func b32 camera_get_id(sz index, camera_id* out_id);
+// Writes the camera id at idx into out_id. Returns 1 on success, 0 otherwise.
+func b32 camera_get_id(sz idx, camera_id* out_id);
 
 // Returns a backend-defined camera name for id, or NULL when unavailable.
 func cstr8 camera_get_name(camera_id id);

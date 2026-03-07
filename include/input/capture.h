@@ -28,7 +28,7 @@ func void input_capture_release_key(input_key key);
 // Releases all non-default capture keys.
 func void input_capture_release_all_keys(void);
 
-// Returns the slot index for key, creating one when possible.
+// Returns the slot idx for key, creating one when possible.
 // Returns INPUT_CAPTURE_MAX_KEYS when no slot is available.
 func sz input_capture_get_slot(input_key key);
 

@@ -98,12 +98,12 @@ func void system_query_windows_version(system_info* out_info) {
   }
 
   system_copy_string(out_info->os_name, size_of(out_info->os_name), "Windows");
-  snprintf(out_info->os_version,
-           size_of(out_info->os_version),
-           "%lu.%lu build %lu",
-           (unsigned long)version_info.dwMajorVersion,
-           (unsigned long)version_info.dwMinorVersion,
-           (unsigned long)version_info.dwBuildNumber);
+  cstr8_format(out_info->os_version,
+               size_of(out_info->os_version),
+               "%lu.%lu build %lu",
+               (unsigned long)version_info.dwMajorVersion,
+               (unsigned long)version_info.dwMinorVersion,
+               (unsigned long)version_info.dwBuildNumber);
 }
 #endif
 
@@ -143,7 +143,7 @@ func b32 system_info_query(system_info* out_info) {
     cstr8 home_drive = getenv("HOMEDRIVE");
     cstr8 home_part = getenv("HOMEPATH");
     if (home_drive != NULL && home_part != NULL) {
-      snprintf(out_info->user_home, size_of(out_info->user_home), "%s%s", home_drive, home_part);
+      cstr8_format(out_info->user_home, size_of(out_info->user_home), "%s%s", home_drive, home_part);
     }
   } else {
     system_copy_string(out_info->user_home, size_of(out_info->user_home), home_path);
@@ -155,11 +155,11 @@ func b32 system_info_query(system_info* out_info) {
   struct utsname uname_info;
   if (uname(&uname_info) == 0) {
     system_copy_string(out_info->os_name, size_of(out_info->os_name), uname_info.sysname);
-    snprintf(out_info->os_version,
-             size_of(out_info->os_version),
-             "%s %s",
-             uname_info.release,
-             uname_info.version);
+    cstr8_format(out_info->os_version,
+                 size_of(out_info->os_version),
+                 "%s %s",
+                 uname_info.release,
+                 uname_info.version);
     system_copy_string(out_info->computer_name, size_of(out_info->computer_name), uname_info.nodename);
   }
 
