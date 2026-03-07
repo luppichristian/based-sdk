@@ -4,7 +4,7 @@
 #pragma once
 
 #include "../basic/codespace.h"
-#include "msg_def.h"
+#include "../basic/utility_defines.h"
 
 // =========================================================================
 // Input Messages
@@ -40,6 +40,28 @@ typedef enum msg_handler_option {
   MSG_HANDLER_OPTION_DISABLED = (1u << 4),
 } msg_handler_option;
 
+typedef enum msg_category {
+  MSG_CATEGORY_CORE,
+  MSG_CATEGORY_GRAPHICS,
+  MSG_CATEGORY_AUDIO,
+  MSG_CATEGORY_USER0,
+  MSG_CATEGORY_USER1,
+  MSG_CATEGORY_USER2,
+  MSG_CATEGORY_USER3,
+  MSG_CATEGORY_MAX,
+} msg_category;
+
+const_var sz MSG_DATA_SIZE = kb(2);
+
+// Normalized event record used by the input message queue.
+typedef struct msg {
+  u32 type;
+  u64 timestamp;
+  callsite post_site;
+  u8 data[MSG_DATA_SIZE];
+  msg_category category;
+} msg;
+
 typedef msg_handler_result (*msg_handler_fn)(msg* src, msg_handler_stage stage, void* user_data);
 
 typedef struct msg_handler_desc {
@@ -73,9 +95,6 @@ func b32 msg_wait_timeout(msg* out_msg, i32 timeout_ms);
 // Suitable for cross-thread producers that need to signal the consumer thread.
 func b32 _msg_post(const msg* src, callsite site);
 #define msg_post(src) _msg_post((src), CALLSITE_HERE)
-
-// Reserves count consecutive custom event types and returns the first type value.
-func u32 msg_register_custom_range(sz count);
 
 // Registers one message handler and returns a non-zero handler id on success.
 // Handlers are dispatched by descending priority.

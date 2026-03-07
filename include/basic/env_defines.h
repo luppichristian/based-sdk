@@ -49,6 +49,12 @@ User-defined build configuration variables:
 - BUILD_SANITIZE: Defined if the build configuration includes sanitizers (e.g., AddressSanitizer, ThreadSanitizer).
 - BUILD_TEST: Defined if the build configuration is for testing (e.g., unit tests, integration tests).
 
+Expected binary-kind definitions:
+- BIN_RUNNABLE:    executable target
+- BIN_DYNAMIC_LIB: shared/module library target
+- BIN_STATIC_LIB:  static library target
+- BIN_OBJ_LIB:     object library target
+
 Below you can find the actual definitions: */
 
 // =========================================================================
@@ -210,12 +216,6 @@ Below you can find the actual definitions: */
 // Binary Type
 // =========================================================================
 
-// Expected binary-kind definitions:
-// - BIN_RUNNABLE   : executable target
-// - BIN_DYNAMIC_LIB: shared/module library target
-// - BIN_STATIC_LIB : static library target
-// - BIN_OBJ_LIB    : object library target
-//
 // These are expected to be provided by the build system.
 #if (defined(BIN_RUNNABLE) + defined(BIN_DYNAMIC_LIB) + defined(BIN_STATIC_LIB) + defined(BIN_OBJ_LIB)) == 0
 #  error "env_defines.h: no binary kind detected. Define one of BIN_RUNNABLE, BIN_DYNAMIC_LIB, BIN_STATIC_LIB, BIN_OBJ_LIB."

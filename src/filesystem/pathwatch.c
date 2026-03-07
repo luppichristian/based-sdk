@@ -5,6 +5,7 @@
 #include "basic/assert.h"
 #include "context/thread_ctx.h"
 #include "input/msg.h"
+#include "input/msg_core.h"
 
 #include <efsw/efsw.h>
 
@@ -211,11 +212,14 @@ func void pathwatch_dispatch(
   }
 
   msg event_msg = {0};
-  event_msg.type = MSG_TYPE_PATHWATCH;
-  event_msg.pathwatch.event_kind = MSG_PATHWATCH_EVENT_ITEM;
-  event_msg.pathwatch.pathwatch_id = binding->pathwatch_id;
-  event_msg.pathwatch.watch_id = watch_binding->watch_id;
-  event_msg.pathwatch.action = pathwatch_map_action(action);
+  event_msg.type = MSG_CORE_TYPE_PATHWATCH;
+  msg_core_pathwatch_data pathwatch_data = {
+      .event_kind = MSG_CORE_PATHWATCH_EVENT_ITEM,
+      .pathwatch_id = binding->pathwatch_id,
+      .watch_id = watch_binding->watch_id,
+      .action = pathwatch_map_action(action),
+  };
+  msg_core_fill_pathwatch(&event_msg, &pathwatch_data);
   (void)msg_post(&event_msg);
 }
 
@@ -234,11 +238,14 @@ func void pathwatch_dispatch_missed(
       pathwatch_find_watch_binding_by_native(native_handle, (i64)native_watch_id);
 
   msg event_msg = {0};
-  event_msg.type = MSG_TYPE_PATHWATCH;
-  event_msg.pathwatch.event_kind = MSG_PATHWATCH_EVENT_MISSED;
-  event_msg.pathwatch.pathwatch_id = binding->pathwatch_id;
-  event_msg.pathwatch.watch_id = watch_binding != NULL ? watch_binding->watch_id : 0;
-  event_msg.pathwatch.action = (pathwatch_action)0;
+  event_msg.type = MSG_CORE_TYPE_PATHWATCH;
+  msg_core_pathwatch_data pathwatch_data = {
+      .event_kind = MSG_CORE_PATHWATCH_EVENT_MISSED,
+      .pathwatch_id = binding->pathwatch_id,
+      .watch_id = watch_binding != NULL ? watch_binding->watch_id : 0,
+      .action = (pathwatch_action)0,
+  };
+  msg_core_fill_pathwatch(&event_msg, &pathwatch_data);
   (void)msg_post(&event_msg);
 }
 
@@ -258,10 +265,13 @@ func pathwatch pathwatch_create(b32 use_generic_mode) {
   }
 
   msg lifecycle_msg = {0};
-  lifecycle_msg.type = MSG_TYPE_OBJECT_LIFECYCLE;
-  lifecycle_msg.object_lifecycle.event_kind = (u32)MSG_OBJECT_EVENT_CREATE;
-  lifecycle_msg.object_lifecycle.object_type = (u32)MSG_OBJECT_TYPE_PATHWATCH;
-  lifecycle_msg.object_lifecycle.object_ptr = watcher.native_handle;
+  lifecycle_msg.type = MSG_CORE_TYPE_OBJECT_LIFECYCLE;
+  msg_core_object_lifecycle_data lifecycle_data = {
+      .object_type = MSG_CORE_OBJECT_TYPE_PATHWATCH,
+      .event_kind = MSG_CORE_OBJECT_EVENT_CREATE,
+      .object_ptr = watcher.native_handle,
+  };
+  msg_core_fill_object_lifecycle(&lifecycle_msg, &lifecycle_data);
   if (!msg_post(&lifecycle_msg)) {
     pathwatch_bind_remove(watcher.native_handle);
     efsw_release((efsw_watcher)watcher.native_handle);
@@ -282,10 +292,13 @@ func void pathwatch_destroy(pathwatch* watcher) {
   assert(watcher != NULL);
 
   msg lifecycle_msg = {0};
-  lifecycle_msg.type = MSG_TYPE_OBJECT_LIFECYCLE;
-  lifecycle_msg.object_lifecycle.event_kind = (u32)MSG_OBJECT_EVENT_DESTROY;
-  lifecycle_msg.object_lifecycle.object_type = (u32)MSG_OBJECT_TYPE_PATHWATCH;
-  lifecycle_msg.object_lifecycle.object_ptr = watcher->native_handle;
+  lifecycle_msg.type = MSG_CORE_TYPE_OBJECT_LIFECYCLE;
+  msg_core_object_lifecycle_data lifecycle_data = {
+      .object_type = MSG_CORE_OBJECT_TYPE_PATHWATCH,
+      .event_kind = MSG_CORE_OBJECT_EVENT_DESTROY,
+      .object_ptr = watcher->native_handle,
+  };
+  msg_core_fill_object_lifecycle(&lifecycle_msg, &lifecycle_data);
   if (!msg_post(&lifecycle_msg)) {
     return;
   }
@@ -400,3 +413,4 @@ func b32 pathwatch_allow_out_of_scope_links(pathwatch* watcher, b32 enabled) {
 func cstr8 pathwatch_get_last_error(void) {
   return efsw_getlasterror();
 }
+

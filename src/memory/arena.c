@@ -5,6 +5,7 @@
 #include "basic/assert.h"
 #include "context/thread_ctx.h"
 #include "input/msg.h"
+#include "input/msg_core.h"
 #include "basic/utility_defines.h"
 #include <string.h>
 
@@ -79,10 +80,12 @@ func arena arena_create(allocator parent_alloc, mutex opt_mutex, sz default_bloc
   arn.opt_mutex = opt_mutex;
   arn.default_block_sz = default_block_sz;
   msg lifecycle_msg = {0};
-  lifecycle_msg.type = MSG_TYPE_OBJECT_LIFECYCLE;
-  lifecycle_msg.object_lifecycle.event_kind = (u32)MSG_OBJECT_EVENT_CREATE;
-  lifecycle_msg.object_lifecycle.object_type = (u32)MSG_OBJECT_TYPE_ARENA;
-  lifecycle_msg.object_lifecycle.object_ptr = &arn;
+  lifecycle_msg.type = MSG_CORE_TYPE_OBJECT_LIFECYCLE;
+  msg_core_fill_object_lifecycle(&lifecycle_msg, &(msg_core_object_lifecycle_data) {
+                                                     .event_kind = MSG_CORE_OBJECT_EVENT_CREATE,
+                                                     .object_type = MSG_CORE_OBJECT_TYPE_ARENA,
+                                                     .object_ptr = &arn,
+                                                 });
   if (!msg_post(&lifecycle_msg)) {
     memset(&arn, 0, size_of(arn));
   }
@@ -103,10 +106,12 @@ func void arena_destroy(arena* arn) {
   assert(arn != NULL);
 
   msg lifecycle_msg = {0};
-  lifecycle_msg.type = MSG_TYPE_OBJECT_LIFECYCLE;
-  lifecycle_msg.object_lifecycle.event_kind = (u32)MSG_OBJECT_EVENT_DESTROY;
-  lifecycle_msg.object_lifecycle.object_type = (u32)MSG_OBJECT_TYPE_ARENA;
-  lifecycle_msg.object_lifecycle.object_ptr = arn;
+  lifecycle_msg.type = MSG_CORE_TYPE_OBJECT_LIFECYCLE;
+  msg_core_fill_object_lifecycle(&lifecycle_msg, &(msg_core_object_lifecycle_data) {
+                                                     .event_kind = MSG_CORE_OBJECT_EVENT_DESTROY,
+                                                     .object_type = MSG_CORE_OBJECT_TYPE_ARENA,
+                                                     .object_ptr = arn,
+                                                 });
   if (!msg_post(&lifecycle_msg)) {
     return;
   }
@@ -322,3 +327,4 @@ func void arena_clear(arena* arn) {
     mutex_unlock(arn->opt_mutex);
   }
 }
+

@@ -55,6 +55,7 @@
 #include "input/keyboard.h"
 #include "input/mouse.h"
 #include "input/msg.h"
+#include "input/msg_core.h"
 #include "input/tablet.h"
 #include "input/touch.h"
 

@@ -19,12 +19,12 @@ func b32 ctx_init(ctx* context, allocator main_allocator, b32 use_log_mutex) {
   assert(use_log_mutex == 0 || use_log_mutex == 1);
 
   memset(context, 0, size_of(*context));
+  context->main_allocator = main_allocator;
   if (!log_state_init(&context->log, use_log_mutex)) {
     memset(context, 0, size_of(*context));
     return false;
   }
 
-  context->main_allocator = main_allocator;
   context->perm_arena = arena_create(main_allocator, NULL, CTX_DEFAULT_BLOCK_SIZE);
   context->temp_arena = arena_create(main_allocator, NULL, CTX_DEFAULT_BLOCK_SIZE);
   context->perm_heap = heap_create(main_allocator, NULL, CTX_DEFAULT_BLOCK_SIZE);

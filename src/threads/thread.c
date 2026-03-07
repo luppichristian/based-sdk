@@ -3,9 +3,10 @@
 
 #include "threads/thread.h"
 #include "basic/assert.h"
+#include "context/global_ctx.h"
 #include "context/thread_ctx.h"
 #include "input/msg.h"
-#include "memory/vmem.h"
+#include "input/msg_core.h"
 #include "../sdl3_include.h"
 
 // SDL_ThreadFunction is `int (SDLCALL *)(void*)`.
@@ -30,7 +31,7 @@ func allocator thread_allocator_resolve(allocator preferred_alloc) {
     return thread_alloc;
   }
 
-  return vmem_get_allocator();
+  return global_get_allocator();
 }
 
 func i32 thread_entry_wrapper(void* raw) {
@@ -68,10 +69,12 @@ func thread thread_create_impl(thread_func entry, void* arg, cstr8 name, allocat
   assert(payload_allocator.dealloc_fn != NULL);
 
   msg lifecycle_msg = {0};
-  lifecycle_msg.type = MSG_TYPE_OBJECT_LIFECYCLE;
-  lifecycle_msg.object_lifecycle.event_kind = (u32)MSG_OBJECT_EVENT_CREATE;
-  lifecycle_msg.object_lifecycle.object_type = (u32)MSG_OBJECT_TYPE_THREAD;
-  lifecycle_msg.object_lifecycle.object_ptr = NULL;
+  lifecycle_msg.type = MSG_CORE_TYPE_OBJECT_LIFECYCLE;
+  msg_core_fill_object_lifecycle(&lifecycle_msg, &(msg_core_object_lifecycle_data) {
+                                                     .event_kind = MSG_CORE_OBJECT_EVENT_CREATE,
+                                                     .object_type = MSG_CORE_OBJECT_TYPE_THREAD,
+                                                     .object_ptr = NULL,
+                                                 });
   if (!msg_post(&lifecycle_msg)) {
     return NULL;
   }
@@ -125,10 +128,12 @@ func b32 thread_join(thread thd, i32* out_exit_code) {
   }
   assert(thread_is_valid(thd));
   msg lifecycle_msg = {0};
-  lifecycle_msg.type = MSG_TYPE_OBJECT_LIFECYCLE;
-  lifecycle_msg.object_lifecycle.event_kind = (u32)MSG_OBJECT_EVENT_DESTROY;
-  lifecycle_msg.object_lifecycle.object_type = (u32)MSG_OBJECT_TYPE_THREAD;
-  lifecycle_msg.object_lifecycle.object_ptr = thd;
+  lifecycle_msg.type = MSG_CORE_TYPE_OBJECT_LIFECYCLE;
+  msg_core_fill_object_lifecycle(&lifecycle_msg, &(msg_core_object_lifecycle_data) {
+                                                     .event_kind = MSG_CORE_OBJECT_EVENT_DESTROY,
+                                                     .object_type = MSG_CORE_OBJECT_TYPE_THREAD,
+                                                     .object_ptr = thd,
+                                                 });
   if (!msg_post(&lifecycle_msg)) {
     return 0;
   }
@@ -142,10 +147,12 @@ func void thread_detach(thread thd) {
     return;
   }
   msg lifecycle_msg = {0};
-  lifecycle_msg.type = MSG_TYPE_OBJECT_LIFECYCLE;
-  lifecycle_msg.object_lifecycle.event_kind = (u32)MSG_OBJECT_EVENT_DESTROY;
-  lifecycle_msg.object_lifecycle.object_type = (u32)MSG_OBJECT_TYPE_THREAD;
-  lifecycle_msg.object_lifecycle.object_ptr = thd;
+  lifecycle_msg.type = MSG_CORE_TYPE_OBJECT_LIFECYCLE;
+  msg_core_fill_object_lifecycle(&lifecycle_msg, &(msg_core_object_lifecycle_data) {
+                                                     .event_kind = MSG_CORE_OBJECT_EVENT_DESTROY,
+                                                     .object_type = MSG_CORE_OBJECT_TYPE_THREAD,
+                                                     .object_ptr = thd,
+                                                 });
   if (!msg_post(&lifecycle_msg)) {
     return;
   }
@@ -160,3 +167,4 @@ func u64 thread_get_id(thread thd) {
 func cstr8 thread_get_name(thread thd) {
   return SDL_GetThreadName((SDL_Thread*)thd);
 }
+

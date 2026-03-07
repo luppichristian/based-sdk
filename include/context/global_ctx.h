@@ -36,6 +36,7 @@ func void global_ctx_unlock(void);
 
 // Convenience wrappers for the shared context payload.
 func allocator global_get_allocator(void);
+func allocator global_get_main_allocator(void);
 func log_state* global_get_log_state(void);
 func arena* global_get_perm_arena(void);
 func arena* global_get_temp_arena(void);

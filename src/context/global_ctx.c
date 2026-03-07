@@ -4,7 +4,7 @@
 #include "context/global_ctx.h"
 #include "basic/assert.h"
 #include "input/msg.h"
-#include "memory/vmem.h"
+#include "input/msg_core.h"
 #include "threads/atomics.h"
 
 #include <string.h>
@@ -33,10 +33,11 @@ func b32 global_ctx_init(allocator main_allocator) {
   i32 expected = 0;
   if (atomic_i32_cmpex(&process_global_ctx_init, &expected, 1)) {
     msg lifecycle_msg = {0};
-    lifecycle_msg.type = MSG_TYPE_OBJECT_LIFECYCLE;
-    lifecycle_msg.object_lifecycle.event_kind = (u32)MSG_OBJECT_EVENT_CREATE;
-    lifecycle_msg.object_lifecycle.object_type = (u32)MSG_OBJECT_TYPE_GLOBAL_CTX;
-    lifecycle_msg.object_lifecycle.object_ptr = &process_global_ctx;
+    lifecycle_msg.type = MSG_CORE_TYPE_GLOBAL_CTX;
+    msg_core_fill_global_ctx(&lifecycle_msg, &(msg_core_global_ctx_data) {
+                                                 .event_kind = MSG_CORE_GLOBAL_CTX_EVENT_INIT,
+                                                 .global_ctx_ptr = &process_global_ctx,
+                                             });
     if (!msg_post(&lifecycle_msg)) {
       atomic_fence_release();
       atomic_i32_set(&process_global_ctx_init, 0);
@@ -77,10 +78,11 @@ func void global_ctx_quit(void) {
   }
 
   msg lifecycle_msg = {0};
-  lifecycle_msg.type = MSG_TYPE_OBJECT_LIFECYCLE;
-  lifecycle_msg.object_lifecycle.event_kind = (u32)MSG_OBJECT_EVENT_DESTROY;
-  lifecycle_msg.object_lifecycle.object_type = (u32)MSG_OBJECT_TYPE_GLOBAL_CTX;
-  lifecycle_msg.object_lifecycle.object_ptr = &process_global_ctx;
+  lifecycle_msg.type = MSG_CORE_TYPE_GLOBAL_CTX;
+  msg_core_fill_global_ctx(&lifecycle_msg, &(msg_core_global_ctx_data) {
+                                               .event_kind = MSG_CORE_GLOBAL_CTX_EVENT_QUIT,
+                                               .global_ctx_ptr = &process_global_ctx,
+                                           });
   if (!msg_post(&lifecycle_msg)) {
     atomic_fence_release();
     atomic_i32_set(&process_global_ctx_init, 2);
@@ -111,7 +113,7 @@ func b32 global_ctx_is_init(void) {
 }
 
 func global_ctx* global_ctx_get(void) {
-  if (!global_ctx_is_init() && !global_ctx_init(vmem_get_allocator())) {
+  if (!global_ctx_is_init()) {
     return NULL;
   }
   return &process_global_ctx;
@@ -145,6 +147,16 @@ func void global_ctx_unlock(void) {
 
 func allocator global_get_allocator(void) {
   return ctx_get_allocator(global_ctx_get_shared());
+}
+
+func allocator global_get_main_allocator(void) {
+  allocator alloc = {0};
+  i32 state = atomic_i32_get(&process_global_ctx_init);
+  if (state == 0) {
+    return alloc;
+  }
+
+  return process_global_ctx.shared_ctx.main_allocator;
 }
 
 func arena* global_get_perm_arena(void) {
@@ -244,3 +256,4 @@ func void global_log_begin_frame(void) {
 func log_frame* global_log_end_frame(u32 severity_mask) {
   return log_state_end_frame(global_get_log_state(), severity_mask);
 }
+

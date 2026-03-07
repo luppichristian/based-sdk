@@ -3,16 +3,25 @@
 
 #include "threads/spinlock.h"
 #include "basic/assert.h"
+#include "context/global_ctx.h"
 #include "context/thread_ctx.h"
 #include "input/msg.h"
-#include "memory/vmem.h"
+#include "input/msg_core.h"
 #include "../sdl3_include.h"
 
-func spinlock _spinlock_create(callsite site) {
+func allocator spinlock_allocator_resolve(void) {
   allocator alloc = thread_get_allocator();
+  if (alloc.alloc_fn != NULL && alloc.dealloc_fn != NULL) {
+    return alloc;
+  }
+  return global_get_allocator();
+}
+
+func spinlock _spinlock_create(callsite site) {
+  allocator alloc = spinlock_allocator_resolve();
   (void)site;
   if (alloc.alloc_fn == NULL || alloc.dealloc_fn == NULL) {
-    alloc = vmem_get_allocator();
+    return NULL;
   }
   assert(alloc.alloc_fn != NULL);
   assert(alloc.dealloc_fn != NULL);
@@ -23,10 +32,12 @@ func spinlock _spinlock_create(callsite site) {
   }
   if (spl != NULL) {
     msg lifecycle_msg = {0};
-    lifecycle_msg.type = MSG_TYPE_OBJECT_LIFECYCLE;
-    lifecycle_msg.object_lifecycle.event_kind = (u32)MSG_OBJECT_EVENT_CREATE;
-    lifecycle_msg.object_lifecycle.object_type = (u32)MSG_OBJECT_TYPE_SPINLOCK;
-    lifecycle_msg.object_lifecycle.object_ptr = spl;
+    lifecycle_msg.type = MSG_CORE_TYPE_OBJECT_LIFECYCLE;
+    msg_core_fill_object_lifecycle(&lifecycle_msg, &(msg_core_object_lifecycle_data) {
+                                                       .event_kind = MSG_CORE_OBJECT_EVENT_CREATE,
+                                                       .object_type = MSG_CORE_OBJECT_TYPE_SPINLOCK,
+                                                       .object_ptr = spl,
+                                                   });
     if (!msg_post(&lifecycle_msg)) {
       allocator_dealloc(&alloc, spl, size_of(SDL_SpinLock));
       return NULL;
@@ -37,21 +48,23 @@ func spinlock _spinlock_create(callsite site) {
 }
 
 func void _spinlock_destroy(spinlock sl, callsite site) {
-  allocator alloc = thread_get_allocator();
+  allocator alloc = spinlock_allocator_resolve();
   (void)site;
   if (!sl) {
     return;
   }
   if (alloc.dealloc_fn == NULL) {
-    alloc = vmem_get_allocator();
+    return;
   }
   assert(alloc.dealloc_fn != NULL);
 
   msg lifecycle_msg = {0};
-  lifecycle_msg.type = MSG_TYPE_OBJECT_LIFECYCLE;
-  lifecycle_msg.object_lifecycle.event_kind = (u32)MSG_OBJECT_EVENT_DESTROY;
-  lifecycle_msg.object_lifecycle.object_type = (u32)MSG_OBJECT_TYPE_SPINLOCK;
-  lifecycle_msg.object_lifecycle.object_ptr = sl;
+  lifecycle_msg.type = MSG_CORE_TYPE_OBJECT_LIFECYCLE;
+  msg_core_fill_object_lifecycle(&lifecycle_msg, &(msg_core_object_lifecycle_data) {
+                                                     .event_kind = MSG_CORE_OBJECT_EVENT_DESTROY,
+                                                     .object_type = MSG_CORE_OBJECT_TYPE_SPINLOCK,
+                                                     .object_ptr = sl,
+                                                 });
   if (!msg_post(&lifecycle_msg)) {
     return;
   }
@@ -86,3 +99,4 @@ func b32 spinlock_try_lock(spinlock sl) {
   assert(sl != NULL);
   return SDL_TryLockSpinlock((SDL_SpinLock*)sl);
 }
+

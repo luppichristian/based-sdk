@@ -27,7 +27,7 @@ typedef struct pathwatch {
 } pathwatch;
 
 // Creates a pathwatch wrapper around efsw.
-// Changes are emitted through MSG_TYPE_PATHWATCH messages.
+// Changes are emitted through MSG_CORE_TYPE_PATHWATCH messages.
 func pathwatch pathwatch_create(b32 use_generic_mode);
 
 // Releases the watcher and every active watch.
@@ -56,3 +56,4 @@ func b32 pathwatch_allow_out_of_scope_links(pathwatch* watcher, b32 enabled);
 
 // Returns the last efsw error string.
 func cstr8 pathwatch_get_last_error(void);
+

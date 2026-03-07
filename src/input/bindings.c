@@ -3,6 +3,7 @@
 
 #include "input/bindings.h"
 #include "basic/assert.h"
+#include "input/msg_core.h"
 
 typedef struct binding_entry {
   b32 used;
@@ -177,18 +178,18 @@ func void bindings_refresh_all_transitions(void) {
 
 func b32 bindings_msg_affects_state(u32 type) {
   switch (type) {
-    case MSG_TYPE_KEY_DOWN:
-    case MSG_TYPE_KEY_UP:
-    case MSG_TYPE_KEYMAP_CHANGED:
-    case MSG_TYPE_MOUSE_BUTTON_DOWN:
-    case MSG_TYPE_MOUSE_BUTTON_UP:
-    case MSG_TYPE_GAMEPAD_BUTTON_DOWN:
-    case MSG_TYPE_GAMEPAD_BUTTON_UP:
-    case MSG_TYPE_GAMEPAD_ADDED:
-    case MSG_TYPE_GAMEPAD_REMOVED:
-    case MSG_TYPE_GAMEPAD_REMAPPED:
-    case MSG_TYPE_GAMEPAD_UPDATE_COMPLETE:
-    case MSG_TYPE_WINDOW_FOCUS_LOST:
+    case MSG_CORE_TYPE_KEY_DOWN:
+    case MSG_CORE_TYPE_KEY_UP:
+    case MSG_CORE_TYPE_KEYMAP_CHANGED:
+    case MSG_CORE_TYPE_MOUSE_BUTTON_DOWN:
+    case MSG_CORE_TYPE_MOUSE_BUTTON_UP:
+    case MSG_CORE_TYPE_GAMEPAD_BUTTON_DOWN:
+    case MSG_CORE_TYPE_GAMEPAD_BUTTON_UP:
+    case MSG_CORE_TYPE_GAMEPAD_ADDED:
+    case MSG_CORE_TYPE_GAMEPAD_REMOVED:
+    case MSG_CORE_TYPE_GAMEPAD_REMAPPED:
+    case MSG_CORE_TYPE_GAMEPAD_UPDATE_COMPLETE:
+    case MSG_CORE_TYPE_WINDOW_FOCUS_LOST:
       return 1;
 
     default:
@@ -350,3 +351,4 @@ func void bindings_on_msg(const msg* src) {
 func void bindings_internal_on_msg(const msg* src) {
   bindings_on_msg(src);
 }
+

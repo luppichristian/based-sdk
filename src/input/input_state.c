@@ -3,6 +3,7 @@
 
 #include "input/input_state.h"
 #include "basic/assert.h"
+#include "input/msg_core.h"
 
 #include <string.h>
 
@@ -107,21 +108,22 @@ func b32 input_state_capture(input_key key, input_state* out_state) {
 }
 
 func void input_state_apply_keyboard_msg(input_state* src, const msg* event_msg) {
-  if (event_msg->type != MSG_TYPE_KEY_DOWN && event_msg->type != MSG_TYPE_KEY_UP) {
+  if (event_msg->type != MSG_CORE_TYPE_KEY_DOWN && event_msg->type != MSG_CORE_TYPE_KEY_UP) {
+    return;
+  }
+  msg* event_msg_mut = (msg*)event_msg;
+
+  if (msg_core_get_keyboard(event_msg_mut)->scancode >= INPUT_STATE_KEY_CAP) {
     return;
   }
 
-  if (event_msg->keyboard.scancode >= INPUT_STATE_KEY_CAP) {
-    return;
-  }
-
-  sz scancode_idx = (sz)event_msg->keyboard.scancode;
+  sz scancode_idx = (sz)msg_core_get_keyboard(event_msg_mut)->scancode;
   src->keyboard_available = 1;
-  src->keyboard_mods = event_msg->keyboard.modifiers;
+  src->keyboard_mods = msg_core_get_keyboard(event_msg_mut)->modifiers;
 
-  if (event_msg->type == MSG_TYPE_KEY_DOWN) {
+  if (event_msg->type == MSG_CORE_TYPE_KEY_DOWN) {
     src->keyboard_down[scancode_idx] = 1;
-    if (event_msg->keyboard.repeat) {
+    if (msg_core_get_keyboard(event_msg_mut)->repeat) {
       src->keyboard_repeat[scancode_idx] += 1;
     } else {
       src->keyboard_repeat[scancode_idx] = 0;
@@ -133,38 +135,40 @@ func void input_state_apply_keyboard_msg(input_state* src, const msg* event_msg)
 }
 
 func void input_state_apply_mouse_msg(input_state* src, const msg* event_msg) {
-  if (event_msg->type == MSG_TYPE_MOUSE_ADDED) {
+  msg* event_msg_mut = (msg*)event_msg;
+
+  if (event_msg->type == MSG_CORE_TYPE_MOUSE_ADDED) {
     src->mouse_available = 1;
     return;
   }
 
-  if (event_msg->type == MSG_TYPE_MOUSE_REMOVED) {
+  if (event_msg->type == MSG_CORE_TYPE_MOUSE_REMOVED) {
     src->mouse_available = 0;
     src->mouse_button_mask = 0;
     input_state_sync_mouse_buttons_from_mask(src);
     return;
   }
 
-  if (event_msg->type == MSG_TYPE_MOUSE_MOTION) {
+  if (event_msg->type == MSG_CORE_TYPE_MOUSE_MOTION) {
     src->mouse_available = 1;
-    src->mouse_x = event_msg->mouse_motion.x;
-    src->mouse_y = event_msg->mouse_motion.y;
-    src->mouse_relative_x = event_msg->mouse_motion.xrel;
-    src->mouse_relative_y = event_msg->mouse_motion.yrel;
-    src->mouse_button_mask = event_msg->mouse_motion.button_mask;
+    src->mouse_x = msg_core_get_mouse_motion(event_msg_mut)->x;
+    src->mouse_y = msg_core_get_mouse_motion(event_msg_mut)->y;
+    src->mouse_relative_x = msg_core_get_mouse_motion(event_msg_mut)->xrel;
+    src->mouse_relative_y = msg_core_get_mouse_motion(event_msg_mut)->yrel;
+    src->mouse_button_mask = msg_core_get_mouse_motion(event_msg_mut)->button_mask;
     input_state_sync_mouse_buttons_from_mask(src);
     return;
   }
 
-  if (event_msg->type != MSG_TYPE_MOUSE_BUTTON_DOWN && event_msg->type != MSG_TYPE_MOUSE_BUTTON_UP) {
+  if (event_msg->type != MSG_CORE_TYPE_MOUSE_BUTTON_DOWN && event_msg->type != MSG_CORE_TYPE_MOUSE_BUTTON_UP) {
     return;
   }
 
   src->mouse_available = 1;
-  i32 button_value = (i32)event_msg->mouse_button.button;
+  i32 button_value = (i32)msg_core_get_mouse_button(event_msg_mut)->button;
   if (button_value > 0 && (sz)button_value < INPUT_STATE_MOUSE_BUTTON_CAP) {
     sz button_idx = (sz)button_value;
-    b32 down_state = event_msg->type == MSG_TYPE_MOUSE_BUTTON_DOWN ? 1 : 0;
+    b32 down_state = event_msg->type == MSG_CORE_TYPE_MOUSE_BUTTON_DOWN ? 1 : 0;
     src->mouse_button_down[button_idx] = down_state;
 
     if (down_state) {
@@ -174,38 +178,40 @@ func void input_state_apply_mouse_msg(input_state* src, const msg* event_msg) {
     }
   }
 
-  src->mouse_x = event_msg->mouse_button.x;
-  src->mouse_y = event_msg->mouse_button.y;
+  src->mouse_x = msg_core_get_mouse_button(event_msg_mut)->x;
+  src->mouse_y = msg_core_get_mouse_button(event_msg_mut)->y;
 }
 
 func void input_state_apply_gamepad_msg(input_state* src, const msg* event_msg) {
-  if (event_msg->type == MSG_TYPE_GAMEPAD_ADDED || event_msg->type == MSG_TYPE_GAMEPAD_REMOVED ||
-      event_msg->type == MSG_TYPE_GAMEPAD_REMAPPED || event_msg->type == MSG_TYPE_GAMEPAD_UPDATE_COMPLETE) {
+  msg* event_msg_mut = (msg*)event_msg;
+
+  if (event_msg->type == MSG_CORE_TYPE_GAMEPAD_ADDED || event_msg->type == MSG_CORE_TYPE_GAMEPAD_REMOVED ||
+      event_msg->type == MSG_CORE_TYPE_GAMEPAD_REMAPPED || event_msg->type == MSG_CORE_TYPE_GAMEPAD_UPDATE_COMPLETE) {
     input_state_sync_gamepads(src, INPUT_KEY_DEFAULT);
     return;
   }
 
-  if (event_msg->type == MSG_TYPE_GAMEPAD_BUTTON_DOWN || event_msg->type == MSG_TYPE_GAMEPAD_BUTTON_UP) {
-    sz slot_idx = input_state_find_gamepad_slot(event_msg->gamepad_button.device);
-    i32 button_value = (i32)event_msg->gamepad_button.button;
+  if (event_msg->type == MSG_CORE_TYPE_GAMEPAD_BUTTON_DOWN || event_msg->type == MSG_CORE_TYPE_GAMEPAD_BUTTON_UP) {
+    sz slot_idx = input_state_find_gamepad_slot(msg_core_get_gamepad_button(event_msg_mut)->device);
+    i32 button_value = (i32)msg_core_get_gamepad_button(event_msg_mut)->button;
     if (slot_idx >= GAMEPADS_MAX_COUNT || button_value < 0 || button_value >= GAMEPAD_BUTTON_COUNT) {
       return;
     }
 
     src->gamepad_connected[slot_idx] = 1;
-    src->gamepad_button_down[slot_idx][(sz)button_value] = event_msg->type == MSG_TYPE_GAMEPAD_BUTTON_DOWN ? 1 : 0;
+    src->gamepad_button_down[slot_idx][(sz)button_value] = event_msg->type == MSG_CORE_TYPE_GAMEPAD_BUTTON_DOWN ? 1 : 0;
     return;
   }
 
-  if (event_msg->type == MSG_TYPE_GAMEPAD_AXIS_MOTION) {
-    sz slot_idx = input_state_find_gamepad_slot(event_msg->gamepad_axis.device);
-    i32 axis_value = (i32)event_msg->gamepad_axis.axis;
+  if (event_msg->type == MSG_CORE_TYPE_GAMEPAD_AXIS_MOTION) {
+    sz slot_idx = input_state_find_gamepad_slot(msg_core_get_gamepad_axis(event_msg_mut)->device);
+    i32 axis_value = (i32)msg_core_get_gamepad_axis(event_msg_mut)->axis;
     if (slot_idx >= GAMEPADS_MAX_COUNT || axis_value < 0 || axis_value >= GAMEPAD_AXIS_COUNT) {
       return;
     }
 
     src->gamepad_connected[slot_idx] = 1;
-    src->gamepad_axis[slot_idx][(sz)axis_value] = event_msg->gamepad_axis.value;
+    src->gamepad_axis[slot_idx][(sz)axis_value] = msg_core_get_gamepad_axis(event_msg_mut)->value;
   }
 }
 
@@ -218,9 +224,9 @@ func void input_state_apply_msg(input_state* src, const msg* event_msg) {
 
   src->timestamp = event_msg->timestamp;
 
-  if (event_msg->type == MSG_TYPE_KEYBOARD_ADDED) {
+  if (event_msg->type == MSG_CORE_TYPE_KEYBOARD_ADDED) {
     src->keyboard_available = 1;
-  } else if (event_msg->type == MSG_TYPE_KEYBOARD_REMOVED) {
+  } else if (event_msg->type == MSG_CORE_TYPE_KEYBOARD_REMOVED) {
     src->keyboard_available = 0;
   }
 

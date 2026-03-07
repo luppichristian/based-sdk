@@ -3,6 +3,8 @@
 
 #include "containers/sort.h"
 #include "basic/assert.h"
+#include "context/thread_ctx.h"
+#include "memory/scratch.h"
 #include <string.h>
 
 typedef struct sort_range {
@@ -307,6 +309,7 @@ func sz sort_quick(
     sort_compare_fn* compare,
     void* user_data,
     allocator allocator) {
+  (void)allocator;
   if (elem_count < 2) {
     return elem_count;
   }
@@ -316,7 +319,8 @@ func sz sort_quick(
   }
 
   u8* base_ptr = (u8*)ptr;
-  if (!allocator.alloc_fn || !allocator.dealloc_fn) {
+  arena* temp_arena = thread_get_temp_arena();
+  if (temp_arena == NULL) {
     sort_quick_recursive(base_ptr, 0, elem_count, elem_size, compare, user_data);
     return elem_count;
   }
@@ -326,10 +330,10 @@ func sz sort_quick(
     return elem_count;
   }
 
-  struct allocator alc = allocator;
-  sz stack_size = elem_count * size_of(sort_range);
-  sort_range* stack_ptr = (sort_range*)allocator_alloc(&alc, stack_size);
+  scratch temp_scope = scratch_begin(temp_arena);
+  sort_range* stack_ptr = arena_alloc_array(temp_arena, sort_range, elem_count);
   if (!stack_ptr) {
+    scratch_end(&temp_scope);
     sort_quick_recursive(base_ptr, 0, elem_count, elem_size, compare, user_data);
     return elem_count;
   }
@@ -377,7 +381,7 @@ func sz sort_quick(
     }
   }
 
-  allocator_dealloc(&alc, stack_ptr, stack_size);
+  scratch_end(&temp_scope);
   return elem_count;
 }
 
@@ -388,6 +392,7 @@ func sz sort_merge(
     sort_compare_fn* compare,
     void* user_data,
     allocator allocator) {
+  (void)allocator;
   if (elem_count < 2) {
     return elem_count;
   }
@@ -396,7 +401,8 @@ func sz sort_merge(
     return 0;
   }
 
-  if (!allocator.alloc_fn || !allocator.dealloc_fn) {
+  arena* temp_arena = thread_get_temp_arena();
+  if (temp_arena == NULL) {
     return sort_quick(ptr, elem_count, elem_size, compare, user_data, allocator);
   }
 
@@ -404,10 +410,11 @@ func sz sort_merge(
     return sort_quick(ptr, elem_count, elem_size, compare, user_data, allocator);
   }
 
-  struct allocator alc = allocator;
   sz temp_size = elem_count * elem_size;
-  u8* tmp_ptr = (u8*)allocator_alloc(&alc, temp_size);
+  scratch temp_scope = scratch_begin(temp_arena);
+  u8* tmp_ptr = (u8*)arena_alloc(temp_arena, temp_size, align_of(u8));
   if (!tmp_ptr) {
+    scratch_end(&temp_scope);
     return sort_quick(ptr, elem_count, elem_size, compare, user_data, allocator);
   }
 
@@ -454,7 +461,7 @@ func sz sort_merge(
     run_size *= 2;
   }
 
-  allocator_dealloc(&alc, tmp_ptr, temp_size);
+  scratch_end(&temp_scope);
   return elem_count;
 }
 

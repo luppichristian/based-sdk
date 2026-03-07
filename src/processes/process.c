@@ -5,6 +5,7 @@
 #include "basic/assert.h"
 #include "context/thread_ctx.h"
 #include "input/msg.h"
+#include "input/msg_core.h"
 #include "../sdl3_include.h"
 
 // Returns true if options matches process_options_default().
@@ -38,10 +39,12 @@ func process _process_create_with(cstr8 const* args, process_options options, ca
   assert(args[0][0] != '\0');
 
   msg lifecycle_msg = {0};
-  lifecycle_msg.type = MSG_TYPE_OBJECT_LIFECYCLE;
-  lifecycle_msg.object_lifecycle.event_kind = (u32)MSG_OBJECT_EVENT_CREATE;
-  lifecycle_msg.object_lifecycle.object_type = (u32)MSG_OBJECT_TYPE_PROCESS;
-  lifecycle_msg.object_lifecycle.object_ptr = NULL;
+  lifecycle_msg.type = MSG_CORE_TYPE_OBJECT_LIFECYCLE;
+  msg_core_fill_object_lifecycle(&lifecycle_msg, &(msg_core_object_lifecycle_data) {
+                                                     .event_kind = MSG_CORE_OBJECT_EVENT_CREATE,
+                                                     .object_type = MSG_CORE_OBJECT_TYPE_PROCESS,
+                                                     .object_ptr = NULL,
+                                                 });
   if (!msg_post(&lifecycle_msg)) {
     return NULL;
   }
@@ -166,10 +169,12 @@ func void process_destroy(process prc) {
   }
 
   msg lifecycle_msg = {0};
-  lifecycle_msg.type = MSG_TYPE_OBJECT_LIFECYCLE;
-  lifecycle_msg.object_lifecycle.event_kind = (u32)MSG_OBJECT_EVENT_DESTROY;
-  lifecycle_msg.object_lifecycle.object_type = (u32)MSG_OBJECT_TYPE_PROCESS;
-  lifecycle_msg.object_lifecycle.object_ptr = prc;
+  lifecycle_msg.type = MSG_CORE_TYPE_OBJECT_LIFECYCLE;
+  msg_core_fill_object_lifecycle(&lifecycle_msg, &(msg_core_object_lifecycle_data) {
+                                                     .event_kind = MSG_CORE_OBJECT_EVENT_DESTROY,
+                                                     .object_type = MSG_CORE_OBJECT_TYPE_PROCESS,
+                                                     .object_ptr = prc,
+                                                 });
   if (!msg_post(&lifecycle_msg)) {
     return;
   }
@@ -177,3 +182,4 @@ func void process_destroy(process prc) {
   thread_log_trace("process_destroy: prc=%p", prc);
   SDL_DestroyProcess((SDL_Process*)prc);
 }
+

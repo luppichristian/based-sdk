@@ -3,9 +3,10 @@
 
 #include "basic/log.h"
 #include "basic/assert.h"
+#include "context/global_ctx.h"
 #include "context/thread_ctx.h"
 #include "input/msg.h"
-#include "memory/vmem.h"
+#include "input/msg_core.h"
 #include "threads/atomics.h"
 
 #include <stdarg.h>
@@ -44,11 +45,20 @@ func log_state* log_state_resolve(log_state* state) {
 }
 
 func allocator log_allocator_resolve(void) {
-  allocator alloc = thread_get_allocator();
+  allocator alloc = {0};
+  alloc = global_get_main_allocator();
   if (alloc.alloc_fn != NULL && alloc.dealloc_fn != NULL) {
     return alloc;
   }
-  return vmem_get_allocator();
+
+  ctx* context = thread_ctx_get();
+  if (context != NULL &&
+      context->main_allocator.alloc_fn != NULL &&
+      context->main_allocator.dealloc_fn != NULL) {
+    return context->main_allocator;
+  }
+
+  return thread_get_allocator();
 }
 
 func void log_state_lock(log_state* state) {
@@ -112,72 +122,72 @@ func log_frame* log_frame_create(void) {
   return frame;
 }
 
-func log_msg* log_msg_create(log_level level, callsite site, cstr8 msg) {
+func log_msg* log_msg_create(log_level level, callsite site, cstr8 text) {
   sz text_len = 0;
   sz total_size = 0;
   allocator alloc = log_allocator_resolve();
-  if (msg == NULL) {
+  if (text == NULL) {
     return NULL;
   }
-  text_len = cstr8_len(msg);
+  text_len = cstr8_len(text);
   total_size = size_of(log_msg) + text_len + 1;
-  log_msg* message = (log_msg*)allocator_alloc(&alloc, total_size);
-  if (!message) {
+  log_msg* msg = (log_msg*)allocator_alloc(&alloc, total_size);
+  if (!msg) {
     return NULL;
   }
 
   assert(msg != NULL);
-  memset(message, 0, size_of(*message));
-  message->level = level;
-  message->site = site;
-  message->text = (cstr8)(message + 1);
-  memcpy((void*)message->text, msg, text_len + 1);
-  return message;
+  memset(msg, 0, size_of(*msg));
+  msg->level = level;
+  msg->site = site;
+  msg->text = (cstr8)(msg + 1);
+  memcpy((void*)msg->text, text, text_len + 1);
+  return msg;
 }
 
-func void log_msg_destroy(log_msg* message) {
+func void log_msg_destroy(log_msg* msg) {
   allocator alloc = log_allocator_resolve();
   sz text_len = 0;
-  if (message == NULL) {
+  if (msg == NULL) {
     return;
   }
-  assert(message->text != NULL);
-  text_len = cstr8_len(message->text);
-  allocator_dealloc(&alloc, message, size_of(*message) + text_len + 1);
+  assert(msg->text != NULL);
+  text_len = cstr8_len(msg->text);
+  allocator_dealloc(&alloc, msg, size_of(*msg) + text_len + 1);
 }
 
 func void log_msg_list_destroy(log_msg* head) {
   while (head) {
-    log_msg* next_message = head->next;
+    log_msg* next_msg = head->next;
     log_msg_destroy(head);
-    head = next_message;
+    head = next_msg;
   }
 }
 
-func void log_frame_append_message_unsafe(log_frame* frame, log_msg* message) {
-  if (!frame || !message) {
+func void log_frame_append_msg_unsafe(log_frame* frame, log_msg* msg) {
+  if (!frame || !msg) {
     return;
   }
 
-  if (frame->messages_tail) {
-    frame->messages_tail->next = message;
-    frame->messages_tail = message;
+  if (frame->msgs_tail) {
+    frame->msgs_tail->next = msg;
+    frame->msgs_tail = msg;
   } else {
-    frame->messages_head = message;
-    frame->messages_tail = message;
+    frame->msgs_head = msg;
+    frame->msgs_tail = msg;
   }
-  frame->message_count += 1;
+  frame->msg_count += 1;
 }
 
-func void log_frame_clear_messages_unsafe(log_frame* frame) {
+func void log_frame_clear_msgs_unsafe(log_frame* frame) {
   if (!frame) {
     return;
   }
 
-  log_msg_list_destroy(frame->messages_head);
-  frame->messages_head = NULL;
-  frame->messages_tail = NULL;
-  frame->message_count = 0;
+  log_msg_list_destroy(frame->msgs_head);
+  frame->msgs_head = NULL;
+  frame->msgs_tail = NULL;
+  frame->msg_count = 0;
 }
 
 func void log_frame_destroy_unsafe(log_frame* frame) {
@@ -186,11 +196,11 @@ func void log_frame_destroy_unsafe(log_frame* frame) {
     return;
   }
 
-  log_frame_clear_messages_unsafe(frame);
+  log_frame_clear_msgs_unsafe(frame);
   allocator_dealloc(&alloc, frame, size_of(*frame));
 }
 
-func void log_state_store_message(log_state* state, log_level level, callsite site, cstr8 msg) {
+func void log_state_store_msg(log_state* state, log_level level, callsite site, cstr8 msg) {
   if (!state || !state->is_init || !state->root_frame) {
     return;
   }
@@ -199,17 +209,17 @@ func void log_state_store_message(log_state* state, log_level level, callsite si
 
   log_state_lock(state);
 
-  log_msg* root_message = log_msg_create(level, site, msg);
-  if (root_message) {
-    log_frame_append_message_unsafe(state->root_frame, root_message);
+  log_msg* root_msg = log_msg_create(level, site, msg);
+  if (root_msg) {
+    log_frame_append_msg_unsafe(state->root_frame, root_msg);
   }
 
   for (log_frame* frame = state->active_frame; frame != NULL; frame = frame->prev_active) {
-    log_msg* frame_message = log_msg_create(level, site, msg);
-    if (!frame_message) {
+    log_msg* frame_msg = log_msg_create(level, site, msg);
+    if (!frame_msg) {
       continue;
     }
-    log_frame_append_message_unsafe(frame, frame_message);
+    log_frame_append_msg_unsafe(frame, frame_msg);
   }
 
   log_state_unlock(state);
@@ -224,7 +234,7 @@ func void log_state_clear_frames_unsafe(log_state* state) {
   }
 
   if (state->root_frame) {
-    log_frame_clear_messages_unsafe(state->root_frame);
+    log_frame_clear_msgs_unsafe(state->root_frame);
   }
 }
 
@@ -325,10 +335,13 @@ func b32 log_state_init(log_state* state, b32 use_mutex) {
   }
   state->is_init = true;
   msg lifecycle_msg = {0};
-  lifecycle_msg.type = MSG_TYPE_OBJECT_LIFECYCLE;
-  lifecycle_msg.object_lifecycle.event_kind = (u32)MSG_OBJECT_EVENT_CREATE;
-  lifecycle_msg.object_lifecycle.object_type = (u32)MSG_OBJECT_TYPE_LOG_STATE;
-  lifecycle_msg.object_lifecycle.object_ptr = state;
+  lifecycle_msg.type = MSG_CORE_TYPE_OBJECT_LIFECYCLE;
+  msg_core_object_lifecycle_data lifecycle_data = {
+      .object_type = MSG_CORE_OBJECT_TYPE_LOG_STATE,
+      .event_kind = MSG_CORE_OBJECT_EVENT_CREATE,
+      .object_ptr = state,
+  };
+  msg_core_fill_object_lifecycle(&lifecycle_msg, &lifecycle_data);
   if (!msg_post(&lifecycle_msg)) {
     log_state_quit(state);
     return false;
@@ -342,10 +355,13 @@ func void log_state_quit(log_state* state) {
   }
 
   msg lifecycle_msg = {0};
-  lifecycle_msg.type = MSG_TYPE_OBJECT_LIFECYCLE;
-  lifecycle_msg.object_lifecycle.event_kind = (u32)MSG_OBJECT_EVENT_DESTROY;
-  lifecycle_msg.object_lifecycle.object_type = (u32)MSG_OBJECT_TYPE_LOG_STATE;
-  lifecycle_msg.object_lifecycle.object_ptr = state;
+  lifecycle_msg.type = MSG_CORE_TYPE_OBJECT_LIFECYCLE;
+  msg_core_object_lifecycle_data lifecycle_data = {
+      .object_type = MSG_CORE_OBJECT_TYPE_LOG_STATE,
+      .event_kind = MSG_CORE_OBJECT_EVENT_DESTROY,
+      .object_ptr = state,
+  };
+  msg_core_fill_object_lifecycle(&lifecycle_msg, &lifecycle_data);
   if (!msg_post(&lifecycle_msg)) {
     return;
   }
@@ -393,19 +409,19 @@ func void log_state_sync(log_state* dst, log_state* src) {
   }
 
   log_state_lock_pair(resolved_dst, resolved_src);
-  if (resolved_src->root_frame->messages_head) {
-    if (resolved_dst->root_frame->messages_tail) {
-      resolved_dst->root_frame->messages_tail->next = resolved_src->root_frame->messages_head;
-      resolved_dst->root_frame->messages_tail = resolved_src->root_frame->messages_tail;
+  if (resolved_src->root_frame->msgs_head) {
+    if (resolved_dst->root_frame->msgs_tail) {
+      resolved_dst->root_frame->msgs_tail->next = resolved_src->root_frame->msgs_head;
+      resolved_dst->root_frame->msgs_tail = resolved_src->root_frame->msgs_tail;
     } else {
-      resolved_dst->root_frame->messages_head = resolved_src->root_frame->messages_head;
-      resolved_dst->root_frame->messages_tail = resolved_src->root_frame->messages_tail;
+      resolved_dst->root_frame->msgs_head = resolved_src->root_frame->msgs_head;
+      resolved_dst->root_frame->msgs_tail = resolved_src->root_frame->msgs_tail;
     }
-    resolved_dst->root_frame->message_count += resolved_src->root_frame->message_count;
+    resolved_dst->root_frame->msg_count += resolved_src->root_frame->msg_count;
 
-    resolved_src->root_frame->messages_head = NULL;
-    resolved_src->root_frame->messages_tail = NULL;
-    resolved_src->root_frame->message_count = 0;
+    resolved_src->root_frame->msgs_head = NULL;
+    resolved_src->root_frame->msgs_tail = NULL;
+    resolved_src->root_frame->msg_count = 0;
   }
   log_state_unlock_pair(resolved_dst, resolved_src);
 }
@@ -445,29 +461,29 @@ func log_frame* log_state_end_frame(log_state* state, u32 severity_mask) {
   resolved->active_frame = frame->prev_active;
   frame->prev_active = NULL;
 
-  log_msg* prev_message = NULL;
-  log_msg* message = frame->messages_head;
-  while (message) {
-    log_msg* next_message = message->next;
-    if (!log_level_matches_mask(message->level, severity_mask)) {
-      if (prev_message) {
-        prev_message->next = next_message;
+  log_msg* prev_msg = NULL;
+  log_msg* msg = frame->msgs_head;
+  while (msg) {
+    log_msg* next_msg = msg->next;
+    if (!log_level_matches_mask(msg->level, severity_mask)) {
+      if (prev_msg) {
+        prev_msg->next = next_msg;
       } else {
-        frame->messages_head = next_message;
+        frame->msgs_head = next_msg;
       }
-      if (frame->messages_tail == message) {
-        frame->messages_tail = prev_message;
+      if (frame->msgs_tail == msg) {
+        frame->msgs_tail = prev_msg;
       }
-      log_msg_destroy(message);
-      frame->message_count -= 1;
+      log_msg_destroy(msg);
+      frame->msg_count -= 1;
     } else {
-      prev_message = message;
+      prev_msg = msg;
     }
-    message = next_message;
+    msg = next_msg;
   }
   log_state_unlock(resolved);
 
-  if (!frame->message_count) {
+  if (!frame->msg_count) {
     log_frame_destroy(frame);
     return NULL;
   }
@@ -482,37 +498,37 @@ func void log_frame_destroy(log_frame* frame) {
   log_frame_destroy_unsafe(frame);
 }
 
-func b32 log_frame_has_messages(log_frame* frame) {
-  return frame != NULL && frame->message_count > 0;
+func b32 log_frame_has_msgs(log_frame* frame) {
+  return frame != NULL && frame->msg_count > 0;
 }
 
-func sz log_frame_message_count(log_frame* frame) {
-  return frame ? frame->message_count : 0;
+func sz log_frame_msg_count(log_frame* frame) {
+  return frame ? frame->msg_count : 0;
 }
 
 func log_msg* log_frame_first(log_frame* frame) {
-  return frame ? frame->messages_head : NULL;
+  return frame ? frame->msgs_head : NULL;
 }
 
 func log_msg* log_frame_last(log_frame* frame) {
-  return frame ? frame->messages_tail : NULL;
+  return frame ? frame->msgs_tail : NULL;
 }
 
-func log_msg* log_msg_next(log_msg* message) {
-  return message ? message->next : NULL;
+func log_msg* log_msg_next(log_msg* msg) {
+  return msg ? msg->next : NULL;
 }
 
-func log_level log_msg_level(log_msg* message) {
-  return message ? message->level : LOG_LEVEL_MAX;
+func log_level log_msg_level(log_msg* msg) {
+  return msg ? msg->level : LOG_LEVEL_MAX;
 }
 
-func callsite log_msg_site(log_msg* message) {
+func callsite log_msg_site(log_msg* msg) {
   callsite empty_site = {0};
-  return message ? message->site : empty_site;
+  return msg ? msg->site : empty_site;
 }
 
-func cstr8 log_msg_text(log_msg* message) {
-  return message ? message->text : NULL;
+func cstr8 log_msg_text(log_msg* msg) {
+  return msg ? msg->text : NULL;
 }
 
 func void _log(log_state* state, log_level level, callsite site, cstr8 fmt, ...) {
@@ -543,15 +559,19 @@ func void _log(log_state* state, log_level level, callsite site, cstr8 fmt, ...)
   va_end(args);
 
   msg log_msg = {0};
-  log_msg.type = MSG_TYPE_LOG;
-  log_msg.log.state_ptr = resolved;
-  log_msg.log.level = level;
-  log_msg.log.source_site = site;
-  snprintf(log_msg.log.text, size_of(log_msg.log.text), "%s", buf);
+  log_msg.type = MSG_CORE_TYPE_LOG;
+  msg_core_log_data log_data = {
+      .state_ptr = resolved,
+      .level = level,
+      .source_site = site,
+  };
+  snprintf(log_data.text, size_of(log_data.text), "%s", buf);
+  msg_core_fill_log(&log_msg, &log_data);
   if (!msg_post(&log_msg)) {
     return;
   }
 
-  log_state_store_message(resolved, level, site, buf);
+  log_state_store_msg(resolved, level, site, buf);
   log_emit(level, site, buf);
 }
+

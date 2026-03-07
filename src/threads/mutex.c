@@ -5,6 +5,7 @@
 #include "basic/assert.h"
 #include "context/thread_ctx.h"
 #include "input/msg.h"
+#include "input/msg_core.h"
 #include "../sdl3_include.h"
 
 func mutex _mutex_create(callsite site) {
@@ -12,10 +13,12 @@ func mutex _mutex_create(callsite site) {
   mutex handle = (mutex)SDL_CreateMutex();
   if (handle != NULL) {
     msg lifecycle_msg = {0};
-    lifecycle_msg.type = MSG_TYPE_OBJECT_LIFECYCLE;
-    lifecycle_msg.object_lifecycle.event_kind = (u32)MSG_OBJECT_EVENT_CREATE;
-    lifecycle_msg.object_lifecycle.object_type = (u32)MSG_OBJECT_TYPE_MUTEX;
-    lifecycle_msg.object_lifecycle.object_ptr = handle;
+    lifecycle_msg.type = MSG_CORE_TYPE_OBJECT_LIFECYCLE;
+    msg_core_fill_object_lifecycle(&lifecycle_msg, &(msg_core_object_lifecycle_data) {
+                                                       .event_kind = MSG_CORE_OBJECT_EVENT_CREATE,
+                                                       .object_type = MSG_CORE_OBJECT_TYPE_MUTEX,
+                                                       .object_ptr = handle,
+                                                   });
     if (!msg_post(&lifecycle_msg)) {
       SDL_DestroyMutex((SDL_Mutex*)handle);
       return NULL;
@@ -32,10 +35,12 @@ func b32 _mutex_destroy(mutex mtx, callsite site) {
   }
 
   msg lifecycle_msg = {0};
-  lifecycle_msg.type = MSG_TYPE_OBJECT_LIFECYCLE;
-  lifecycle_msg.object_lifecycle.event_kind = (u32)MSG_OBJECT_EVENT_DESTROY;
-  lifecycle_msg.object_lifecycle.object_type = (u32)MSG_OBJECT_TYPE_MUTEX;
-  lifecycle_msg.object_lifecycle.object_ptr = mtx;
+  lifecycle_msg.type = MSG_CORE_TYPE_OBJECT_LIFECYCLE;
+  msg_core_fill_object_lifecycle(&lifecycle_msg, &(msg_core_object_lifecycle_data) {
+                                                     .event_kind = MSG_CORE_OBJECT_EVENT_DESTROY,
+                                                     .object_type = MSG_CORE_OBJECT_TYPE_MUTEX,
+                                                     .object_ptr = mtx,
+                                                 });
   if (!msg_post(&lifecycle_msg)) {
     return 0;
   }
@@ -71,3 +76,4 @@ func void mutex_unlock(mutex mtx) {
   assert(mtx != NULL);
   SDL_UnlockMutex((SDL_Mutex*)mtx);
 }
+

@@ -4,12 +4,13 @@
 #include "filesystem/filestream.h"
 
 #include "basic/assert.h"
+#include "context/global_ctx.h"
 #include "context/thread_ctx.h"
 #include "filesystem/archive.h"
 #include "input/msg.h"
+#include "input/msg_core.h"
 #include "memory/allocator.h"
 #include "memory/buffer.h"
-#include "memory/vmem.h"
 
 #include "../sdl3_include.h"
 
@@ -28,7 +29,7 @@ func allocator filestream_allocator_resolve(void) {
   if (alloc.alloc_fn != NULL && alloc.dealloc_fn != NULL) {
     return alloc;
   }
-  return vmem_get_allocator();
+  return global_get_allocator();
 }
 
 func filestream filestream_empty(void) {
@@ -159,10 +160,12 @@ func filestream filestream_open(const path* src, u32 mode_flags) {
   stm.native_handle = file_ptr;
   stm.error_code = FILESTREAM_ERROR_NONE;
   msg lifecycle_msg = {0};
-  lifecycle_msg.type = MSG_TYPE_OBJECT_LIFECYCLE;
-  lifecycle_msg.object_lifecycle.event_kind = (u32)MSG_OBJECT_EVENT_CREATE;
-  lifecycle_msg.object_lifecycle.object_type = (u32)MSG_OBJECT_TYPE_FILESTREAM;
-  lifecycle_msg.object_lifecycle.object_ptr = &stm;
+  lifecycle_msg.type = MSG_CORE_TYPE_OBJECT_LIFECYCLE;
+  msg_core_fill_object_lifecycle(&lifecycle_msg, &(msg_core_object_lifecycle_data) {
+                                                     .event_kind = MSG_CORE_OBJECT_EVENT_CREATE,
+                                                     .object_type = MSG_CORE_OBJECT_TYPE_FILESTREAM,
+                                                     .object_ptr = &stm,
+                                                 });
   if (!msg_post(&lifecycle_msg)) {
     filestream_close(&stm);
     return filestream_empty();
@@ -210,10 +213,12 @@ func filestream filestream_open_archive(archive* arc, const path* src, u32 mode_
   }
 
   msg lifecycle_msg = {0};
-  lifecycle_msg.type = MSG_TYPE_OBJECT_LIFECYCLE;
-  lifecycle_msg.object_lifecycle.event_kind = (u32)MSG_OBJECT_EVENT_CREATE;
-  lifecycle_msg.object_lifecycle.object_type = (u32)MSG_OBJECT_TYPE_FILESTREAM;
-  lifecycle_msg.object_lifecycle.object_ptr = &stm;
+  lifecycle_msg.type = MSG_CORE_TYPE_OBJECT_LIFECYCLE;
+  msg_core_fill_object_lifecycle(&lifecycle_msg, &(msg_core_object_lifecycle_data) {
+                                                     .event_kind = MSG_CORE_OBJECT_EVENT_CREATE,
+                                                     .object_type = MSG_CORE_OBJECT_TYPE_FILESTREAM,
+                                                     .object_ptr = &stm,
+                                                 });
   if (!msg_post(&lifecycle_msg)) {
     filestream_close(&stm);
     return filestream_empty();
@@ -265,10 +270,12 @@ func void filestream_close(filestream* stm) {
   }
 
   msg lifecycle_msg = {0};
-  lifecycle_msg.type = MSG_TYPE_OBJECT_LIFECYCLE;
-  lifecycle_msg.object_lifecycle.event_kind = (u32)MSG_OBJECT_EVENT_DESTROY;
-  lifecycle_msg.object_lifecycle.object_type = (u32)MSG_OBJECT_TYPE_FILESTREAM;
-  lifecycle_msg.object_lifecycle.object_ptr = stm;
+  lifecycle_msg.type = MSG_CORE_TYPE_OBJECT_LIFECYCLE;
+  msg_core_fill_object_lifecycle(&lifecycle_msg, &(msg_core_object_lifecycle_data) {
+                                                     .event_kind = MSG_CORE_OBJECT_EVENT_DESTROY,
+                                                     .object_type = MSG_CORE_OBJECT_TYPE_FILESTREAM,
+                                                     .object_ptr = stm,
+                                                 });
   if (!msg_post(&lifecycle_msg)) {
     return;
   }
@@ -523,3 +530,4 @@ func filestream_error filestream_get_error(const filestream* stm) {
 
   return stm->error_code;
 }
+

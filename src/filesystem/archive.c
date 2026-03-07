@@ -4,10 +4,11 @@
 #include "filesystem/archive.h"
 #include "basic/assert.h"
 #include "basic/utility_defines.h"
+#include "context/global_ctx.h"
 #include "context/thread_ctx.h"
 #include "filesystem/file.h"
 #include "input/msg.h"
-#include "memory/vmem.h"
+#include "input/msg_core.h"
 
 #include <string.h>
 
@@ -32,7 +33,7 @@ func allocator archive_allocator_resolve(allocator* opt_alloc) {
     return thread_alloc;
   }
 
-  return vmem_get_allocator();
+  return global_get_allocator();
 }
 
 func void* archive_alloc_bytes(allocator* opt_alloc, sz size) {
@@ -257,10 +258,12 @@ func archive archive_create(allocator* opt_alloc) {
   arc.opt_alloc = opt_alloc;
   thread_log_trace("archive_create: opt_alloc=%p", (void*)opt_alloc);
   msg lifecycle_msg = {0};
-  lifecycle_msg.type = MSG_TYPE_OBJECT_LIFECYCLE;
-  lifecycle_msg.object_lifecycle.event_kind = (u32)MSG_OBJECT_EVENT_CREATE;
-  lifecycle_msg.object_lifecycle.object_type = (u32)MSG_OBJECT_TYPE_ARCHIVE;
-  lifecycle_msg.object_lifecycle.object_ptr = &arc;
+  lifecycle_msg.type = MSG_CORE_TYPE_OBJECT_LIFECYCLE;
+  msg_core_fill_object_lifecycle(&lifecycle_msg, &(msg_core_object_lifecycle_data) {
+                                                     .event_kind = MSG_CORE_OBJECT_EVENT_CREATE,
+                                                     .object_type = MSG_CORE_OBJECT_TYPE_ARCHIVE,
+                                                     .object_ptr = &arc,
+                                                 });
   if (!msg_post(&lifecycle_msg)) {
     memset(&arc, 0, size_of(arc));
   }
@@ -289,10 +292,12 @@ func void archive_destroy(archive* arc) {
   thread_log_trace("archive_destroy: arc=%p entries=%zu", (void*)arc, (size_t)arc->entry_count);
 
   msg lifecycle_msg = {0};
-  lifecycle_msg.type = MSG_TYPE_OBJECT_LIFECYCLE;
-  lifecycle_msg.object_lifecycle.event_kind = (u32)MSG_OBJECT_EVENT_DESTROY;
-  lifecycle_msg.object_lifecycle.object_type = (u32)MSG_OBJECT_TYPE_ARCHIVE;
-  lifecycle_msg.object_lifecycle.object_ptr = arc;
+  lifecycle_msg.type = MSG_CORE_TYPE_OBJECT_LIFECYCLE;
+  msg_core_fill_object_lifecycle(&lifecycle_msg, &(msg_core_object_lifecycle_data) {
+                                                     .event_kind = MSG_CORE_OBJECT_EVENT_DESTROY,
+                                                     .object_type = MSG_CORE_OBJECT_TYPE_ARCHIVE,
+                                                     .object_ptr = arc,
+                                                 });
   if (!msg_post(&lifecycle_msg)) {
     return;
   }
@@ -597,3 +602,4 @@ func b32 archive_save_file(const archive* arc, const path* dst) {
   return 0;
 #endif
 }
+

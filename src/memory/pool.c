@@ -5,6 +5,7 @@
 #include "basic/assert.h"
 #include "context/thread_ctx.h"
 #include "input/msg.h"
+#include "input/msg_core.h"
 #include "basic/utility_defines.h"
 #include <string.h>
 
@@ -120,10 +121,12 @@ func pool pool_create(
   pol.object_size = object_size;
   pol.object_align = object_align;
   msg lifecycle_msg = {0};
-  lifecycle_msg.type = MSG_TYPE_OBJECT_LIFECYCLE;
-  lifecycle_msg.object_lifecycle.event_kind = (u32)MSG_OBJECT_EVENT_CREATE;
-  lifecycle_msg.object_lifecycle.object_type = (u32)MSG_OBJECT_TYPE_POOL;
-  lifecycle_msg.object_lifecycle.object_ptr = &pol;
+  lifecycle_msg.type = MSG_CORE_TYPE_OBJECT_LIFECYCLE;
+  msg_core_fill_object_lifecycle(&lifecycle_msg, &(msg_core_object_lifecycle_data) {
+                                                     .event_kind = MSG_CORE_OBJECT_EVENT_CREATE,
+                                                     .object_type = MSG_CORE_OBJECT_TYPE_POOL,
+                                                     .object_ptr = &pol,
+                                                 });
   if (!msg_post(&lifecycle_msg)) {
     memset(&pol, 0, size_of(pol));
   }
@@ -149,10 +152,12 @@ func void pool_destroy(pool* pol) {
   assert(pol != NULL);
 
   msg lifecycle_msg = {0};
-  lifecycle_msg.type = MSG_TYPE_OBJECT_LIFECYCLE;
-  lifecycle_msg.object_lifecycle.event_kind = (u32)MSG_OBJECT_EVENT_DESTROY;
-  lifecycle_msg.object_lifecycle.object_type = (u32)MSG_OBJECT_TYPE_POOL;
-  lifecycle_msg.object_lifecycle.object_ptr = pol;
+  lifecycle_msg.type = MSG_CORE_TYPE_OBJECT_LIFECYCLE;
+  msg_core_fill_object_lifecycle(&lifecycle_msg, &(msg_core_object_lifecycle_data) {
+                                                     .event_kind = MSG_CORE_OBJECT_EVENT_DESTROY,
+                                                     .object_type = MSG_CORE_OBJECT_TYPE_POOL,
+                                                     .object_ptr = pol,
+                                                 });
   if (!msg_post(&lifecycle_msg)) {
     return;
   }
@@ -365,3 +370,4 @@ func void pool_clear(pool* pol) {
     mutex_unlock(pol->opt_mutex);
   }
 }
+

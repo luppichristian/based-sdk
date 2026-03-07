@@ -5,6 +5,7 @@
 #include "basic/assert.h"
 #include "context/thread_ctx.h"
 #include "input/msg.h"
+#include "input/msg_core.h"
 #include "../sdl3_include.h"
 
 func condvar _condvar_create(callsite site) {
@@ -12,10 +13,12 @@ func condvar _condvar_create(callsite site) {
   condvar handle = (condvar)SDL_CreateCondition();
   if (handle != NULL) {
     msg lifecycle_msg = {0};
-    lifecycle_msg.type = MSG_TYPE_OBJECT_LIFECYCLE;
-    lifecycle_msg.object_lifecycle.event_kind = (u32)MSG_OBJECT_EVENT_CREATE;
-    lifecycle_msg.object_lifecycle.object_type = (u32)MSG_OBJECT_TYPE_CONDVAR;
-    lifecycle_msg.object_lifecycle.object_ptr = handle;
+    lifecycle_msg.type = MSG_CORE_TYPE_OBJECT_LIFECYCLE;
+    msg_core_fill_object_lifecycle(&lifecycle_msg, &(msg_core_object_lifecycle_data) {
+                                                       .event_kind = MSG_CORE_OBJECT_EVENT_CREATE,
+                                                       .object_type = MSG_CORE_OBJECT_TYPE_CONDVAR,
+                                                       .object_ptr = handle,
+                                                   });
     if (!msg_post(&lifecycle_msg)) {
       SDL_DestroyCondition((SDL_Condition*)handle);
       return NULL;
@@ -32,10 +35,12 @@ func b32 _condvar_destroy(condvar cond, callsite site) {
   }
 
   msg lifecycle_msg = {0};
-  lifecycle_msg.type = MSG_TYPE_OBJECT_LIFECYCLE;
-  lifecycle_msg.object_lifecycle.event_kind = (u32)MSG_OBJECT_EVENT_DESTROY;
-  lifecycle_msg.object_lifecycle.object_type = (u32)MSG_OBJECT_TYPE_CONDVAR;
-  lifecycle_msg.object_lifecycle.object_ptr = cond;
+  lifecycle_msg.type = MSG_CORE_TYPE_OBJECT_LIFECYCLE;
+  msg_core_fill_object_lifecycle(&lifecycle_msg, &(msg_core_object_lifecycle_data) {
+                                                     .event_kind = MSG_CORE_OBJECT_EVENT_DESTROY,
+                                                     .object_type = MSG_CORE_OBJECT_TYPE_CONDVAR,
+                                                     .object_ptr = cond,
+                                                 });
   if (!msg_post(&lifecycle_msg)) {
     return 0;
   }
@@ -81,3 +86,4 @@ func void condvar_broadcast(condvar cond) {
   assert(cond != NULL);
   SDL_BroadcastCondition((SDL_Condition*)cond);
 }
+

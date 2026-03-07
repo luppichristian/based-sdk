@@ -5,10 +5,11 @@
 
 #include "basic/assert.h"
 #include "basic/env_defines.h"
+#include "context/global_ctx.h"
 #include "context/thread_ctx.h"
 #include "filesystem/file.h"
 #include "input/msg.h"
-#include "memory/vmem.h"
+#include "input/msg_core.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -38,7 +39,7 @@ func allocator filemap_allocator_resolve(void) {
   if (alloc.alloc_fn != NULL && alloc.dealloc_fn != NULL) {
     return alloc;
   }
-  return vmem_get_allocator();
+  return global_get_allocator();
 }
 
 func b32 filemap_is_open(const filemap* map) {
@@ -107,10 +108,12 @@ func void filemap_close(filemap* map) {
   assert(map->data_size == 0 || map->source_path.buf[0] != '\0');
 
   msg lifecycle_msg = {0};
-  lifecycle_msg.type = MSG_TYPE_OBJECT_LIFECYCLE;
-  lifecycle_msg.object_lifecycle.event_kind = (u32)MSG_OBJECT_EVENT_DESTROY;
-  lifecycle_msg.object_lifecycle.object_type = (u32)MSG_OBJECT_TYPE_FILEMAP;
-  lifecycle_msg.object_lifecycle.object_ptr = map;
+  lifecycle_msg.type = MSG_CORE_TYPE_OBJECT_LIFECYCLE;
+  msg_core_fill_object_lifecycle(&lifecycle_msg, &(msg_core_object_lifecycle_data) {
+                                                     .event_kind = MSG_CORE_OBJECT_EVENT_DESTROY,
+                                                     .object_type = MSG_CORE_OBJECT_TYPE_FILEMAP,
+                                                     .object_ptr = map,
+                                                 });
   if (!msg_post(&lifecycle_msg)) {
     return;
   }
@@ -227,10 +230,12 @@ func filemap filemap_open(const path* src, filemap_access access) {
   }
 
   msg lifecycle_msg = {0};
-  lifecycle_msg.type = MSG_TYPE_OBJECT_LIFECYCLE;
-  lifecycle_msg.object_lifecycle.event_kind = (u32)MSG_OBJECT_EVENT_CREATE;
-  lifecycle_msg.object_lifecycle.object_type = (u32)MSG_OBJECT_TYPE_FILEMAP;
-  lifecycle_msg.object_lifecycle.object_ptr = &map;
+  lifecycle_msg.type = MSG_CORE_TYPE_OBJECT_LIFECYCLE;
+  msg_core_fill_object_lifecycle(&lifecycle_msg, &(msg_core_object_lifecycle_data) {
+                                                     .event_kind = MSG_CORE_OBJECT_EVENT_CREATE,
+                                                     .object_type = MSG_CORE_OBJECT_TYPE_FILEMAP,
+                                                     .object_ptr = &map,
+                                                 });
   if (!msg_post(&lifecycle_msg)) {
     filemap_close(&map);
     return filemap_empty();
@@ -277,10 +282,12 @@ func filemap filemap_open(const path* src, filemap_access access) {
 
   map.native_mapping = (void*)(up)map_flags;
   msg lifecycle_msg = {0};
-  lifecycle_msg.type = MSG_TYPE_OBJECT_LIFECYCLE;
-  lifecycle_msg.object_lifecycle.event_kind = (u32)MSG_OBJECT_EVENT_CREATE;
-  lifecycle_msg.object_lifecycle.object_type = (u32)MSG_OBJECT_TYPE_FILEMAP;
-  lifecycle_msg.object_lifecycle.object_ptr = &map;
+  lifecycle_msg.type = MSG_CORE_TYPE_OBJECT_LIFECYCLE;
+  msg_core_fill_object_lifecycle(&lifecycle_msg, &(msg_core_object_lifecycle_data) {
+                                                     .event_kind = MSG_CORE_OBJECT_EVENT_CREATE,
+                                                     .object_type = MSG_CORE_OBJECT_TYPE_FILEMAP,
+                                                     .object_ptr = &map,
+                                                 });
   if (!msg_post(&lifecycle_msg)) {
     filemap_close(&map);
     return filemap_empty();
@@ -297,10 +304,12 @@ func filemap filemap_open(const path* src, filemap_access access) {
   map.data_size = file_data.size;
   map.uses_fallback_copy = 1;
   msg lifecycle_msg = {0};
-  lifecycle_msg.type = MSG_TYPE_OBJECT_LIFECYCLE;
-  lifecycle_msg.object_lifecycle.event_kind = (u32)MSG_OBJECT_EVENT_CREATE;
-  lifecycle_msg.object_lifecycle.object_type = (u32)MSG_OBJECT_TYPE_FILEMAP;
-  lifecycle_msg.object_lifecycle.object_ptr = &map;
+  lifecycle_msg.type = MSG_CORE_TYPE_OBJECT_LIFECYCLE;
+  msg_core_fill_object_lifecycle(&lifecycle_msg, &(msg_core_object_lifecycle_data) {
+                                                     .event_kind = MSG_CORE_OBJECT_EVENT_CREATE,
+                                                     .object_type = MSG_CORE_OBJECT_TYPE_FILEMAP,
+                                                     .object_ptr = &map,
+                                                 });
   if (!msg_post(&lifecycle_msg)) {
     filemap_close(&map);
     return filemap_empty();
@@ -309,3 +318,4 @@ func filemap filemap_open(const path* src, filemap_access access) {
   return map;
 #endif
 }
+

@@ -4,6 +4,7 @@
 #include "input/keyboard.h"
 #include "basic/assert.h"
 #include "input/msg.h"
+#include "input/msg_core.h"
 #include "../sdl3_include.h"
 
 global_var u32 keyboard_pressed_generation[SDL_SCANCODE_COUNT] = {0};
@@ -135,27 +136,27 @@ func cstr8 keyboard_get_scancode_name(u32 scancode) {
   return SDL_GetScancodeName((SDL_Scancode)scancode);
 }
 
-func void keyboard_internal_on_msg(const msg* src) {
-  if (src == NULL || (src->type != MSG_TYPE_KEY_DOWN && src->type != MSG_TYPE_KEY_UP)) {
+func void keyboard_internal_on_msg(msg* src) {
+  if (src == NULL || (src->type != MSG_CORE_TYPE_KEY_DOWN && src->type != MSG_CORE_TYPE_KEY_UP)) {
     return;
   }
 
-  if (!keyboard_scancode_is_valid(src->keyboard.scancode)) {
+  if (!keyboard_scancode_is_valid(msg_core_get_keyboard(src)->scancode)) {
     return;
   }
 
-  u32 scancode = src->keyboard.scancode;
+  u32 scancode = msg_core_get_keyboard(src)->scancode;
 
-  if (src->type == MSG_TYPE_KEY_DOWN) {
-    if (!src->keyboard.repeat) {
+  if (src->type == MSG_CORE_TYPE_KEY_DOWN) {
+    if (!msg_core_get_keyboard(src)->repeat) {
       keyboard_pressed_generation[scancode] = keyboard_next_generation(keyboard_pressed_generation[scancode]);
     }
-    if (src->keyboard.repeat) {
+    if (msg_core_get_keyboard(src)->repeat) {
       keyboard_repeat_count[scancode] += 1;
     } else {
       keyboard_repeat_count[scancode] = 0;
     }
-  } else if (src->type == MSG_TYPE_KEY_UP) {
+  } else if (src->type == MSG_CORE_TYPE_KEY_UP) {
     keyboard_released_generation[scancode] = keyboard_next_generation(keyboard_released_generation[scancode]);
     keyboard_repeat_count[scancode] = 0;
   }

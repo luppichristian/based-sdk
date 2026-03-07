@@ -5,6 +5,7 @@
 #include "basic/assert.h"
 #include "context/thread_ctx.h"
 #include "input/msg.h"
+#include "input/msg_core.h"
 #include "../sdl3_include.h"
 
 func semaphore _semaphore_create(u32 initial_count, callsite site) {
@@ -12,10 +13,12 @@ func semaphore _semaphore_create(u32 initial_count, callsite site) {
   semaphore handle = (semaphore)SDL_CreateSemaphore((Uint32)initial_count);
   if (handle != NULL) {
     msg lifecycle_msg = {0};
-    lifecycle_msg.type = MSG_TYPE_OBJECT_LIFECYCLE;
-    lifecycle_msg.object_lifecycle.event_kind = (u32)MSG_OBJECT_EVENT_CREATE;
-    lifecycle_msg.object_lifecycle.object_type = (u32)MSG_OBJECT_TYPE_SEMAPHORE;
-    lifecycle_msg.object_lifecycle.object_ptr = handle;
+    lifecycle_msg.type = MSG_CORE_TYPE_OBJECT_LIFECYCLE;
+    msg_core_fill_object_lifecycle(&lifecycle_msg, &(msg_core_object_lifecycle_data) {
+                                                       .event_kind = MSG_CORE_OBJECT_EVENT_CREATE,
+                                                       .object_type = MSG_CORE_OBJECT_TYPE_SEMAPHORE,
+                                                       .object_ptr = handle,
+                                                   });
     if (!msg_post(&lifecycle_msg)) {
       SDL_DestroySemaphore((SDL_Semaphore*)handle);
       return NULL;
@@ -32,10 +35,12 @@ func b32 _semaphore_destroy(semaphore sem, callsite site) {
   }
 
   msg lifecycle_msg = {0};
-  lifecycle_msg.type = MSG_TYPE_OBJECT_LIFECYCLE;
-  lifecycle_msg.object_lifecycle.event_kind = (u32)MSG_OBJECT_EVENT_DESTROY;
-  lifecycle_msg.object_lifecycle.object_type = (u32)MSG_OBJECT_TYPE_SEMAPHORE;
-  lifecycle_msg.object_lifecycle.object_ptr = sem;
+  lifecycle_msg.type = MSG_CORE_TYPE_OBJECT_LIFECYCLE;
+  msg_core_fill_object_lifecycle(&lifecycle_msg, &(msg_core_object_lifecycle_data) {
+                                                     .event_kind = MSG_CORE_OBJECT_EVENT_DESTROY,
+                                                     .object_type = MSG_CORE_OBJECT_TYPE_SEMAPHORE,
+                                                     .object_ptr = sem,
+                                                 });
   if (!msg_post(&lifecycle_msg)) {
     return 0;
   }
@@ -79,3 +84,4 @@ func void semaphore_signal(semaphore sem) {
   assert(sem != NULL);
   SDL_SignalSemaphore((SDL_Semaphore*)sem);
 }
+

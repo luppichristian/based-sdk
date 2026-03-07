@@ -6,10 +6,10 @@
 #endif
 
 #include "basic/entry.h"
-#include "basic/assert.h"
 #include "context/global_ctx.h"
 #include "context/thread_ctx.h"
 #include "input/msg.h"
+#include "input/msg_core.h"
 #include "memory/vmem.h"
 #include "../sdl3_include.h"
 
@@ -23,13 +23,20 @@ func b32 entry_main(cmdline cmdl);
 // Entry runtime state
 // =========================================================================
 
-global_var sz entry_sdl_init_depth = 0;
-global_var b32 entry_owns_sdl = false;
-global_var sz entry_global_ctx_init_depth = 0;
-global_var b32 entry_owns_global_ctx = false;
+typedef struct entry_shared_state {
+  sz sdl_init_depth;
+  b32 owns_sdl;
+  sz global_ctx_init_depth;
+  b32 owns_global_ctx;
+} entry_shared_state;
 
-thread_local global_var sz entry_thread_ctx_init_depth = 0;
-thread_local global_var b32 entry_owns_thread_ctx = false;
+typedef struct entry_thread_state {
+  sz thread_ctx_init_depth;
+  b32 owns_thread_ctx;
+} entry_thread_state;
+
+global_var entry_shared_state entry_shared = {0};
+thread_local global_var entry_thread_state entry_thread = {0};
 
 // =========================================================================
 // Common lifecycle hooks
@@ -37,94 +44,83 @@ thread_local global_var b32 entry_owns_thread_ctx = false;
 
 func b32 entry_init(cmdline cmdline) {
   (void)cmdline;
-  assert(entry_sdl_init_depth >= 0);
 
-  if (entry_sdl_init_depth == 0) {
+#ifdef OVERRIDE_GLOBAL_DEFAULT_ALLOCATOR
+  allocator default_global_allocator = global_allocator_default();
+#else
+  allocator default_global_allocator = vmem_get_allocator();
+#endif
+
+  if (entry_shared.sdl_init_depth == 0) {
     if (!SDL_WasInit(0)) {
       if (!SDL_Init(0)) {
         return false;
       }
       thread_log_trace("entry_init: SDL initialized");
-      entry_owns_sdl = true;
+      entry_shared.owns_sdl = true;
     } else {
-      entry_owns_sdl = false;
+      entry_shared.owns_sdl = false;
     }
   }
-  entry_sdl_init_depth += 1;
+  entry_shared.sdl_init_depth += 1;
 
-  if (entry_global_ctx_init_depth == 0) {
+  if (entry_shared.global_ctx_init_depth == 0) {
     if (!global_ctx_is_init()) {
-      if (!global_ctx_init(vmem_get_allocator())) {
-        entry_sdl_init_depth -= 1;
-        if (entry_sdl_init_depth == 0 && entry_owns_sdl) {
-          SDL_Quit();
-          entry_owns_sdl = false;
-        }
+      if (!global_ctx_init(default_global_allocator)) {
         return false;
       }
-      entry_owns_global_ctx = true;
+
+      entry_shared.owns_global_ctx = true;
       thread_log_trace("entry_init: global_ctx initialized");
     } else {
-      entry_owns_global_ctx = false;
+      entry_shared.owns_global_ctx = false;
     }
   }
-  entry_global_ctx_init_depth += 1;
+  entry_shared.global_ctx_init_depth += 1;
 
-  if (entry_thread_ctx_init_depth == 0) {
+  if (entry_thread.thread_ctx_init_depth == 0) {
     if (!thread_ctx_is_init()) {
-      if (!thread_ctx_init(vmem_get_allocator())) {
-        if (entry_global_ctx_init_depth > 0) {
-          entry_global_ctx_init_depth -= 1;
-          if (entry_global_ctx_init_depth == 0 && entry_owns_global_ctx) {
-            global_ctx_quit();
-            entry_owns_global_ctx = false;
-          }
-        }
-        entry_sdl_init_depth -= 1;
-        if (entry_sdl_init_depth == 0 && entry_owns_sdl) {
-          SDL_Quit();
-          entry_owns_sdl = false;
-        }
+      if (!thread_ctx_init(global_get_allocator())) {
         return false;
       }
 
-      entry_owns_thread_ctx = true;
+      entry_thread.owns_thread_ctx = true;
       (void)thread_log_sync();
       thread_log_trace("entry_init: thread_ctx initialized");
     } else {
-      entry_owns_thread_ctx = false;
+      entry_thread.owns_thread_ctx = false;
     }
   }
-  entry_thread_ctx_init_depth += 1;
+  entry_thread.thread_ctx_init_depth += 1;
 
   return true;
 }
 
 func void entry_quit(void) {
-  if (entry_thread_ctx_init_depth > 0) {
-    entry_thread_ctx_init_depth -= 1;
-    if (entry_thread_ctx_init_depth == 0 && entry_owns_thread_ctx) {
+  if (entry_thread.thread_ctx_init_depth > 0) {
+    entry_thread.thread_ctx_init_depth -= 1;
+    if (entry_thread.thread_ctx_init_depth == 0 && entry_thread.owns_thread_ctx) {
       thread_log_trace("entry_quit: thread_ctx");
       thread_ctx_quit();
-      entry_owns_thread_ctx = false;
+      entry_thread.owns_thread_ctx = false;
     }
   }
 
-  if (entry_global_ctx_init_depth > 0) {
-    entry_global_ctx_init_depth -= 1;
-    if (entry_global_ctx_init_depth == 0 && entry_owns_global_ctx) {
+  if (entry_shared.global_ctx_init_depth > 0) {
+    entry_shared.global_ctx_init_depth -= 1;
+    if (entry_shared.global_ctx_init_depth == 0 && entry_shared.owns_global_ctx) {
       thread_log_trace("entry_quit: global_ctx");
       global_ctx_quit();
-      entry_owns_global_ctx = false;
+      entry_shared.owns_global_ctx = false;
     }
   }
 
-  if (entry_sdl_init_depth > 0) {
-    entry_sdl_init_depth -= 1;
-    if (entry_sdl_init_depth == 0 && entry_owns_sdl) {
+  if (entry_shared.sdl_init_depth > 0) {
+    entry_shared.sdl_init_depth -= 1;
+    if (entry_shared.sdl_init_depth == 0 && entry_shared.owns_sdl) {
       thread_log_trace("entry_quit: SDL");
       SDL_Quit();
-      entry_owns_sdl = false;
+      entry_shared.owns_sdl = false;
     }
   }
 }
@@ -191,9 +187,7 @@ SDL_AppResult SDL_AppIterate(void* appstate) {
 
 SDL_AppResult SDL_AppEvent(void* appstate, SDL_Event* event) {
   msg based_msg = {0};
-
   (void)appstate;
-
   if (event->type == SDL_EVENT_QUIT) {
     if (msg_from_native(event, &based_msg)) {
       (void)msg_post(&based_msg);

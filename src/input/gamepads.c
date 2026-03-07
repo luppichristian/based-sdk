@@ -4,6 +4,7 @@
 #include "input/gamepads.h"
 #include "basic/assert.h"
 #include "input/msg.h"
+#include "input/msg_core.h"
 #include "../sdl3_include.h"
 
 typedef struct gamepad_slot_state {
@@ -230,24 +231,24 @@ func i16 gamepads_get_axis(input_key key, sz slot_idx, gamepad_axis axis) {
   return (i16)SDL_GetGamepadAxis(gamepad_slots[slot_idx].handle, (SDL_GamepadAxis)axis);
 }
 
-func void gamepads_internal_on_msg(const msg* src) {
-  if (src == NULL || (src->type != MSG_TYPE_GAMEPAD_BUTTON_DOWN && src->type != MSG_TYPE_GAMEPAD_BUTTON_UP)) {
+func void gamepads_internal_on_msg(msg* src) {
+  if (src == NULL || (src->type != MSG_CORE_TYPE_GAMEPAD_BUTTON_DOWN && src->type != MSG_CORE_TYPE_GAMEPAD_BUTTON_UP)) {
     return;
   }
 
   gamepads_sync_slots();
 
-  if (src->gamepad_button.button < 0 || src->gamepad_button.button >= GAMEPAD_BUTTON_COUNT) {
+  if (msg_core_get_gamepad_button(src)->button < 0 || msg_core_get_gamepad_button(src)->button >= GAMEPAD_BUTTON_COUNT) {
     return;
   }
 
-  sz slot_idx = gamepads_find_slot_by_instance((SDL_JoystickID)src->gamepad_button.device.instance);
+  sz slot_idx = gamepads_find_slot_by_instance((SDL_JoystickID)msg_core_get_gamepad_button(src)->device.instance);
   if (slot_idx >= GAMEPADS_MAX_COUNT) {
     return;
   }
 
-  gamepad_button button = src->gamepad_button.button;
-  if (src->type == MSG_TYPE_GAMEPAD_BUTTON_DOWN) {
+  gamepad_button button = msg_core_get_gamepad_button(src)->button;
+  if (src->type == MSG_CORE_TYPE_GAMEPAD_BUTTON_DOWN) {
     gamepad_slots[slot_idx].button_pressed_generation[button] =
         gamepads_next_generation(gamepad_slots[slot_idx].button_pressed_generation[button]);
   } else {

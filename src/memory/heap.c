@@ -5,6 +5,7 @@
 #include "basic/assert.h"
 #include "context/thread_ctx.h"
 #include "input/msg.h"
+#include "input/msg_core.h"
 #include "basic/utility_defines.h"
 #include <string.h>
 
@@ -177,10 +178,12 @@ func heap heap_create(allocator parent_alloc, mutex opt_mutex, sz default_block_
   hep.opt_mutex = opt_mutex;
   hep.default_block_sz = default_block_sz;
   msg lifecycle_msg = {0};
-  lifecycle_msg.type = MSG_TYPE_OBJECT_LIFECYCLE;
-  lifecycle_msg.object_lifecycle.event_kind = (u32)MSG_OBJECT_EVENT_CREATE;
-  lifecycle_msg.object_lifecycle.object_type = (u32)MSG_OBJECT_TYPE_HEAP;
-  lifecycle_msg.object_lifecycle.object_ptr = &hep;
+  lifecycle_msg.type = MSG_CORE_TYPE_OBJECT_LIFECYCLE;
+  msg_core_fill_object_lifecycle(&lifecycle_msg, &(msg_core_object_lifecycle_data) {
+                                                     .event_kind = MSG_CORE_OBJECT_EVENT_CREATE,
+                                                     .object_type = MSG_CORE_OBJECT_TYPE_HEAP,
+                                                     .object_ptr = &hep,
+                                                 });
   if (!msg_post(&lifecycle_msg)) {
     memset(&hep, 0, size_of(hep));
   }
@@ -201,10 +204,12 @@ func void heap_destroy(heap* hep) {
   assert(hep != NULL);
 
   msg lifecycle_msg = {0};
-  lifecycle_msg.type = MSG_TYPE_OBJECT_LIFECYCLE;
-  lifecycle_msg.object_lifecycle.event_kind = (u32)MSG_OBJECT_EVENT_DESTROY;
-  lifecycle_msg.object_lifecycle.object_type = (u32)MSG_OBJECT_TYPE_HEAP;
-  lifecycle_msg.object_lifecycle.object_ptr = hep;
+  lifecycle_msg.type = MSG_CORE_TYPE_OBJECT_LIFECYCLE;
+  msg_core_fill_object_lifecycle(&lifecycle_msg, &(msg_core_object_lifecycle_data) {
+                                                     .event_kind = MSG_CORE_OBJECT_EVENT_DESTROY,
+                                                     .object_type = MSG_CORE_OBJECT_TYPE_HEAP,
+                                                     .object_ptr = hep,
+                                                 });
   if (!msg_post(&lifecycle_msg)) {
     return;
   }
@@ -469,3 +474,4 @@ func void heap_clear(heap* hep) {
     mutex_unlock(hep->opt_mutex);
   }
 }
+

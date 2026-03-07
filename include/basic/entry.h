@@ -6,6 +6,7 @@
 #include "../utils/cmdline.h"
 #include "env_defines.h"
 #include "primitive_types.h"
+#include "../memory/allocator.h"
 
 // =========================================================================
 // Application Entry Points
@@ -75,3 +76,13 @@ func b32 entry_init(cmdline cmdline);
 // Common shutdown hook paired with entry_init().
 // Safe to call even if initialization failed.
 func void entry_quit(void);
+
+// =========================================================================
+// Override Global Default Allocator
+// =========================================================================
+
+// If you want, you can override the global ctx allocator.
+// By default its set to vmem_get_allocator().
+#ifdef OVERRIDE_GLOBAL_DEFAULT_ALLOCATOR
+func allocator global_allocator_default();
+#endif

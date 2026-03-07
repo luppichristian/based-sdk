@@ -5,6 +5,7 @@
 #include "basic/log.h"
 #include "context/thread_ctx.h"
 #include "input/msg.h"
+#include "input/msg_core.h"
 #include "threads/atomics.h"
 #include "../sdl3_include.h"
 #include "basic/utility_defines.h"
@@ -112,10 +113,13 @@ func void _assert(b32 condition, cstr8 cond_msg, callsite site) {
   }
 
   msg assert_msg = {0};
-  assert_msg.type = MSG_TYPE_ASSERT;
-  assert_msg.assert_data.mode = mode;
-  assert_msg.assert_data.source_site = site;
-  strncpy(assert_msg.assert_data.text, cond_msg != NULL ? cond_msg : "", MSG_ASSERT_TEXT_CAP);
+  assert_msg.type = MSG_CORE_TYPE_ASSERT;
+  msg_core_assert_data assert_data = {
+      .mode = mode,
+      .source_site = site,
+  };
+  strncpy(assert_data.text, cond_msg != NULL ? cond_msg : "", MSG_ASSERT_TEXT_CAP);
+  msg_core_fill_assert(&assert_msg, &assert_data);
   if (!msg_post(&assert_msg)) {
     return;
   }

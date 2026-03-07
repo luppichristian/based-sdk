@@ -3,9 +3,10 @@
 
 #include "threads/thread_group.h"
 #include "basic/assert.h"
+#include "context/global_ctx.h"
 #include "context/thread_ctx.h"
 #include "input/msg.h"
-#include "memory/vmem.h"
+#include "input/msg_core.h"
 #include "../sdl3_include.h"
 
 // SDL thread wrapper that bridges thread_func into thread_group_func.
@@ -18,11 +19,22 @@ func i32 thread_group_wrapper(void* raw) {
   return slot->entry(slot->index, slot->arg);
 }
 
+func allocator thread_group_allocator_resolve(void) {
+  allocator alloc = thread_get_allocator();
+  if (alloc.alloc_fn != NULL && alloc.dealloc_fn != NULL) {
+    return alloc;
+  }
+  return global_get_allocator();
+}
+
 // Shared creation path. base_name may be NULL for unnamed threads.
 func thread_group create_impl(u32 count, thread_group_func entry, void* arg, cstr8 base_name) {
-  allocator alloc = vmem_get_allocator();
+  allocator alloc = thread_group_allocator_resolve();
   thread_group empty = {0};
   if (!count || !entry) {
+    return empty;
+  }
+  if (alloc.alloc_fn == NULL || alloc.dealloc_fn == NULL) {
     return empty;
   }
   assert(alloc.alloc_fn != NULL);
@@ -75,10 +87,12 @@ func thread_group create_impl(u32 count, thread_group_func entry, void* arg, cst
 func thread_group _thread_group_create(u32 count, thread_group_func entry, void* arg, callsite site) {
   (void)site;
   msg lifecycle_msg = {0};
-  lifecycle_msg.type = MSG_TYPE_OBJECT_LIFECYCLE;
-  lifecycle_msg.object_lifecycle.event_kind = (u32)MSG_OBJECT_EVENT_CREATE;
-  lifecycle_msg.object_lifecycle.object_type = (u32)MSG_OBJECT_TYPE_THREAD_GROUP;
-  lifecycle_msg.object_lifecycle.object_ptr = NULL;
+  lifecycle_msg.type = MSG_CORE_TYPE_OBJECT_LIFECYCLE;
+  msg_core_fill_object_lifecycle(&lifecycle_msg, &(msg_core_object_lifecycle_data) {
+                                                     .event_kind = MSG_CORE_OBJECT_EVENT_CREATE,
+                                                     .object_type = MSG_CORE_OBJECT_TYPE_THREAD_GROUP,
+                                                     .object_ptr = NULL,
+                                                 });
   if (!msg_post(&lifecycle_msg)) {
     thread_group empty = {0};
     return empty;
@@ -94,10 +108,12 @@ func thread_group _thread_group_create_named(
     callsite site) {
   (void)site;
   msg lifecycle_msg = {0};
-  lifecycle_msg.type = MSG_TYPE_OBJECT_LIFECYCLE;
-  lifecycle_msg.object_lifecycle.event_kind = (u32)MSG_OBJECT_EVENT_CREATE;
-  lifecycle_msg.object_lifecycle.object_type = (u32)MSG_OBJECT_TYPE_THREAD_GROUP;
-  lifecycle_msg.object_lifecycle.object_ptr = NULL;
+  lifecycle_msg.type = MSG_CORE_TYPE_OBJECT_LIFECYCLE;
+  msg_core_fill_object_lifecycle(&lifecycle_msg, &(msg_core_object_lifecycle_data) {
+                                                     .event_kind = MSG_CORE_OBJECT_EVENT_CREATE,
+                                                     .object_type = MSG_CORE_OBJECT_TYPE_THREAD_GROUP,
+                                                     .object_ptr = NULL,
+                                                 });
   if (!msg_post(&lifecycle_msg)) {
     thread_group empty = {0};
     return empty;
@@ -106,18 +122,23 @@ func thread_group _thread_group_create_named(
 }
 
 func void _thread_group_destroy(thread_group* group, callsite site) {
-  allocator alloc = vmem_get_allocator();
+  allocator alloc = thread_group_allocator_resolve();
   (void)site;
   if (!group) {
+    return;
+  }
+  if (alloc.dealloc_fn == NULL) {
     return;
   }
   assert(alloc.dealloc_fn != NULL);
 
   msg lifecycle_msg = {0};
-  lifecycle_msg.type = MSG_TYPE_OBJECT_LIFECYCLE;
-  lifecycle_msg.object_lifecycle.event_kind = (u32)MSG_OBJECT_EVENT_DESTROY;
-  lifecycle_msg.object_lifecycle.object_type = (u32)MSG_OBJECT_TYPE_THREAD_GROUP;
-  lifecycle_msg.object_lifecycle.object_ptr = group;
+  lifecycle_msg.type = MSG_CORE_TYPE_OBJECT_LIFECYCLE;
+  msg_core_fill_object_lifecycle(&lifecycle_msg, &(msg_core_object_lifecycle_data) {
+                                                     .event_kind = MSG_CORE_OBJECT_EVENT_DESTROY,
+                                                     .object_type = MSG_CORE_OBJECT_TYPE_THREAD_GROUP,
+                                                     .object_ptr = group,
+                                                 });
   if (!msg_post(&lifecycle_msg)) {
     return;
   }
@@ -174,3 +195,4 @@ func void thread_group_detach_all(thread_group* group) {
     group->threads[idx] = NULL;
   }
 }
+

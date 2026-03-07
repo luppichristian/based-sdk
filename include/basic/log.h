@@ -39,9 +39,9 @@ typedef struct log_msg {
 // and may also hold a stack of active nested frames.
 typedef struct log_frame {
   struct log_frame* prev_active;
-  log_msg* messages_head;
-  log_msg* messages_tail;
-  sz message_count;
+  log_msg* msgs_head;
+  log_msg* msgs_tail;
+  sz msg_count;
 } log_frame;
 
 // Per-thread (or caller-owned) log configuration.
@@ -90,14 +90,14 @@ func log_frame* log_state_end_frame(log_state* state, u32 severity_mask);
 
 // Frame helpers.
 func void log_frame_destroy(log_frame* frame);
-func b32 log_frame_has_messages(log_frame* frame);
-func sz log_frame_message_count(log_frame* frame);
+func b32 log_frame_has_msgs(log_frame* frame);
+func sz log_frame_msg_count(log_frame* frame);
 func log_msg* log_frame_first(log_frame* frame);
 func log_msg* log_frame_last(log_frame* frame);
-func log_msg* log_msg_next(log_msg* message);
-func log_level log_msg_level(log_msg* message);
-func callsite log_msg_site(log_msg* message);
-func cstr8 log_msg_text(log_msg* message);
+func log_msg* log_msg_next(log_msg* msg);
+func log_level log_msg_level(log_msg* msg);
+func callsite log_msg_site(log_msg* msg);
+func cstr8 log_msg_text(log_msg* msg);
 
 // Iterates over every message in a log frame from first to last.
 #define LOG_FRAME_FOREACH(frame, it) \

@@ -5,6 +5,7 @@
 #include "basic/assert.h"
 #include "context/global_ctx.h"
 #include "input/msg.h"
+#include "input/msg_core.h"
 #include "threads/thread_current.h"
 
 #include <string.h>
@@ -96,10 +97,13 @@ func b32 thread_ctx_init(allocator main_allocator) {
   assert(main_allocator.dealloc_fn != NULL);
 
   msg thread_ctx_msg = {0};
-  thread_ctx_msg.type = MSG_TYPE_THREAD_CTX;
-  thread_ctx_msg.thread_ctx.event_kind = (u32)MSG_THREAD_CTX_EVENT_INIT;
-  thread_ctx_msg.thread_ctx.ctx_ptr = &thread_ctx;
-  thread_ctx_msg.thread_ctx.thread_id = thread_id();
+  thread_ctx_msg.type = MSG_CORE_TYPE_THREAD_CTX;
+  msg_core_thread_ctx_data thread_ctx_data = {
+      .event_kind = MSG_CORE_THREAD_CTX_EVENT_INIT,
+      .thread_id = thread_id(),
+      .ctx_ptr = &thread_ctx,
+  };
+  msg_core_fill_thread_ctx(&thread_ctx_msg, &thread_ctx_data);
   if (!msg_post(&thread_ctx_msg)) {
     return false;
   }
@@ -120,10 +124,13 @@ func void thread_ctx_quit(void) {
   }
 
   msg thread_ctx_msg = {0};
-  thread_ctx_msg.type = MSG_TYPE_THREAD_CTX;
-  thread_ctx_msg.thread_ctx.event_kind = (u32)MSG_THREAD_CTX_EVENT_QUIT;
-  thread_ctx_msg.thread_ctx.ctx_ptr = &thread_ctx;
-  thread_ctx_msg.thread_ctx.thread_id = thread_id();
+  thread_ctx_msg.type = MSG_CORE_TYPE_THREAD_CTX;
+  msg_core_thread_ctx_data thread_ctx_data = {
+      .event_kind = MSG_CORE_THREAD_CTX_EVENT_QUIT,
+      .thread_id = thread_id(),
+      .ctx_ptr = &thread_ctx,
+  };
+  msg_core_fill_thread_ctx(&thread_ctx_msg, &thread_ctx_data);
   if (!msg_post(&thread_ctx_msg)) {
     return;
   }
@@ -131,3 +138,4 @@ func void thread_ctx_quit(void) {
   thread_log_trace("thread_ctx_quit: thread_id=%llu", (unsigned long long)thread_id());
   ctx_quit(&thread_ctx);
 }
+

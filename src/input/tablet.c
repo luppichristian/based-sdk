@@ -4,6 +4,7 @@
 #include "input/tablet.h"
 #include "basic/assert.h"
 #include "input/msg.h"
+#include "input/msg_core.h"
 #include "../sdl3_include.h"
 #include <SDL3/SDL_hidapi.h>
 
@@ -156,71 +157,71 @@ func b32 tablet_read_hid_report(device_id id, void* dst, sz capacity, sz* out_si
   return 1;
 }
 
-func void tablet_internal_on_msg(const msg* src) {
+func void tablet_internal_on_msg(msg* src) {
   if (!src) {
     return;
   }
 
   switch (src->type) {
-    case MSG_TYPE_PEN_PROXIMITY_IN:
-      tablet_cached_pen_state.id = src->pen_proximity.device;
-      tablet_cached_pen_state.pen_id = src->pen_proximity.pen_id;
+    case MSG_CORE_TYPE_PEN_PROXIMITY_IN:
+      tablet_cached_pen_state.id = msg_core_get_pen_proximity(src)->device;
+      tablet_cached_pen_state.pen_id = msg_core_get_pen_proximity(src)->pen_id;
       tablet_cached_pen_state.in_proximity = 1;
-      tablet_cached_pen_state.window_id = src->pen_proximity.window_id;
+      tablet_cached_pen_state.window_id = msg_core_get_pen_proximity(src)->window_id;
       break;
 
-    case MSG_TYPE_PEN_PROXIMITY_OUT:
-      tablet_cached_pen_state.id = src->pen_proximity.device;
-      tablet_cached_pen_state.pen_id = src->pen_proximity.pen_id;
+    case MSG_CORE_TYPE_PEN_PROXIMITY_OUT:
+      tablet_cached_pen_state.id = msg_core_get_pen_proximity(src)->device;
+      tablet_cached_pen_state.pen_id = msg_core_get_pen_proximity(src)->pen_id;
       tablet_cached_pen_state.in_proximity = 0;
       tablet_cached_pen_state.touching = 0;
-      tablet_cached_pen_state.window_id = src->pen_proximity.window_id;
+      tablet_cached_pen_state.window_id = msg_core_get_pen_proximity(src)->window_id;
       break;
 
-    case MSG_TYPE_PEN_MOTION:
-      tablet_cached_pen_state.id = src->pen_motion.device;
-      tablet_cached_pen_state.pen_id = src->pen_motion.pen_id;
+    case MSG_CORE_TYPE_PEN_MOTION:
+      tablet_cached_pen_state.id = msg_core_get_pen_motion(src)->device;
+      tablet_cached_pen_state.pen_id = msg_core_get_pen_motion(src)->pen_id;
       tablet_cached_pen_state.in_proximity = 1;
-      tablet_cached_pen_state.input_mask = src->pen_motion.pen_state;
-      tablet_cached_pen_state.window_id = src->pen_motion.window_id;
-      tablet_cached_pen_state.x = src->pen_motion.x;
-      tablet_cached_pen_state.y = src->pen_motion.y;
+      tablet_cached_pen_state.input_mask = msg_core_get_pen_motion(src)->pen_state;
+      tablet_cached_pen_state.window_id = msg_core_get_pen_motion(src)->window_id;
+      tablet_cached_pen_state.x = msg_core_get_pen_motion(src)->x;
+      tablet_cached_pen_state.y = msg_core_get_pen_motion(src)->y;
       break;
 
-    case MSG_TYPE_PEN_DOWN:
-    case MSG_TYPE_PEN_UP:
-      tablet_cached_pen_state.id = src->pen_touch.device;
-      tablet_cached_pen_state.pen_id = src->pen_touch.pen_id;
+    case MSG_CORE_TYPE_PEN_DOWN:
+    case MSG_CORE_TYPE_PEN_UP:
+      tablet_cached_pen_state.id = msg_core_get_pen_touch(src)->device;
+      tablet_cached_pen_state.pen_id = msg_core_get_pen_touch(src)->pen_id;
       tablet_cached_pen_state.in_proximity = 1;
-      tablet_cached_pen_state.touching = src->pen_touch.down;
-      tablet_cached_pen_state.eraser = src->pen_touch.eraser;
-      tablet_cached_pen_state.input_mask = src->pen_touch.pen_state;
-      tablet_cached_pen_state.window_id = src->pen_touch.window_id;
-      tablet_cached_pen_state.x = src->pen_touch.x;
-      tablet_cached_pen_state.y = src->pen_touch.y;
+      tablet_cached_pen_state.touching = msg_core_get_pen_touch(src)->down;
+      tablet_cached_pen_state.eraser = msg_core_get_pen_touch(src)->eraser;
+      tablet_cached_pen_state.input_mask = msg_core_get_pen_touch(src)->pen_state;
+      tablet_cached_pen_state.window_id = msg_core_get_pen_touch(src)->window_id;
+      tablet_cached_pen_state.x = msg_core_get_pen_touch(src)->x;
+      tablet_cached_pen_state.y = msg_core_get_pen_touch(src)->y;
       break;
 
-    case MSG_TYPE_PEN_BUTTON_DOWN:
-    case MSG_TYPE_PEN_BUTTON_UP:
-      tablet_cached_pen_state.id = src->pen_button.device;
-      tablet_cached_pen_state.pen_id = src->pen_button.pen_id;
+    case MSG_CORE_TYPE_PEN_BUTTON_DOWN:
+    case MSG_CORE_TYPE_PEN_BUTTON_UP:
+      tablet_cached_pen_state.id = msg_core_get_pen_button(src)->device;
+      tablet_cached_pen_state.pen_id = msg_core_get_pen_button(src)->pen_id;
       tablet_cached_pen_state.in_proximity = 1;
-      tablet_cached_pen_state.input_mask = src->pen_button.pen_state;
-      tablet_cached_pen_state.window_id = src->pen_button.window_id;
-      tablet_cached_pen_state.x = src->pen_button.x;
-      tablet_cached_pen_state.y = src->pen_button.y;
+      tablet_cached_pen_state.input_mask = msg_core_get_pen_button(src)->pen_state;
+      tablet_cached_pen_state.window_id = msg_core_get_pen_button(src)->window_id;
+      tablet_cached_pen_state.x = msg_core_get_pen_button(src)->x;
+      tablet_cached_pen_state.y = msg_core_get_pen_button(src)->y;
       break;
 
-    case MSG_TYPE_PEN_AXIS:
-      tablet_cached_pen_state.id = src->pen_axis.device;
-      tablet_cached_pen_state.pen_id = src->pen_axis.pen_id;
+    case MSG_CORE_TYPE_PEN_AXIS:
+      tablet_cached_pen_state.id = msg_core_get_pen_axis(src)->device;
+      tablet_cached_pen_state.pen_id = msg_core_get_pen_axis(src)->pen_id;
       tablet_cached_pen_state.in_proximity = 1;
-      tablet_cached_pen_state.input_mask = src->pen_axis.pen_state;
-      tablet_cached_pen_state.window_id = src->pen_axis.window_id;
-      tablet_cached_pen_state.x = src->pen_axis.x;
-      tablet_cached_pen_state.y = src->pen_axis.y;
-      if (src->pen_axis.axis < TABLET_AXIS_COUNT) {
-        tablet_cached_pen_state.axis_values[src->pen_axis.axis] = src->pen_axis.value;
+      tablet_cached_pen_state.input_mask = msg_core_get_pen_axis(src)->pen_state;
+      tablet_cached_pen_state.window_id = msg_core_get_pen_axis(src)->window_id;
+      tablet_cached_pen_state.x = msg_core_get_pen_axis(src)->x;
+      tablet_cached_pen_state.y = msg_core_get_pen_axis(src)->y;
+      if (msg_core_get_pen_axis(src)->axis < TABLET_AXIS_COUNT) {
+        tablet_cached_pen_state.axis_values[msg_core_get_pen_axis(src)->axis] = msg_core_get_pen_axis(src)->value;
       }
       break;
 

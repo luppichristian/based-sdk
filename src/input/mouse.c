@@ -4,6 +4,7 @@
 #include "input/mouse.h"
 #include "basic/assert.h"
 #include "input/msg.h"
+#include "input/msg_core.h"
 #include "../sdl3_include.h"
 
 #define MOUSE_BUTTON_TRACK_CAP 8u
@@ -127,17 +128,17 @@ func b32 mouse_is_button_released(input_key key, u8 button) {
   return 1;
 }
 
-func void mouse_internal_on_msg(const msg* src) {
-  if (src == NULL || (src->type != MSG_TYPE_MOUSE_BUTTON_DOWN && src->type != MSG_TYPE_MOUSE_BUTTON_UP)) {
+func void mouse_internal_on_msg(msg* src) {
+  if (src == NULL || (src->type != MSG_CORE_TYPE_MOUSE_BUTTON_DOWN && src->type != MSG_CORE_TYPE_MOUSE_BUTTON_UP)) {
     return;
   }
 
-  u8 button = (u8)src->mouse_button.button;
+  u8 button = (u8)msg_core_get_mouse_button(src)->button;
   if (!mouse_button_is_valid(button)) {
     return;
   }
 
-  if (src->type == MSG_TYPE_MOUSE_BUTTON_DOWN) {
+  if (src->type == MSG_CORE_TYPE_MOUSE_BUTTON_DOWN) {
     mouse_pressed_generation[button] = mouse_next_generation(mouse_pressed_generation[button]);
   } else {
     mouse_released_generation[button] = mouse_next_generation(mouse_released_generation[button]);
