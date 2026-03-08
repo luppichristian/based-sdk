@@ -141,10 +141,7 @@ func b32 thread_ctx_init(allocator main_allocator) {
       .ctx_ptr = &thread_ctx,
   };
   msg_core_fill_thread_ctx(&thread_ctx_msg, &thread_ctx_data);
-  if (!msg_post(&thread_ctx_msg)) {
-    TracyCZoneEnd(__tracy_zone_ctx);
-    return false;
-  }
+  (void)msg_post(&thread_ctx_msg);
 
   memset(&thread_ctx, 0, size_of(thread_ctx));
   if (!ctx_init(&thread_ctx, main_allocator, NULL, false)) {
@@ -173,10 +170,7 @@ func void thread_ctx_quit(void) {
       .ctx_ptr = &thread_ctx,
   };
   msg_core_fill_thread_ctx(&thread_ctx_msg, &thread_ctx_data);
-  if (!msg_post(&thread_ctx_msg)) {
-    TracyCZoneEnd(__tracy_zone_ctx);
-    return;
-  }
+  (void)msg_post(&thread_ctx_msg);
 
   thread_log_trace("thread_ctx_quit: thread_id=%llu", (unsigned long long)thread_id());
   ctx_quit(&thread_ctx);

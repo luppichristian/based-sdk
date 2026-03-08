@@ -198,11 +198,7 @@ func filestream filestream_open(const path* src, u32 mode_flags) {
                                                      .object_type = MSG_CORE_OBJECT_TYPE_FILESTREAM,
                                                      .object_ptr = &stm,
                                                  });
-  if (!msg_post(&lifecycle_msg)) {
-    filestream_close(&stm);
-    TracyCZoneEnd(__tracy_zone_ctx);
-    return filestream_empty();
-  }
+  (void)msg_post(&lifecycle_msg);
   thread_log_trace("filestream_open: native src=%s flags=0x%08x", src->buf, mode_flags);
   TracyCZoneEnd(__tracy_zone_ctx);
   return stm;
@@ -257,11 +253,7 @@ func filestream filestream_open_archive(archive* arc, const path* src, u32 mode_
                                                      .object_type = MSG_CORE_OBJECT_TYPE_FILESTREAM,
                                                      .object_ptr = &stm,
                                                  });
-  if (!msg_post(&lifecycle_msg)) {
-    filestream_close(&stm);
-    TracyCZoneEnd(__tracy_zone_ctx);
-    return filestream_empty();
-  }
+  (void)msg_post(&lifecycle_msg);
   thread_log_trace("filestream_open_archive: path=%s flags=0x%08x", stm.archive_path.buf, mode_flags);
 
   TracyCZoneEnd(__tracy_zone_ctx);
@@ -324,10 +316,7 @@ func void filestream_close(filestream* stm) {
                                                      .object_type = MSG_CORE_OBJECT_TYPE_FILESTREAM,
                                                      .object_ptr = stm,
                                                  });
-  if (!msg_post(&lifecycle_msg)) {
-    TracyCZoneEnd(__tracy_zone_ctx);
-    return;
-  }
+  (void)msg_post(&lifecycle_msg);
 
   if (stm->kind == FILESTREAM_KIND_NATIVE) {
     file_ptr = (SDL_IOStream*)stm->native_handle;

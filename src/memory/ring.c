@@ -27,9 +27,7 @@ func ring ring_create(void* ptr, sz capacity, mutex opt_mutex) {
                                                      .object_type = MSG_CORE_OBJECT_TYPE_RING,
                                                      .object_ptr = &rng,
                                                  });
-  if (!msg_post(&lifecycle_msg)) {
-    memset(&rng, 0, size_of(rng));
-  }
+  (void)msg_post(&lifecycle_msg);
   thread_log_trace("ring_create: capacity=%zu", (size_t)capacity);
   TracyCZoneEnd(__tracy_zone_ctx);
   return rng;
@@ -61,12 +59,7 @@ func ring ring_create_alloc(allocator parent_alloc, sz capacity, mutex opt_mutex
                                                      .object_type = MSG_CORE_OBJECT_TYPE_RING,
                                                      .object_ptr = &rng,
                                                  });
-  if (!msg_post(&lifecycle_msg)) {
-    if (rng.buf_owned && rng.parent.alloc_fn) {
-      _allocator_dealloc(&rng.parent, rng.ptr, rng.capacity, CALLSITE_HERE);
-    }
-    memset(&rng, 0, size_of(rng));
-  }
+  (void)msg_post(&lifecycle_msg);
   thread_log_trace("ring_create_alloc: capacity=%zu", (size_t)capacity);
   TracyCZoneEnd(__tracy_zone_ctx);
   return rng;
@@ -95,10 +88,7 @@ func void ring_destroy(ring* rng) {
                                                      .object_type = MSG_CORE_OBJECT_TYPE_RING,
                                                      .object_ptr = rng,
                                                  });
-  if (!msg_post(&lifecycle_msg)) {
-    TracyCZoneEnd(__tracy_zone_ctx);
-    return;
-  }
+  (void)msg_post(&lifecycle_msg);
 
   if (rng->opt_mutex) {
     mutex_lock(rng->opt_mutex);

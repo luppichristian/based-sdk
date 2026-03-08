@@ -26,10 +26,7 @@ func pipe pipe_stdin(process prc) {
                                                        .object_type = MSG_CORE_OBJECT_TYPE_PIPE,
                                                        .object_ptr = pip,
                                                    });
-    if (!msg_post(&lifecycle_msg)) {
-      TracyCZoneEnd(__tracy_zone_ctx);
-      return NULL;
-    }
+    (void)msg_post(&lifecycle_msg);
   }
   TracyCZoneEnd(__tracy_zone_ctx);
   return pip;
@@ -52,10 +49,7 @@ func pipe pipe_stdout(process prc) {
                                                        .object_type = MSG_CORE_OBJECT_TYPE_PIPE,
                                                        .object_ptr = pip,
                                                    });
-    if (!msg_post(&lifecycle_msg)) {
-      TracyCZoneEnd(__tracy_zone_ctx);
-      return NULL;
-    }
+    (void)msg_post(&lifecycle_msg);
   }
   TracyCZoneEnd(__tracy_zone_ctx);
   return pip;
@@ -84,10 +78,7 @@ func pipe pipe_stderr(process prc) {
                                                        .object_type = MSG_CORE_OBJECT_TYPE_PIPE,
                                                        .object_ptr = pip,
                                                    });
-    if (!msg_post(&lifecycle_msg)) {
-      TracyCZoneEnd(__tracy_zone_ctx);
-      return NULL;
-    }
+    (void)msg_post(&lifecycle_msg);
   }
   TracyCZoneEnd(__tracy_zone_ctx);
   return pip;
@@ -175,10 +166,7 @@ func void pipe_close(pipe pip) {
                                                      .object_type = MSG_CORE_OBJECT_TYPE_PIPE,
                                                      .object_ptr = pip,
                                                  });
-  if (!msg_post(&lifecycle_msg)) {
-    TracyCZoneEnd(__tracy_zone_ctx);
-    return;
-  }
+  (void)msg_post(&lifecycle_msg);
 
   thread_log_trace("pipe_close: pipe=%p", pip);
   SDL_CloseIO((SDL_IOStream*)pip);

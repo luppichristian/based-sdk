@@ -44,12 +44,7 @@ func b32 global_ctx_init(allocator main_allocator) {
                                                  .event_kind = MSG_CORE_GLOBAL_CTX_EVENT_INIT,
                                                  .global_ctx_ptr = &process_global_ctx,
                                              });
-    if (!msg_post(&lifecycle_msg)) {
-      atomic_fence_release();
-      atomic_i32_set(&process_global_ctx_init, 0);
-      TracyCZoneEnd(__tracy_zone_ctx);
-      return false;
-    }
+    (void)msg_post(&lifecycle_msg);
 
     memset(&process_global_ctx, 0, size_of(process_global_ctx));
     process_global_ctx.mutex_handle = mutex_create();
@@ -96,12 +91,7 @@ func void global_ctx_quit(void) {
                                                .event_kind = MSG_CORE_GLOBAL_CTX_EVENT_QUIT,
                                                .global_ctx_ptr = &process_global_ctx,
                                            });
-  if (!msg_post(&lifecycle_msg)) {
-    atomic_fence_release();
-    atomic_i32_set(&process_global_ctx_init, 2);
-    TracyCZoneEnd(__tracy_zone_ctx);
-    return;
-  }
+  (void)msg_post(&lifecycle_msg);
 
   mutex wrapper_mutex = process_global_ctx.mutex_handle;
   if (wrapper_mutex) {

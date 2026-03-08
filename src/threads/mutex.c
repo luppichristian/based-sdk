@@ -21,11 +21,7 @@ func mutex _mutex_create(callsite site) {
                                                        .object_type = MSG_CORE_OBJECT_TYPE_MUTEX,
                                                        .object_ptr = handle,
                                                    });
-    if (!msg_post(&lifecycle_msg)) {
-      SDL_DestroyMutex((SDL_Mutex*)handle);
-      TracyCZoneEnd(__tracy_zone_ctx);
-      return NULL;
-    }
+    (void)msg_post(&lifecycle_msg);
     thread_log_trace("mutex_create: handle=%p", handle);
   }
   TracyCZoneEnd(__tracy_zone_ctx);
@@ -47,10 +43,7 @@ func b32 _mutex_destroy(mutex mtx, callsite site) {
                                                      .object_type = MSG_CORE_OBJECT_TYPE_MUTEX,
                                                      .object_ptr = mtx,
                                                  });
-  if (!msg_post(&lifecycle_msg)) {
-    TracyCZoneEnd(__tracy_zone_ctx);
-    return 0;
-  }
+  (void)msg_post(&lifecycle_msg);
   thread_log_trace("mutex_destroy: handle=%p", mtx);
   SDL_DestroyMutex((SDL_Mutex*)mtx);
   TracyCZoneEnd(__tracy_zone_ctx);

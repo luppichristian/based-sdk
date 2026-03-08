@@ -1,0 +1,1759 @@
+[main] Building folder: c:/Users/Utente/Developer/based/build 
+[build] Starting build
+[proc] Executing command: "C:\Program Files\CMake\bin\cmake.exe" --build c:/Users/Utente/Developer/based/build --config Debug --target based-tests -j 8 --
+[build] [1/2   0% :: 0.021] Re-checking globbed directories...
+[build] ninja: no work to do.
+[driver] Build completed: 00:00:00.109
+[build] Build finished with exit code 0
+[proc] Executing command: "C:\Program Files\CMake\bin\ctest.exe" -j8 -C Debug -T test --output-on-failure
+[ctest] Cannot find file: C:/Users/Utente/Developer/based/build/DartConfiguration.tcl
+[ctest]    Site: 
+[ctest]    Build name: (empty)
+[ctest] Cannot find file: C:/Users/Utente/Developer/based/build/DartConfiguration.tcl
+[ctest] Test project C:/Users/Utente/Developer/based/build
+[ctest]         Start 141: filesystem_directory_test.create_iterate_copy_and_remove_recursive
+[ctest]         Start 146: filesystem_filemap_test.open_read_and_close_map
+[ctest]         Start 263: processes_pipe_test.pipe_poll_readable
+[ctest]         Start 155: filesystem_pathwatch_test.lifecycle_controls_work_when_watcher_is_created
+[ctest]         Start 522: threads_mutex_test.critical_section_protection
+[ctest]         Start 262: processes_pipe_test.pipe_write
+[ctest]         Start 258: processes_pipe_test.stdin_invalid
+[ctest]         Start 259: processes_pipe_test.stdout_valid
+[ctest]   1/682 Test #146: filesystem_filemap_test.open_read_and_close_map .................................***Skipped   1.80 sec
+[ctest]         Start 277: processes_process_test.wait_blocking
+[ctest]   2/682 Test #259: processes_pipe_test.stdout_valid ................................................   Passed    1.89 sec
+[ctest]         Start 260: processes_pipe_test.stderr_valid
+[ctest]   3/682 Test #258: processes_pipe_test.stdin_invalid ...............................................   Passed    1.92 sec
+[ctest]         Start 280: processes_process_test.read_captured
+[ctest]   4/682 Test #141: filesystem_directory_test.create_iterate_copy_and_remove_recursive ..............***Skipped   1.95 sec
+[ctest]         Start 279: processes_process_test.wait_timeout
+[ctest]   5/682 Test #262: processes_pipe_test.pipe_write ..................................................   Passed    2.00 sec
+[ctest]         Start 491: threads_atomics_test.i32_sub
+[ctest]   6/682 Test #522: threads_mutex_test.critical_section_protection ..................................   Passed    2.38 sec
+[ctest]         Start 532: threads_rwlock_test.timed_write_lock
+[ctest]   7/682 Test #263: processes_pipe_test.pipe_poll_readable ..........................................   Passed    2.76 sec
+[ctest]         Start 536: threads_semaphore_test.initial_count
+[ctest]   8/682 Test #155: filesystem_pathwatch_test.lifecycle_controls_work_when_watcher_is_created .......   Passed    2.84 sec
+[ctest]         Start 261: processes_pipe_test.pipe_read
+[ctest]   9/682 Test #277: processes_process_test.wait_blocking ............................................***Failed    1.82 sec
+[ctest] Note: Google Test filter = processes_process_test.wait_blocking
+[ctest] [==========] Running 1 test from 1 test suite.
+[ctest] [----------] Global test environment set-up.
+[ctest] [----------] 1 test from processes_process_test
+[ctest] [ RUN      ] processes_process_test.wait_blocking
+[ctest] ""echo hello world" non � riconosciuto come comando interno o esterno,
+[ctest]  un programma eseguibile o un file batch.
+[ctest] C:/Users/Utente/Developer/based/tests/processes/process_test.cpp(69): error: Expected equality of these values:
+[ctest]   0
+[ctest]   exit_code
+[ctest]     Which is: 1
+[ctest] 
+[ctest] [  FAILED  ] processes_process_test.wait_blocking (23 ms)
+[ctest] [----------] 1 test from processes_process_test (23 ms total)
+[ctest] 
+[ctest] [----------] Global test environment tear-down
+[ctest] [==========] 1 test from 1 test suite ran. (24 ms total)
+[ctest] [  PASSED  ] 0 tests.
+[ctest] [  FAILED  ] 1 test, listed below:
+[ctest] [  FAILED  ] processes_process_test.wait_blocking
+[ctest] 
+[ctest]  1 FAILED TEST
+[ctest] 
+[ctest]         Start 510: threads_atomics_test.concurrent_increment
+[ctest]  10/682 Test #279: processes_process_test.wait_timeout .............................................***Failed    1.86 sec
+[ctest] Note: Google Test filter = processes_process_test.wait_timeout
+[ctest] [==========] Running 1 test from 1 test suite.
+[ctest] [----------] Global test environment set-up.
+[ctest] [----------] 1 test from processes_process_test
+[ctest] [ RUN      ] processes_process_test.wait_timeout
+[ctest] ""echo hello world" non � riconosciuto come comando interno o esterno,
+[ctest]  un programma eseguibile o un file batch.
+[ctest] C:/Users/Utente/Developer/based/tests/processes/process_test.cpp(102): error: Expected equality of these values:
+[ctest]   0
+[ctest]   exit_code
+[ctest]     Which is: 1
+[ctest] 
+[ctest] [  FAILED  ] processes_process_test.wait_timeout (19 ms)
+[ctest] [----------] 1 test from processes_process_test (19 ms total)
+[ctest] 
+[ctest] [----------] Global test environment tear-down
+[ctest] [==========] 1 test from 1 test suite ran. (20 ms total)
+[ctest] [  PASSED  ] 0 tests.
+[ctest] [  FAILED  ] 1 test, listed below:
+[ctest] [  FAILED  ] processes_process_test.wait_timeout
+[ctest] 
+[ctest]  1 FAILED TEST
+[ctest] 
+[ctest]         Start 264: processes_pipe_test.pipe_close
+[ctest]  11/682 Test #260: processes_pipe_test.stderr_valid ................................................   Passed    1.92 sec
+[ctest]         Start 513: threads_condvar_test.broadcast_wakes_all
+[ctest]  12/682 Test #280: processes_process_test.read_captured ............................................***Failed    1.92 sec
+[ctest] Note: Google Test filter = processes_process_test.read_captured
+[ctest] [==========] Running 1 test from 1 test suite.
+[ctest] [----------] Global test environment set-up.
+[ctest] [----------] 1 test from processes_process_test
+[ctest] [ RUN      ] processes_process_test.read_captured
+[ctest] C:/Users/Utente/Developer/based/tests/processes/process_test.cpp(119): error: Expected equality of these values:
+[ctest]   0
+[ctest]   exit_code
+[ctest]     Which is: 1
+[ctest] 
+[ctest] [  FAILED  ] processes_process_test.read_captured (18 ms)
+[ctest] [----------] 1 test from processes_process_test (18 ms total)
+[ctest] 
+[ctest] [----------] Global test environment tear-down
+[ctest] [==========] 1 test from 1 test suite ran. (19 ms total)
+[ctest] [  PASSED  ] 0 tests.
+[ctest] [  FAILED  ] 1 test, listed below:
+[ctest] [  FAILED  ] processes_process_test.read_captured
+[ctest] 
+[ctest]  1 FAILED TEST
+[ctest] 
+[ctest]         Start 667: utils_version_test.string_length
+[ctest]  13/682 Test #491: threads_atomics_test.i32_sub ....................................................   Passed    1.90 sec
+[ctest]         Start 535: threads_semaphore_test.create_destroy
+[ctest]  14/682 Test #532: threads_rwlock_test.timed_write_lock ............................................   Passed    1.81 sec
+[ctest]         Start 534: threads_rwlock_test.writer_excludes_reader
+[ctest]  15/682 Test #536: threads_semaphore_test.initial_count ............................................   Passed    1.85 sec
+[ctest]         Start 533: threads_rwlock_test.multiple_readers
+[ctest]  16/682 Test #261: processes_pipe_test.pipe_read ...................................................***Failed    1.84 sec
+[ctest] Note: Google Test filter = processes_pipe_test.pipe_read
+[ctest] [==========] Running 1 test from 1 test suite.
+[ctest] [----------] Global test environment set-up.
+[ctest] [----------] 1 test from processes_pipe_test
+[ctest] [ RUN      ] processes_pipe_test.pipe_read
+[ctest] ""echo hello pipe test" non � riconosciuto come comando interno o esterno,
+[ctest]  un programma eseguibile o un file batch.
+[ctest] C:/Users/Utente/Developer/based/tests/processes/pipe_test.cpp(97): error: Expected: (bytes_read) > (0U), actual: 0 vs 0
+[ctest] 
+[ctest] C:/Users/Utente/Developer/based/tests/processes/pipe_test.cpp(98): error: Expected: (cstr8_len(buffer)) > (0U), actual: 0 vs 0
+[ctest] 
+[ctest] C:/Users/Utente/Developer/based/tests/processes/pipe_test.cpp(100): error: Expected equality of these values:
+[ctest]   0
+[ctest]   exit_code
+[ctest]     Which is: 1
+[ctest] 
+[ctest] [  FAILED  ] processes_pipe_test.pipe_read (17 ms)
+[ctest] [----------] 1 test from processes_pipe_test (17 ms total)
+[ctest] 
+[ctest] [----------] Global test environment tear-down
+[ctest] [==========] 1 test from 1 test suite ran. (17 ms total)
+[ctest] [  PASSED  ] 0 tests.
+[ctest] [  FAILED  ] 1 test, listed below:
+[ctest] [  FAILED  ] processes_pipe_test.pipe_read
+[ctest] 
+[ctest]  1 FAILED TEST
+[ctest] 
+[ctest]         Start  12: basic_intrinsics_test.popcount_counts_bits_for_u32_and_u64
+[ctest]  17/682 Test #510: threads_atomics_test.concurrent_increment .......................................   Passed    1.92 sec
+[ctest]         Start   2: basic_assert_test.hook_is_invoked_for_failed_assert_in_ignore_mode
+[ctest]  18/682 Test #264: processes_pipe_test.pipe_close ..................................................   Passed    1.87 sec
+[ctest]         Start 511: threads_condvar_test.create_destroy
+[ctest]  19/682 Test #667: utils_version_test.string_length ................................................   Passed    1.87 sec
+[ctest]         Start 378: strings_strings_test.str8_format
+[ctest]  20/682 Test #535: threads_semaphore_test.create_destroy ...........................................   Passed    1.86 sec
+[ctest]         Start 537: threads_semaphore_test.wait_and_signal
+[ctest]  21/682 Test #513: threads_condvar_test.broadcast_wakes_all ........................................   Passed    1.95 sec
+[ctest]         Start 553: threads_thread_current_test.get_set_priority
+[ctest]  22/682 Test #534: threads_rwlock_test.writer_excludes_reader ......................................   Passed    1.82 sec
+[ctest]         Start 451: strings_unicode_test.utf8_to_utf16
+[ctest]  23/682 Test  #12: basic_intrinsics_test.popcount_counts_bits_for_u32_and_u64 ......................***Exception: SegFault  1.58 sec
+[ctest] Note: Google Test filter = basic_intrinsics_test.popcount_counts_bits_for_u32_and_u64
+[ctest] [==========] Running 1 test from 1 test suite.
+[ctest] [----------] Global test environment set-up.
+[ctest] [----------] 1 test from basic_intrinsics_test
+[ctest] [ RUN      ] basic_intrinsics_test.popcount_counts_bits_for_u32_and_u64
+[ctest] [       OK ] basic_intrinsics_test.popcount_counts_bits_for_u32_and_u64 (0 ms)
+[ctest] [----------] 1 test from basic_intrinsics_test (0 ms total)
+[ctest] 
+[ctest] [----------] Global test environment tear-down
+[ctest] [==========] 1 test from 1 test suite ran. (0 ms total)
+[ctest] [  PASSED  ] 1 test.
+[ctest] 
+[ctest]         Start 509: threads_atomics_test.pause
+[ctest]  24/682 Test #533: threads_rwlock_test.multiple_readers ............................................   Passed    1.88 sec
+[ctest]         Start 541: threads_semaphore_test.wait_timeout_failure
+[ctest]  25/682 Test   #2: basic_assert_test.hook_is_invoked_for_failed_assert_in_ignore_mode ..............   Passed    1.83 sec
+[ctest]         Start 161: input_devices_test.type_names_and_audio_id_encoding_roundtrip
+[ctest]  26/682 Test #511: threads_condvar_test.create_destroy .............................................   Passed    1.84 sec
+[ctest]         Start   1: basic_assert_test.set_mode_roundtrip_and_ignore_invalid_value
+[ctest]  27/682 Test #378: strings_strings_test.str8_format ................................................   Passed    1.85 sec
+[ctest]         Start 165: input_input_state_test.clear_and_serialize_deserialize_roundtrip
+[ctest]  28/682 Test #553: threads_thread_current_test.get_set_priority ....................................   Passed    1.87 sec
+[ctest]         Start 512: threads_condvar_test.signal_wakes_one
+[ctest]  29/682 Test #537: threads_semaphore_test.wait_and_signal ..........................................   Passed    1.91 sec
+[ctest]         Start 452: strings_unicode_test.utf8_to_utf16_multibyte
+[ctest]  30/682 Test #451: strings_unicode_test.utf8_to_utf16 ..............................................   Passed    1.82 sec
+[ctest]         Start   5: basic_codespace_test.src_loc_keeps_filename_and_line
+[ctest]  31/682 Test #509: threads_atomics_test.pause ......................................................   Passed    1.82 sec
+[ctest]         Start 507: threads_atomics_test.ptr_comparisons
+[ctest]  32/682 Test #541: threads_semaphore_test.wait_timeout_failure .....................................   Passed    1.84 sec
+[ctest]         Start 585: utils_crc_test.crc64_update
+[ctest]  33/682 Test #161: input_devices_test.type_names_and_audio_id_encoding_roundtrip ...................   Passed    1.81 sec
+[ctest]         Start  43: containers_binary_tree_test.remove
+[ctest]  34/682 Test   #1: basic_assert_test.set_mode_roundtrip_and_ignore_invalid_value ...................   Passed    1.80 sec
+[ctest]         Start 322: strings_cstrings_test.cstr8_ends_with
+[ctest]  35/682 Test #165: input_input_state_test.clear_and_serialize_deserialize_roundtrip ................   Passed    1.84 sec
+[ctest]         Start 100: containers_sort_test.bubble_sort
+[ctest]  36/682 Test #512: threads_condvar_test.signal_wakes_one ...........................................   Passed    1.77 sec
+[ctest]         Start 515: threads_condvar_test.producer_consumer
+[ctest]  37/682 Test #452: strings_unicode_test.utf8_to_utf16_multibyte ....................................   Passed    1.80 sec
+[ctest]         Start 538: threads_semaphore_test.try_wait_success
+[ctest]  38/682 Test   #5: basic_codespace_test.src_loc_keeps_filename_and_line ............................   Passed    1.79 sec
+[ctest]         Start 120: containers_tree_test.is_leaf
+[ctest]  39/682 Test #507: threads_atomics_test.ptr_comparisons ............................................   Passed    1.73 sec
+[ctest]         Start 550: threads_thread_current_test.sleep
+[ctest]  40/682 Test #585: utils_crc_test.crc64_update .....................................................   Passed    1.80 sec
+[ctest]         Start 547: threads_spinlock_test.critical_section_protection
+[ctest]  41/682 Test  #43: containers_binary_tree_test.remove ..............................................   Passed    1.83 sec
+[ctest]         Start 453: strings_unicode_test.utf8_to_utf16_count
+[ctest]  42/682 Test #322: strings_cstrings_test.cstr8_ends_with ...........................................   Passed    1.77 sec
+[ctest]         Start 647: utils_timestamp_test.clamp
+[ctest]  43/682 Test #100: containers_sort_test.bubble_sort ................................................   Passed    1.77 sec
+[ctest]         Start 489: threads_atomics_test.i32_get_set
+[ctest]  44/682 Test #515: threads_condvar_test.producer_consumer ..........................................   Passed    1.81 sec
+[ctest]         Start 166: input_input_state_test.capture_and_apply_keyboard_message
+[ctest]  45/682 Test #538: threads_semaphore_test.try_wait_success .........................................   Passed    1.82 sec
+[ctest]         Start  59: containers_doubly_list_test.push_back
+[ctest]  46/682 Test #120: containers_tree_test.is_leaf ....................................................   Passed    1.76 sec
+[ctest]         Start 650: utils_timestamp_test.cmp_equal
+[ctest]  47/682 Test #550: threads_thread_current_test.sleep ...............................................   Passed    1.84 sec
+[ctest]         Start 173: input_msg_test.add_remove_handler_and_before_post_dispatch
+[ctest]  48/682 Test #547: threads_spinlock_test.critical_section_protection ...............................   Passed    1.90 sec
+[ctest]         Start 186: memory_arena_test.alloc
+[ctest]  49/682 Test #453: strings_unicode_test.utf8_to_utf16_count ........................................   Passed    1.75 sec
+[ctest]         Start 394: strings_strings_test.str16_empty
+[ctest]  50/682 Test #647: utils_timestamp_test.clamp ......................................................   Passed    1.78 sec
+[ctest]         Start 212: memory_heap_test.realloc
+[ctest]  51/682 Test #489: threads_atomics_test.i32_get_set ................................................   Passed    1.76 sec
+[ctest]         Start  11: basic_env_defines_test.build_configuration_is_selected
+[ctest]  52/682 Test #166: input_input_state_test.capture_and_apply_keyboard_message .......................   Passed    1.77 sec
+[ctest]         Start 123: containers_tree_test.insert_before
+[ctest]  53/682 Test  #59: containers_doubly_list_test.push_back ...........................................   Passed    1.79 sec
+[ctest]         Start  13: basic_intrinsics_test.ctz_and_clz_handle_zero_and_non_zero_values
+[ctest]  54/682 Test #650: utils_timestamp_test.cmp_equal ..................................................   Passed    1.82 sec
+[ctest]         Start 670: utils_version_test.to_cstr8_large_version
+[ctest]  55/682 Test #173: input_msg_test.add_remove_handler_and_before_post_dispatch ......................   Passed    1.78 sec
+[ctest]         Start 265: processes_process_current_test.get_id
+[ctest]  56/682 Test #186: memory_arena_test.alloc .........................................................   Passed    1.77 sec
+[ctest]         Start 552: threads_thread_current_test.sleep_ns
+[ctest]  57/682 Test #394: strings_strings_test.str16_empty ................................................   Passed    1.81 sec
+[ctest]         Start 125: containers_tree_test.remove
+[ctest]  58/682 Test #212: memory_heap_test.realloc ........................................................   Passed    1.84 sec
+[ctest]         Start 121: containers_tree_test.insert_child_front
+[ctest]  59/682 Test  #11: basic_env_defines_test.build_configuration_is_selected ..........................   Passed    1.84 sec
+[ctest]         Start 409: strings_strings_test.str16_replace_char
+[ctest]  60/682 Test #123: containers_tree_test.insert_before ..............................................   Passed    1.86 sec
+[ctest]         Start 481: system_system_info_test.computer_name
+[ctest]  61/682 Test  #13: basic_intrinsics_test.ctz_and_clz_handle_zero_and_non_zero_values ...............   Passed    1.89 sec
+[ctest]         Start 531: threads_rwlock_test.timed_read_lock
+[ctest]  62/682 Test #670: utils_version_test.to_cstr8_large_version .......................................   Passed    1.83 sec
+[ctest]         Start   9: basic_env_defines_test.one_platform_and_one_arch_are_detected
+[ctest]  63/682 Test #265: processes_process_current_test.get_id ...........................................   Passed    1.85 sec
+[ctest]         Start 514: threads_condvar_test.wait_timeout
+[ctest]  64/682 Test #552: threads_thread_current_test.sleep_ns ............................................   Passed    1.90 sec
+[ctest]         Start 356: strings_cstrings_test.cstr32_to_upper
+[ctest]  65/682 Test #125: containers_tree_test.remove .....................................................   Passed    1.77 sec
+[ctest]         Start 460: strings_unicode_test.utf16_to_utf8_count
+[ctest]  66/682 Test #121: containers_tree_test.insert_child_front .........................................   Passed    1.79 sec
+[ctest]         Start 485: system_system_runtime_test.memory_values
+[ctest]  67/682 Test #409: strings_strings_test.str16_replace_char .........................................   Passed    1.79 sec
+[ctest]         Start 520: threads_mutex_test.timed_lock
+[ctest]  68/682 Test #481: system_system_info_test.computer_name ...........................................   Passed    1.79 sec
+[ctest]         Start  10: basic_env_defines_test.one_compiler_and_one_word_size_macro_are_detected
+[ctest]  69/682 Test #531: threads_rwlock_test.timed_read_lock .............................................   Passed    1.78 sec
+[ctest]         Start 256: processes_common_processes_test.open_file_window
+[ctest]  70/682 Test   #9: basic_env_defines_test.one_platform_and_one_arch_are_detected ...................   Passed    1.79 sec
+[ctest]         Start 493: threads_atomics_test.i32_cmpex_failure
+[ctest]  71/682 Test #514: threads_condvar_test.wait_timeout ...............................................   Passed    1.92 sec
+[ctest]         Start 651: utils_timestamp_test.cmp_less
+[ctest]  72/682 Test #356: strings_cstrings_test.cstr32_to_upper ...........................................   Passed    1.88 sec
+[ctest]         Start 646: utils_timestamp_test.abs_already_positive
+[ctest]  73/682 Test #460: strings_unicode_test.utf16_to_utf8_count ........................................   Passed    1.90 sec
+[ctest]         Start  97: containers_singly_list_test.foreach
+[ctest]  74/682 Test #485: system_system_runtime_test.memory_values ........................................   Passed    1.93 sec
+[ctest]         Start 408: strings_strings_test.str16_cat
+[ctest]  75/682 Test #520: threads_mutex_test.timed_lock ...................................................   Passed    1.89 sec
+[ctest]         Start 543: threads_spinlock_test.create_destroy
+[ctest]  76/682 Test  #10: basic_env_defines_test.one_compiler_and_one_word_size_macro_are_detected ........   Passed    1.91 sec
+[ctest]         Start 644: utils_timestamp_test.scale
+[ctest]  77/682 Test #493: threads_atomics_test.i32_cmpex_failure ..........................................   Passed    1.97 sec
+[ctest]         Start 347: strings_cstrings_test.cstr16_to_upper
+[ctest]  78/682 Test #256: processes_common_processes_test.open_file_window ................................   Passed    2.06 sec
+[ctest]         Start 359: strings_strings_test.str8_empty
+[ctest]  79/682 Test #651: utils_timestamp_test.cmp_less ...................................................   Passed    2.17 sec
+[ctest]         Start 469: strings_unicode_test.utf32_to_utf16_codepoint
+[ctest]  80/682 Test #646: utils_timestamp_test.abs_already_positive .......................................   Passed    2.11 sec
+[ctest]         Start 495: threads_atomics_test.i32_comparisons
+[ctest]  81/682 Test  #97: containers_singly_list_test.foreach .............................................   Passed    2.22 sec
+[ctest]         Start 540: threads_semaphore_test.wait_timeout_success
+[ctest]  82/682 Test #408: strings_strings_test.str16_cat ..................................................   Passed    2.08 sec
+[ctest]         Start 645: utils_timestamp_test.abs
+[ctest]  83/682 Test #543: threads_spinlock_test.create_destroy ............................................   Passed    2.10 sec
+[ctest]         Start 588: utils_endian_test.is_little_or_big
+[ctest]  84/682 Test #644: utils_timestamp_test.scale ......................................................   Passed    2.09 sec
+[ctest]         Start 559: threads_thread_group_test.parallel_execution
+[ctest]  85/682 Test #347: strings_cstrings_test.cstr16_to_upper ...........................................   Passed    2.00 sec
+[ctest]         Start 546: threads_spinlock_test.try_lock_failure_when_locked
+[ctest]  86/682 Test #359: strings_strings_test.str8_empty .................................................   Passed    1.99 sec
+[ctest]         Start   4: basic_codespace_test.callsite_struct_fields_roundtrip
+[ctest]  87/682 Test #469: strings_unicode_test.utf32_to_utf16_codepoint ...................................   Passed    1.93 sec
+[ctest]         Start 402: strings_strings_test.str16_to_lower
+[ctest]  88/682 Test #495: threads_atomics_test.i32_comparisons ............................................   Passed    1.83 sec
+[ctest]         Start 116: containers_stack_list_test.next_macro
+[ctest]  89/682 Test #540: threads_semaphore_test.wait_timeout_success .....................................   Passed    1.94 sec
+[ctest]         Start 593: utils_endian_test.be32_roundtrip
+[ctest]  90/682 Test #645: utils_timestamp_test.abs ........................................................   Passed    1.92 sec
+[ctest]         Start 143: filesystem_file_test.create_write_read_append_copy_and_delete
+[ctest]  91/682 Test #588: utils_endian_test.is_little_or_big ..............................................   Passed    1.93 sec
+[ctest]         Start 581: utils_crc_test.crc32_finalize
+[ctest]  92/682 Test #559: threads_thread_group_test.parallel_execution ....................................   Passed    1.87 sec
+[ctest]         Start 506: threads_atomics_test.ptr_cmpex
+[ctest]  93/682 Test #546: threads_spinlock_test.try_lock_failure_when_locked ..............................   Passed    1.94 sec
+[ctest]         Start 505: threads_atomics_test.ptr_get_set
+[ctest]  94/682 Test   #4: basic_codespace_test.callsite_struct_fields_roundtrip ...........................   Passed    1.96 sec
+[ctest]         Start 329: strings_cstrings_test.cstr8_remove_prefix
+[ctest]  95/682 Test #402: strings_strings_test.str16_to_lower .............................................   Passed    1.90 sec
+[ctest]         Start 605: utils_id_test.id16_zero
+[ctest]  96/682 Test #116: containers_stack_list_test.next_macro ...........................................   Passed    1.88 sec
+[ctest]         Start 672: utils_version_test.parse_cstr8_invalid
+[ctest]  97/682 Test #593: utils_endian_test.be32_roundtrip ................................................   Passed    1.93 sec
+[ctest]         Start 419: strings_strings_test.str32_from_cstr
+[ctest]  98/682 Test #506: threads_atomics_test.ptr_cmpex ..................................................   Passed    1.88 sec
+[ctest]         Start 377: strings_strings_test.str8_truncate
+[ctest]  99/682 Test #581: utils_crc_test.crc32_finalize ...................................................   Passed    1.95 sec
+[ctest]         Start  26: basic_primitive_types_test.bool_and_char_aliases_have_expected_sizes
+[ctest] 100/682 Test #143: filesystem_file_test.create_write_read_append_copy_and_delete ...................***Skipped   2.03 sec
+[ctest]         Start 286: strings_char_test.c8_is_digit
+[ctest] 101/682 Test #505: threads_atomics_test.ptr_get_set ................................................   Passed    1.89 sec
+[ctest]         Start 673: utils_version_test.parse_cstr8_large_patch
+[ctest] 102/682 Test #329: strings_cstrings_test.cstr8_remove_prefix .......................................   Passed    1.91 sec
+[ctest]         Start 199: memory_buffer_test.cmp_not_equal
+[ctest] 103/682 Test #605: utils_id_test.id16_zero .........................................................   Passed    1.87 sec
+[ctest]         Start 544: threads_spinlock_test.lock_unlock
+[ctest] 104/682 Test #672: utils_version_test.parse_cstr8_invalid ..........................................   Passed    1.87 sec
+[ctest]         Start 167: input_keyboard_test.invalid_scancodes_and_basic_queries
+[ctest] 105/682 Test #419: strings_strings_test.str32_from_cstr ............................................   Passed    1.90 sec
+[ctest]         Start 139: filesystem_archive_test.write_read_and_metadata_roundtrip
+[ctest] 106/682 Test #377: strings_strings_test.str8_truncate ..............................................   Passed    1.87 sec
+[ctest]         Start 354: strings_cstrings_test.cstr32_starts_with
+[ctest] 107/682 Test  #26: basic_primitive_types_test.bool_and_char_aliases_have_expected_sizes ............   Passed    1.90 sec
+[ctest]         Start 267: processes_process_current_test.set_priority
+[ctest] 108/682 Test #286: strings_char_test.c8_is_digit ...................................................   Passed    1.91 sec
+[ctest]         Start 442: strings_unicode_test.utf8_decode
+[ctest] 109/682 Test #673: utils_version_test.parse_cstr8_large_patch ......................................   Passed    1.84 sec
+[ctest]         Start 215: memory_heap_test.get_allocator
+[ctest] 110/682 Test #199: memory_buffer_test.cmp_not_equal ................................................   Passed    1.87 sec
+[ctest]         Start 622: utils_id_test.id64_string
+[ctest] 111/682 Test #544: threads_spinlock_test.lock_unlock ...............................................   Passed    1.84 sec
+[ctest]         Start 441: strings_unicode_test.utf8_byte_count
+[ctest] 112/682 Test #167: input_keyboard_test.invalid_scancodes_and_basic_queries .........................   Passed    1.87 sec
+[ctest]         Start 242: memory_vmem_test.reserve_basic
+[ctest] 113/682 Test #139: filesystem_archive_test.write_read_and_metadata_roundtrip .......................   Passed    1.89 sec
+[ctest]         Start 549: threads_thread_current_test.id_is_unique_per_thread
+[ctest] 114/682 Test #354: strings_cstrings_test.cstr32_starts_with ........................................   Passed    1.86 sec
+[ctest]         Start 282: strings_char_test.c8_is_alnum
+[ctest] 115/682 Test #267: processes_process_current_test.set_priority .....................................   Passed    1.88 sec
+[ctest]         Start 502: threads_atomics_test.u64_get_set
+[ctest] 116/682 Test #442: strings_unicode_test.utf8_decode ................................................   Passed    1.87 sec
+[ctest]         Start  35: basic_utility_defines_test.swap_alignment_and_scale_macros_work
+[ctest] 117/682 Test #215: memory_heap_test.get_allocator ..................................................   Passed    1.82 sec
+[ctest]         Start 621: utils_id_test.id64_cmp_greater
+[ctest] 118/682 Test #622: utils_id_test.id64_string .......................................................   Passed    1.83 sec
+[ctest]         Start 138: context_thread_ctx_test.log_sync_succeeds_for_initialized_thread_context
+[ctest] 119/682 Test #441: strings_unicode_test.utf8_byte_count ............................................   Passed    1.84 sec
+[ctest]         Start 207: memory_buffer_test.set32
+[ctest] 120/682 Test #242: memory_vmem_test.reserve_basic ..................................................   Passed    1.81 sec
+[ctest]         Start 482: system_system_info_test.user_name
+[ctest] 121/682 Test #282: strings_char_test.c8_is_alnum ...................................................   Passed    1.85 sec
+[ctest]         Start 170: input_mouse_test.primary_device_id_query_is_consistent
+[ctest] 122/682 Test #549: threads_thread_current_test.id_is_unique_per_thread .............................   Passed    1.91 sec
+[ctest]         Start 390: strings_strings_test.str8_join
+[ctest] 123/682 Test #502: threads_atomics_test.u64_get_set ................................................   Passed    1.88 sec
+[ctest]         Start 145: filesystem_filemap_test.open_invalid_path_sets_error_and_stays_closed
+[ctest] 124/682 Test  #35: basic_utility_defines_test.swap_alignment_and_scale_macros_work .................   Passed    1.87 sec
+[ctest]         Start 596: utils_endian_test.be16_values
+[ctest] 125/682 Test #621: utils_id_test.id64_cmp_greater ..................................................   Passed    1.84 sec
+[ctest]         Start 649: utils_timestamp_test.clamp_above_max
+[ctest] 126/682 Test #138: context_thread_ctx_test.log_sync_succeeds_for_initialized_thread_context ........   Passed    1.83 sec
+[ctest]         Start 501: threads_atomics_test.i64_cmpex
+[ctest] 127/682 Test #207: memory_buffer_test.set32 ........................................................   Passed    1.91 sec
+[ctest]         Start 294: strings_char_test.c8_to_lower
+[ctest] 128/682 Test #482: system_system_info_test.user_name ...............................................   Passed    1.83 sec
+[ctest]         Start 627: utils_timer_test.consume_true
+[ctest] 129/682 Test #170: input_mouse_test.primary_device_id_query_is_consistent ..........................   Passed    1.84 sec
+[ctest]         Start 610: utils_id_test.id16_string
+[ctest] 130/682 Test #390: strings_strings_test.str8_join ..................................................   Passed    1.81 sec
+[ctest]         Start 468: strings_unicode_test.utf32_to_utf16
+[ctest] 131/682 Test #145: filesystem_filemap_test.open_invalid_path_sets_error_and_stays_closed ...........   Passed    1.83 sec
+[ctest]         Start 450: strings_unicode_test.utf16_codepoint_count
+[ctest] 132/682 Test #596: utils_endian_test.be16_values ...................................................   Passed    1.83 sec
+[ctest]         Start 598: utils_id_test.id8_make
+[ctest] 133/682 Test #649: utils_timestamp_test.clamp_above_max ............................................   Passed    1.84 sec
+[ctest]         Start 616: utils_id_test.id32_string
+[ctest] 134/682 Test #501: threads_atomics_test.i64_cmpex ..................................................   Passed    1.79 sec
+[ctest]         Start 119: containers_tree_test.is_root
+[ctest] 135/682 Test #294: strings_char_test.c8_to_lower ...................................................   Passed    1.79 sec
+[ctest]         Start 421: strings_strings_test.str32_cmp
+[ctest] 136/682 Test #627: utils_timer_test.consume_true ...................................................   Passed    1.78 sec
+[ctest]         Start 529: threads_rwlock_test.try_write_lock_fails_with_reader
+[ctest] 137/682 Test #610: utils_id_test.id16_string .......................................................   Passed    1.83 sec
+[ctest]         Start  33: basic_utility_defines_test.array_and_bit_helpers_work
+[ctest] 138/682 Test #468: strings_unicode_test.utf32_to_utf16 .............................................   Passed    1.82 sec
+[ctest]         Start 314: strings_cstrings_test.cstr8_truncate
+[ctest] 139/682 Test #450: strings_unicode_test.utf16_codepoint_count ......................................   Passed    1.85 sec
+[ctest]         Start 638: utils_timestamp_test.as_milliseconds
+[ctest] 140/682 Test #119: containers_tree_test.is_root ....................................................   Passed    1.78 sec
+[ctest]         Start 111: containers_stack_list_test.empty_macro
+[ctest] 141/682 Test #616: utils_id_test.id32_string .......................................................   Passed    1.80 sec
+[ctest]         Start 607: utils_id_test.id16_cmp_equal
+[ctest] 142/682 Test #598: utils_id_test.id8_make ..........................................................   Passed    1.86 sec
+[ctest]         Start 386: strings_strings_test.str8_remove_suffix
+[ctest] 143/682 Test #421: strings_strings_test.str32_cmp ..................................................   Passed    1.85 sec
+[ctest]         Start 403: strings_strings_test.str16_trim
+[ctest] 144/682 Test #529: threads_rwlock_test.try_write_lock_fails_with_reader ............................   Passed    1.86 sec
+[ctest]         Start 671: utils_version_test.parse_cstr8
+[ctest] 145/682 Test  #33: basic_utility_defines_test.array_and_bit_helpers_work ...........................   Passed    1.94 sec
+[ctest]         Start 210: memory_heap_test.alloc_array
+[ctest] 146/682 Test #314: strings_cstrings_test.cstr8_truncate ............................................   Passed    1.95 sec
+[ctest]         Start 306: strings_cstrings_test.cstr8_clear
+[ctest] 147/682 Test #638: utils_timestamp_test.as_milliseconds ............................................   Passed    1.90 sec
+[ctest]         Start 490: threads_atomics_test.i32_add
+[ctest] 148/682 Test #607: utils_id_test.id16_cmp_equal ....................................................   Passed    1.91 sec
+[ctest]         Start  50: containers_bitset_test.test_macro
+[ctest] 149/682 Test #386: strings_strings_test.str8_remove_suffix .........................................   Passed    1.92 sec
+[ctest]         Start 652: utils_timestamp_test.cmp_greater
+[ctest] 150/682 Test #111: containers_stack_list_test.empty_macro ..........................................   Passed    1.98 sec
+[ctest]         Start 178: input_tablet_test.count_and_device_id_consistency
+[ctest] 151/682 Test #403: strings_strings_test.str16_trim .................................................   Passed    1.79 sec
+[ctest]         Start 527: threads_rwlock_test.try_read_lock_fails_with_writer
+[ctest] 152/682 Test #671: utils_version_test.parse_cstr8 ..................................................   Passed    1.77 sec
+[ctest]         Start 375: strings_strings_test.str8_cat
+[ctest] 153/682 Test #306: strings_cstrings_test.cstr8_clear ...............................................   Passed    1.80 sec
+[ctest]         Start 542: threads_semaphore_test.multiple_signals
+[ctest] 154/682 Test #210: memory_heap_test.alloc_array ....................................................   Passed    1.83 sec
+[ctest]         Start  45: containers_binary_tree_test.rotate_right
+[ctest] 155/682 Test #490: threads_atomics_test.i32_add ....................................................   Passed    1.83 sec
+[ctest]         Start 283: strings_char_test.c8_is_alpha
+[ctest] 156/682 Test #652: utils_timestamp_test.cmp_greater ................................................   Passed    1.81 sec
+[ctest]         Start 340: strings_cstrings_test.cstr16_to_cstr8
+[ctest] 157/682 Test  #50: containers_bitset_test.test_macro ...............................................   Passed    1.86 sec
+[ctest]         Start 648: utils_timestamp_test.clamp_below_min
+[ctest] 158/682 Test #178: input_tablet_test.count_and_device_id_consistency ...............................   Passed    1.81 sec
+[ctest]         Start 353: strings_cstrings_test.cstr32_find
+[ctest] 159/682 Test #527: threads_rwlock_test.try_read_lock_fails_with_writer .............................   Passed    1.74 sec
+[ctest]         Start 554: threads_thread_group_test.create
+[ctest] 160/682 Test #375: strings_strings_test.str8_cat ...................................................   Passed    1.77 sec
+[ctest]         Start 526: threads_rwlock_test.try_read_lock_success
+[ctest] 161/682 Test #542: threads_semaphore_test.multiple_signals .........................................   Passed    1.76 sec
+[ctest]         Start 142: filesystem_directory_test.base_pref_and_invalid_paths_are_handled
+[ctest] 162/682 Test  #45: containers_binary_tree_test.rotate_right ........................................   Passed    1.78 sec
+[ctest]         Start 412: strings_strings_test.str16_remove_suffix
+[ctest] 163/682 Test #283: strings_char_test.c8_is_alpha ...................................................   Passed    1.78 sec
+[ctest]         Start  94: containers_singly_list_test.pop_front
+[ctest] 164/682 Test #340: strings_cstrings_test.cstr16_to_cstr8 ...........................................   Passed    1.81 sec
+[ctest]         Start  28: basic_primitive_types_test.pointer_and_size_types_match_native_width
+[ctest] 165/682 Test #353: strings_cstrings_test.cstr32_find ...............................................   Passed    1.80 sec
+[ctest]         Start 385: strings_strings_test.str8_remove_prefix
+[ctest] 166/682 Test #648: utils_timestamp_test.clamp_below_min ............................................   Passed    1.86 sec
+[ctest]         Start 466: strings_unicode_test.utf32_to_utf8_invalid
+[ctest] 167/682 Test #554: threads_thread_group_test.create ................................................   Passed    1.80 sec
+[ctest]         Start  89: containers_ring_list_test.foreach
+[ctest] 168/682 Test #526: threads_rwlock_test.try_read_lock_success .......................................   Passed    1.81 sec
+[ctest]         Start 602: utils_id_test.id8_cmp_greater
+[ctest] 169/682 Test #412: strings_strings_test.str16_remove_suffix ........................................   Passed    1.79 sec
+[ctest]         Start  69: containers_hash_map_test.create_destroy
+[ctest] 170/682 Test #142: filesystem_directory_test.base_pref_and_invalid_paths_are_handled ...............   Passed    1.83 sec
+[ctest]         Start 548: threads_thread_current_test.get_id
+[ctest] 171/682 Test  #94: containers_singly_list_test.pop_front ...........................................   Passed    1.78 sec
+[ctest]         Start 595: utils_endian_test.le16_values
+[ctest] 172/682 Test  #28: basic_primitive_types_test.pointer_and_size_types_match_native_width ............   Passed    1.79 sec
+[ctest]         Start 664: utils_version_test.from_packed
+[ctest] 173/682 Test #385: strings_strings_test.str8_remove_prefix .........................................   Passed    1.77 sec
+[ctest]         Start 456: strings_unicode_test.utf8_to_utf32_count
+[ctest] 174/682 Test #466: strings_unicode_test.utf32_to_utf8_invalid ......................................   Passed    1.82 sec
+[ctest]         Start 132: context_global_ctx_test.singleton_and_wrappers_are_available_after_entry_init
+[ctest] 175/682 Test  #89: containers_ring_list_test.foreach ...............................................   Passed    1.77 sec
+[ctest]         Start 130: context_ctx_test.user_data_slots_support_set_get_and_bounds_checks
+[ctest] 176/682 Test #602: utils_id_test.id8_cmp_greater ...................................................   Passed    1.82 sec
+[ctest]         Start 428: strings_strings_test.str32_clear
+[ctest] 177/682 Test  #69: containers_hash_map_test.create_destroy .........................................   Passed    1.85 sec
+[ctest]         Start 388: strings_strings_test.str8_beautify
+[ctest] 178/682 Test #548: threads_thread_current_test.get_id ..............................................   Passed    1.86 sec
+[ctest]         Start 387: strings_strings_test.str8_replace
+[ctest] 179/682 Test #595: utils_endian_test.le16_values ...................................................   Passed    1.84 sec
+[ctest]         Start 599: utils_id_test.id8_next
+[ctest] 180/682 Test #664: utils_version_test.from_packed ..................................................   Passed    1.80 sec
+[ctest]         Start  99: containers_sort_test.check_sorted
+[ctest] 181/682 Test #456: strings_unicode_test.utf8_to_utf32_count ........................................   Passed    1.84 sec
+[ctest]         Start 185: memory_arena_test.create
+[ctest] 182/682 Test #132: context_global_ctx_test.singleton_and_wrappers_are_available_after_entry_init ...   Passed    1.80 sec
+[ctest]         Start 565: threads_thread_test.multiple_threads
+[ctest] 183/682 Test #130: context_ctx_test.user_data_slots_support_set_get_and_bounds_checks ..............   Passed    1.83 sec
+[ctest]         Start 517: threads_mutex_test.lock_unlock
+[ctest] 184/682 Test #428: strings_strings_test.str32_clear ................................................   Passed    1.77 sec
+[ctest]         Start 355: strings_cstrings_test.cstr32_ends_with
+[ctest] 185/682 Test #388: strings_strings_test.str8_beautify ..............................................   Passed    1.81 sec
+[ctest]         Start 523: threads_rwlock_test.create_destroy
+[ctest] 186/682 Test #387: strings_strings_test.str8_replace ...............................................   Passed    1.81 sec
+[ctest]         Start 174: input_msg_test.filter_blocks_posts_and_count_flush_work_for_type_range
+[ctest] 187/682 Test #599: utils_id_test.id8_next ..........................................................   Passed    1.82 sec
+[ctest]         Start 162: input_devices_test.invalid_ids_are_reported_as_disconnected
+[ctest] 188/682 Test  #99: containers_sort_test.check_sorted ...............................................   Passed    1.86 sec
+[ctest]         Start 257: processes_common_processes_test.open_terminal_null
+[ctest] 189/682 Test #185: memory_arena_test.create ........................................................   Passed    1.82 sec
+[ctest]         Start 539: threads_semaphore_test.try_wait_failure
+[ctest] 190/682 Test #565: threads_thread_test.multiple_threads ............................................   Passed    1.81 sec
+[ctest]         Start 573: utils_cmdline_test.has
+[ctest] 191/682 Test #517: threads_mutex_test.lock_unlock ..................................................   Passed    1.75 sec
+[ctest]         Start 193: memory_buffer_test.sub_from
+[ctest] 192/682 Test #355: strings_cstrings_test.cstr32_ends_with ..........................................   Passed    1.80 sec
+[ctest]         Start 208: memory_heap_test.create
+[ctest] 193/682 Test #523: threads_rwlock_test.create_destroy ..............................................   Passed    1.84 sec
+[ctest]         Start 372: strings_strings_test.str8_to_f64
+[ctest] 194/682 Test #174: input_msg_test.filter_blocks_posts_and_count_flush_work_for_type_range ..........   Passed    1.84 sec
+[ctest]         Start 443: strings_unicode_test.utf8_decode_multibyte
+[ctest] 195/682 Test #162: input_devices_test.invalid_ids_are_reported_as_disconnected .....................   Passed    1.82 sec
+[ctest]         Start 662: utils_uuid_test.version_nibble
+[ctest] 196/682 Test #257: processes_common_processes_test.open_terminal_null ..............................   Passed    1.81 sec
+[ctest]         Start 516: threads_mutex_test.create_destroy
+[ctest] 197/682 Test #539: threads_semaphore_test.try_wait_failure .........................................   Passed    1.82 sec
+[ctest]         Start 410: strings_strings_test.str16_remove_char
+[ctest] 198/682 Test #573: utils_cmdline_test.has ..........................................................   Passed    1.80 sec
+[ctest]         Start 205: memory_buffer_test.set8
+[ctest] 199/682 Test #193: memory_buffer_test.sub_from .....................................................   Passed    1.75 sec
+[ctest]         Start 416: strings_strings_test.str16_to_str32
+[ctest] 200/682 Test #208: memory_heap_test.create .........................................................   Passed    1.80 sec
+[ctest]         Start 569: utils_cmdline_test.build_with_args
+[ctest] 201/682 Test #372: strings_strings_test.str8_to_f64 ................................................   Passed    1.79 sec
+[ctest]         Start 615: utils_id_test.id32_cmp_greater
+[ctest] 202/682 Test #443: strings_unicode_test.utf8_decode_multibyte ......................................   Passed    1.80 sec
+[ctest]         Start 190: memory_arena_test.get_allocator
+[ctest] 203/682 Test #662: utils_uuid_test.version_nibble ..................................................   Passed    1.80 sec
+[ctest]         Start 545: threads_spinlock_test.try_lock_success
+[ctest] 204/682 Test #516: threads_mutex_test.create_destroy ...............................................   Passed    1.82 sec
+[ctest]         Start 604: utils_id_test.id8_parse
+[ctest] 205/682 Test #410: strings_strings_test.str16_remove_char ..........................................   Passed    1.81 sec
+[ctest]         Start  34: basic_utility_defines_test.layout_range_and_bounds_helpers_work
+[ctest] 206/682 Test #205: memory_buffer_test.set8 .........................................................   Passed    1.79 sec
+[ctest]         Start 655: utils_uuid_test.from_u64
+[ctest] 207/682 Test #416: strings_strings_test.str16_to_str32 .............................................   Passed    1.76 sec
+[ctest]         Start  48: containers_binary_tree_test.foreach_postorder
+[ctest] 208/682 Test #569: utils_cmdline_test.build_with_args ..............................................   Passed    1.71 sec
+[ctest]         Start 492: threads_atomics_test.i32_cmpex_success
+[ctest] 209/682 Test #615: utils_id_test.id32_cmp_greater ..................................................   Passed    1.80 sec
+[ctest]         Start  86: containers_ring_list_test.remove
+[ctest] 210/682 Test #190: memory_arena_test.get_allocator .................................................   Passed    1.80 sec
+[ctest]         Start 594: utils_endian_test.be64_roundtrip
+[ctest] 211/682 Test #545: threads_spinlock_test.try_lock_success ..........................................   Passed    1.81 sec
+[ctest]         Start 611: utils_id_test.id32_zero
+[ctest] 212/682 Test #604: utils_id_test.id8_parse .........................................................   Passed    1.78 sec
+[ctest]         Start 192: memory_buffer_test.from
+[ctest] 213/682 Test #655: utils_uuid_test.from_u64 ........................................................   Passed    1.80 sec
+[ctest] 214/682 Test  #34: basic_utility_defines_test.layout_range_and_bounds_helpers_work .................   Passed    1.83 sec
+[ctest]         Start 674: utils_version_test.cmp_equal
+[ctest]         Start 153: filesystem_pathinfo_test.invalid_inputs_return_failure
+[ctest] 215/682 Test  #48: containers_binary_tree_test.foreach_postorder ...................................   Passed    1.79 sec
+[ctest]         Start 472: system_cpu_info_test.query
+[ctest] 216/682 Test #492: threads_atomics_test.i32_cmpex_success ..........................................   Passed    1.78 sec
+[ctest]         Start 154: filesystem_pathwatch_test.invalid_arguments_are_rejected
+[ctest] 217/682 Test #594: utils_endian_test.be64_roundtrip ................................................   Passed    1.81 sec
+[ctest]         Start 483: system_system_info_test.user_home
+[ctest] 218/682 Test #611: utils_id_test.id32_zero .........................................................   Passed    1.81 sec
+[ctest]         Start 181: memory_allocator_test.create_default
+[ctest] 219/682 Test  #86: containers_ring_list_test.remove ................................................   Passed    1.87 sec
+[ctest]         Start 566: threads_thread_test.exit_code
+[ctest] 220/682 Test #192: memory_buffer_test.from .........................................................   Passed    1.78 sec
+[ctest]         Start  44: containers_binary_tree_test.rotate_left
+[ctest] 221/682 Test #674: utils_version_test.cmp_equal ....................................................   Passed    1.81 sec
+[ctest]         Start 525: threads_rwlock_test.write_lock_unlock
+[ctest] 222/682 Test #153: filesystem_pathinfo_test.invalid_inputs_return_failure ..........................   Passed    1.84 sec
+[ctest]         Start 180: input_touch_test.count_and_device_id_consistency
+[ctest] 223/682 Test #472: system_cpu_info_test.query ......................................................   Passed    1.81 sec
+[ctest]         Start 476: system_cpu_info_test.instruction_sets
+[ctest] 224/682 Test #154: filesystem_pathwatch_test.invalid_arguments_are_rejected ........................   Passed    1.71 sec
+[ctest]         Start 323: strings_cstrings_test.cstr8_to_upper
+[ctest] 225/682 Test #483: system_system_info_test.user_home ...............................................   Passed    1.84 sec
+[ctest]         Start 524: threads_rwlock_test.read_lock_unlock
+[ctest] 226/682 Test #566: threads_thread_test.exit_code ...................................................   Passed    1.91 sec
+[ctest]         Start 187: memory_arena_test.alloc_array
+[ctest] 227/682 Test #181: memory_allocator_test.create_default ............................................   Passed    1.92 sec
+[ctest]         Start 360: strings_strings_test.str8_from_cstr
+[ctest] 228/682 Test #180: input_touch_test.count_and_device_id_consistency ................................   Passed    1.84 sec
+[ctest]         Start 107: containers_sort_test.single_element
+[ctest] 229/682 Test  #44: containers_binary_tree_test.rotate_left .........................................   Passed    1.96 sec
+[ctest]         Start  32: basic_utility_defines_test.string_and_concat_macros_expand_values
+[ctest] 230/682 Test #476: system_cpu_info_test.instruction_sets ...........................................   Passed    1.85 sec
+[ctest]         Start 371: strings_strings_test.str8_to_i64
+[ctest] 231/682 Test #323: strings_cstrings_test.cstr8_to_upper ............................................   Passed    1.80 sec
+[ctest]         Start  37: containers_binary_tree_test.next_inorder_ptr
+[ctest] 232/682 Test #525: threads_rwlock_test.write_lock_unlock ...........................................   Passed    1.92 sec
+[ctest]         Start  60: containers_doubly_list_test.pop_front
+[ctest] 233/682 Test #524: threads_rwlock_test.read_lock_unlock ............................................   Passed    1.81 sec
+[ctest]         Start 274: processes_process_test.create_with_echo
+[ctest] 234/682 Test #187: memory_arena_test.alloc_array ...................................................   Passed    1.79 sec
+[ctest]         Start 568: utils_cmdline_test.build_empty
+[ctest] 235/682 Test #360: strings_strings_test.str8_from_cstr .............................................   Passed    1.82 sec
+[ctest]         Start 397: strings_strings_test.str16_cmp
+[ctest] 236/682 Test  #32: basic_utility_defines_test.string_and_concat_macros_expand_values ...............   Passed    1.82 sec
+[ctest]         Start 113: containers_stack_list_test.pop
+[ctest] 237/682 Test #107: containers_sort_test.single_element .............................................   Passed    1.89 sec
+[ctest]         Start 580: utils_crc_test.crc32_update
+[ctest] 238/682 Test  #60: containers_doubly_list_test.pop_front ...........................................   Passed    1.89 sec
+[ctest] 239/682 Test #371: strings_strings_test.str8_to_i64 ................................................   Passed    1.91 sec
+[ctest]         Start  68: containers_doubly_list_test.foreach_reverse
+[ctest]         Start  36: containers_binary_tree_test.first_inorder_ptr
+[ctest] 240/682 Test  #37: containers_binary_tree_test.next_inorder_ptr ....................................   Passed    1.93 sec
+[ctest]         Start  61: containers_doubly_list_test.pop_back
+[ctest] 241/682 Test #274: processes_process_test.create_with_echo .........................................   Passed    1.84 sec
+[ctest]         Start 352: strings_cstrings_test.cstr32_cmp
+[ctest] 242/682 Test #397: strings_strings_test.str16_cmp ..................................................   Passed    1.85 sec
+[ctest]         Start  98: containers_sort_test.check_unsorted
+[ctest] 243/682 Test #568: utils_cmdline_test.build_empty ..................................................   Passed    1.89 sec
+[ctest]         Start 160: input_clipboard_test.invalid_arguments_and_basic_text_cycle
+[ctest] 244/682 Test #113: containers_stack_list_test.pop ..................................................   Passed    1.85 sec
+[ctest]         Start 172: input_msg_core_test.category_or_type_mismatch_returns_null_accessor
+[ctest] 245/682 Test #580: utils_crc_test.crc32_update .....................................................   Passed    1.82 sec
+[ctest]         Start  80: containers_hash_map_test.not_found
+[ctest] 246/682 Test  #61: containers_doubly_list_test.pop_back ............................................   Passed    1.79 sec
+[ctest]         Start  84: containers_ring_list_test.pop_front
+[ctest] 247/682 Test  #68: containers_doubly_list_test.foreach_reverse .....................................   Passed    1.87 sec
+[ctest]         Start 479: system_system_info_test.os_version
+[ctest] 248/682 Test  #36: containers_binary_tree_test.first_inorder_ptr ...................................   Passed    1.89 sec
+[ctest]         Start 284: strings_char_test.c8_is_blank
+[ctest] 249/682 Test #352: strings_cstrings_test.cstr32_cmp ................................................   Passed    1.77 sec
+[ctest]         Start  96: containers_singly_list_test.head_tail
+[ctest] 250/682 Test #160: input_clipboard_test.invalid_arguments_and_basic_text_cycle .....................   Passed    1.84 sec
+[ctest]         Start 281: processes_process_test.kill
+[ctest] 251/682 Test  #98: containers_sort_test.check_unsorted .............................................   Passed    1.88 sec
+[ctest]         Start 110: containers_sort_test.radix64
+[ctest] 252/682 Test #172: input_msg_core_test.category_or_type_mismatch_returns_null_accessor .............   Passed    1.85 sec
+[ctest]         Start 558: threads_thread_group_test.detach_all
+[ctest] 253/682 Test  #80: containers_hash_map_test.not_found ..............................................   Passed    1.84 sec
+[ctest]         Start 245: memory_vmem_test.alloc_basic
+[ctest] 254/682 Test  #84: containers_ring_list_test.pop_front .............................................   Passed    1.83 sec
+[ctest]         Start 438: strings_strings_test.str32_to_str16
+[ctest] 255/682 Test #479: system_system_info_test.os_version ..............................................   Passed    1.82 sec
+[ctest]         Start 597: utils_id_test.id8_zero
+[ctest] 256/682 Test #284: strings_char_test.c8_is_blank ...................................................   Passed    1.80 sec
+[ctest]         Start 182: memory_allocator_test.custom_callbacks
+[ctest] 257/682 Test #558: threads_thread_group_test.detach_all ............................................***Exception: SegFault  1.52 sec
+[ctest] Note: Google Test filter = threads_thread_group_test.detach_all
+[ctest] [==========] Running 1 test from 1 test suite.
+[ctest] [----------] Global test environment set-up.
+[ctest] [----------] 1 test from threads_thread_group_test
+[ctest] [ RUN      ] threads_thread_group_test.detach_all
+[ctest] [       OK ] threads_thread_group_test.detach_all (0 ms)
+[ctest] [----------] 1 test from threads_thread_group_test (0 ms total)
+[ctest] 
+[ctest] [----------] Global test environment tear-down
+[ctest] [==========] 1 test from 1 test suite ran. (0 ms total)
+[ctest] [  PASSED  ] 1 test.
+[ctest] 
+[ctest]         Start 243: memory_vmem_test.reserve_commit_release
+[ctest] 258/682 Test  #96: containers_singly_list_test.head_tail ...........................................   Passed    1.80 sec
+[ctest]         Start 603: utils_id_test.id8_string
+[ctest] 259/682 Test #281: processes_process_test.kill .....................................................   Passed    1.80 sec
+[ctest]         Start 312: strings_cstrings_test.cstr8_cat
+[ctest] 260/682 Test #110: containers_sort_test.radix64 ....................................................   Passed    1.83 sec
+[ctest]         Start 276: processes_process_test.get_id
+[ctest] 261/682 Test #245: memory_vmem_test.alloc_basic ....................................................   Passed    1.81 sec
+[ctest]         Start 318: strings_cstrings_test.cstr8_find_char
+[ctest] 262/682 Test #438: strings_strings_test.str32_to_str16 .............................................   Passed    1.81 sec
+[ctest]         Start 500: threads_atomics_test.i64_add
+[ctest] 263/682 Test #182: memory_allocator_test.custom_callbacks ..........................................   Passed    1.78 sec
+[ctest]         Start 194: memory_buffer_test.sub_from_sized
+[ctest] 264/682 Test #597: utils_id_test.id8_zero ..........................................................   Passed    1.81 sec
+[ctest]         Start 589: utils_endian_test.le16_roundtrip
+[ctest] 265/682 Test #243: memory_vmem_test.reserve_commit_release .........................................   Passed    1.80 sec
+[ctest]         Start 220: memory_pool_test.free_count
+[ctest] 266/682 Test #603: utils_id_test.id8_string ........................................................   Passed    1.88 sec
+[ctest]         Start 459: strings_unicode_test.utf16_to_utf8_surrogate
+[ctest] 267/682 Test #312: strings_cstrings_test.cstr8_cat .................................................   Passed    1.78 sec
+[ctest]         Start  18: basic_keyword_defines_test.likely_and_unlikely_preserve_boolean_value
+[ctest] 268/682 Test #276: processes_process_test.get_id ...................................................   Passed    1.78 sec
+[ctest]         Start 518: threads_mutex_test.trylock
+[ctest] 269/682 Test #318: strings_cstrings_test.cstr8_find_char ...........................................   Passed    1.78 sec
+[ctest]         Start 382: strings_strings_test.str8_replace_char
+[ctest] 270/682 Test #194: memory_buffer_test.sub_from_sized ...............................................   Passed    1.79 sec
+[ctest]         Start 496: threads_atomics_test.u32_get_set
+[ctest] 271/682 Test #500: threads_atomics_test.i64_add ....................................................   Passed    1.83 sec
+[ctest] 272/682 Test #589: utils_endian_test.le16_roundtrip ................................................   Passed    1.80 sec
+[ctest]         Start 391: strings_strings_test.str8_to_str16
+[ctest]         Start 473: system_cpu_info_test.vendor_name
+[ctest] 273/682 Test #220: memory_pool_test.free_count .....................................................   Passed    1.80 sec
+[ctest]         Start 467: strings_unicode_test.utf32_to_utf8_count
+[ctest] 274/682 Test #459: strings_unicode_test.utf16_to_utf8_surrogate ....................................   Passed    1.80 sec
+[ctest]         Start 239: memory_scratch_test.nested_allocations_released
+[ctest] 275/682 Test  #18: basic_keyword_defines_test.likely_and_unlikely_preserve_boolean_value ...........   Passed    1.80 sec
+[ctest]         Start 292: strings_char_test.c8_is_upper
+[ctest] 276/682 Test #518: threads_mutex_test.trylock ......................................................   Passed    1.80 sec
+[ctest]         Start 392: strings_strings_test.str8_to_str32
+[ctest] 277/682 Test #382: strings_strings_test.str8_replace_char ..........................................   Passed    1.78 sec
+[ctest]         Start 675: utils_version_test.cmp_major_less
+[ctest] 278/682 Test #496: threads_atomics_test.u32_get_set ................................................   Passed    1.77 sec
+[ctest]         Start 663: utils_version_test.zero
+[ctest] 279/682 Test #391: strings_strings_test.str8_to_str16 ..............................................   Passed    1.83 sec
+[ctest]         Start 494: threads_atomics_test.i32_and_or_xor
+[ctest] 280/682 Test #473: system_cpu_info_test.vendor_name ................................................   Passed    1.84 sec
+[ctest]         Start  23: basic_log_test.frame_capture_and_filtering_work
+[ctest] 281/682 Test #467: strings_unicode_test.utf32_to_utf8_count ........................................   Passed    1.80 sec
+[ctest]         Start 457: strings_unicode_test.utf16_to_utf8
+[ctest] 282/682 Test #239: memory_scratch_test.nested_allocations_released .................................   Passed    1.77 sec
+[ctest]         Start 379: strings_strings_test.str8_to_upper
+[ctest] 283/682 Test #292: strings_char_test.c8_is_upper ...................................................   Passed    1.79 sec
+[ctest]         Start 358: strings_strings_test.str8_make
+[ctest] 284/682 Test #392: strings_strings_test.str8_to_str32 ..............................................   Passed    1.78 sec
+[ctest]         Start 108: containers_sort_test.empty_array
+[ctest] 285/682 Test #675: utils_version_test.cmp_major_less ...............................................   Passed    1.81 sec
+[ctest]         Start 665: utils_version_test.make
+[ctest] 286/682 Test #663: utils_version_test.zero .........................................................   Passed    1.80 sec
+[ctest]         Start 191: memory_arena_test.total_free
+[ctest] 287/682 Test  #23: basic_log_test.frame_capture_and_filtering_work .................................   Passed    1.78 sec
+[ctest]         Start 411: strings_strings_test.str16_remove_prefix
+[ctest] 288/682 Test #494: threads_atomics_test.i32_and_or_xor .............................................   Passed    1.86 sec
+[ctest]         Start 248: memory_vmem_test.realloc_shrink
+[ctest] 289/682 Test #457: strings_unicode_test.utf16_to_utf8 ..............................................   Passed    1.77 sec
+[ctest]         Start 335: strings_cstrings_test.cstr8_to_f64
+[ctest] 290/682 Test #379: strings_strings_test.str8_to_upper ..............................................   Passed    1.75 sec
+[ctest]         Start 572: utils_cmdline_test.find
+[ctest] 291/682 Test #358: strings_strings_test.str8_make ..................................................   Passed    1.80 sec
+[ctest]         Start 140: filesystem_archive_test.iterate_remove_and_clear_entries
+[ctest] 292/682 Test #108: containers_sort_test.empty_array ................................................   Passed    1.81 sec
+[ctest]         Start  92: containers_singly_list_test.push_front
+[ctest] 293/682 Test #665: utils_version_test.make .........................................................   Passed    1.85 sec
+[ctest]         Start 346: strings_cstrings_test.cstr16_ends_with
+[ctest] 294/682 Test #191: memory_arena_test.total_free ....................................................   Passed    1.84 sec
+[ctest]         Start 503: threads_atomics_test.u64_add_sub
+[ctest] 295/682 Test #411: strings_strings_test.str16_remove_prefix ........................................   Passed    1.77 sec
+[ctest]         Start 504: threads_atomics_test.u64_cmpex
+[ctest] 296/682 Test #248: memory_vmem_test.realloc_shrink .................................................   Passed    1.78 sec
+[ctest]         Start 641: utils_timestamp_test.as_hours
+[ctest] 297/682 Test #335: strings_cstrings_test.cstr8_to_f64 ..............................................   Passed    1.84 sec
+[ctest]         Start 128: containers_tree_test.foreach_preorder
+[ctest] 298/682 Test #572: utils_cmdline_test.find .........................................................   Passed    1.85 sec
+[ctest]         Start  19: basic_keyword_defines_test.size_of_and_static_assert_are_usable
+[ctest] 299/682 Test #140: filesystem_archive_test.iterate_remove_and_clear_entries ........................   Passed    1.78 sec
+[ctest]         Start 136: context_thread_ctx_test.user_data_roundtrip_and_bounds_checks_work
+[ctest] 300/682 Test  #92: containers_singly_list_test.push_front ..........................................   Passed    1.79 sec
+[ctest]         Start 570: utils_cmdline_test.get_program
+[ctest] 301/682 Test #346: strings_cstrings_test.cstr16_ends_with ..........................................   Passed    1.77 sec
+[ctest]         Start 373: strings_strings_test.str8_clear
+[ctest] 302/682 Test #504: threads_atomics_test.u64_cmpex ..................................................   Passed    1.77 sec
+[ctest]         Start 619: utils_id_test.id64_cmp_equal
+[ctest] 303/682 Test #503: threads_atomics_test.u64_add_sub ................................................   Passed    1.83 sec
+[ctest]         Start 484: system_system_runtime_test.query
+[ctest] 304/682 Test #641: utils_timestamp_test.as_hours ...................................................   Passed    1.82 sec
+[ctest]         Start 357: strings_cstrings_test.cstr32_to_lower
+[ctest] 305/682 Test #128: containers_tree_test.foreach_preorder ...........................................   Passed    1.74 sec
+[ctest]         Start 321: strings_cstrings_test.cstr8_starts_with
+[ctest] 306/682 Test  #19: basic_keyword_defines_test.size_of_and_static_assert_are_usable .................   Passed    1.79 sec
+[ctest]         Start 455: strings_unicode_test.utf8_to_utf32_multibyte
+[ctest] 307/682 Test #136: context_thread_ctx_test.user_data_roundtrip_and_bounds_checks_work ..............   Passed    1.79 sec
+[ctest]         Start 341: strings_cstrings_test.cstr16_len
+[ctest] 308/682 Test #570: utils_cmdline_test.get_program ..................................................   Passed    1.79 sec
+[ctest]         Start 406: strings_strings_test.str16_clear
+[ctest] 309/682 Test #373: strings_strings_test.str8_clear .................................................   Passed    1.76 sec
+[ctest]         Start 367: strings_strings_test.str8_find_last_char
+[ctest] 310/682 Test #619: utils_id_test.id64_cmp_equal ....................................................   Passed    1.81 sec
+[ctest]         Start 219: memory_pool_test.dealloc
+[ctest] 311/682 Test #484: system_system_runtime_test.query ................................................   Passed    1.79 sec
+[ctest]         Start 575: utils_cmdline_test.get_option_equals
+[ctest] 312/682 Test #357: strings_cstrings_test.cstr32_to_lower ...........................................   Passed    1.78 sec
+[ctest]         Start 551: threads_thread_current_test.yield
+[ctest] 313/682 Test #321: strings_cstrings_test.cstr8_starts_with .........................................   Passed    1.77 sec
+[ctest]         Start 477: system_system_info_test.query
+[ctest] 314/682 Test #455: strings_unicode_test.utf8_to_utf32_multibyte ....................................   Passed    1.78 sec
+[ctest]         Start 200: memory_buffer_test.cmp_common
+[ctest] 315/682 Test #341: strings_cstrings_test.cstr16_len ................................................   Passed    1.78 sec
+[ctest]         Start 298: strings_char_test.c16_classification
+[ctest] 316/682 Test #406: strings_strings_test.str16_clear ................................................   Passed    1.79 sec
+[ctest]         Start 103: containers_sort_test.insertion_sort
+[ctest] 317/682 Test #367: strings_strings_test.str8_find_last_char ........................................   Passed    1.75 sec
+[ctest]         Start 124: containers_tree_test.insert_after
+[ctest] 318/682 Test #219: memory_pool_test.dealloc ........................................................   Passed    1.78 sec
+[ctest]         Start  31: basic_profiler_test.tracy_zone_macros_compile_and_execute
+[ctest] 319/682 Test #575: utils_cmdline_test.get_option_equals ............................................   Passed    1.79 sec
+[ctest]         Start 578: utils_cmdline_test.get_option_f64
+[ctest] 320/682 Test #551: threads_thread_current_test.yield ...............................................   Passed    1.78 sec
+[ctest]         Start 383: strings_strings_test.str8_remove_char
+[ctest] 321/682 Test #477: system_system_info_test.query ...................................................   Passed    1.78 sec
+[ctest]         Start 422: strings_strings_test.str32_find
+[ctest] 322/682 Test #200: memory_buffer_test.cmp_common ...................................................   Passed    1.80 sec
+[ctest]         Start 624: utils_timer_test.bump
+[ctest] 323/682 Test #298: strings_char_test.c16_classification ............................................   Passed    1.77 sec
+[ctest]         Start 101: containers_sort_test.bubble_sort_already_sorted
+[ctest] 324/682 Test #103: containers_sort_test.insertion_sort .............................................   Passed    1.86 sec
+[ctest]         Start 620: utils_id_test.id64_cmp_less
+[ctest] 325/682 Test #124: containers_tree_test.insert_after ...............................................   Passed    1.87 sec
+[ctest]         Start  15: basic_intrinsics_test.bswap_reverses_byte_order
+[ctest] 326/682 Test #578: utils_cmdline_test.get_option_f64 ...............................................   Passed    1.77 sec
+[ctest]         Start 255: processes_common_processes_test.open_weblink_null
+[ctest] 327/682 Test  #31: basic_profiler_test.tracy_zone_macros_compile_and_execute .......................   Passed    1.86 sec
+[ctest]         Start 676: utils_version_test.cmp_minor_less
+[ctest] 328/682 Test #383: strings_strings_test.str8_remove_char ...........................................   Passed    1.79 sec
+[ctest]         Start  67: containers_doubly_list_test.foreach
+[ctest] 329/682 Test #422: strings_strings_test.str32_find .................................................   Passed    1.80 sec
+[ctest]         Start 486: system_system_runtime_test.process_memory
+[ctest] 330/682 Test #624: utils_timer_test.bump ...........................................................   Passed    1.77 sec
+[ctest]         Start 401: strings_strings_test.str16_to_upper
+[ctest] 331/682 Test #101: containers_sort_test.bubble_sort_already_sorted .................................   Passed    1.84 sec
+[ctest]         Start 448: strings_unicode_test.utf16_decode_surrogate
+[ctest] 332/682 Test  #15: basic_intrinsics_test.bswap_reverses_byte_order .................................   Passed    1.82 sec
+[ctest]         Start 576: utils_cmdline_test.get_option_missing
+[ctest] 333/682 Test #620: utils_id_test.id64_cmp_less .....................................................   Passed    1.83 sec
+[ctest]         Start 461: strings_unicode_test.utf16_to_utf32
+[ctest] 334/682 Test #255: processes_common_processes_test.open_weblink_null ...............................   Passed    1.81 sec
+[ctest]         Start 519: threads_mutex_test.trylock_when_locked
+[ctest] 335/682 Test #676: utils_version_test.cmp_minor_less ...............................................   Passed    1.79 sec
+[ctest]         Start 297: strings_char_test.c8_nibble_to_hex
+[ctest] 336/682 Test  #67: containers_doubly_list_test.foreach .............................................   Passed    1.77 sec
+[ctest]         Start 631: utils_timestamp_test.zero
+[ctest] 337/682 Test #486: system_system_runtime_test.process_memory .......................................   Passed    1.80 sec
+[ctest]         Start 222: memory_pool_test.add_block
+[ctest] 338/682 Test #401: strings_strings_test.str16_to_upper .............................................   Passed    1.82 sec
+[ctest]         Start 606: utils_id_test.id16_make
+[ctest] 339/682 Test #448: strings_unicode_test.utf16_decode_surrogate .....................................   Passed    1.81 sec
+[ctest]         Start 316: strings_cstrings_test.cstr8_find
+[ctest] 340/682 Test #576: utils_cmdline_test.get_option_missing ...........................................   Passed    1.88 sec
+[ctest]         Start 252: memory_vmem_test.alloc_larger_than_page
+[ctest] 341/682 Test #461: strings_unicode_test.utf16_to_utf32 .............................................   Passed    1.89 sec
+[ctest]         Start 114: containers_stack_list_test.count
+[ctest] 342/682 Test #297: strings_char_test.c8_nibble_to_hex ..............................................   Passed    1.86 sec
+[ctest]         Start 118: containers_tree_test.next_preorder_ptr
+[ctest] 343/682 Test #519: threads_mutex_test.trylock_when_locked ..........................................   Passed    1.90 sec
+[ctest]         Start 337: strings_cstrings_test.cstr8_join
+[ctest] 344/682 Test #631: utils_timestamp_test.zero .......................................................   Passed    1.84 sec
+[ctest]         Start 339: strings_cstrings_test.cstr8_to_cstr32
+[ctest] 345/682 Test #222: memory_pool_test.add_block ......................................................   Passed    1.92 sec
+[ctest]         Start 449: strings_unicode_test.utf16_encode
+[ctest] 346/682 Test #606: utils_id_test.id16_make .........................................................   Passed    1.88 sec
+[ctest]         Start 564: threads_thread_test.detach
+[ctest] 347/682 Test #337: strings_cstrings_test.cstr8_join ................................................***Exception: SegFault  1.67 sec
+[ctest] Note: Google Test filter = strings_cstrings_test.cstr8_join
+[ctest] [==========] Running 1 test from 1 test suite.
+[ctest] [----------] Global test environment set-up.
+[ctest] [----------] 1 test from strings_cstrings_test
+[ctest] [ RUN      ] strings_cstrings_test.cstr8_join
+[ctest] [       OK ] strings_cstrings_test.cstr8_join (0 ms)
+[ctest] [----------] 1 test from strings_cstrings_test (0 ms total)
+[ctest] 
+[ctest] [----------] Global test environment tear-down
+[ctest] [==========] 1 test from 1 test suite ran. (0 ms total)
+[ctest] [  PASSED  ] 1 test.
+[ctest] 
+[ctest]         Start 623: utils_timer_test.clear
+[ctest] 348/682 Test #316: strings_cstrings_test.cstr8_find ................................................   Passed    1.97 sec
+[ctest]         Start 601: utils_id_test.id8_cmp_less
+[ctest] 349/682 Test #252: memory_vmem_test.alloc_larger_than_page .........................................   Passed    1.93 sec
+[ctest]         Start 361: strings_strings_test.str8_is_empty
+[ctest] 350/682 Test #114: containers_stack_list_test.count ................................................   Passed    1.94 sec
+[ctest]         Start 351: strings_cstrings_test.cstr32_is_empty
+[ctest] 351/682 Test #118: containers_tree_test.next_preorder_ptr ..........................................   Passed    2.00 sec
+[ctest]         Start 389: strings_strings_test.str8_split_next
+[ctest] 352/682 Test #339: strings_cstrings_test.cstr8_to_cstr32 ...........................................   Passed    2.03 sec
+[ctest]         Start 434: strings_strings_test.str32_remove_suffix
+[ctest] 353/682 Test #564: threads_thread_test.detach ......................................................   Passed    2.20 sec
+[ctest]         Start 334: strings_cstrings_test.cstr8_to_i64
+[ctest] 354/682 Test #449: strings_unicode_test.utf16_encode ...............................................   Passed    2.31 sec
+[ctest]         Start 225: memory_ring_test.create_alloc
+[ctest] 355/682 Test #623: utils_timer_test.clear ..........................................................   Passed    2.42 sec
+[ctest]         Start 530: threads_rwlock_test.try_write_lock_fails_with_writer
+[ctest] 356/682 Test #601: utils_id_test.id8_cmp_less ......................................................   Passed    2.62 sec
+[ctest]         Start 211: memory_heap_test.dealloc
+[ctest] 357/682 Test #361: strings_strings_test.str8_is_empty ..............................................   Passed    2.53 sec
+[ctest]         Start 400: strings_strings_test.str16_ends_with
+[ctest] 358/682 Test #389: strings_strings_test.str8_split_next ............................................   Passed    2.41 sec
+[ctest]         Start 216: memory_pool_test.create
+[ctest] 359/682 Test #351: strings_cstrings_test.cstr32_is_empty ...........................................   Passed    2.57 sec
+[ctest]         Start 574: utils_cmdline_test.get_option
+[ctest] 360/682 Test #434: strings_strings_test.str32_remove_suffix ........................................   Passed    2.52 sec
+[ctest]         Start 521: threads_mutex_test.recursive_lock_by_different_thread
+[ctest] 361/682 Test #334: strings_cstrings_test.cstr8_to_i64 ..............................................   Passed    3.09 sec
+[ctest]         Start  63: containers_doubly_list_test.insert_after
+[ctest] 362/682 Test #225: memory_ring_test.create_alloc ...................................................   Passed    3.06 sec
+[ctest]         Start 591: utils_endian_test.le64_roundtrip
+[ctest] 363/682 Test #530: threads_rwlock_test.try_write_lock_fails_with_writer ............................   Passed    2.99 sec
+[ctest]         Start 364: strings_strings_test.str8_find
+[ctest] 364/682 Test #211: memory_heap_test.dealloc ........................................................   Passed    2.98 sec
+[ctest]         Start 345: strings_cstrings_test.cstr16_starts_with
+[ctest] 365/682 Test #574: utils_cmdline_test.get_option ...................................................   Passed    2.95 sec
+[ctest]         Start  73: containers_hash_map_test.multiple_keys
+[ctest] 366/682 Test #216: memory_pool_test.create .........................................................   Passed    3.04 sec
+[ctest]         Start 315: strings_cstrings_test.cstr8_format
+[ctest] 367/682 Test #400: strings_strings_test.str16_ends_with ............................................   Passed    3.20 sec
+[ctest]         Start 480: system_system_info_test.architecture_name
+[ctest] 368/682 Test #521: threads_mutex_test.recursive_lock_by_different_thread ...........................   Passed    3.10 sec
+[ctest]         Start 204: memory_buffer_test.zero
+[ctest] 369/682 Test  #63: containers_doubly_list_test.insert_after ........................................   Passed    2.39 sec
+[ctest]         Start 273: processes_process_test.create_invalid
+[ctest] 370/682 Test #591: utils_endian_test.le64_roundtrip ................................................   Passed    2.47 sec
+[ctest]         Start 497: threads_atomics_test.u32_add_sub
+[ctest] 371/682 Test #364: strings_strings_test.str8_find ..................................................   Passed    2.41 sec
+[ctest]         Start  20: basic_keyword_defines_test.cosmetic_keywords_expand_to_valid_storage
+[ctest] 372/682 Test #345: strings_cstrings_test.cstr16_starts_with ........................................   Passed    2.39 sec
+[ctest]         Start 567: threads_thread_test.parallel_execution
+[ctest] 373/682 Test #315: strings_cstrings_test.cstr8_format ..............................................   Passed    2.43 sec
+[ctest]         Start 198: memory_buffer_test.cmp_equal
+[ctest] 374/682 Test  #73: containers_hash_map_test.multiple_keys ..........................................   Passed    2.54 sec
+[ctest]         Start 632: utils_timestamp_test.now
+[ctest] 375/682 Test #480: system_system_info_test.architecture_name .......................................   Passed    2.38 sec
+[ctest]         Start 106: containers_sort_test.reverse_sort
+[ctest] 376/682 Test #204: memory_buffer_test.zero .........................................................   Passed    2.36 sec
+[ctest]         Start   8: basic_env_defines_test.exactly_one_binary_kind_is_defined
+[ctest] 377/682 Test #497: threads_atomics_test.u32_add_sub ................................................   Passed    2.53 sec
+[ctest]         Start 395: strings_strings_test.str16_from_cstr
+[ctest] 378/682 Test #273: processes_process_test.create_invalid ...........................................   Passed    2.70 sec
+[ctest]         Start 618: utils_id_test.id64_make
+[ctest] 379/682 Test  #20: basic_keyword_defines_test.cosmetic_keywords_expand_to_valid_storage ............   Passed    2.47 sec
+[ctest]         Start 609: utils_id_test.id16_cmp_greater
+[ctest] 380/682 Test #567: threads_thread_test.parallel_execution ..........................................   Passed    2.52 sec
+[ctest]         Start  25: basic_primitive_types_test.integer_aliases_have_expected_sizes
+[ctest] 381/682 Test #198: memory_buffer_test.cmp_equal ....................................................   Passed    2.43 sec
+[ctest]         Start 285: strings_char_test.c8_is_cntrl
+[ctest] 382/682 Test   #8: basic_env_defines_test.exactly_one_binary_kind_is_defined .......................   Passed    2.50 sec
+[ctest]         Start  65: containers_doubly_list_test.count
+[ctest] 383/682 Test #632: utils_timestamp_test.now ........................................................   Passed    2.59 sec
+[ctest]         Start 254: processes_common_processes_test.open_weblink_invalid
+[ctest] 384/682 Test #106: containers_sort_test.reverse_sort ...............................................   Passed    2.63 sec
+[ctest]         Start  71: containers_hash_map_test.has
+[ctest] 385/682 Test #395: strings_strings_test.str16_from_cstr ............................................   Passed    2.10 sec
+[ctest]         Start   7: basic_entry_test.nested_init_keeps_original_cmdline_and_balances_quit
+[ctest] 386/682 Test #618: utils_id_test.id64_make .........................................................   Passed    2.14 sec
+[ctest]         Start  83: containers_ring_list_test.push_back
+[ctest] 387/682 Test #609: utils_id_test.id16_cmp_greater ..................................................   Passed    2.07 sec
+[ctest]         Start 308: strings_cstrings_test.cstr8_cmp_n
+[ctest] 388/682 Test  #25: basic_primitive_types_test.integer_aliases_have_expected_sizes ..................   Passed    2.04 sec
+[ctest]         Start 266: processes_process_current_test.get_priority
+[ctest] 389/682 Test #285: strings_char_test.c8_is_cntrl ...................................................   Passed    1.99 sec
+[ctest]         Start 639: utils_timestamp_test.as_seconds
+[ctest] 390/682 Test  #65: containers_doubly_list_test.count ...............................................   Passed    1.97 sec
+[ctest]         Start 584: utils_crc_test.crc64_init
+[ctest] 391/682 Test  #71: containers_hash_map_test.has ....................................................   Passed    1.94 sec
+[ctest]         Start 465: strings_unicode_test.utf32_to_utf8_codepoint
+[ctest] 392/682 Test #254: processes_common_processes_test.open_weblink_invalid ............................   Passed    2.01 sec
+[ctest]         Start 366: strings_strings_test.str8_find_last
+[ctest] 393/682 Test   #7: basic_entry_test.nested_init_keeps_original_cmdline_and_balances_quit ...........   Passed    2.03 sec
+[ctest]         Start 462: strings_unicode_test.utf16_to_utf32_surrogate
+[ctest] 394/682 Test  #83: containers_ring_list_test.push_back .............................................   Passed    2.04 sec
+[ctest]         Start 305: strings_cstrings_test.cstr8_is_empty
+[ctest] 395/682 Test #308: strings_cstrings_test.cstr8_cmp_n ...............................................   Passed    2.04 sec
+[ctest]         Start 415: strings_strings_test.str16_to_str8
+[ctest] 396/682 Test #266: processes_process_current_test.get_priority .....................................   Passed    2.04 sec
+[ctest]         Start 668: utils_version_test.to_cstr8
+[ctest] 397/682 Test #639: utils_timestamp_test.as_seconds .................................................   Passed    2.07 sec
+[ctest]         Start 320: strings_cstrings_test.cstr8_count_char
+[ctest] 398/682 Test #584: utils_crc_test.crc64_init .......................................................   Passed    1.96 sec
+[ctest]         Start 235: memory_ring_test.empty_peek
+[ctest] 399/682 Test #465: strings_unicode_test.utf32_to_utf8_codepoint ....................................   Passed    2.00 sec
+[ctest]         Start 600: utils_id_test.id8_cmp_equal
+[ctest] 400/682 Test #366: strings_strings_test.str8_find_last .............................................   Passed    2.03 sec
+[ctest]         Start 202: memory_buffer_test.get_ptr_out_of_bounds
+[ctest] 401/682 Test #462: strings_unicode_test.utf16_to_utf32_surrogate ...................................   Passed    1.92 sec
+[ctest]         Start 437: strings_strings_test.str32_to_str8
+[ctest] 402/682 Test #305: strings_cstrings_test.cstr8_is_empty ............................................   Passed    1.87 sec
+[ctest]         Start 344: strings_cstrings_test.cstr16_find
+[ctest] 403/682 Test #415: strings_strings_test.str16_to_str8 ..............................................   Passed    1.90 sec
+[ctest]         Start  51: containers_bitset_test.set_all_clear_all
+[ctest] 404/682 Test #668: utils_version_test.to_cstr8 .....................................................   Passed    1.85 sec
+[ctest]         Start 557: threads_thread_group_test.join_all
+[ctest] 405/682 Test #320: strings_cstrings_test.cstr8_count_char ..........................................   Passed    1.96 sec
+[ctest]         Start 188: memory_arena_test.clear
+[ctest] 406/682 Test #235: memory_ring_test.empty_peek .....................................................   Passed    1.89 sec
+[ctest]         Start 319: strings_cstrings_test.cstr8_find_last_char
+[ctest] 407/682 Test #202: memory_buffer_test.get_ptr_out_of_bounds ........................................   Passed    1.90 sec
+[ctest]         Start 311: strings_cstrings_test.cstr8_copy_n
+[ctest] 408/682 Test #600: utils_id_test.id8_cmp_equal .....................................................   Passed    1.94 sec
+[ctest]         Start 217: memory_pool_test.alloc
+[ctest] 409/682 Test #437: strings_strings_test.str32_to_str8 ..............................................   Passed    2.03 sec
+[ctest]         Start 370: strings_strings_test.str8_ends_with
+[ctest] 410/682 Test #344: strings_cstrings_test.cstr16_find ...............................................   Passed    2.00 sec
+[ctest]         Start 102: containers_sort_test.selection_sort
+[ctest] 411/682 Test  #51: containers_bitset_test.set_all_clear_all ........................................   Passed    1.95 sec
+[ctest]         Start 328: strings_cstrings_test.cstr8_remove_whitespace
+[ctest] 412/682 Test #557: threads_thread_group_test.join_all ..............................................   Passed    1.94 sec
+[ctest]         Start 629: utils_timer_test.consume_once_true
+[ctest] 413/682 Test #188: memory_arena_test.clear .........................................................   Passed    2.01 sec
+[ctest]         Start 213: memory_heap_test.clear
+[ctest] 414/682 Test #319: strings_cstrings_test.cstr8_find_last_char ......................................   Passed    2.01 sec
+[ctest]         Start 291: strings_char_test.c8_is_space
+[ctest] 415/682 Test #311: strings_cstrings_test.cstr8_copy_n ..............................................   Passed    1.99 sec
+[ctest]         Start 176: input_sensor_test.enumeration_consistency_when_devices_exist
+[ctest] 416/682 Test #217: memory_pool_test.alloc ..........................................................   Passed    1.99 sec
+[ctest]         Start 556: threads_thread_group_test.get
+[ctest] 417/682 Test #102: containers_sort_test.selection_sort .............................................   Passed    1.83 sec
+[ctest]         Start 444: strings_unicode_test.utf8_encode
+[ctest] 418/682 Test #370: strings_strings_test.str8_ends_with .............................................   Passed    1.92 sec
+[ctest]         Start 224: memory_ring_test.create_with_buffer
+[ctest] 419/682 Test #328: strings_cstrings_test.cstr8_remove_whitespace ...................................   Passed    1.86 sec
+[ctest]         Start 275: processes_process_test.create_with_options
+[ctest] 420/682 Test #629: utils_timer_test.consume_once_true ..............................................   Passed    1.79 sec
+[ctest]         Start 203: memory_buffer_test.get_data
+[ctest] 421/682 Test #213: memory_heap_test.clear ..........................................................   Passed    1.91 sec
+[ctest]         Start 327: strings_cstrings_test.cstr8_remove_char
+[ctest] 422/682 Test #291: strings_char_test.c8_is_space ...................................................   Passed    1.92 sec
+[ctest]         Start 369: strings_strings_test.str8_starts_with
+[ctest] 423/682 Test #176: input_sensor_test.enumeration_consistency_when_devices_exist ....................   Passed    1.89 sec
+[ctest]         Start 666: utils_version_test.get_packed
+[ctest] 424/682 Test #556: threads_thread_group_test.get ...................................................   Passed    1.89 sec
+[ctest]         Start  78: containers_hash_map_test.rehash
+[ctest] 425/682 Test #444: strings_unicode_test.utf8_encode ................................................   Passed    2.05 sec
+[ctest]         Start 362: strings_strings_test.str8_cmp
+[ctest] 426/682 Test #275: processes_process_test.create_with_options ......................................   Passed    2.02 sec
+[ctest]         Start 209: memory_heap_test.alloc
+[ctest] 427/682 Test #224: memory_ring_test.create_with_buffer .............................................   Passed    2.08 sec
+[ctest]         Start 214: memory_heap_test.add_block
+[ctest] 428/682 Test #203: memory_buffer_test.get_data .....................................................   Passed    1.99 sec
+[ctest]         Start 499: threads_atomics_test.i64_get_set
+[ctest] 429/682 Test #499: threads_atomics_test.i64_get_set ................................................***Exception: SegFault  0.54 sec
+[ctest] 
+[ctest]         Start 150: filesystem_path_test.normalize_join_and_extract_parts
+[ctest] 430/682 Test #327: strings_cstrings_test.cstr8_remove_char .........................................   Passed    2.19 sec
+[ctest]         Start 498: threads_atomics_test.u32_cmpex
+[ctest] 431/682 Test #369: strings_strings_test.str8_starts_with ...........................................   Passed    2.21 sec
+[ctest]         Start 587: utils_crc_test.crc64_empty
+[ctest] 432/682 Test  #78: containers_hash_map_test.rehash .................................................   Passed    2.29 sec
+[ctest]         Start 109: containers_sort_test.radix32
+[ctest] 433/682 Test #666: utils_version_test.get_packed ...................................................   Passed    2.32 sec
+[ctest]         Start 169: input_mouse_test.invalid_buttons_and_state_queries_are_safe
+[ctest] 434/682 Test #362: strings_strings_test.str8_cmp ...................................................   Passed    2.24 sec
+[ctest]         Start 657: utils_uuid_test.cmp
+[ctest] 435/682 Test #209: memory_heap_test.alloc ..........................................................   Passed    2.31 sec
+[ctest]         Start 427: strings_strings_test.str32_trim
+[ctest] 436/682 Test #214: memory_heap_test.add_block ......................................................   Passed    2.31 sec
+[ctest]         Start 368: strings_strings_test.str8_count_char
+[ctest] 437/682 Test #587: utils_crc_test.crc64_empty ......................................................   Passed    2.11 sec
+[ctest]         Start  47: containers_binary_tree_test.foreach_inorder
+[ctest] 438/682 Test #150: filesystem_path_test.normalize_join_and_extract_parts ...........................   Passed    2.19 sec
+[ctest]         Start 586: utils_crc_test.crc64_oneshot
+[ctest] 439/682 Test #498: threads_atomics_test.u32_cmpex ..................................................   Passed    2.28 sec
+[ctest]         Start 304: strings_cstrings_test.cstr8_len
+[ctest] 440/682 Test #109: containers_sort_test.radix32 ....................................................   Passed    2.15 sec
+[ctest]         Start 313: strings_cstrings_test.cstr8_append_char
+[ctest] 441/682 Test #169: input_mouse_test.invalid_buttons_and_state_queries_are_safe .....................   Passed    2.15 sec
+[ctest]         Start 307: strings_cstrings_test.cstr8_cmp
+[ctest] 442/682 Test #657: utils_uuid_test.cmp .............................................................   Passed    1.94 sec
+[ctest]         Start 612: utils_id_test.id32_make
+[ctest] 443/682 Test #368: strings_strings_test.str8_count_char ............................................   Passed    2.04 sec
+[ctest]         Start 614: utils_id_test.id32_cmp_less
+[ctest] 444/682 Test #427: strings_strings_test.str32_trim .................................................   Passed    2.10 sec
+[ctest]         Start 183: memory_allocator_test.alloc_zero
+[ctest] 445/682 Test #586: utils_crc_test.crc64_oneshot ....................................................   Passed    1.96 sec
+[ctest]         Start 661: utils_uuid_test.generate_v4
+[ctest] 446/682 Test  #47: containers_binary_tree_test.foreach_inorder .....................................   Passed    2.01 sec
+[ctest]         Start 563: threads_thread_test.get_id
+[ctest] 447/682 Test #304: strings_cstrings_test.cstr8_len .................................................   Passed    1.96 sec
+[ctest]         Start 135: context_thread_ctx_test.current_thread_context_is_initialized_by_entry
+[ctest] 448/682 Test #307: strings_cstrings_test.cstr8_cmp .................................................   Passed    1.94 sec
+[ctest]         Start  58: containers_doubly_list_test.push_front
+[ctest] 449/682 Test #313: strings_cstrings_test.cstr8_append_char .........................................   Passed    1.99 sec
+[ctest]         Start 196: memory_buffer_test.split_offset
+[ctest] 450/682 Test #612: utils_id_test.id32_make .........................................................   Passed    1.98 sec
+[ctest]         Start 236: memory_scratch_test.begin_end_basic
+[ctest] 451/682 Test #614: utils_id_test.id32_cmp_less .....................................................   Passed    2.06 sec
+[ctest]         Start 590: utils_endian_test.le32_roundtrip
+[ctest] 452/682 Test #183: memory_allocator_test.alloc_zero ................................................   Passed    2.10 sec
+[ctest]         Start 445: strings_unicode_test.utf8_codepoint_count
+[ctest] 453/682 Test #661: utils_uuid_test.generate_v4 .....................................................   Passed    2.07 sec
+[ctest]         Start 420: strings_strings_test.str32_is_empty
+[ctest] 454/682 Test #563: threads_thread_test.get_id ......................................................   Passed    2.09 sec
+[ctest]         Start 571: utils_cmdline_test.get_arg
+[ctest] 455/682 Test #135: context_thread_ctx_test.current_thread_context_is_initialized_by_entry ..........   Passed    2.06 sec
+[ctest]         Start 399: strings_strings_test.str16_starts_with
+[ctest] 456/682 Test  #58: containers_doubly_list_test.push_front ..........................................   Passed    2.10 sec
+[ctest]         Start 164: input_gamepads_test.axis_deadzone_api_works_without_hardware
+[ctest] 457/682 Test #196: memory_buffer_test.split_offset .................................................   Passed    2.12 sec
+[ctest]         Start  46: containers_binary_tree_test.foreach_preorder
+[ctest] 458/682 Test #236: memory_scratch_test.begin_end_basic .............................................   Passed    2.21 sec
+[ctest]         Start 440: strings_unicode_test.utf8_encode_size
+[ctest] 459/682 Test #445: strings_unicode_test.utf8_codepoint_count .......................................   Passed    2.16 sec
+[ctest]         Start 197: memory_buffer_test.split_size
+[ctest] 460/682 Test #590: utils_endian_test.le32_roundtrip ................................................   Passed    2.22 sec
+[ctest]         Start  66: containers_doubly_list_test.head_tail
+[ctest] 461/682 Test #420: strings_strings_test.str32_is_empty .............................................   Passed    2.14 sec
+[ctest]         Start  29: basic_profiler_test.tracy_callstack_depth_macro_is_defined
+[ctest] 462/682 Test #571: utils_cmdline_test.get_arg ......................................................   Passed    2.21 sec
+[ctest]         Start  27: basic_primitive_types_test.numeric_limits_are_ordered_correctly
+[ctest] 463/682 Test #399: strings_strings_test.str16_starts_with ..........................................   Passed    2.20 sec
+[ctest]         Start 300: strings_char_test.c16_hex
+[ctest] 464/682 Test #164: input_gamepads_test.axis_deadzone_api_works_without_hardware ....................   Passed    2.14 sec
+[ctest]         Start 228: memory_ring_test.read_basic
+[ctest] 465/682 Test  #46: containers_binary_tree_test.foreach_preorder ....................................   Passed    2.15 sec
+[ctest]         Start  52: containers_bitset_test.count
+[ctest] 466/682 Test #440: strings_unicode_test.utf8_encode_size ...........................................   Passed    1.93 sec
+[ctest]         Start 127: containers_tree_test.foreach_children_reverse
+[ctest] 467/682 Test #197: memory_buffer_test.split_size ...................................................   Passed    1.96 sec
+[ctest]         Start 418: strings_strings_test.str32_empty
+[ctest] 468/682 Test  #66: containers_doubly_list_test.head_tail ...........................................   Passed    1.95 sec
+[ctest]         Start 407: strings_strings_test.str16_copy
+[ctest] 469/682 Test  #29: basic_profiler_test.tracy_callstack_depth_macro_is_defined ......................   Passed    1.92 sec
+[ctest]         Start 338: strings_cstrings_test.cstr8_to_cstr16
+[ctest] 470/682 Test  #27: basic_primitive_types_test.numeric_limits_are_ordered_correctly .................   Passed    1.92 sec
+[ctest]         Start 463: strings_unicode_test.utf16_to_utf32_count
+[ctest] 471/682 Test #300: strings_char_test.c16_hex .......................................................   Passed    1.95 sec
+[ctest]         Start 423: strings_strings_test.str32_starts_with
+[ctest] 472/682 Test #228: memory_ring_test.read_basic .....................................................   Passed    1.94 sec
+[ctest]         Start 628: utils_timer_test.consume_false
+[ctest] 473/682 Test  #52: containers_bitset_test.count ....................................................   Passed    1.94 sec
+[ctest]         Start 654: utils_uuid_test.from_bytes
+[ctest] 474/682 Test #127: containers_tree_test.foreach_children_reverse ...................................   Passed    2.05 sec
+[ctest]         Start 332: strings_cstrings_test.cstr8_common_prefix
+[ctest] 475/682 Test #418: strings_strings_test.str32_empty ................................................   Passed    2.18 sec
+[ctest]         Start 325: strings_cstrings_test.cstr8_trim
+[ctest] 476/682 Test #407: strings_strings_test.str16_copy .................................................   Passed    2.18 sec
+[ctest]         Start   6: basic_entry_test.get_cmdline_exposes_initialized_runtime_cmdline
+[ctest] 477/682 Test #338: strings_cstrings_test.cstr8_to_cstr16 ...........................................   Passed    2.11 sec
+[ctest]         Start 229: memory_ring_test.read_partial
+[ctest] 478/682 Test #463: strings_unicode_test.utf16_to_utf32_count .......................................   Passed    2.13 sec
+[ctest]         Start  77: containers_hash_map_test.reserve
+[ctest] 479/682 Test #423: strings_strings_test.str32_starts_with ..........................................   Passed    2.11 sec
+[ctest]         Start 244: memory_vmem_test.commit_decommit_multiple
+[ctest] 480/682 Test #628: utils_timer_test.consume_false ..................................................   Passed    2.15 sec
+[ctest]         Start  41: containers_binary_tree_test.is_root_is_leaf
+[ctest] 481/682 Test #654: utils_uuid_test.from_bytes ......................................................   Passed    2.15 sec
+[ctest]         Start  75: containers_hash_map_test.clear
+[ctest] 482/682 Test #332: strings_cstrings_test.cstr8_common_prefix .......................................   Passed    1.90 sec
+[ctest]         Start 288: strings_char_test.c8_is_lower
+[ctest] 483/682 Test #325: strings_cstrings_test.cstr8_trim ................................................   Passed    1.93 sec
+[ctest]         Start 175: input_sensor_test.id_conversion_and_invalid_lifecycle_calls
+[ctest] 484/682 Test   #6: basic_entry_test.get_cmdline_exposes_initialized_runtime_cmdline ................   Passed    1.99 sec
+[ctest]         Start  39: containers_binary_tree_test.next_postorder_ptr
+[ctest] 485/682 Test #229: memory_ring_test.read_partial ...................................................   Passed    1.84 sec
+[ctest]         Start 653: utils_uuid_test.zero
+[ctest] 486/682 Test  #77: containers_hash_map_test.reserve ................................................   Passed    1.90 sec
+[ctest]         Start  56: containers_bitset_test.foreach_set
+[ctest] 487/682 Test #244: memory_vmem_test.commit_decommit_multiple .......................................   Passed    1.94 sec
+[ctest]         Start 310: strings_cstrings_test.cstr8_copy
+[ctest] 488/682 Test  #41: containers_binary_tree_test.is_root_is_leaf .....................................   Passed    1.86 sec
+[ctest]         Start 129: context_ctx_test.init_exposes_allocator_log_and_sub_allocators
+[ctest] 489/682 Test  #75: containers_hash_map_test.clear ..................................................   Passed    1.85 sec
+[ctest]         Start 343: strings_cstrings_test.cstr16_cmp
+[ctest] 490/682 Test #288: strings_char_test.c8_is_lower ...................................................   Passed    1.85 sec
+[ctest]         Start 302: strings_char_test.c32_case_conversion
+[ctest] 491/682 Test #175: input_sensor_test.id_conversion_and_invalid_lifecycle_calls .....................   Passed    1.82 sec
+[ctest]         Start 658: utils_uuid_test.parse_cstr8
+[ctest] 492/682 Test  #39: containers_binary_tree_test.next_postorder_ptr ..................................   Passed    1.93 sec
+[ctest]         Start 168: input_keyboard_test.primary_device_id_matches_availability_expectations
+[ctest] 493/682 Test #653: utils_uuid_test.zero ............................................................   Passed    1.92 sec
+[ctest]         Start 660: utils_uuid_test.string_length
+[ctest] 494/682 Test  #56: containers_bitset_test.foreach_set ..............................................   Passed    1.84 sec
+[ctest]         Start  14: basic_intrinsics_test.bsr_reports_highest_set_bit_or_zero_for_empty_input
+[ctest] 495/682 Test #129: context_ctx_test.init_exposes_allocator_log_and_sub_allocators ..................   Passed    1.83 sec
+[ctest]         Start 250: memory_vmem_test.get_stats_initial
+[ctest] 496/682 Test #310: strings_cstrings_test.cstr8_copy ................................................   Passed    1.91 sec
+[ctest]         Start 608: utils_id_test.id16_cmp_less
+[ctest] 497/682 Test #343: strings_cstrings_test.cstr16_cmp ................................................   Passed    1.86 sec
+[ctest]         Start 380: strings_strings_test.str8_to_lower
+[ctest] 498/682 Test #302: strings_char_test.c32_case_conversion ...........................................   Passed    1.87 sec
+[ctest]         Start 640: utils_timestamp_test.as_minutes
+[ctest] 499/682 Test #658: utils_uuid_test.parse_cstr8 .....................................................   Passed    1.84 sec
+[ctest]         Start 613: utils_id_test.id32_cmp_equal
+[ctest] 500/682 Test #168: input_keyboard_test.primary_device_id_matches_availability_expectations .........   Passed    1.84 sec
+[ctest]         Start 425: strings_strings_test.str32_to_upper
+[ctest] 501/682 Test #660: utils_uuid_test.string_length ...................................................   Passed    1.87 sec
+[ctest]         Start 238: memory_scratch_test.scratch_on_empty_arena
+[ctest] 502/682 Test  #14: basic_intrinsics_test.bsr_reports_highest_set_bit_or_zero_for_empty_input .......   Passed    1.85 sec
+[ctest]         Start  76: containers_hash_map_test.load_factor
+[ctest] 503/682 Test #250: memory_vmem_test.get_stats_initial ..............................................   Passed    1.85 sec
+[ctest]         Start 195: memory_buffer_test.slice
+[ctest] 504/682 Test #380: strings_strings_test.str8_to_lower ..............................................   Passed    1.84 sec
+[ctest]         Start 464: strings_unicode_test.utf32_to_utf8
+[ctest] 505/682 Test #608: utils_id_test.id16_cmp_less .....................................................   Passed    1.91 sec
+[ctest]         Start 577: utils_cmdline_test.get_option_i64
+[ctest] 506/682 Test #640: utils_timestamp_test.as_minutes .................................................   Passed    1.97 sec
+[ctest]         Start 384: strings_strings_test.str8_remove_whitespace
+[ctest] 507/682 Test #613: utils_id_test.id32_cmp_equal ....................................................   Passed    1.81 sec
+[ctest]         Start 413: strings_strings_test.str16_replace
+[ctest] 508/682 Test #425: strings_strings_test.str32_to_upper .............................................   Passed    1.92 sec
+[ctest] 509/682 Test #238: memory_scratch_test.scratch_on_empty_arena ......................................   Passed    1.85 sec
+[ctest]         Start 617: utils_id_test.id64_zero
+[ctest]         Start  55: containers_bitset_test.find_next_set
+[ctest] 510/682 Test  #76: containers_hash_map_test.load_factor ............................................   Passed    1.82 sec
+[ctest]         Start 376: strings_strings_test.str8_append_char
+[ctest] 511/682 Test #195: memory_buffer_test.slice ........................................................   Passed    1.85 sec
+[ctest]         Start 433: strings_strings_test.str32_remove_prefix
+[ctest] 512/682 Test #464: strings_unicode_test.utf32_to_utf8 ..............................................   Passed    1.78 sec
+[ctest]         Start 115: containers_stack_list_test.head_macro
+[ctest] 513/682 Test #577: utils_cmdline_test.get_option_i64 ...............................................   Passed    1.91 sec
+[ctest]         Start 475: system_cpu_info_test.supports_64bit
+[ctest] 514/682 Test #384: strings_strings_test.str8_remove_whitespace .....................................   Passed    1.91 sec
+[ctest]         Start  64: containers_doubly_list_test.insert_before
+[ctest] 515/682 Test #413: strings_strings_test.str16_replace ..............................................   Passed    1.84 sec
+[ctest]         Start 221: memory_pool_test.clear
+[ctest] 516/682 Test #617: utils_id_test.id64_zero .........................................................   Passed    1.83 sec
+[ctest]         Start 633: utils_timestamp_test.from_microseconds
+[ctest] 517/682 Test  #55: containers_bitset_test.find_next_set ............................................   Passed    1.86 sec
+[ctest]         Start 301: strings_char_test.c32_classification
+[ctest] 518/682 Test #376: strings_strings_test.str8_append_char ...........................................   Passed    1.84 sec
+[ctest]         Start 488: system_system_runtime_test.cpu_usage_delta
+[ctest] 519/682 Test #433: strings_strings_test.str32_remove_prefix ........................................   Passed    1.87 sec
+[ctest]         Start 478: system_system_info_test.os_name
+[ctest] 520/682 Test #115: containers_stack_list_test.head_macro ...........................................   Passed    1.91 sec
+[ctest]         Start 656: utils_uuid_test.equal
+[ctest] 521/682 Test #475: system_cpu_info_test.supports_64bit .............................................   Passed    1.86 sec
+[ctest]         Start 458: strings_unicode_test.utf16_to_utf8_multibyte
+[ctest] 522/682 Test  #64: containers_doubly_list_test.insert_before .......................................   Passed    1.98 sec
+[ctest]         Start 435: strings_strings_test.str32_replace
+[ctest] 523/682 Test #221: memory_pool_test.clear ..........................................................   Passed    1.97 sec
+[ctest]         Start 163: input_gamepads_test.invalid_slots_and_buttons_return_safe_defaults
+[ctest] 524/682 Test #633: utils_timestamp_test.from_microseconds ..........................................   Passed    2.09 sec
+[ctest]         Start 152: filesystem_pathinfo_test.get_info_for_existing_file_and_directory
+[ctest] 525/682 Test #301: strings_char_test.c32_classification ............................................   Passed    2.09 sec
+[ctest]         Start 430: strings_strings_test.str32_cat
+[ctest] 526/682 Test #488: system_system_runtime_test.cpu_usage_delta ......................................   Passed    2.10 sec
+[ctest]         Start 429: strings_strings_test.str32_copy
+[ctest] 527/682 Test #478: system_system_info_test.os_name .................................................   Passed    2.08 sec
+[ctest]         Start 630: utils_timer_test.consume_once_false
+[ctest] 528/682 Test #656: utils_uuid_test.equal ...........................................................   Passed    2.15 sec
+[ctest]         Start 326: strings_cstrings_test.cstr8_replace_char
+[ctest] 529/682 Test #458: strings_unicode_test.utf16_to_utf8_multibyte ....................................   Passed    2.04 sec
+[ctest]         Start  90: containers_ring_list_test.foreach_reverse
+[ctest] 530/682 Test #435: strings_strings_test.str32_replace ..............................................   Passed    2.00 sec
+[ctest]         Start 226: memory_ring_test.write_single
+[ctest] 531/682 Test #163: input_gamepads_test.invalid_slots_and_buttons_return_safe_defaults ..............   Passed    1.94 sec
+[ctest]         Start 424: strings_strings_test.str32_ends_with
+[ctest] 532/682 Test #430: strings_strings_test.str32_cat ..................................................   Passed    2.01 sec
+[ctest]         Start 293: strings_char_test.c8_is_xdigit
+[ctest] 533/682 Test #429: strings_strings_test.str32_copy .................................................   Passed    2.00 sec
+[ctest]         Start 126: containers_tree_test.foreach_children
+[ctest] 534/682 Test #152: filesystem_pathinfo_test.get_info_for_existing_file_and_directory ...............   Passed    2.11 sec
+[ctest]         Start 233: memory_ring_test.wrap_around_write_read
+[ctest] 535/682 Test #630: utils_timer_test.consume_once_false .............................................   Passed    2.01 sec
+[ctest]         Start 149: filesystem_module_test.extension_is_available_and_invalid_open_fails
+[ctest] 536/682 Test #326: strings_cstrings_test.cstr8_replace_char ........................................   Passed    1.97 sec
+[ctest]         Start 439: strings_unicode_test.unicode_is_valid
+[ctest] 537/682 Test  #90: containers_ring_list_test.foreach_reverse .......................................   Passed    1.97 sec
+[ctest]         Start 287: strings_char_test.c8_is_graph
+[ctest] 538/682 Test #226: memory_ring_test.write_single ...................................................   Passed    2.04 sec
+[ctest]         Start 398: strings_strings_test.str16_find
+[ctest] 539/682 Test #424: strings_strings_test.str32_ends_with ............................................   Passed    2.04 sec
+[ctest]         Start 592: utils_endian_test.be16_roundtrip
+[ctest] 540/682 Test #126: containers_tree_test.foreach_children ...........................................   Passed    2.10 sec
+[ctest]         Start 555: threads_thread_group_test.create_named
+[ctest] 541/682 Test #293: strings_char_test.c8_is_xdigit ..................................................   Passed    2.12 sec
+[ctest]         Start 148: filesystem_filestream_test.archive_stream_flushes_into_archive_entry
+[ctest] 542/682 Test #233: memory_ring_test.wrap_around_write_read .........................................   Passed    2.09 sec
+[ctest]         Start 237: memory_scratch_test.multiple_scratches
+[ctest] 543/682 Test #287: strings_char_test.c8_is_graph ...................................................   Passed    2.05 sec
+[ctest]         Start 303: strings_char_test.c32_hex
+[ctest] 544/682 Test #149: filesystem_module_test.extension_is_available_and_invalid_open_fails ............   Passed    2.13 sec
+[ctest]         Start 201: memory_buffer_test.get_ptr
+[ctest] 545/682 Test #439: strings_unicode_test.unicode_is_valid ...........................................   Passed    2.06 sec
+[ctest]         Start 253: memory_vmem_test.multiple_allocations
+[ctest] 546/682 Test #398: strings_strings_test.str16_find .................................................   Passed    2.05 sec
+[ctest]         Start 560: threads_thread_group_test.destroy_null
+[ctest] 547/682 Test #592: utils_endian_test.be16_roundtrip ................................................   Passed    2.04 sec
+[ctest]         Start 278: processes_process_test.wait_nonblocking
+[ctest] 548/682 Test #148: filesystem_filestream_test.archive_stream_flushes_into_archive_entry ............   Passed    2.01 sec
+[ctest]         Start 290: strings_char_test.c8_is_punct
+[ctest] 549/682 Test #555: threads_thread_group_test.create_named ..........................................   Passed    2.05 sec
+[ctest]         Start 365: strings_strings_test.str8_find_char
+[ctest] 550/682 Test #237: memory_scratch_test.multiple_scratches ..........................................   Passed    2.04 sec
+[ctest]         Start 296: strings_char_test.c8_hex_to_nibble
+[ctest] 551/682 Test #303: strings_char_test.c32_hex .......................................................   Passed    1.96 sec
+[ctest]         Start 117: containers_stack_list_test.foreach
+[ctest] 552/682 Test #201: memory_buffer_test.get_ptr ......................................................   Passed    2.03 sec
+[ctest]         Start 268: processes_process_current_test.set_priority_low
+[ctest] 553/682 Test #253: memory_vmem_test.multiple_allocations ...........................................   Passed    2.03 sec
+[ctest]         Start 436: strings_strings_test.str32_beautify
+[ctest] 554/682 Test #560: threads_thread_group_test.destroy_null ..........................................   Passed    1.99 sec
+[ctest]         Start 454: strings_unicode_test.utf8_to_utf32
+[ctest] 555/682 Test #278: processes_process_test.wait_nonblocking .........................................   Passed    1.99 sec
+[ctest]         Start  17: basic_keyword_defines_test.align_macros_match_storage_layout
+[ctest] 556/682 Test #290: strings_char_test.c8_is_punct ...................................................   Passed    2.02 sec
+[ctest] 557/682 Test #365: strings_strings_test.str8_find_char .............................................   Passed    1.98 sec
+[ctest]         Start 159: input_capture_test.acquire_release_and_slot_epoch_behavior
+[ctest]         Start 324: strings_cstrings_test.cstr8_to_lower
+[ctest] 558/682 Test #296: strings_char_test.c8_hex_to_nibble ..............................................   Passed    2.01 sec
+[ctest]         Start 227: memory_ring_test.write_overflow
+[ctest] 559/682 Test #117: containers_stack_list_test.foreach ..............................................   Passed    1.96 sec
+[ctest]         Start 295: strings_char_test.c8_to_upper
+[ctest] 560/682 Test #436: strings_strings_test.str32_beautify .............................................   Passed    2.00 sec
+[ctest] 561/682 Test #268: processes_process_current_test.set_priority_low .................................   Passed    2.01 sec
+[ctest]         Start 381: strings_strings_test.str8_trim
+[ctest]         Start 635: utils_timestamp_test.from_seconds
+[ctest] 562/682 Test #454: strings_unicode_test.utf8_to_utf32 ..............................................   Passed    1.99 sec
+[ctest]         Start 299: strings_char_test.c16_case_conversion
+[ctest] 563/682 Test  #17: basic_keyword_defines_test.align_macros_match_storage_layout ....................   Passed    1.98 sec
+[ctest]         Start 579: utils_crc_test.crc32_init
+[ctest] 564/682 Test #159: input_capture_test.acquire_release_and_slot_epoch_behavior ......................   Passed    2.01 sec
+[ctest]         Start 636: utils_timestamp_test.from_minutes
+[ctest] 565/682 Test #324: strings_cstrings_test.cstr8_to_lower ............................................   Passed    2.04 sec
+[ctest]         Start 131: context_ctx_test.clear_temp_resets_temp_allocators_without_destroying_context
+[ctest] 566/682 Test #295: strings_char_test.c8_to_upper ...................................................   Passed    1.97 sec
+[ctest]         Start  62: containers_doubly_list_test.remove
+[ctest] 567/682 Test #227: memory_ring_test.write_overflow .................................................   Passed    2.04 sec
+[ctest]         Start  38: containers_binary_tree_test.first_postorder_ptr
+[ctest] 568/682 Test #635: utils_timestamp_test.from_seconds ...............................................   Passed    1.99 sec
+[ctest]         Start 184: memory_allocator_test.dealloc
+[ctest] 569/682 Test #381: strings_strings_test.str8_trim ..................................................   Passed    2.01 sec
+[ctest]         Start 471: strings_unicode_test.utf32_to_utf16_count
+[ctest] 570/682 Test #299: strings_char_test.c16_case_conversion ...........................................   Passed    1.98 sec
+[ctest]         Start 363: strings_strings_test.str8_cmp_nocase
+[ctest] 571/682 Test #579: utils_crc_test.crc32_init .......................................................   Passed    1.97 sec
+[ctest]         Start  87: containers_ring_list_test.head_tail
+[ctest] 572/682 Test #636: utils_timestamp_test.from_minutes ...............................................   Passed    1.95 sec
+[ctest]         Start  53: containers_bitset_test.first_set
+[ctest] 573/682 Test #131: context_ctx_test.clear_temp_resets_temp_allocators_without_destroying_context ...   Passed    2.02 sec
+[ctest]         Start 330: strings_cstrings_test.cstr8_remove_suffix
+[ctest] 574/682 Test  #62: containers_doubly_list_test.remove ..............................................   Passed    2.02 sec
+[ctest]         Start  30: basic_profiler_test.profiler_enable_macro_is_binary_value
+[ctest] 575/682 Test  #38: containers_binary_tree_test.first_postorder_ptr .................................   Passed    2.05 sec
+[ctest]         Start 218: memory_pool_test.alloc_array_typed
+[ctest] 576/682 Test #471: strings_unicode_test.utf32_to_utf16_count .......................................   Passed    1.97 sec
+[ctest]         Start 179: input_touch_test.invalid_device_queries_return_safe_defaults
+[ctest] 577/682 Test #184: memory_allocator_test.dealloc ...................................................   Passed    2.03 sec
+[ctest]         Start 350: strings_cstrings_test.cstr32_len
+[ctest] 578/682 Test #363: strings_strings_test.str8_cmp_nocase ............................................   Passed    1.98 sec
+[ctest]         Start 582: utils_crc_test.crc32_oneshot
+[ctest] 579/682 Test  #87: containers_ring_list_test.head_tail .............................................   Passed    2.01 sec
+[ctest]         Start 147: filesystem_filestream_test.native_stream_write_seek_read
+[ctest] 580/682 Test  #53: containers_bitset_test.first_set ................................................   Passed    2.01 sec
+[ctest]         Start 232: memory_ring_test.clear
+[ctest] 581/682 Test #330: strings_cstrings_test.cstr8_remove_suffix .......................................   Passed    1.98 sec
+[ctest]         Start 157: input_camera_test.id_conversion_and_invalid_lifecycle_calls
+[ctest] 582/682 Test  #30: basic_profiler_test.profiler_enable_macro_is_binary_value .......................   Passed    2.01 sec
+[ctest]         Start 643: utils_timestamp_test.sub
+[ctest] 583/682 Test #218: memory_pool_test.alloc_array_typed ..............................................   Passed    2.03 sec
+[ctest]         Start 626: utils_timer_test.increment_zero
+[ctest] 584/682 Test #179: input_touch_test.invalid_device_queries_return_safe_defaults ....................   Passed    1.99 sec
+[ctest]         Start 637: utils_timestamp_test.from_hours
+[ctest] 585/682 Test #350: strings_cstrings_test.cstr32_len ................................................   Passed    1.98 sec
+[ctest]         Start 133: context_global_ctx_test.user_data_permissions_gate_access_per_slot
+[ctest] 586/682 Test #582: utils_crc_test.crc32_oneshot ....................................................   Passed    2.04 sec
+[ctest]         Start 414: strings_strings_test.str16_beautify
+[ctest] 587/682 Test #147: filesystem_filestream_test.native_stream_write_seek_read ........................***Failed    1.99 sec
+[ctest] Note: Google Test filter = filesystem_filestream_test.native_stream_write_seek_read
+[ctest] [==========] Running 1 test from 1 test suite.
+[ctest] [----------] Global test environment set-up.
+[ctest] [----------] 1 test from filesystem_filestream_test
+[ctest] [ RUN      ] filesystem_filestream_test.native_stream_write_seek_read
+[ctest] [0;36m[DEBUG][0m filestream_open: failed src=C:/Users/Utente/AppData/Roaming/based/tests/filestream_tests/�H��_1720828147642/stream.bin mode=w+b  [0;90m(filestream_open() C:/Users/Utente/Developer/based/src/filesystem/filestream.c:179)[0m
+[ctest] C:/Users/Utente/Developer/based/tests/filesystem/filestream_test.cpp(30): error: Value of: filestream_is_open(&stm_val) != 0
+[ctest]   Actual: false
+[ctest] Expected: true
+[ctest] 
+[ctest] [  FAILED  ] filesystem_filestream_test.native_stream_write_seek_read (7 ms)
+[ctest] [----------] 1 test from filesystem_filestream_test (7 ms total)
+[ctest] 
+[ctest] [----------] Global test environment tear-down
+[ctest] [==========] 1 test from 1 test suite ran. (7 ms total)
+[ctest] [  PASSED  ] 0 tests.
+[ctest] [  FAILED  ] 1 test, listed below:
+[ctest] [  FAILED  ] filesystem_filestream_test.native_stream_write_seek_read
+[ctest] 
+[ctest]  1 FAILED TEST
+[ctest] 
+[ctest]         Start  95: containers_singly_list_test.count
+[ctest] 588/682 Test #232: memory_ring_test.clear ..........................................................   Passed    1.99 sec
+[ctest]         Start 583: utils_crc_test.crc32_empty
+[ctest] 589/682 Test #157: input_camera_test.id_conversion_and_invalid_lifecycle_calls .....................   Passed    1.93 sec
+[ctest]         Start 331: strings_cstrings_test.cstr8_replace
+[ctest] 590/682 Test #643: utils_timestamp_test.sub ........................................................   Passed    2.00 sec
+[ctest]         Start 426: strings_strings_test.str32_to_lower
+[ctest] 591/682 Test #626: utils_timer_test.increment_zero .................................................   Passed    1.94 sec
+[ctest]         Start  42: containers_binary_tree_test.insert_left_right
+[ctest] 592/682 Test #637: utils_timestamp_test.from_hours .................................................   Passed    1.98 sec
+[ctest]         Start 432: strings_strings_test.str32_remove_char
+[ctest] 593/682 Test #133: context_global_ctx_test.user_data_permissions_gate_access_per_slot ..............   Passed    1.97 sec
+[ctest]         Start 112: containers_stack_list_test.push_pop
+[ctest] 594/682 Test #414: strings_strings_test.str16_beautify .............................................   Passed    2.00 sec
+[ctest]         Start  21: basic_log_test.level_labels_are_stable
+[ctest] 595/682 Test  #95: containers_singly_list_test.count ...............................................   Passed    2.08 sec
+[ctest]         Start 104: containers_sort_test.quick_sort
+[ctest] 596/682 Test #583: utils_crc_test.crc32_empty ......................................................   Passed    2.03 sec
+[ctest]         Start 122: containers_tree_test.insert_child_back
+[ctest] 597/682 Test #331: strings_cstrings_test.cstr8_replace .............................................   Passed    2.05 sec
+[ctest]         Start  57: containers_doubly_list_test.empty_macro
+[ctest] 598/682 Test #426: strings_strings_test.str32_to_lower .............................................   Passed    2.01 sec
+[ctest]         Start 317: strings_cstrings_test.cstr8_find_last
+[ctest] 599/682 Test  #42: containers_binary_tree_test.insert_left_right ...................................   Passed    2.04 sec
+[ctest]         Start 234: memory_ring_test.empty_read
+[ctest] 600/682 Test #432: strings_strings_test.str32_remove_char ..........................................   Passed    2.02 sec
+[ctest]         Start 289: strings_char_test.c8_is_print
+[ctest] 601/682 Test #112: containers_stack_list_test.push_pop .............................................   Passed    2.00 sec
+[ctest]         Start 223: memory_pool_test.get_allocator
+[ctest] 602/682 Test  #21: basic_log_test.level_labels_are_stable ..........................................   Passed    2.00 sec
+[ctest]         Start 470: strings_unicode_test.utf32_to_utf16_invalid
+[ctest] 603/682 Test #104: containers_sort_test.quick_sort .................................................   Passed    1.98 sec
+[ctest]         Start 206: memory_buffer_test.set16
+[ctest] 604/682 Test #122: containers_tree_test.insert_child_back ..........................................   Passed    2.08 sec
+[ctest]         Start 396: strings_strings_test.str16_is_empty
+[ctest] 605/682 Test  #57: containers_doubly_list_test.empty_macro .........................................   Passed    2.06 sec
+[ctest]         Start  24: basic_log_test.state_sync_moves_root_messages_between_states
+[ctest] 606/682 Test #317: strings_cstrings_test.cstr8_find_last ...........................................   Passed    2.04 sec
+[ctest]         Start 634: utils_timestamp_test.from_milliseconds
+[ctest] 607/682 Test #234: memory_ring_test.empty_read .....................................................   Passed    2.04 sec
+[ctest]         Start 474: system_cpu_info_test.brand_name
+[ctest] 608/682 Test #289: strings_char_test.c8_is_print ...................................................   Passed    2.05 sec
+[ctest]         Start  54: containers_bitset_test.first_clear
+[ctest] 609/682 Test #223: memory_pool_test.get_allocator ..................................................   Passed    2.08 sec
+[ctest]         Start 374: strings_strings_test.str8_copy
+[ctest] 610/682 Test #470: strings_unicode_test.utf32_to_utf16_invalid .....................................   Passed    1.98 sec
+[ctest]         Start 446: strings_unicode_test.utf16_encode_size
+[ctest] 611/682 Test #206: memory_buffer_test.set16 ........................................................   Passed    2.00 sec
+[ctest]         Start 405: strings_strings_test.str16_to_f64
+[ctest] 612/682 Test #396: strings_strings_test.str16_is_empty .............................................   Passed    2.05 sec
+[ctest]         Start  88: containers_ring_list_test.count
+[ctest] 613/682 Test #634: utils_timestamp_test.from_milliseconds ..........................................   Passed    2.01 sec
+[ctest]         Start 251: memory_vmem_test.get_stats_after_operations
+[ctest] 614/682 Test  #24: basic_log_test.state_sync_moves_root_messages_between_states ....................   Passed    2.09 sec
+[ctest]         Start 249: memory_vmem_test.realloc_null
+[ctest] 615/682 Test #474: system_cpu_info_test.brand_name .................................................   Passed    2.02 sec
+[ctest]         Start 240: memory_scratch_test.preserve_original_allocation
+[ctest] 616/682 Test  #54: containers_bitset_test.first_clear ..............................................   Passed    2.00 sec
+[ctest]         Start 246: memory_vmem_test.alloc_zero_init
+[ctest] 617/682 Test #374: strings_strings_test.str8_copy ..................................................   Passed    1.98 sec
+[ctest]         Start 404: strings_strings_test.str16_to_i64
+[ctest] 618/682 Test #446: strings_unicode_test.utf16_encode_size ..........................................   Passed    2.03 sec
+[ctest]         Start  79: containers_hash_map_test.iteration
+[ctest] 619/682 Test #405: strings_strings_test.str16_to_f64 ...............................................   Passed    2.03 sec
+[ctest]         Start 134: context_global_ctx_test.global_log_frame_helpers_capture_messages
+[ctest] 620/682 Test  #88: containers_ring_list_test.count .................................................   Passed    2.11 sec
+[ctest]         Start 241: memory_vmem_test.page_size
+[ctest] 621/682 Test #249: memory_vmem_test.realloc_null ...................................................   Passed    2.11 sec
+[ctest]         Start 669: utils_version_test.to_cstr8_small_buffer
+[ctest] 622/682 Test #240: memory_scratch_test.preserve_original_allocation ................................   Passed    2.14 sec
+[ctest]         Start 333: strings_cstrings_test.cstr8_beautify
+[ctest] 623/682 Test #251: memory_vmem_test.get_stats_after_operations .....................................   Passed    2.21 sec
+[ctest]         Start 336: strings_cstrings_test.cstr8_tokenizer
+[ctest] 624/682 Test #404: strings_strings_test.str16_to_i64 ...............................................   Passed    2.13 sec
+[ctest]         Start 625: utils_timer_test.increment
+[ctest] 625/682 Test #246: memory_vmem_test.alloc_zero_init ................................................   Passed    2.15 sec
+[ctest]         Start 171: input_msg_core_test.keyboard_fill_and_get_roundtrip_uses_type_defaults
+[ctest] 626/682 Test  #79: containers_hash_map_test.iteration ..............................................   Passed    2.03 sec
+[ctest]         Start  70: containers_hash_map_test.set_get
+[ctest] 627/682 Test #134: context_global_ctx_test.global_log_frame_helpers_capture_messages ...............   Passed    1.95 sec
+[ctest]         Start 349: strings_cstrings_test.cstr16_trim
+[ctest] 628/682 Test #241: memory_vmem_test.page_size ......................................................   Passed    1.93 sec
+[ctest]         Start  81: containers_ring_list_test.empty_macro
+[ctest] 629/682 Test #669: utils_version_test.to_cstr8_small_buffer ........................................   Passed    1.95 sec
+[ctest]         Start 348: strings_cstrings_test.cstr16_to_lower
+[ctest] 630/682 Test #333: strings_cstrings_test.cstr8_beautify ............................................   Passed    1.95 sec
+[ctest]         Start 487: system_system_runtime_test.cpu_usage_initial
+[ctest] 631/682 Test #336: strings_cstrings_test.cstr8_tokenizer ...........................................   Passed    1.98 sec
+[ctest]         Start 431: strings_strings_test.str32_replace_char
+[ctest] 632/682 Test #625: utils_timer_test.increment ......................................................   Passed    1.98 sec
+[ctest]         Start 642: utils_timestamp_test.add
+[ctest] 633/682 Test #171: input_msg_core_test.keyboard_fill_and_get_roundtrip_uses_type_defaults ..........   Passed    1.98 sec
+[ctest]         Start 680: windowing_monitor_test.count_and_primary_monitor_queries
+[ctest] 634/682 Test  #70: containers_hash_map_test.set_get ................................................   Passed    1.88 sec
+[ctest]         Start  40: containers_binary_tree_test.next_preorder_ptr
+[ctest] 635/682 Test #349: strings_cstrings_test.cstr16_trim ...............................................   Passed    1.90 sec
+[ctest]         Start 309: strings_cstrings_test.cstr8_cmp_nocase
+[ctest] 636/682 Test  #81: containers_ring_list_test.empty_macro ...........................................   Passed    1.85 sec
+[ctest]         Start 447: strings_unicode_test.utf16_decode
+[ctest] 637/682 Test #348: strings_cstrings_test.cstr16_to_lower ...........................................   Passed    1.90 sec
+[ctest]         Start  93: containers_singly_list_test.push_back
+[ctest] 638/682 Test #487: system_system_runtime_test.cpu_usage_initial ....................................   Passed    1.92 sec
+[ctest]         Start 677: utils_version_test.cmp_patch_less
+[ctest] 639/682 Test #680: windowing_monitor_test.count_and_primary_monitor_queries ........................   Passed    1.89 sec
+[ctest]         Start 659: utils_uuid_test.to_cstr8
+[ctest] 640/682 Test #642: utils_timestamp_test.add ........................................................   Passed    1.92 sec
+[ctest]         Start 177: input_tablet_test.invalid_queries_are_rejected_safely
+[ctest] 641/682 Test #431: strings_strings_test.str32_replace_char .........................................   Passed    2.06 sec
+[ctest]         Start 271: processes_process_test.options_default
+[ctest] 642/682 Test  #40: containers_binary_tree_test.next_preorder_ptr ...................................   Passed    1.93 sec
+[ctest]         Start   3: basic_codespace_test.callsite_here_captures_line_and_strings
+[ctest] 643/682 Test #309: strings_cstrings_test.cstr8_cmp_nocase ..........................................   Passed    1.93 sec
+[ctest]         Start 417: strings_strings_test.str32_make
+[ctest] 644/682 Test #447: strings_unicode_test.utf16_decode ...............................................   Passed    2.10 sec
+[ctest]         Start 393: strings_strings_test.str16_make
+[ctest] 645/682 Test  #93: containers_singly_list_test.push_back ...........................................   Passed    2.12 sec
+[ctest]         Start  91: containers_singly_list_test.empty_macro
+[ctest] 646/682 Test #677: utils_version_test.cmp_patch_less ...............................................   Passed    2.18 sec
+[ctest]         Start 231: memory_ring_test.skip
+[ctest] 647/682 Test #659: utils_uuid_test.to_cstr8 ........................................................   Passed    2.17 sec
+[ctest]         Start 105: containers_sort_test.merge_sort
+[ctest] 648/682 Test #177: input_tablet_test.invalid_queries_are_rejected_safely ...........................   Passed    2.27 sec
+[ctest] 649/682 Test #271: processes_process_test.options_default ..........................................   Passed    2.16 sec
+[ctest]         Start  49: containers_bitset_test.set_clear_toggle
+[ctest]         Start 247: memory_vmem_test.realloc_basic
+[ctest] 650/682 Test   #3: basic_codespace_test.callsite_here_captures_line_and_strings ....................   Passed    2.16 sec
+[ctest]         Start  82: containers_ring_list_test.push_front
+[ctest] 651/682 Test #417: strings_strings_test.str32_make .................................................   Passed    2.15 sec
+[ctest]         Start  85: containers_ring_list_test.pop_back
+[ctest] 652/682 Test #393: strings_strings_test.str16_make .................................................   Passed    2.00 sec
+[ctest]         Start  22: basic_log_test.state_init_and_quit_toggle_init_flag
+[ctest] 653/682 Test  #91: containers_singly_list_test.empty_macro .........................................   Passed    1.98 sec
+[ctest]         Start 342: strings_cstrings_test.cstr16_is_empty
+[ctest] 654/682 Test #231: memory_ring_test.skip ...........................................................   Passed    1.98 sec
+[ctest]         Start  72: containers_hash_map_test.remove
+[ctest] 655/682 Test #105: containers_sort_test.merge_sort .................................................   Passed    2.09 sec
+[ctest]         Start 272: processes_process_test.options_captured
+[ctest] 656/682 Test  #49: containers_bitset_test.set_clear_toggle .........................................   Passed    2.00 sec
+[ctest]         Start 189: memory_arena_test.add_block
+[ctest] 657/682 Test #247: memory_vmem_test.realloc_basic ..................................................   Passed    2.08 sec
+[ctest]         Start 144: filesystem_file_test.atomic_write_and_invalid_arguments
+[ctest] 658/682 Test  #82: containers_ring_list_test.push_front ............................................   Passed    1.98 sec
+[ctest]         Start  74: containers_hash_map_test.update_existing_key
+[ctest] 659/682 Test  #85: containers_ring_list_test.pop_back ..............................................   Passed    1.91 sec
+[ctest]         Start 681: windowing_window_test.invalid_window_id_paths_return_failure
+[ctest] 660/682 Test  #22: basic_log_test.state_init_and_quit_toggle_init_flag .............................   Passed    1.94 sec
+[ctest]         Start 156: input_bindings_test.add_remove_enable_and_query_binding_descriptors
+[ctest] 661/682 Test #342: strings_cstrings_test.cstr16_is_empty ...........................................   Passed    1.92 sec
+[ctest]         Start  16: basic_intrinsics_test.rotates_wrap_bits_across_word_size
+[ctest] 662/682 Test  #72: containers_hash_map_test.remove .................................................   Passed    1.91 sec
+[ctest]         Start 230: memory_ring_test.peek
+[ctest] 663/682 Test #189: memory_arena_test.add_block .....................................................   Passed    1.91 sec
+[ctest]         Start 158: input_camera_test.enumeration_consistency_when_devices_exist
+[ctest] 664/682 Test #272: processes_process_test.options_captured .........................................   Passed    1.97 sec
+[ctest]         Start 270: processes_process_current_test.is_unique
+[ctest] 665/682 Test #144: filesystem_file_test.atomic_write_and_invalid_arguments .........................***Skipped   1.92 sec
+[ctest]         Start 679: windowing_monitor_test.id_conversion_and_invalid_queries
+[ctest] 666/682 Test  #74: containers_hash_map_test.update_existing_key ....................................   Passed    1.92 sec
+[ctest]         Start 269: processes_process_current_test.set_priority_high
+[ctest] 667/682 Test #681: windowing_window_test.invalid_window_id_paths_return_failure ....................   Passed    1.93 sec
+[ctest]         Start 678: windowing_dialog_test.validation_failures_do_not_require_user_interaction
+[ctest] 668/682 Test #156: input_bindings_test.add_remove_enable_and_query_binding_descriptors .............   Passed    1.93 sec
+[ctest]         Start 508: threads_atomics_test.fence
+[ctest] 669/682 Test  #16: basic_intrinsics_test.rotates_wrap_bits_across_word_size ........................   Passed    1.98 sec
+[ctest]         Start 561: threads_thread_test.create_join
+[ctest] 670/682 Test #230: memory_ring_test.peek ...........................................................   Passed    1.95 sec
+[ctest]         Start 528: threads_rwlock_test.try_write_lock_success
+[ctest] 671/682 Test #158: input_camera_test.enumeration_consistency_when_devices_exist ....................   Passed    1.97 sec
+[ctest]         Start 137: context_thread_ctx_test.log_helpers_capture_and_filter_messages
+[ctest] 672/682 Test #270: processes_process_current_test.is_unique ........................................   Passed    1.97 sec
+[ctest]         Start 151: filesystem_path_test.resolve_make_relative_and_current_directory
+[ctest] 673/682 Test #679: windowing_monitor_test.id_conversion_and_invalid_queries ........................   Passed    1.93 sec
+[ctest]         Start 562: threads_thread_test.create_named
+[ctest] 674/682 Test #269: processes_process_current_test.set_priority_high ................................   Passed    2.01 sec
+[ctest]         Start 682: windowing_window_test.create_modify_and_destroy_window_when_available
+[ctest] 675/682 Test #678: windowing_dialog_test.validation_failures_do_not_require_user_interaction .......   Passed    1.98 sec
+[ctest] 676/682 Test #508: threads_atomics_test.fence ......................................................   Passed    1.89 sec
+[ctest] 677/682 Test #561: threads_thread_test.create_join .................................................   Passed    1.87 sec
+[ctest] 678/682 Test #528: threads_rwlock_test.try_write_lock_success ......................................   Passed    1.90 sec
+[ctest] 679/682 Test #137: context_thread_ctx_test.log_helpers_capture_and_filter_messages .................***Skipped   1.88 sec
+[ctest] 680/682 Test #151: filesystem_path_test.resolve_make_relative_and_current_directory ................***Failed    1.90 sec
+[ctest] Note: Google Test filter = filesystem_path_test.resolve_make_relative_and_current_directory
+[ctest] [==========] Running 1 test from 1 test suite.
+[ctest] [----------] Global test environment set-up.
+[ctest] [----------] 1 test from filesystem_path_test
+[ctest] [ RUN      ] filesystem_path_test.resolve_make_relative_and_current_directory
+[ctest] C:/Users/Utente/Developer/based/tests/filesystem/path_test.cpp(46): error: Value of: dir_create_recursive(&nested_path) != 0
+[ctest]   Actual: false
+[ctest] Expected: true
+[ctest] 
+[ctest] [  FAILED  ] filesystem_path_test.resolve_make_relative_and_current_directory (4 ms)
+[ctest] [----------] 1 test from filesystem_path_test (4 ms total)
+[ctest] 
+[ctest] [----------] Global test environment tear-down
+[ctest] [==========] 1 test from 1 test suite ran. (4 ms total)
+[ctest] [  PASSED  ] 0 tests.
+[ctest] [  FAILED  ] 1 test, listed below:
+[ctest] [  FAILED  ] filesystem_path_test.resolve_make_relative_and_current_directory
+[ctest] 
+[ctest]  1 FAILED TEST
+[ctest] 
+[ctest] 681/682 Test #562: threads_thread_test.create_named ................................................***Skipped   1.88 sec
+[ctest] 682/682 Test #682: windowing_window_test.create_modify_and_destroy_window_when_available ...........***Skipped   1.60 sec
+[ctest] 
+[ctest] 99% tests passed, 10 tests failed out of 682
+[ctest] 
+[ctest] Total Test time (real) = 166.73 sec
+[ctest] 
+[ctest] The following tests did not run:
+[ctest] 	137 - context_thread_ctx_test.log_helpers_capture_and_filter_messages (Skipped)
+[ctest] 	141 - filesystem_directory_test.create_iterate_copy_and_remove_recursive (Skipped)
+[ctest] 	143 - filesystem_file_test.create_write_read_append_copy_and_delete (Skipped)
+[ctest] 	144 - filesystem_file_test.atomic_write_and_invalid_arguments (Skipped)
+[ctest] 	146 - filesystem_filemap_test.open_read_and_close_map (Skipped)
+[ctest] 	562 - threads_thread_test.create_named (Skipped)
+[ctest] 	682 - windowing_window_test.create_modify_and_destroy_window_when_available (Skipped)
+[ctest] 
+[ctest] The following tests FAILED:
+[ctest] 	 12 - basic_intrinsics_test.popcount_counts_bits_for_u32_and_u64 (SEGFAULT)
+[ctest] 	147 - filesystem_filestream_test.native_stream_write_seek_read (Failed)
+[ctest] 	151 - filesystem_path_test.resolve_make_relative_and_current_directory (Failed)
+[ctest] 	261 - processes_pipe_test.pipe_read (Failed)
+[ctest] 	277 - processes_process_test.wait_blocking (Failed)
+[ctest] 	279 - processes_process_test.wait_timeout (Failed)
+[ctest] 	280 - processes_process_test.read_captured (Failed)
+[ctest] 	337 - strings_cstrings_test.cstr8_join (SEGFAULT)
+[ctest] 	499 - threads_atomics_test.i64_get_set (SEGFAULT)
+[ctest] 	558 - threads_thread_group_test.detach_all (SEGFAULT)
+[ctest] Errors while running CTest
+[proc] The command: "C:\Program Files\CMake\bin\ctest.exe" -j8 -C Debug -T test --output-on-failure exited with code: 8
+[ctest] CTest finished with return code 8
+[ctest] Note: Google Test filter = processes_process_test.wait_blocking
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from processes_process_test
+[ RUN      ] processes_process_test.wait_blocking
+""echo hello world" non � riconosciuto come comando interno o esterno,
+ un programma eseguibile o un file batch.
+C:/Users/Utente/Developer/based/tests/processes/process_test.cpp(69): error: Expected equality of these values:
+  0
+  exit_code
+    Which is: 1
+
+[  FAILED  ] processes_process_test.wait_blocking (23 ms)
+[----------] 1 test from processes_process_test (23 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (24 ms total)
+[  PASSED  ] 0 tests.
+[  FAILED  ] 1 test, listed below:
+[  FAILED  ] processes_process_test.wait_blocking
+
+ 1 FAILED TEST
+
+Test processes_process_test.wait_blocking failed with exit code 1.
+[ctest] Note: Google Test filter = processes_process_test.wait_timeout
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from processes_process_test
+[ RUN      ] processes_process_test.wait_timeout
+""echo hello world" non � riconosciuto come comando interno o esterno,
+ un programma eseguibile o un file batch.
+C:/Users/Utente/Developer/based/tests/processes/process_test.cpp(102): error: Expected equality of these values:
+  0
+  exit_code
+    Which is: 1
+
+[  FAILED  ] processes_process_test.wait_timeout (19 ms)
+[----------] 1 test from processes_process_test (19 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (20 ms total)
+[  PASSED  ] 0 tests.
+[  FAILED  ] 1 test, listed below:
+[  FAILED  ] processes_process_test.wait_timeout
+
+ 1 FAILED TEST
+
+Test processes_process_test.wait_timeout failed with exit code 1.
+[ctest] Note: Google Test filter = processes_process_test.read_captured
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from processes_process_test
+[ RUN      ] processes_process_test.read_captured
+C:/Users/Utente/Developer/based/tests/processes/process_test.cpp(119): error: Expected equality of these values:
+  0
+  exit_code
+    Which is: 1
+
+[  FAILED  ] processes_process_test.read_captured (18 ms)
+[----------] 1 test from processes_process_test (18 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (19 ms total)
+[  PASSED  ] 0 tests.
+[  FAILED  ] 1 test, listed below:
+[  FAILED  ] processes_process_test.read_captured
+
+ 1 FAILED TEST
+
+Test processes_process_test.read_captured failed with exit code 1.
+[ctest] Note: Google Test filter = processes_pipe_test.pipe_read
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from processes_pipe_test
+[ RUN      ] processes_pipe_test.pipe_read
+""echo hello pipe test" non � riconosciuto come comando interno o esterno,
+ un programma eseguibile o un file batch.
+C:/Users/Utente/Developer/based/tests/processes/pipe_test.cpp(97): error: Expected: (bytes_read) > (0U), actual: 0 vs 0
+
+C:/Users/Utente/Developer/based/tests/processes/pipe_test.cpp(98): error: Expected: (cstr8_len(buffer)) > (0U), actual: 0 vs 0
+
+C:/Users/Utente/Developer/based/tests/processes/pipe_test.cpp(100): error: Expected equality of these values:
+  0
+  exit_code
+    Which is: 1
+
+[  FAILED  ] processes_pipe_test.pipe_read (17 ms)
+[----------] 1 test from processes_pipe_test (17 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (17 ms total)
+[  PASSED  ] 0 tests.
+[  FAILED  ] 1 test, listed below:
+[  FAILED  ] processes_pipe_test.pipe_read
+
+ 1 FAILED TEST
+
+Test processes_pipe_test.pipe_read failed with exit code 1.
+[ctest] Note: Google Test filter = basic_intrinsics_test.popcount_counts_bits_for_u32_and_u64
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from basic_intrinsics_test
+[ RUN      ] basic_intrinsics_test.popcount_counts_bits_for_u32_and_u64
+[       OK ] basic_intrinsics_test.popcount_counts_bits_for_u32_and_u64 (0 ms)
+[----------] 1 test from basic_intrinsics_test (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (0 ms total)
+[  PASSED  ] 1 test.
+
+Test basic_intrinsics_test.popcount_counts_bits_for_u32_and_u64 failed with exit code 3221225477.
+[ctest] Note: Google Test filter = threads_thread_group_test.detach_all
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from threads_thread_group_test
+[ RUN      ] threads_thread_group_test.detach_all
+[       OK ] threads_thread_group_test.detach_all (0 ms)
+[----------] 1 test from threads_thread_group_test (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (0 ms total)
+[  PASSED  ] 1 test.
+
+Test threads_thread_group_test.detach_all failed with exit code 3221225477.
+[ctest] Note: Google Test filter = strings_cstrings_test.cstr8_join
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from strings_cstrings_test
+[ RUN      ] strings_cstrings_test.cstr8_join
+[       OK ] strings_cstrings_test.cstr8_join (0 ms)
+[----------] 1 test from strings_cstrings_test (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (0 ms total)
+[  PASSED  ] 1 test.
+
+Test strings_cstrings_test.cstr8_join failed with exit code 3221225477.
+[ctest] 
+Test threads_atomics_test.i64_get_set failed with exit code 3221225477.
+[ctest] Note: Google Test filter = filesystem_filestream_test.native_stream_write_seek_read
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from filesystem_filestream_test
+[ RUN      ] filesystem_filestream_test.native_stream_write_seek_read
+[0;36m[DEBUG][0m filestream_open: failed src=C:/Users/Utente/AppData/Roaming/based/tests/filestream_tests/�H��_1720828147642/stream.bin mode=w+b  [0;90m(filestream_open() C:/Users/Utente/Developer/based/src/filesystem/filestream.c:179)[0m
+C:/Users/Utente/Developer/based/tests/filesystem/filestream_test.cpp(30): error: Value of: filestream_is_open(&stm_val) != 0
+  Actual: false
+Expected: true
+
+[  FAILED  ] filesystem_filestream_test.native_stream_write_seek_read (7 ms)
+[----------] 1 test from filesystem_filestream_test (7 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (7 ms total)
+[  PASSED  ] 0 tests.
+[  FAILED  ] 1 test, listed below:
+[  FAILED  ] filesystem_filestream_test.native_stream_write_seek_read
+
+ 1 FAILED TEST
+
+Test filesystem_filestream_test.native_stream_write_seek_read failed with exit code 1.
+[ctest] Note: Google Test filter = filesystem_path_test.resolve_make_relative_and_current_directory
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from filesystem_path_test
+[ RUN      ] filesystem_path_test.resolve_make_relative_and_current_directory
+C:/Users/Utente/Developer/based/tests/filesystem/path_test.cpp(46): error: Value of: dir_create_recursive(&nested_path) != 0
+  Actual: false
+Expected: true
+
+[  FAILED  ] filesystem_path_test.resolve_make_relative_and_current_directory (4 ms)
+[----------] 1 test from filesystem_path_test (4 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (4 ms total)
+[  PASSED  ] 0 tests.
+[  FAILED  ] 1 test, listed below:
+[  FAILED  ] filesystem_path_test.resolve_make_relative_and_current_directory
+
+ 1 FAILED TEST
+
+Test filesystem_path_test.resolve_make_relative_and_current_directory failed with exit code 1.

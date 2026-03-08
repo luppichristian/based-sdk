@@ -112,66 +112,62 @@ func force_inline void* binary_tree_next_preorder_ptr(void* root_ptr, void* node
 
 // Mutation helpers.
 #define BINARY_TREE_INSERT_LEFT(parent, node) expr_stmt( \
-  (node)->parent = (parent);                              \
-  (parent)->left = (node);)
+    (node)->parent = (parent);                           \
+    (parent)->left = (node);)
 
 #define BINARY_TREE_INSERT_RIGHT(parent, node) expr_stmt( \
-  (node)->parent = (parent);                               \
-  (parent)->right = (node);)
+    (node)->parent = (parent);                            \
+    (parent)->right = (node);)
 
 #define BINARY_TREE_REMOVE(root_ptr, node) expr_stmt( \
-  if ((node)->parent == nullptr) {                    \
-    *(root_ptr) = nullptr;                            \
-  } else if ((node) == (node)->parent->left) {       \
-    (node)->parent->left = nullptr;                   \
-  } else {                                            \
-    (node)->parent->right = nullptr;                  \
-  }                                                   \
-  (node)->parent = nullptr;)
+    if ((node)->parent == nullptr) {                  \
+      *(root_ptr) = nullptr;                          \
+    } else if ((node) == (node)->parent->left) {      \
+      (node)->parent->left = nullptr;                 \
+    } else {                                          \
+      (node)->parent->right = nullptr;                \
+    }(node)                                           \
+        ->parent = nullptr;)
 
 #define BINARY_TREE_ROTATE_LEFT(root_ptr, node) expr_stmt( \
-  typeof((node)->right) _right = (node)->right;             \
-  (node)->right = _right->left;                             \
-  if (_right->left != nullptr) {                            \
-    _right->left->parent = (node);                          \
-  }                                                          \
-  _right->parent = (node)->parent;                          \
-  if ((node)->parent == nullptr) {                          \
-    *(root_ptr) = _right;                                   \
-  } else if ((node) == (node)->parent->left) {             \
-    (node)->parent->left = _right;                          \
-  } else {                                                  \
-    (node)->parent->right = _right;                         \
-  }                                                         \
-  _right->left = (node);                                    \
-  (node)->parent = _right;)
+    typeof((node)->right) _right = (node)->right;          \
+    (node)->right = _right->left;                          \
+    if (_right->left != nullptr) {                         \
+      _right->left->parent = (node);                       \
+    } _right->parent = (node)->parent;                     \
+    if ((node)->parent == nullptr) {                       \
+      *(root_ptr) = _right;                                \
+    } else if ((node) == (node)->parent->left) {           \
+      (node)->parent->left = _right;                       \
+    } else {                                               \
+      (node)->parent->right = _right;                      \
+    } _right->left = (node);                               \
+    (node)->parent = _right;)
 
 #define BINARY_TREE_ROTATE_RIGHT(root_ptr, node) expr_stmt( \
-  typeof((node)->left) _left = (node)->left;                \
-  (node)->left = _left->right;                              \
-  if (_left->right != nullptr) {                            \
-    _left->right->parent = (node);                          \
-  }                                                          \
-  _left->parent = (node)->parent;                           \
-  if ((node)->parent == nullptr) {                          \
-    *(root_ptr) = _left;                                    \
-  } else if ((node) == (node)->parent->right) {            \
-    (node)->parent->right = _left;                          \
-  } else {                                                  \
-    (node)->parent->left = _left;                           \
-  }                                                         \
-  _left->right = (node);                                    \
-  (node)->parent = _left;)
+    typeof((node)->left) _left = (node)->left;              \
+    (node)->left = _left->right;                            \
+    if (_left->right != nullptr) {                          \
+      _left->right->parent = (node);                        \
+    } _left->parent = (node)->parent;                       \
+    if ((node)->parent == nullptr) {                        \
+      *(root_ptr) = _left;                                  \
+    } else if ((node) == (node)->parent->left) {            \
+      (node)->parent->left = _left;                         \
+    } else {                                                \
+      (node)->parent->right = _left;                        \
+    } _left->right = (node);                                \
+    (node)->parent = _left;)
 
 // Typed traversal macros.
-#define BINARY_TREE_FOREACH_PREORDER(root, it) \
+#define BINARY_TREE_FOREACH_PREORDER(root, it)    \
   for (typeof(root) it = (root); (it) != nullptr; \
        (it) = (typeof(root))binary_tree_next_preorder_ptr((void*)(root), (void*)(it)))
 
-#define BINARY_TREE_FOREACH_INORDER(root, it) \
+#define BINARY_TREE_FOREACH_INORDER(root, it)                                                         \
   for (typeof(root) it = (typeof(root))binary_tree_first_inorder_ptr((void*)(root)); (it) != nullptr; \
        (it) = (typeof(root))binary_tree_next_inorder_ptr((void*)(root), (void*)(it)))
 
-#define BINARY_TREE_FOREACH_POSTORDER(root, it) \
+#define BINARY_TREE_FOREACH_POSTORDER(root, it)                                                         \
   for (typeof(root) it = (typeof(root))binary_tree_first_postorder_ptr((void*)(root)); (it) != nullptr; \
        (it) = (typeof(root))binary_tree_next_postorder_ptr((void*)(root), (void*)(it)))

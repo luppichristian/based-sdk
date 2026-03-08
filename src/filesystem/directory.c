@@ -19,7 +19,14 @@ typedef struct dir_iterate_state {
   void* user_data;
   b32 stop_requested;
   b32 success;
+  struct dir_pending_dir* pending_head;
+  struct dir_pending_dir* pending_tail;
 } dir_iterate_state;
+
+typedef struct dir_pending_dir {
+  path dir_path;
+  struct dir_pending_dir* next;
+} dir_pending_dir;
 
 typedef struct dir_remove_state {
   b32 success;
@@ -183,6 +190,58 @@ func b32 dir_emit_entry(
   return state->callback(&entry, state->user_data);
 }
 
+func b32 dir_pending_push(dir_iterate_state* state, const path* src) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
+  dir_pending_dir* node = (dir_pending_dir*)SDL_malloc(size_of(dir_pending_dir));
+  if (node == NULL) {
+    TracyCZoneEnd(__tracy_zone_ctx);
+    return 0;
+  }
+
+  node->dir_path = *src;
+  node->next = NULL;
+
+  if (state->pending_tail != NULL) {
+    state->pending_tail->next = node;
+  } else {
+    state->pending_head = node;
+  }
+  state->pending_tail = node;
+
+  TracyCZoneEnd(__tracy_zone_ctx);
+  return 1;
+}
+
+func b32 dir_pending_pop(dir_iterate_state* state, path* out_path) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
+  dir_pending_dir* node = state->pending_head;
+  if (node == NULL) {
+    TracyCZoneEnd(__tracy_zone_ctx);
+    return 0;
+  }
+
+  state->pending_head = node->next;
+  if (state->pending_head == NULL) {
+    state->pending_tail = NULL;
+  }
+  *out_path = node->dir_path;
+  SDL_free(node);
+
+  TracyCZoneEnd(__tracy_zone_ctx);
+  return 1;
+}
+
+func void dir_pending_clear(dir_iterate_state* state) {
+  TracyCZoneN(__tracy_zone_ctx, __func__, 1);
+  while (state->pending_head != NULL) {
+    dir_pending_dir* node = state->pending_head;
+    state->pending_head = node->next;
+    SDL_free(node);
+  }
+  state->pending_tail = NULL;
+  TracyCZoneEnd(__tracy_zone_ctx);
+}
+
 func SDL_EnumerationResult SDLCALL dir_enumerate_callback(
     void* user_data,
     const char* dirname,
@@ -194,9 +253,20 @@ func SDL_EnumerationResult SDLCALL dir_enumerate_callback(
   path name_path;
   path full_path;
 
-  if (state == NULL || fname == NULL) {
+  if (state == NULL) {
     TracyCZoneEnd(__tracy_zone_ctx);
     return SDL_ENUM_FAILURE;
+  }
+
+  if (fname == NULL || fname[0] == '\0') {
+    TracyCZoneEnd(__tracy_zone_ctx);
+    return SDL_ENUM_CONTINUE;
+  }
+
+  if ((fname[0] == '.' && fname[1] == '\0') ||
+      (fname[0] == '.' && fname[1] == '.' && fname[2] == '\0')) {
+    TracyCZoneEnd(__tracy_zone_ctx);
+    return SDL_ENUM_CONTINUE;
   }
 
   if (state->stop_requested) {
@@ -209,6 +279,7 @@ func SDL_EnumerationResult SDLCALL dir_enumerate_callback(
   full_path = path_join(&dir_path, &name_path);
 
   if (!SDL_GetPathInfo(full_path.buf, &path_info)) {
+    thread_log_error("dir_iterate: SDL_GetPathInfo failed for '%s'", full_path.buf);
     state->success = 0;
     TracyCZoneEnd(__tracy_zone_ctx);
     return SDL_ENUM_FAILURE;
@@ -221,20 +292,10 @@ func SDL_EnumerationResult SDLCALL dir_enumerate_callback(
   }
 
   if (state->recursive && path_info.type == SDL_PATHTYPE_DIRECTORY) {
-    if (!SDL_EnumerateDirectory(full_path.buf, dir_enumerate_callback, state)) {
-      if (state->stop_requested) {
-        TracyCZoneEnd(__tracy_zone_ctx);
-        return SDL_ENUM_SUCCESS;
-      }
-
+    if (!dir_pending_push(state, &full_path)) {
       state->success = 0;
       TracyCZoneEnd(__tracy_zone_ctx);
       return SDL_ENUM_FAILURE;
-    }
-
-    if (state->stop_requested) {
-      TracyCZoneEnd(__tracy_zone_ctx);
-      return SDL_ENUM_SUCCESS;
     }
   }
 
@@ -253,9 +314,20 @@ func SDL_EnumerationResult SDLCALL dir_remove_callback(
   path name_path;
   path full_path;
 
-  if (state == NULL || fname == NULL) {
+  if (state == NULL) {
     TracyCZoneEnd(__tracy_zone_ctx);
     return SDL_ENUM_FAILURE;
+  }
+
+  if (fname == NULL || fname[0] == '\0') {
+    TracyCZoneEnd(__tracy_zone_ctx);
+    return SDL_ENUM_CONTINUE;
+  }
+
+  if ((fname[0] == '.' && fname[1] == '\0') ||
+      (fname[0] == '.' && fname[1] == '.' && fname[2] == '\0')) {
+    TracyCZoneEnd(__tracy_zone_ctx);
+    return SDL_ENUM_CONTINUE;
   }
 
   dir_path = path_from_cstr(dirname != NULL ? dirname : "");
@@ -565,26 +637,8 @@ func b32 dir_iterate_recursive(
     dir_iterate_callback* callback,
     void* user_data) {
   TracyCZoneN(__tracy_zone_ctx, __func__, 1);
-  dir_iterate_state state;
-
-  if (!dir_exists(src) || callback == NULL) {
-    TracyCZoneEnd(__tracy_zone_ctx);
-    return 0;
-  }
-  assert(callback != NULL);
-
-  memset(&state, 0, size_of(state));
-  state.root_path = *src;
-  state.recursive = 1;
-  state.callback = callback;
-  state.user_data = user_data;
-  state.success = 1;
-
-  if (!SDL_EnumerateDirectory(dir_path_cstr(src), dir_enumerate_callback, &state)) {
-    TracyCZoneEnd(__tracy_zone_ctx);
-    return state.stop_requested ? 1 : 0;
-  }
+  b32 result = dir_iterate(src, callback, user_data);
 
   TracyCZoneEnd(__tracy_zone_ctx);
-  return state.success;
+  return result;
 }

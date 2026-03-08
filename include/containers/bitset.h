@@ -9,45 +9,45 @@
 #define BITSET_WORD_COUNT(n) (((n) + 63) / 64)
 
 // Single-bit operations.
-#define BITSET_SET(arr, idx) expr_stmt((arr)[(idx) / 64] |= (1ULL << ((idx) % 64));)
-#define BITSET_CLEAR(arr, idx) expr_stmt((arr)[(idx) / 64] &= ~(1ULL << ((idx) % 64));)
+#define BITSET_SET(arr, idx)    expr_stmt((arr)[(idx) / 64] |= (1ULL << ((idx) % 64));)
+#define BITSET_CLEAR(arr, idx)  expr_stmt((arr)[(idx) / 64] &= ~(1ULL << ((idx) % 64));)
 #define BITSET_TOGGLE(arr, idx) expr_stmt((arr)[(idx) / 64] ^= (1ULL << ((idx) % 64));)
-#define BITSET_TEST(arr, idx) (((arr)[(idx) / 64] >> ((idx) % 64)) & 1ULL)
+#define BITSET_TEST(arr, idx)   (((arr)[(idx) / 64] >> ((idx) % 64)) & 1ULL)
 
 // Whole-set operations.
-#define BITSET_CLEAR_ALL(arr, word_count) expr_stmt( \
-  for (sz _word_idx = 0; _word_idx < (sz)(word_count); _word_idx++) { \
-    (arr)[_word_idx] = 0ULL; \
-  })
+#define BITSET_CLEAR_ALL(arr, word_count) expr_stmt(                    \
+    for (sz _word_idx = 0; _word_idx < (sz)(word_count); _word_idx++) { \
+      (arr)[_word_idx] = 0ULL;                                          \
+    })
 
-#define BITSET_SET_ALL(arr, word_count) expr_stmt( \
-  for (sz _word_idx = 0; _word_idx < (sz)(word_count); _word_idx++) { \
-    (arr)[_word_idx] = ~0ULL; \
-  })
+#define BITSET_SET_ALL(arr, word_count) expr_stmt(                      \
+    for (sz _word_idx = 0; _word_idx < (sz)(word_count); _word_idx++) { \
+      (arr)[_word_idx] = ~0ULL;                                         \
+    })
 
-#define BITSET_COUNT(arr, word_count, out) expr_stmt( \
-  (out) = 0; \
-  for (sz _word_idx = 0; _word_idx < (sz)(word_count); _word_idx++) { \
-    (out) += popcount_u64((arr)[_word_idx]); \
-  })
+#define BITSET_COUNT(arr, word_count, out) expr_stmt(                   \
+    (out) = 0;                                                          \
+    for (sz _word_idx = 0; _word_idx < (sz)(word_count); _word_idx++) { \
+      (out) += popcount_u64((arr)[_word_idx]);                          \
+    })
 
-#define BITSET_FIRST_SET(arr, word_count, out) expr_stmt( \
-  (out) = -1; \
-  for (sz _word_idx = 0; _word_idx < (sz)(word_count); _word_idx++) { \
-    if ((arr)[_word_idx] != 0ULL) { \
-      (out) = (i32)(_word_idx * 64U) + ctz_u64((arr)[_word_idx]); \
-      break; \
-    } \
-  })
+#define BITSET_FIRST_SET(arr, word_count, out) expr_stmt(               \
+    (out) = -1;                                                         \
+    for (sz _word_idx = 0; _word_idx < (sz)(word_count); _word_idx++) { \
+      if ((arr)[_word_idx] != 0ULL) {                                   \
+        (out) = (i32)(_word_idx * 64U) + ctz_u64((arr)[_word_idx]);     \
+        break;                                                          \
+      }                                                                 \
+    })
 
-#define BITSET_FIRST_CLEAR(arr, word_count, out) expr_stmt( \
-  (out) = -1; \
-  for (sz _word_idx = 0; _word_idx < (sz)(word_count); _word_idx++) { \
-    if (~(arr)[_word_idx] != 0ULL) { \
-      (out) = (i32)(_word_idx * 64U) + ctz_u64(~(arr)[_word_idx]); \
-      break; \
-    } \
-  })
+#define BITSET_FIRST_CLEAR(arr, word_count, out) expr_stmt(             \
+    (out) = -1;                                                         \
+    for (sz _word_idx = 0; _word_idx < (sz)(word_count); _word_idx++) { \
+      if (~(arr)[_word_idx] != 0ULL) {                                  \
+        (out) = (i32)(_word_idx * 64U) + ctz_u64(~(arr)[_word_idx]);    \
+        break;                                                          \
+      }                                                                 \
+    })
 
 // Returns the first set bit at or after from_idx, or -1 when not found.
 func force_inline i32 bitset_find_next_set(const u64* arr, sz word_count, i32 from_idx) {
@@ -74,6 +74,6 @@ func force_inline i32 bitset_find_next_set(const u64* arr, sz word_count, i32 fr
 }
 
 // Typed traversal macro over all set bits.
-#define BITSET_FOREACH_SET(arr, word_count, idx) \
+#define BITSET_FOREACH_SET(arr, word_count, idx)                                \
   for (i32 idx = bitset_find_next_set((arr), (sz)(word_count), 0); (idx) != -1; \
        (idx) = bitset_find_next_set((arr), (sz)(word_count), (idx) + 1))

@@ -228,10 +228,10 @@ func b32 cstr8_append_format(c8* dst, sz dst_cap, cstr8 fmt, ...) {
   }
   va_list args;
   va_start(args, fmt);
-  int result = cstr8_format(dst + len, dst_cap - len, fmt, args);
+  b32 result = cstr8_vformat(dst + len, dst_cap - len, fmt, args);
   va_end(args);
   TracyCZoneEnd(__tracy_zone_ctx);
-  return (result >= 0 && (sz)result < dst_cap - len) ? 1 : 0;
+  return result;
 }
 
 func b32 cstr8_append_vformat(c8* dst, sz dst_cap, cstr8 fmt, va_list args) {
@@ -241,9 +241,9 @@ func b32 cstr8_append_vformat(c8* dst, sz dst_cap, cstr8 fmt, va_list args) {
     TracyCZoneEnd(__tracy_zone_ctx);
     return 0;
   }
-  int result = cstr8_vformat(dst + len, dst_cap - len, fmt, args);
+  b32 result = cstr8_vformat(dst + len, dst_cap - len, fmt, args);
   TracyCZoneEnd(__tracy_zone_ctx);
-  return (result >= 0 && (sz)result < dst_cap - len) ? 1 : 0;
+  return result;
 }
 
 func b32 cstr8_scan(cstr8 str, cstr8 fmt, ...) {

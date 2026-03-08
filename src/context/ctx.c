@@ -46,11 +46,11 @@ func void ctx_quit(ctx* context) {
     return;
   }
 
+  log_state_quit(&context->log);
   heap_destroy(&context->temp_heap);
   heap_destroy(&context->perm_heap);
   arena_destroy(&context->temp_arena);
   arena_destroy(&context->perm_arena);
-  log_state_quit(&context->log);
   thread_log_trace("ctx_quit: context=%p", (void*)context);
   memset(context, 0, size_of(*context));
   TracyCZoneEnd(__tracy_zone_ctx);

@@ -190,6 +190,11 @@ target_compile_definitions(
 
 if(BASED_BUILD_TESTS)
     enable_testing()
+
+    # Ignore a placeholder test registered by libmath2 when its test binary
+    # is intentionally disabled in this workspace configuration.
+    file(WRITE "${CMAKE_BINARY_DIR}/CTestCustom.cmake" "set(CTEST_CUSTOM_TESTS_IGNORE libmath2-tests_NOT_BUILT)\n")
+
     find_package(GTest QUIET)
 
     if(NOT GTest_FOUND AND BASED_GTEST_FETCH)
@@ -212,7 +217,7 @@ if(BASED_BUILD_TESTS)
     based_apply_binary_type_defines(based-tests)
 
     include(GoogleTest)
-    gtest_discover_tests(based-tests)
+    gtest_discover_tests(based-tests PROPERTIES RUN_SERIAL TRUE)
 
     # libmath2 may register a gtest_discover placeholder when its test binary
     # is not built in this workspace configuration; ignore that non-project test.

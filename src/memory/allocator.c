@@ -8,15 +8,15 @@
 
 func void* _allocator_alloc(allocator* alloc, sz size, callsite site) {
   TracyCZoneN(__tracy_zone_ctx, __func__, 1);
-  if (alloc == NULL || alloc->alloc_fn == NULL || size == 0) {
+  if (alloc == NULL || alloc->alloc_fn == NULL) {
     TracyCZoneEnd(__tracy_zone_ctx);
     return NULL;
   }
   assert(alloc->alloc_fn != NULL);
-  assert(size > 0);
+  sz request_size = size > 0 ? size : 1;
   if (alloc->alloc_fn) {
     TracyCZoneEnd(__tracy_zone_ctx);
-    return alloc->alloc_fn(alloc->user_data, site, size);
+    return alloc->alloc_fn(alloc->user_data, site, request_size);
   }
   TracyCZoneEnd(__tracy_zone_ctx);
   return NULL;
@@ -39,6 +39,7 @@ func void* _allocator_calloc(allocator* alloc, sz count, sz size, callsite site)
 
 func void _allocator_dealloc(allocator* alloc, void* ptr, sz size, callsite site) {
   TracyCZoneN(__tracy_zone_ctx, __func__, 1);
+  (void)size;
   if (alloc == NULL || ptr == NULL) {
     TracyCZoneEnd(__tracy_zone_ctx);
     return;

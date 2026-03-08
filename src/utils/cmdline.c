@@ -16,7 +16,7 @@ func cmdline cmdline_build(sz count, c8** args) {
   assert(count > 0);
   assert(args != NULL);
 
-  cmdline cmdl = {.count = (sz)count, .args = args};
+  cmdline cmdl = {.count = count, .args = args};
   TracyCZoneEnd(__tracy_zone_ctx);
   return cmdl;
 }
@@ -92,20 +92,36 @@ func cstr8 cmdline_get_option(cmdline cmdl, cstr8 name) {
     return NULL;
   }
 
+  c8 normalized_name[128] = {0};
+  cstr8 lookup_name = name;
+  sz lookup_len = name_len;
+  if (name[0] != '-') {
+    if (!cstr8_copy(normalized_name, size_of(normalized_name), "--")) {
+      TracyCZoneEnd(__tracy_zone_ctx);
+      return NULL;
+    }
+    if (!cstr8_cat(normalized_name, size_of(normalized_name), name)) {
+      TracyCZoneEnd(__tracy_zone_ctx);
+      return NULL;
+    }
+    lookup_name = normalized_name;
+    lookup_len = cstr8_len(lookup_name);
+  }
+
   for (sz idx = 1; idx < cmdl.count; idx++) {
     cstr8 value = cmdline_get_arg(cmdl, idx);
     if (value == NULL) {
       continue;
     }
 
-    if (cstr8_cmp(value, name) == 0) {
+    if (cstr8_cmp(value, lookup_name) == 0) {
       TracyCZoneEnd(__tracy_zone_ctx);
       return cmdline_get_arg(cmdl, idx + 1);
     }
 
-    if (cstr8_cmp_n(value, name, name_len) == 0 && value[name_len] == '=') {
+    if (cstr8_cmp_n(value, lookup_name, lookup_len) == 0 && value[lookup_len] == '=') {
       TracyCZoneEnd(__tracy_zone_ctx);
-      return value + name_len + 1;
+      return value + lookup_len + 1;
     }
   }
 

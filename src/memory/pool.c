@@ -3,6 +3,7 @@
 
 #include "memory/pool.h"
 #include "basic/assert.h"
+#include "context/global_ctx.h"
 #include "context/thread_ctx.h"
 #include "input/msg.h"
 #include "input/msg_core.h"
@@ -135,6 +136,12 @@ func pool pool_create(
   pool pol;
   memset(&pol, 0, size_of(pol));
   pol.parent = parent_alloc;
+  if (pol.parent.alloc_fn == NULL || pol.parent.dealloc_fn == NULL) {
+    pol.parent = thread_get_allocator();
+  }
+  if (pol.parent.alloc_fn == NULL || pol.parent.dealloc_fn == NULL) {
+    pol.parent = global_get_allocator();
+  }
   pol.opt_mutex = opt_mutex;
   pol.default_block_sz = default_block_sz;
   pol.object_size = object_size;
@@ -146,9 +153,7 @@ func pool pool_create(
                                                      .object_type = MSG_CORE_OBJECT_TYPE_POOL,
                                                      .object_ptr = &pol,
                                                  });
-  if (!msg_post(&lifecycle_msg)) {
-    memset(&pol, 0, size_of(pol));
-  }
+  (void)msg_post(&lifecycle_msg);
   thread_log_trace("pool_create: obj_size=%zu obj_align=%zu", (size_t)object_size, (size_t)object_align);
   TracyCZoneEnd(__tracy_zone_ctx);
   return pol;
@@ -182,10 +187,7 @@ func void pool_destroy(pool* pol) {
                                                      .object_type = MSG_CORE_OBJECT_TYPE_POOL,
                                                      .object_ptr = pol,
                                                  });
-  if (!msg_post(&lifecycle_msg)) {
-    TracyCZoneEnd(__tracy_zone_ctx);
-    return;
-  }
+  (void)msg_post(&lifecycle_msg);
 
   if (pol->opt_mutex) {
     mutex_lock(pol->opt_mutex);

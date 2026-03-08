@@ -3,6 +3,7 @@
 
 #include "memory/arena.h"
 #include "basic/assert.h"
+#include "context/global_ctx.h"
 #include "context/thread_ctx.h"
 #include "input/msg.h"
 #include "input/msg_core.h"
@@ -92,6 +93,12 @@ func arena arena_create(allocator parent_alloc, mutex opt_mutex, sz default_bloc
   arena arn;
   memset(&arn, 0, size_of(arn));
   arn.parent = parent_alloc;
+  if (arn.parent.alloc_fn == NULL || arn.parent.dealloc_fn == NULL) {
+    arn.parent = thread_get_allocator();
+  }
+  if (arn.parent.alloc_fn == NULL || arn.parent.dealloc_fn == NULL) {
+    arn.parent = global_get_allocator();
+  }
   arn.opt_mutex = opt_mutex;
   arn.default_block_sz = default_block_sz;
   msg lifecycle_msg = {0};
@@ -101,9 +108,7 @@ func arena arena_create(allocator parent_alloc, mutex opt_mutex, sz default_bloc
                                                      .object_type = MSG_CORE_OBJECT_TYPE_ARENA,
                                                      .object_ptr = &arn,
                                                  });
-  if (!msg_post(&lifecycle_msg)) {
-    memset(&arn, 0, size_of(arn));
-  }
+  (void)msg_post(&lifecycle_msg);
   thread_log_trace("arena_create: block_sz=%zu", (size_t)default_block_sz);
   TracyCZoneEnd(__tracy_zone_ctx);
   return arn;
@@ -132,10 +137,7 @@ func void arena_destroy(arena* arn) {
                                                      .object_type = MSG_CORE_OBJECT_TYPE_ARENA,
                                                      .object_ptr = arn,
                                                  });
-  if (!msg_post(&lifecycle_msg)) {
-    TracyCZoneEnd(__tracy_zone_ctx);
-    return;
-  }
+  (void)msg_post(&lifecycle_msg);
 
   if (arn->opt_mutex) {
     mutex_lock(arn->opt_mutex);

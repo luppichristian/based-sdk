@@ -3,6 +3,7 @@
 
 #include "memory/heap.h"
 #include "basic/assert.h"
+#include "context/global_ctx.h"
 #include "context/thread_ctx.h"
 #include "input/msg.h"
 #include "input/msg_core.h"
@@ -198,6 +199,12 @@ func heap heap_create(allocator parent_alloc, mutex opt_mutex, sz default_block_
   heap hep;
   memset(&hep, 0, size_of(hep));
   hep.parent = parent_alloc;
+  if (hep.parent.alloc_fn == NULL || hep.parent.dealloc_fn == NULL) {
+    hep.parent = thread_get_allocator();
+  }
+  if (hep.parent.alloc_fn == NULL || hep.parent.dealloc_fn == NULL) {
+    hep.parent = global_get_allocator();
+  }
   hep.opt_mutex = opt_mutex;
   hep.default_block_sz = default_block_sz;
   msg lifecycle_msg = {0};
@@ -207,9 +214,7 @@ func heap heap_create(allocator parent_alloc, mutex opt_mutex, sz default_block_
                                                      .object_type = MSG_CORE_OBJECT_TYPE_HEAP,
                                                      .object_ptr = &hep,
                                                  });
-  if (!msg_post(&lifecycle_msg)) {
-    memset(&hep, 0, size_of(hep));
-  }
+  (void)msg_post(&lifecycle_msg);
   thread_log_trace("heap_create: block_sz=%zu", (size_t)default_block_sz);
   TracyCZoneEnd(__tracy_zone_ctx);
   return hep;
@@ -238,10 +243,7 @@ func void heap_destroy(heap* hep) {
                                                      .object_type = MSG_CORE_OBJECT_TYPE_HEAP,
                                                      .object_ptr = hep,
                                                  });
-  if (!msg_post(&lifecycle_msg)) {
-    TracyCZoneEnd(__tracy_zone_ctx);
-    return;
-  }
+  (void)msg_post(&lifecycle_msg);
 
   if (hep->opt_mutex) {
     mutex_lock(hep->opt_mutex);

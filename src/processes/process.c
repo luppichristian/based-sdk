@@ -57,10 +57,7 @@ func process _process_create_with(cstr8 const* args, process_options options, ca
                                                      .object_type = MSG_CORE_OBJECT_TYPE_PROCESS,
                                                      .object_ptr = NULL,
                                                  });
-  if (!msg_post(&lifecycle_msg)) {
-    TracyCZoneEnd(__tracy_zone_ctx);
-    return NULL;
-  }
+  (void)msg_post(&lifecycle_msg);
 
   if (process_options_is_default(options)) {
     process prc = (process)SDL_CreateProcess(args, false);
@@ -234,10 +231,7 @@ func void process_destroy(process prc) {
                                                      .object_type = MSG_CORE_OBJECT_TYPE_PROCESS,
                                                      .object_ptr = prc,
                                                  });
-  if (!msg_post(&lifecycle_msg)) {
-    TracyCZoneEnd(__tracy_zone_ctx);
-    return;
-  }
+  (void)msg_post(&lifecycle_msg);
 
   thread_log_trace("process_destroy: prc=%p", prc);
   SDL_DestroyProcess((SDL_Process*)prc);

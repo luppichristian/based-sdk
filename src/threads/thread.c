@@ -85,10 +85,7 @@ func thread thread_create_impl(thread_func entry, void* arg, cstr8 name, allocat
                                                      .object_type = MSG_CORE_OBJECT_TYPE_THREAD,
                                                      .object_ptr = NULL,
                                                  });
-  if (!msg_post(&lifecycle_msg)) {
-    TracyCZoneEnd(__tracy_zone_ctx);
-    return NULL;
-  }
+  (void)msg_post(&lifecycle_msg);
 
   thread_entry_payload* payload = (thread_entry_payload*)allocator_alloc(&payload_allocator, size_of(*payload));
   if (!payload) {
@@ -156,10 +153,7 @@ func b32 thread_join(thread thd, i32* out_exit_code) {
                                                      .object_type = MSG_CORE_OBJECT_TYPE_THREAD,
                                                      .object_ptr = thd,
                                                  });
-  if (!msg_post(&lifecycle_msg)) {
-    TracyCZoneEnd(__tracy_zone_ctx);
-    return 0;
-  }
+  (void)msg_post(&lifecycle_msg);
   SDL_WaitThread((SDL_Thread*)thd, (int*)out_exit_code);
   thread_log_trace("thread_join: thread=%p", thd);
   TracyCZoneEnd(__tracy_zone_ctx);
@@ -179,10 +173,7 @@ func void thread_detach(thread thd) {
                                                      .object_type = MSG_CORE_OBJECT_TYPE_THREAD,
                                                      .object_ptr = thd,
                                                  });
-  if (!msg_post(&lifecycle_msg)) {
-    TracyCZoneEnd(__tracy_zone_ctx);
-    return;
-  }
+  (void)msg_post(&lifecycle_msg);
   SDL_DetachThread((SDL_Thread*)thd);
   thread_log_trace("thread_detach: thread=%p", thd);
   TracyCZoneEnd(__tracy_zone_ctx);

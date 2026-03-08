@@ -10,10 +10,7 @@ Use this file as the authoritative repo guide for future coding tasks. If files 
 
 Keeping this file up to date is mandatory. Any change that adds, removes, or materially repurposes files or directories covered here must update `AGENTS.md` in the same change.
 
-NOTE: For now you can skip tests
-
 ## Code Rules
-- Never build, configure cmake yourself. Always let me do it.
 - Every `.h`, `.c`, and test file should start with:
   `// MIT License`
   `// Copyright (c) 2026 Christian Luppi`

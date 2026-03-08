@@ -108,7 +108,7 @@ func u8 uuid_get_version(uuid value) {
 func u8 uuid_get_variant(uuid value) {
   TracyCZoneN(__tracy_zone_ctx, __func__, 1);
   TracyCZoneEnd(__tracy_zone_ctx);
-  return (u8)((value.bytes[8] >> 5U) & 0x07U);
+  return (u8)((value.bytes[8] >> 6U) & 0x03U);
 }
 
 func sz uuid_string_length(void) {

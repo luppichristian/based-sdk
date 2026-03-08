@@ -11,7 +11,5 @@ int main(int argc, char** argv) {
 
   ::testing::InitGoogleTest(&argc, argv);
   int test_result = RUN_ALL_TESTS();
-
-  entry_quit();
   return test_result;
 }

@@ -20,7 +20,7 @@ func b32 hash_map_raw_insert(
     u64 key,
     void* value) {
   TracyCZoneN(__tracy_zone_ctx, __func__, 1);
-  sz pos = (sz)(lm2_hash_u64(key) & (u64)(cap - 1));
+  sz pos = (sz)(hash_u64(key) & (u64)(cap - 1));
   u32 dist = 0;
 
   hash_map_slot incoming;
@@ -147,15 +147,21 @@ func hash_map hash_map_create(sz cap, allocator alloc) {
   hash_map map;
   memset(&map, 0, size_of(map));
   map.alloc = alloc;
-  assert(alloc.alloc_fn != NULL);
-  assert(alloc.dealloc_fn != NULL);
+  if (map.alloc.alloc_fn == NULL || map.alloc.dealloc_fn == NULL) {
+    map.alloc = thread_get_allocator();
+  }
+  if (map.alloc.alloc_fn == NULL || map.alloc.dealloc_fn == NULL) {
+    map.alloc = global_get_allocator();
+  }
 
   sz actual = 16;
   while (actual < cap) {
     actual *= 2;
   }
   map.cap = actual;
-  map.slots = (hash_map_slot*)allocator_calloc(&map.alloc, actual, size_of(hash_map_slot));
+  if (map.alloc.alloc_fn != NULL && map.alloc.dealloc_fn != NULL) {
+    map.slots = (hash_map_slot*)allocator_calloc(&map.alloc, actual, size_of(hash_map_slot));
+  }
   TracyCZoneEnd(__tracy_zone_ctx);
   return map;
 }
@@ -216,7 +222,7 @@ func f32 hash_map_load_factor(hash_map const* map) {
   TracyCZoneN(__tracy_zone_ctx, __func__, 1);
   if (map == NULL || map->cap == 0) {
     TracyCZoneEnd(__tracy_zone_ctx);
-    return 0.0f;
+    return 0.0F;
   }
   f32 result = (f32)map->count / (f32)map->cap;
   TracyCZoneEnd(__tracy_zone_ctx);

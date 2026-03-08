@@ -420,11 +420,7 @@ func b32 log_state_init(log_state* state, b32 use_mutex) {
       .object_ptr = state,
   };
   msg_core_fill_object_lifecycle(&lifecycle_msg, &lifecycle_data);
-  if (!msg_post(&lifecycle_msg)) {
-    log_state_quit(state);
-    TracyCZoneEnd(__tracy_zone_ctx);
-    return false;
-  }
+  (void)msg_post(&lifecycle_msg);
   TracyCZoneEnd(__tracy_zone_ctx);
   return true;
 }
@@ -444,10 +440,7 @@ func void log_state_quit(log_state* state) {
       .object_ptr = state,
   };
   msg_core_fill_object_lifecycle(&lifecycle_msg, &lifecycle_data);
-  if (!msg_post(&lifecycle_msg)) {
-    TracyCZoneEnd(__tracy_zone_ctx);
-    return;
-  }
+  (void)msg_post(&lifecycle_msg);
 
   mutex state_mutex = state->mutex_handle;
   log_frame* root_frame = state->root_frame;
@@ -652,14 +645,14 @@ func cstr8 log_msg_text(log_msg* msg) {
   return msg ? msg->text : NULL;
 }
 
-func void _log(log_state* state, log_level level, callsite site, cstr8 fmt, ...) {
+func void _log(log_state* state, log_level level, callsite site, cstr8 msg, ...) {
   TracyCZoneN(__tracy_zone_ctx, __func__, 1);
   log_state* resolved = log_state_resolve(state);
   if (!resolved) {
     TracyCZoneEnd(__tracy_zone_ctx);
     return;
   }
-  if (fmt == NULL) {
+  if (msg == NULL) {
     TracyCZoneEnd(__tracy_zone_ctx);
     return;
   }
@@ -679,11 +672,11 @@ func void _log(log_state* state, log_level level, callsite site, cstr8 fmt, ...)
 
   str8_large buf = {0};
   va_list args;
-  va_start(args, fmt);
-  cstr8_vformat(buf, size_of(buf), fmt, args);
+  va_start(args, msg);
+  cstr8_vformat(buf, size_of(buf), msg, args);
   va_end(args);
 
-  msg log_msg = {0};
+  struct msg log_msg = {0};
   log_msg.type = MSG_CORE_TYPE_LOG;
   msg_core_log_data log_data = {
       .state_ptr = resolved,
@@ -692,10 +685,7 @@ func void _log(log_state* state, log_level level, callsite site, cstr8 fmt, ...)
   };
   cstr8_format(log_data.text, size_of(log_data.text), "%s", buf);
   msg_core_fill_log(&log_msg, &log_data);
-  if (!msg_post(&log_msg)) {
-    TracyCZoneEnd(__tracy_zone_ctx);
-    return;
-  }
+  (void)msg_post(&log_msg);
 
   log_state_store_msg(resolved, level, site, buf);
   log_emit(level, site, buf);

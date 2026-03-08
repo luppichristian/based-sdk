@@ -178,10 +178,7 @@ func void filemap_close(filemap* map) {
                                                      .object_type = MSG_CORE_OBJECT_TYPE_FILEMAP,
                                                      .object_ptr = map,
                                                  });
-  if (!msg_post(&lifecycle_msg)) {
-    TracyCZoneEnd(__tracy_zone_ctx);
-    return;
-  }
+  (void)msg_post(&lifecycle_msg);
 
   if (map->uses_fallback_copy) {
     if (map->writable) {
@@ -316,11 +313,7 @@ func filemap filemap_open(const path* src, filemap_access access) {
                                                      .object_type = MSG_CORE_OBJECT_TYPE_FILEMAP,
                                                      .object_ptr = &map,
                                                  });
-  if (!msg_post(&lifecycle_msg)) {
-    filemap_close(&map);
-    TracyCZoneEnd(__tracy_zone_ctx);
-    return filemap_empty();
-  }
+  (void)msg_post(&lifecycle_msg);
   thread_log_trace("filemap_open: windows path=%s size=%zu writable=%u", src->buf, (size_t)map.data_size, (u32)map.writable);
   TracyCZoneEnd(__tracy_zone_ctx);
   return map;
@@ -377,11 +370,7 @@ func filemap filemap_open(const path* src, filemap_access access) {
                                                      .object_type = MSG_CORE_OBJECT_TYPE_FILEMAP,
                                                      .object_ptr = &map,
                                                  });
-  if (!msg_post(&lifecycle_msg)) {
-    filemap_close(&map);
-    TracyCZoneEnd(__tracy_zone_ctx);
-    return filemap_empty();
-  }
+  (void)msg_post(&lifecycle_msg);
   thread_log_trace("filemap_open: unix path=%s size=%zu writable=%u", src->buf, (size_t)map.data_size, (u32)map.writable);
   TracyCZoneEnd(__tracy_zone_ctx);
   return map;
@@ -403,14 +392,9 @@ func filemap filemap_open(const path* src, filemap_access access) {
                                                      .object_type = MSG_CORE_OBJECT_TYPE_FILEMAP,
                                                      .object_ptr = &map,
                                                  });
-  if (!msg_post(&lifecycle_msg)) {
-    filemap_close(&map);
-    TracyCZoneEnd(__tracy_zone_ctx);
-    return filemap_empty();
-  }
+  (void)msg_post(&lifecycle_msg);
   thread_log_trace("filemap_open: fallback path=%s size=%zu writable=%u", src->buf, (size_t)map.data_size, (u32)map.writable);
   TracyCZoneEnd(__tracy_zone_ctx);
   return map;
 #endif
 }
-

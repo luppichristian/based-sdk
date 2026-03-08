@@ -107,11 +107,7 @@ func thread_group _thread_group_create(u32 count, thread_group_func entry, void*
                                                      .object_type = MSG_CORE_OBJECT_TYPE_THREAD_GROUP,
                                                      .object_ptr = NULL,
                                                  });
-  if (!msg_post(&lifecycle_msg)) {
-    thread_group empty = {0};
-    TracyCZoneEnd(__tracy_zone_ctx);
-    return empty;
-  }
+  (void)msg_post(&lifecycle_msg);
   TracyCZoneEnd(__tracy_zone_ctx);
   return create_impl(count, entry, arg, NULL);
 }
@@ -131,11 +127,7 @@ func thread_group _thread_group_create_named(
                                                      .object_type = MSG_CORE_OBJECT_TYPE_THREAD_GROUP,
                                                      .object_ptr = NULL,
                                                  });
-  if (!msg_post(&lifecycle_msg)) {
-    thread_group empty = {0};
-    TracyCZoneEnd(__tracy_zone_ctx);
-    return empty;
-  }
+  (void)msg_post(&lifecycle_msg);
   TracyCZoneEnd(__tracy_zone_ctx);
   return create_impl(count, entry, arg, base_name);
 }
@@ -161,10 +153,7 @@ func void _thread_group_destroy(thread_group* group, callsite site) {
                                                      .object_type = MSG_CORE_OBJECT_TYPE_THREAD_GROUP,
                                                      .object_ptr = group,
                                                  });
-  if (!msg_post(&lifecycle_msg)) {
-    TracyCZoneEnd(__tracy_zone_ctx);
-    return;
-  }
+  (void)msg_post(&lifecycle_msg);
 
   allocator_dealloc(&alloc, group->threads, (sz)group->count * size_of(thread));
   allocator_dealloc(&alloc, group->slots, (sz)group->count * size_of(thread_group_slot));
