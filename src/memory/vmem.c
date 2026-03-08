@@ -521,4 +521,3 @@ func vmem_stats vmem_get_stats(void) {
   TracyCZoneEnd(__tracy_zone_ctx);
   return stats;
 }
-

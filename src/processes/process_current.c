@@ -252,4 +252,3 @@ func no_return void process_abort(void) {
   TracyCZoneEnd(__tracy_zone_ctx);
   abort();
 }
-

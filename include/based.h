@@ -123,4 +123,3 @@
 #  define LM2_NO_GENERICS
 #endif
 #include <lm2.h>
-

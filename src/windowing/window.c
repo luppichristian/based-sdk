@@ -349,5 +349,3 @@ func b32 window_get_monitor_id(window id, monitor* out_monitor_id) {
   TracyCZoneEnd(__tracy_zone_ctx);
   return 1;
 }
-
-

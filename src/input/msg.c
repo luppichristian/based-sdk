@@ -1797,7 +1797,3 @@ func b32 msg_to_native(const msg* src, void* native_event) {
   TracyCZoneEnd(__tracy_zone_ctx);
   return msg_to_sdl_event((msg*)src, (SDL_Event*)native_event);
 }
-
-
-
-

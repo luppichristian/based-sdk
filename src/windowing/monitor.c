@@ -270,5 +270,3 @@ func monitor_orientation monitor_get_orientation(monitor id) {
       return MONITOR_ORIENTATION_UNKNOWN;
   }
 }
-
-

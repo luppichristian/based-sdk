@@ -3,9 +3,9 @@
 
 #pragma once
 
+#include "../windowing/window.h"
 #include "capture.h"
 #include "devices.h"
-#include "../windowing/window.h"
 
 // =========================================================================
 // Keyboard

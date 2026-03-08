@@ -123,23 +123,23 @@ MSG_CORE_DEFINE_MATCHER_ONE(msg_core_type_is_global_ctx, MSG_CORE_TYPE_GLOBAL_CT
 
 #define MSG_CORE_DEFINE_ACCESSORS(data_type, fill_name, get_name, default_type_expr, matcher_name) \
   func void fill_name(msg* src, const data_type* core_data) {                                      \
-    TracyCZoneN(__tracy_zone_ctx, __func__, 1);                                                     \
-    if (core_data == NULL) {                                                                         \
-      TracyCZoneEnd(__tracy_zone_ctx);                                                               \
-      return;                                                                                         \
-    }                                                                                                \
-    msg_fill_core_raw(src, (default_type_expr), core_data, size_of(*core_data));                    \
-    TracyCZoneEnd(__tracy_zone_ctx);                                                                 \
-  }                                                                                                  \
-                                                                                                     \
-  func data_type* get_name(msg* src) {                                                               \
-    TracyCZoneN(__tracy_zone_ctx, __func__, 1);                                                     \
+    TracyCZoneN(__tracy_zone_ctx, __func__, 1);                                                    \
+    if (core_data == NULL) {                                                                       \
+      TracyCZoneEnd(__tracy_zone_ctx);                                                             \
+      return;                                                                                      \
+    }                                                                                              \
+    msg_fill_core_raw(src, (default_type_expr), core_data, size_of(*core_data));                   \
+    TracyCZoneEnd(__tracy_zone_ctx);                                                               \
+  }                                                                                                \
+                                                                                                   \
+  func data_type* get_name(msg* src) {                                                             \
+    TracyCZoneN(__tracy_zone_ctx, __func__, 1);                                                    \
     if (!msg_core_is_valid(src, matcher_name(src != NULL ? src->type : MSG_CORE_TYPE_NONE))) {     \
-      TracyCZoneEnd(__tracy_zone_ctx);                                                               \
-      return NULL;                                                                                   \
-    }                                                                                                \
-    TracyCZoneEnd(__tracy_zone_ctx);                                                                 \
-    return (data_type*)src->data;                                                                    \
+      TracyCZoneEnd(__tracy_zone_ctx);                                                             \
+      return NULL;                                                                                 \
+    }                                                                                              \
+    TracyCZoneEnd(__tracy_zone_ctx);                                                               \
+    return (data_type*)src->data;                                                                  \
   }
 
 MSG_CORE_DEFINE_ACCESSORS(msg_core_monitor_data, msg_core_fill_monitor, msg_core_get_monitor, MSG_CORE_TYPE_MONITOR_ORIENTATION, msg_core_type_is_monitor)
@@ -184,5 +184,3 @@ MSG_CORE_DEFINE_ACCESSORS(msg_core_pathwatch_data, msg_core_fill_pathwatch, msg_
 MSG_CORE_DEFINE_ACCESSORS(msg_core_log_data, msg_core_fill_log, msg_core_get_log, MSG_CORE_TYPE_LOG, msg_core_type_is_log)
 MSG_CORE_DEFINE_ACCESSORS(msg_core_assert_data, msg_core_fill_assert, msg_core_get_assert, MSG_CORE_TYPE_ASSERT, msg_core_type_is_assert)
 MSG_CORE_DEFINE_ACCESSORS(msg_core_global_ctx_data, msg_core_fill_global_ctx, msg_core_get_global_ctx, MSG_CORE_TYPE_GLOBAL_CTX, msg_core_type_is_global_ctx)
-
-

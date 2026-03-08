@@ -222,4 +222,3 @@ func b32 system_info_query(system_info* out_info) {
   return 0;
 #endif
 }
-

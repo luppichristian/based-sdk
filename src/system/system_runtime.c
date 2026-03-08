@@ -344,4 +344,3 @@ func b32 system_runtime_query(system_runtime_info* out_info) {
   return 0;
 #endif
 }
-

@@ -384,4 +384,3 @@ func b32 file_write_all_atomic(const path* src, buffer data) {
   TracyCZoneEnd(__tracy_zone_ctx);
   return 1;
 }
-

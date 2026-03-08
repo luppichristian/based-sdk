@@ -125,7 +125,7 @@
 #  error "env_defines.h: no target CPU architecture detected."
 #endif
 
-#if !defined(COMPILER_MSVC) && !defined(COMPILER_GCC) && \
+#if !defined(COMPILER_MSVC) && !defined(COMPILER_GCC) &&    \
     !defined(COMPILER_CLANG) && !defined(COMPILER_INTEL) && \
     !defined(COMPILER_APPLE_CLANG)
 #  error "env_defines.h: no compiler detected."

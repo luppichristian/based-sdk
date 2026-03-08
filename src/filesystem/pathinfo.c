@@ -230,4 +230,3 @@ func b32 pathinfo_get(const path* src, pathinfo* out_info) {
   TracyCZoneEnd(__tracy_zone_ctx);
   return 1;
 }
-

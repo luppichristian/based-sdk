@@ -239,4 +239,3 @@ func b32 cpu_info_query(cpu_info* out_info) {
   TracyCZoneEnd(__tracy_zone_ctx);
   return 1;
 }
-

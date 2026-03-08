@@ -112,4 +112,3 @@ func b32 devices_is_connected(device_id id);
 
 // Fills out_info with the latest metadata for id. Returns 1 on success, 0 otherwise.
 func b32 devices_get_info(device_id id, device_info* out_info);
-

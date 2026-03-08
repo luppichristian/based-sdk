@@ -566,4 +566,3 @@ func timestamp path_get_last_write_time(const path* src) {
   TracyCZoneEnd(__tracy_zone_ctx);
   return timestamp_from_microseconds((i64)SDL_NS_TO_US(path_info.modify_time));
 }
-

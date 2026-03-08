@@ -49,5 +49,3 @@ func b32 window_focus(window id);
 func cstr8 window_get_title(window id);
 func b32 window_set_title(window id, cstr8 title);
 func b32 window_get_monitor_id(window id, monitor* out_monitor_id);
-
-

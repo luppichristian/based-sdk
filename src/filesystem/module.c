@@ -178,4 +178,3 @@ func mod mod_open(const path* src) {
   TracyCZoneEnd(__tracy_zone_ctx);
   return module_value;
 }
-
