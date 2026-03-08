@@ -4,6 +4,8 @@ function(fetch_efsw)
         return()
     endif()
 
+    message(STATUS "Fetching efsw...")
+
     find_package(efsw QUIET)
     if(efsw_FOUND)
         set_property(GLOBAL PROPERTY BASED_FETCH_EFSW_DONE TRUE)
@@ -25,5 +27,6 @@ function(fetch_efsw)
     )
     FetchContent_MakeAvailable(efsw)
 
+    message(STATUS "efsw package properly fetched")
     set_property(GLOBAL PROPERTY BASED_FETCH_EFSW_DONE TRUE)
 endfunction()

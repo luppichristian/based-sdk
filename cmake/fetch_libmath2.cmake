@@ -4,6 +4,8 @@ function(fetch_libmath2)
         return()
     endif()
 
+    message(STATUS "Fetching libmath2...")
+
     find_package(libmath2 QUIET)
     if(libmath2_FOUND)
         set_property(GLOBAL PROPERTY BASED_FETCH_LIBMATH2_DONE TRUE)
@@ -24,5 +26,6 @@ function(fetch_libmath2)
     )
     FetchContent_MakeAvailable(libmath2)
 
+    message(STATUS "libmath2 package properly fetched")
     set_property(GLOBAL PROPERTY BASED_FETCH_LIBMATH2_DONE TRUE)
 endfunction()

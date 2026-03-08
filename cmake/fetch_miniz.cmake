@@ -4,6 +4,8 @@ function(fetch_miniz)
         return()
     endif()
 
+    message(STATUS "Fetching miniz...")
+
     find_package(miniz QUIET)
     if(miniz_FOUND)
         set_property(GLOBAL PROPERTY BASED_FETCH_MINIZ_DONE TRUE)
@@ -25,5 +27,6 @@ function(fetch_miniz)
     )
     FetchContent_MakeAvailable(miniz)
 
+    message(STATUS "miniz package properly fetched")
     set_property(GLOBAL PROPERTY BASED_FETCH_MINIZ_DONE TRUE)
 endfunction()

@@ -4,6 +4,8 @@ function(fetch_googletest)
         return()
     endif()
 
+    message(STATUS "Fetching GTest...")
+
     find_package(GTest QUIET)
     if(GTest_FOUND)
         set_property(GLOBAL PROPERTY BASED_FETCH_GTEST_DONE TRUE)
@@ -30,5 +32,6 @@ function(fetch_googletest)
         target_compile_options(gtest_main PRIVATE $<$<CXX_COMPILER_ID:Clang,AppleClang,GNU>:-Wno-undef>)
     endif()
 
+    message(STATUS "GTest package properly fetched")
     set_property(GLOBAL PROPERTY BASED_FETCH_GTEST_DONE TRUE)
 endfunction()

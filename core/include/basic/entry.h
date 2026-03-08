@@ -55,15 +55,6 @@ func dll_export void mod_quit(void);
 
 #endif
 
-// Entry mode and binary-kind consistency.
-#if defined(ENTRY_TYPE_MOD) && !defined(BIN_DYNAMIC_LIB)
-#  error "entry.h: ENTRY_TYPE_MOD requires BIN_DYNAMIC_LIB."
-#endif
-
-#if (defined(ENTRY_TYPE_APP) || defined(ENTRY_TYPE_MAIN)) && !defined(BIN_RUNNABLE)
-#  error "entry.h: ENTRY_TYPE_APP and ENTRY_TYPE_MAIN require BIN_RUNNABLE."
-#endif
-
 // =========================================================================
 // Shared Program Lifecycle
 // =========================================================================

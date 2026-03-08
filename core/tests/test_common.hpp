@@ -6,5 +6,5 @@
 #include <gtest/gtest.h>
 
 extern "C" {
-#include <based.h>
+#include <based_core.h>
 }

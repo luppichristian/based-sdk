@@ -4,6 +4,8 @@ function(fetch_olib)
         return()
     endif()
 
+    message(STATUS "Fetching olib...")
+
     find_package(olib QUIET)
     if(olib_FOUND)
         set_property(GLOBAL PROPERTY BASED_FETCH_OLIB_DONE TRUE)
@@ -25,5 +27,6 @@ function(fetch_olib)
     )
     FetchContent_MakeAvailable(olib)
 
+    message(STATUS "olib package properly fetched")
     set_property(GLOBAL PROPERTY BASED_FETCH_OLIB_DONE TRUE)
 endfunction()

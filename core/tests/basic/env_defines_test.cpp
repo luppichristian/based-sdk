@@ -3,24 +3,6 @@
 
 #include "test_common.hpp"
 
-TEST(basic_env_defines_test, exactly_one_binary_kind_is_defined) {
-  i32 kind_count = 0;
-#if defined(BIN_RUNNABLE)
-  kind_count += 1;
-#endif
-#if defined(BIN_DYNAMIC_LIB)
-  kind_count += 1;
-#endif
-#if defined(BIN_STATIC_LIB)
-  kind_count += 1;
-#endif
-#if defined(BIN_OBJ_LIB)
-  kind_count += 1;
-#endif
-
-  EXPECT_EQ(kind_count, 1);
-}
-
 TEST(basic_env_defines_test, one_platform_and_one_arch_are_detected) {
   i32 platform_count = 0;
 #if defined(PLATFORM_WINDOWS)

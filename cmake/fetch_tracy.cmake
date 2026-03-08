@@ -4,6 +4,8 @@ function(fetch_tracy)
         return()
     endif()
 
+    message(STATUS "Fetching Tracy...")
+
     find_package(Tracy CONFIG QUIET)
     if(Tracy_FOUND)
         set_property(GLOBAL PROPERTY BASED_FETCH_TRACY_DONE TRUE)
@@ -21,5 +23,6 @@ function(fetch_tracy)
     )
     FetchContent_MakeAvailable(tracy)
 
+    message(STATUS "Tracy package properly fetched")
     set_property(GLOBAL PROPERTY BASED_FETCH_TRACY_DONE TRUE)
 endfunction()
