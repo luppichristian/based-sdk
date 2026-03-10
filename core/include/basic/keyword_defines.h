@@ -30,6 +30,8 @@ Functional keywords:
 - 'size_of' alias for sizeof, but as a keyword for consistency with align_of.
 - 'likely' and 'unlikely' for branch prediction hints to the compiler.
 - 'read_only' for variables that are constant and should not be modified after init.
+- 'c_begin' use to mark the start of a based header.
+- 'c_end' use to mark the end of a based header.
 
 Purely cosmetic keywords:
 - 'func' as a shorthand for 'function' to improve readability.
@@ -191,6 +193,17 @@ If ALL_GLOBAL_VARS_STATIC is defined, all global variables will be declared as s
 #  else
 #    define read_only const
 #  endif
+#endif
+
+// c_begin & c_end - this can be used in headers to make them C++ compatible.
+// The only exeption is that the actual C main entry point main(int, char**) must be called outside
+// this block no matter what.
+#ifdef __cplusplus
+#  define c_begin extern "C" {
+#  define c_end   }
+#else
+#  define c_begin
+#  define c_end
 #endif
 
 // =========================================================================

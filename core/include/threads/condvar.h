@@ -6,6 +6,10 @@
 #include "../basic/codespace.h"
 #include "mutex.h"
 
+// =========================================================================
+c_begin;
+// =========================================================================
+
 // Opaque handle to a condition variable.
 typedef void* condvar;
 
@@ -34,3 +38,7 @@ func void condvar_signal(condvar cond);
 
 // Wakes all threads waiting on cond.
 func void condvar_broadcast(condvar cond);
+
+// =========================================================================
+c_end;
+// =========================================================================

@@ -6,6 +6,10 @@
 #include "basic/primitive_types.h"
 #include "basic/utility_defines.h"
 
+// =========================================================================
+c_begin;
+// =========================================================================
+
 #define SINGLY_LIST_EMPTY(head, tail) ((head) == nullptr)
 
 #define SINGLY_LIST_COUNT(head, tail, count) expr_stmt(                        \
@@ -44,3 +48,7 @@
 
 #define SINGLY_LIST_FOREACH(head, tail, it) \
   for (typeof(head) it = (head); (it) != nullptr; (it) = (it)->next)
+
+// =========================================================================
+c_end;
+// =========================================================================

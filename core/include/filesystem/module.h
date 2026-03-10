@@ -5,6 +5,10 @@
 
 #include "path.h"
 
+// =========================================================================
+c_begin;
+// =========================================================================
+
 // Signature expected from module entry points defined by basic/entry.h.
 typedef b32 mod_init_func(void);
 typedef void mod_quit_func(void);
@@ -32,3 +36,7 @@ func cstr8 mod_get_extension(void);
 
 // Calls mod_quit() when needed, unloads the module, and resets mod.
 func void mod_close(mod* mod_ptr);
+
+// =========================================================================
+c_end;
+// =========================================================================

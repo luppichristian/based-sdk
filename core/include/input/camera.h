@@ -7,6 +7,10 @@
 #include "../memory/buffer.h"
 #include "../strings/cstrings.h"
 
+// =========================================================================
+c_begin;
+// =========================================================================
+
 typedef void* camera;
 
 typedef enum camera_position {
@@ -42,3 +46,7 @@ func b32 camera_close(camera id);
 func b32 camera_start(camera id);
 func b32 camera_stop(camera id);
 func b32 camera_read(camera id, buffer* out_frame);
+
+// =========================================================================
+c_end;
+// =========================================================================

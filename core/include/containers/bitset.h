@@ -5,6 +5,10 @@
 
 #include "basic/intrinsics.h"
 
+// =========================================================================
+c_begin;
+// =========================================================================
+
 // Returns number of u64 words required to store n bits.
 #define BITSET_WORD_COUNT(n) (((n) + 63) / 64)
 
@@ -77,3 +81,7 @@ func force_inline i32 bitset_find_next_set(const u64* arr, sz word_count, i32 fr
 #define BITSET_FOREACH_SET(arr, word_count, idx)                                \
   for (i32 idx = bitset_find_next_set((arr), (sz)(word_count), 0); (idx) != -1; \
        (idx) = bitset_find_next_set((arr), (sz)(word_count), (idx) + 1))
+
+// =========================================================================
+c_end;
+// =========================================================================

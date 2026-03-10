@@ -5,6 +5,10 @@
 
 #include "../basic/codespace.h"
 
+// =========================================================================
+c_begin;
+// =========================================================================
+
 // Opaque handle to a semaphore.
 typedef void* semaphore;
 
@@ -36,3 +40,7 @@ func b32 semaphore_wait_timeout(semaphore sem, u32 millis);
 
 // Increments the given semaphore, potentially unblocking a waiting thread.
 func void semaphore_signal(semaphore sem);
+
+// =========================================================================
+c_end;
+// =========================================================================

@@ -7,6 +7,10 @@
 #include "devices.h"
 
 // =========================================================================
+c_begin;
+// =========================================================================
+
+// =========================================================================
 // Gamepads
 // =========================================================================
 
@@ -106,3 +110,7 @@ func b32 gamepads_set_rumble(sz slot_idx, u16 low_freq, u16 high_freq, u32 durat
 func b32 gamepads_set_led(sz slot_idx, u8 red, u8 green, u8 blue);
 func b32 gamepads_set_axis_deadzone(sz slot_idx, gamepad_axis axis, i16 deadzone);
 func i16 gamepads_get_axis_deadzone(sz slot_idx, gamepad_axis axis);
+
+// =========================================================================
+c_end;
+// =========================================================================

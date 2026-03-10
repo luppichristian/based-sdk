@@ -5,6 +5,10 @@
 
 #include "../basic/primitive_types.h"
 
+// =========================================================================
+c_begin;
+// =========================================================================
+
 typedef struct buffer {
   sz size;
   void* ptr;
@@ -51,3 +55,7 @@ func void buffer_set32(buffer buff, u32 value);
 func void buffer_set64(buffer buff, u64 value);
 // Fills the entire buffer with zeros.
 func void buffer_zero(buffer buff);
+
+// =========================================================================
+c_end;
+// =========================================================================

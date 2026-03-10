@@ -5,6 +5,10 @@
 
 #include "thread.h"
 
+// =========================================================================
+c_begin;
+// =========================================================================
+
 // Scheduling priority levels for a thread.
 typedef enum thread_priority {
   THREAD_PRIORITY_LOW,
@@ -36,3 +40,7 @@ func void thread_sleep_ns(u64 nanos);
 // remainder for high accuracy. Prefer thread_sleep / thread_sleep_ns for
 // long durations to avoid wasting CPU.
 func void thread_sleep_precise(u64 nanos);
+
+// =========================================================================
+c_end;
+// =========================================================================

@@ -8,6 +8,10 @@
 #include "../strings/cstrings.h"
 #include "devices.h"
 
+// =========================================================================
+c_begin;
+// =========================================================================
+
 typedef void* sensor;
 
 // Returns 1 if src refers to a concrete sensor id, 0 otherwise.
@@ -40,3 +44,7 @@ func b32 sensor_close(sensor id);
 func b32 sensor_start(sensor id);
 func b32 sensor_stop(sensor id);
 func b32 sensor_read(sensor id, buffer* out_samples);
+
+// =========================================================================
+c_end;
+// =========================================================================

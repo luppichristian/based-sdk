@@ -6,6 +6,10 @@
 #include "../basic/utility_defines.h"
 #include "path.h"
 
+// =========================================================================
+c_begin;
+// =========================================================================
+
 typedef struct archive archive;
 
 typedef enum filestream_kind {
@@ -93,3 +97,7 @@ func b32 filestream_eof(const filestream* stm);
 
 // Returns the last stream error.
 func filestream_error filestream_get_error(const filestream* stm);
+
+// =========================================================================
+c_end;
+// =========================================================================

@@ -6,6 +6,10 @@
 #include "../basic/primitive_types.h"
 #include "../strings/cstrings.h"
 
+// =========================================================================
+c_begin;
+// =========================================================================
+
 typedef void* monitor;
 
 typedef struct monitor_rect {
@@ -55,3 +59,7 @@ func b32 monitor_get_desktop_mode(monitor id, monitor_mode* out_mode);
 func f32 monitor_get_refresh_rate(monitor id);
 func f32 monitor_get_content_scale(monitor id);
 func monitor_orientation monitor_get_orientation(monitor id);
+
+// =========================================================================
+c_end;
+// =========================================================================

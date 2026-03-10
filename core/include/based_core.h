@@ -3,14 +3,11 @@
 
 #pragma once
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 // Include basic module.
 #include "basic/assert.h"
 #include "basic/codespace.h"
 #include "basic/entry.h"
+#include "basic/entry_impl.h"
 #include "basic/env_defines.h"
 #include "basic/intrinsics.h"
 #include "basic/keyword_defines.h"
@@ -116,21 +113,21 @@ extern "C" {
 #include "threads/thread_current.h"
 #include "threads/thread_group.h"
 
-#ifdef __cplusplus
-}
+// Include olib, my own library for dealing with file formats.
+#ifndef BASED_NO_OLIB
+#  include <olib.h>
 #endif
 
-#include "basic/entry_impl.h"
-
-#include <olib.h>
-
-#ifndef LM2_ENABLE_UNPREFIXED_NAMES
-#  define LM2_ENABLE_UNPREFIXED_NAMES
+// Include libmath2, my own math library that integrates well with the codebase.
+#ifndef BASED_NO_LIBMATH2
+#  ifndef LM2_ENABLE_UNPREFIXED_NAMES
+#    define LM2_ENABLE_UNPREFIXED_NAMES
+#  endif
+#  ifndef LM2_CUSTOM_ASSERT
+#    define LM2_CUSTOM_ASSERT
+#  endif
+#  ifndef LM2_NO_GENERICS
+#    define LM2_NO_GENERICS
+#  endif
+#  include <lm2.h>
 #endif
-#ifndef LM2_CUSTOM_ASSERT
-#  define LM2_CUSTOM_ASSERT
-#endif
-#ifndef LM2_NO_GENERICS
-#  define LM2_NO_GENERICS
-#endif
-#include <lm2.h>

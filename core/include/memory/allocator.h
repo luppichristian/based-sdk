@@ -5,6 +5,10 @@
 
 #include "../basic/codespace.h"
 
+// =========================================================================
+c_begin;
+// =========================================================================
+
 // A flexible memory allocator interface that allows users to provide custom allocation strategies.
 typedef void* allocator_callback_realloc(
     void* user_data,
@@ -53,3 +57,7 @@ func void* _allocator_realloc(allocator* alloc, void* ptr, sz old_size, sz new_s
   _allocator_calloc(alloc, count, size, CALLSITE_HERE)
 #define allocator_realloc(alloc, ptr, old_size, new_size) \
   _allocator_realloc(alloc, ptr, old_size, new_size, CALLSITE_HERE)
+
+// =========================================================================
+c_end;
+// =========================================================================

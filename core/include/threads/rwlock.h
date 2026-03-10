@@ -5,6 +5,10 @@
 
 #include "../basic/codespace.h"
 
+// =========================================================================
+c_begin;
+// =========================================================================
+
 // Opaque handle to a reader-writer lock.
 typedef void* rwlock;
 
@@ -51,3 +55,7 @@ func b32 rwlock_timed_read_lock(rwlock rw, i32 timeout_ms);
 
 // Tries to acquire a write lock until timeout_ms expires.
 func b32 rwlock_timed_write_lock(rwlock rw, i32 timeout_ms);
+
+// =========================================================================
+c_end;
+// =========================================================================

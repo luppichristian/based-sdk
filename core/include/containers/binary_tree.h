@@ -6,6 +6,10 @@
 #include "basic/primitive_types.h"
 #include "basic/utility_defines.h"
 
+// =========================================================================
+c_begin;
+// =========================================================================
+
 typedef struct binary_tree_links {
   struct binary_tree_links* left;
   struct binary_tree_links* right;
@@ -171,3 +175,7 @@ func force_inline void* binary_tree_next_preorder_ptr(void* root_ptr, void* node
 #define BINARY_TREE_FOREACH_POSTORDER(root, it)                                                         \
   for (typeof(root) it = (typeof(root))binary_tree_first_postorder_ptr((void*)(root)); (it) != nullptr; \
        (it) = (typeof(root))binary_tree_next_postorder_ptr((void*)(root), (void*)(it)))
+
+// =========================================================================
+c_end;
+// =========================================================================

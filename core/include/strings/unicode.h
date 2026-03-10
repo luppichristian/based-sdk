@@ -6,6 +6,10 @@
 #include "../basic/primitive_types.h"
 
 // =========================================================================
+c_begin;
+// =========================================================================
+
+// =========================================================================
 // Unicode Utilities
 // =========================================================================
 
@@ -106,3 +110,7 @@ func sz utf32_to_utf8(cstr32 src, sz src_size, c8* dst, sz dst_cap);
 // Returns the number of c16 units written (or required when dst is nullptr).
 // Invalid codepoints are replaced with UNICODE_REPLACEMENT_CHAR.
 func sz utf32_to_utf16(cstr32 src, sz src_size, c16* dst, sz dst_cap);
+
+// =========================================================================
+c_end;
+// =========================================================================

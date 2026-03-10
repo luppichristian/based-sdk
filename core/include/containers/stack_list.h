@@ -6,6 +6,10 @@
 #include "basic/primitive_types.h"
 #include "basic/utility_defines.h"
 
+// =========================================================================
+c_begin;
+// =========================================================================
+
 #define STACK_LIST_EMPTY(head) ((head) == nullptr)
 
 #define STACK_LIST_COUNT(head, count) expr_stmt(                               \
@@ -30,3 +34,7 @@
 
 #define STACK_LIST_FOREACH(head, it) \
   for (typeof(head) it = (head); (it) != nullptr; (it) = (it)->next)
+
+// =========================================================================
+c_end;
+// =========================================================================

@@ -8,6 +8,10 @@
 #include "../memory/heap.h"
 #include "../threads/mutex.h"
 
+// =========================================================================
+c_begin;
+// =========================================================================
+
 // Fixed number of generic user-data slots available in each context.
 const_var sz CTX_USER_DATA_COUNT = 32;
 typedef sz ctx_user_data_idx;
@@ -72,3 +76,7 @@ func b32 ctx_set_user_data(ctx* context, ctx_user_data_idx idx, void* user_data)
 
 // Clears temporary allocators in the context.
 func void ctx_clear_temp(ctx* context);
+
+// =========================================================================
+c_end;
+// =========================================================================

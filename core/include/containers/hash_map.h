@@ -7,6 +7,10 @@
 #include "basic/primitive_types.h"
 #include "memory/allocator.h"
 
+// =========================================================================
+c_begin;
+// =========================================================================
+
 typedef struct hash_map_slot {
   u64 key;
   void* value;
@@ -46,3 +50,7 @@ func b32 hash_map_remove(hash_map* map, u64 key);
 // Iteration over occupied slots.
 func hash_map_iter hash_map_iter_begin(void);
 func hash_map_slot* hash_map_next(hash_map* map, hash_map_iter* iter);
+
+// =========================================================================
+c_end;
+// =========================================================================

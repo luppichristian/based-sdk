@@ -6,6 +6,10 @@
 #include "basic/primitive_types.h"
 #include "basic/utility_defines.h"
 
+// =========================================================================
+c_begin;
+// =========================================================================
+
 #define DOUBLY_LIST_EMPTY(head, tail) ((head) == nullptr)
 
 #define DOUBLY_LIST_COUNT(head, tail, count) expr_stmt(                        \
@@ -100,3 +104,7 @@
 
 #define DOUBLY_LIST_FOREACH_REVERSE(head, tail, it) \
   for (typeof(tail) it = (tail); (it) != nullptr; (it) = (it)->prev)
+
+// =========================================================================
+c_end;
+// =========================================================================

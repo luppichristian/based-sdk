@@ -5,6 +5,10 @@
 
 #include "devices.h"
 
+// =========================================================================
+c_begin;
+// =========================================================================
+
 typedef u64 finger_id;
 
 // =========================================================================
@@ -44,3 +48,7 @@ func sz touch_get_finger_count(device_id id);
 
 // Writes the finger state at idx into out_finger. Returns 1 on success, 0 otherwise.
 func b32 touch_get_finger(device_id id, sz idx, touch_finger_state* out_finger);
+
+// =========================================================================
+c_end;
+// =========================================================================

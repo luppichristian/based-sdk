@@ -110,6 +110,10 @@ func allocator entry_default_allocator(allocator start_alloc) {
 
 func b32 entry_init(cmdline cmdline) {
   profile_func_begin;
+  // Tracks whether at least one depth counter was incremented in this call.
+  // If so, any later failure must unwind via entry_quit() to keep state balanced.
+  b32 must_unwind = false;
+
   if (entry_cmdline_current.args == NULL && cmdline.args != NULL && cmdline.count > 0) {
     entry_cmdline_current = cmdline;
   }
@@ -123,13 +127,13 @@ func b32 entry_init(cmdline cmdline) {
       entry_pipeline_calloc,
       entry_pipeline_realloc);
 
+  // SDL memory hooks must be configured before SDL init.
   if (!SDL_SetMemoryFunctions(
           entry_pipeline_malloc,
           entry_pipeline_calloc,
           entry_pipeline_realloc,
           entry_pipeline_free)) {
-    profile_func_end;
-    return false;
+    goto fail;
   }
 
   SDL_InitFlags init_flags =
@@ -145,8 +149,7 @@ func b32 entry_init(cmdline cmdline) {
   if (entry_shared.sdl_init_depth == 0) {
     if (!SDL_WasInit(init_flags)) {
       if (!SDL_Init(init_flags)) {
-        profile_func_end;
-        return false;
+        goto fail;
       }
       thread_log_trace("entry_init: SDL initialized");
       entry_shared.owns_sdl = true;
@@ -155,12 +158,12 @@ func b32 entry_init(cmdline cmdline) {
     }
   }
   entry_shared.sdl_init_depth += 1;
+  must_unwind = true;
 
   if (entry_shared.global_ctx_init_depth == 0) {
     if (!global_ctx_is_init()) {
       if (!global_ctx_init(default_global_allocator)) {
-        profile_func_end;
-        return false;
+        goto fail;
       }
 
       entry_shared.owns_global_ctx = true;
@@ -170,12 +173,12 @@ func b32 entry_init(cmdline cmdline) {
     }
   }
   entry_shared.global_ctx_init_depth += 1;
+  must_unwind = true;
 
   if (entry_thread.thread_ctx_init_depth == 0) {
     if (!thread_ctx_is_init()) {
       if (!thread_ctx_init(global_get_allocator())) {
-        profile_func_end;
-        return false;
+        goto fail;
       }
 
       entry_thread.owns_thread_ctx = true;
@@ -186,9 +189,18 @@ func b32 entry_init(cmdline cmdline) {
     }
   }
   entry_thread.thread_ctx_init_depth += 1;
+  must_unwind = true;
 
   profile_func_end;
   return true;
+
+fail:
+  // Roll back only the work performed by this invocation.
+  if (must_unwind) {
+    entry_quit();
+  }
+  profile_func_end;
+  return false;
 }
 
 func void entry_quit(void) {
@@ -228,32 +240,17 @@ func void entry_quit(void) {
 }
 
 // =========================================================================
-// Application entry point
+// Callback runtime state
 // =========================================================================
 
 global_var b32 app_entry_initialized = false;
 global_var b32 app_callbacks_started = false;
-global_var entry_app_init_fn* app_init_callback = NULL;
-global_var entry_app_update_fn* app_update_callback = NULL;
-global_var entry_app_quit_fn* app_quit_callback = NULL;
-global_var entry_run_fn* run_callback = NULL;
+global_var entry_app_callbacks app_callbacks = {0};
+global_var entry_run_callbacks run_callbacks = {0};
 
-func void entry_set_app_callbacks(
-    entry_app_init_fn* init_fn,
-    entry_app_update_fn* update_fn,
-    entry_app_quit_fn* quit_fn) {
-  profile_func_begin;
-  app_init_callback = init_fn;
-  app_update_callback = update_fn;
-  app_quit_callback = quit_fn;
-  profile_func_end;
-}
-
-func void entry_set_run_callback(entry_run_fn* callback_fn) {
-  profile_func_begin;
-  run_callback = callback_fn;
-  profile_func_end;
-}
+// =========================================================================
+// SDL app callback bridge
+// =========================================================================
 
 func SDL_AppResult app_result_to_sdl_result(app_result result) {
   profile_func_begin;
@@ -281,6 +278,7 @@ SDL_AppResult SDL_AppInit(void** appstate, int argc, char** argv) {
     *appstate = NULL;
   }
 
+  // Reset per-run guards before booting.
   app_entry_initialized = false;
   app_callbacks_started = false;
 
@@ -288,22 +286,23 @@ SDL_AppResult SDL_AppInit(void** appstate, int argc, char** argv) {
     return SDL_APP_FAILURE;
   }
 
-  if (app_init_callback == NULL || app_update_callback == NULL || app_quit_callback == NULL) {
+  if (app_callbacks.init_fn == NULL || app_callbacks.update_fn == NULL || app_callbacks.quit_fn == NULL) {
     entry_quit();
     return SDL_APP_FAILURE;
   }
 
   app_entry_initialized = true;
 
+  // From this point SDL_AppQuit is allowed to call app_quit.
   app_callbacks_started = true;
-  return app_result_to_sdl_result(app_init_callback(cmdl, appstate));
+  return app_result_to_sdl_result(app_callbacks.init_fn(cmdl, appstate));
 }
 
 void SDL_AppQuit(void* appstate, SDL_AppResult result) {
   (void)result;
 
-  if (app_callbacks_started && app_quit_callback != NULL) {
-    app_quit_callback(appstate);
+  if (app_callbacks_started && app_callbacks.quit_fn != NULL) {
+    app_callbacks.quit_fn(appstate);
     app_callbacks_started = false;
   }
 
@@ -314,11 +313,11 @@ void SDL_AppQuit(void* appstate, SDL_AppResult result) {
 }
 
 SDL_AppResult SDL_AppIterate(void* appstate) {
-  if (app_update_callback == NULL) {
+  if (app_callbacks.update_fn == NULL) {
     return SDL_APP_FAILURE;
   }
 
-  return app_result_to_sdl_result(app_update_callback(appstate));
+  return app_result_to_sdl_result(app_callbacks.update_fn(appstate));
 }
 
 SDL_AppResult SDL_AppEvent(void* appstate, SDL_Event* event) {
@@ -333,8 +332,10 @@ SDL_AppResult SDL_AppEvent(void* appstate, SDL_Event* event) {
   return SDL_APP_CONTINUE;
 }
 
-int main_app(int argc, char** argv, allocator alloc) {
+int main_app(int argc, char** argv, allocator alloc, entry_app_callbacks callbacks) {
+  // Store boot-time wiring once, then hand control to SDL's loop.
   entry_start_allocator = alloc;
+  app_callbacks = callbacks;
   return SDL_EnterAppMainCallbacks(argc, argv, SDL_AppInit, SDL_AppIterate, SDL_AppEvent, SDL_AppQuit);
 }
 
@@ -348,18 +349,19 @@ int main_run_internal(int argc, char** argv) {
     return EXIT_FAILURE;
   }
 
-  if (run_callback == NULL) {
+  if (run_callbacks.run_fn == NULL) {
     entry_quit();
     return EXIT_FAILURE;
   }
 
-  b32 result = run_callback(cmdl);
+  b32 result = run_callbacks.run_fn(cmdl);
   entry_quit();
 
   return result ? EXIT_SUCCESS : EXIT_FAILURE;
 }
 
-int main_run(int argc, char** argv, allocator alloc) {
+int main_run(int argc, char** argv, allocator alloc, entry_run_callbacks callbacks) {
   entry_start_allocator = alloc;
+  run_callbacks = callbacks;
   return SDL_RunApp(argc, argv, main_run_internal, NULL);
 }

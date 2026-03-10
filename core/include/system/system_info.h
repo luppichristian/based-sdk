@@ -6,6 +6,10 @@
 #include "../basic/primitive_types.h"
 #include "../strings/cstrings.h"
 
+// =========================================================================
+c_begin;
+// =========================================================================
+
 typedef struct system_info {
   str8_short os_name;
   str8_short os_version;
@@ -19,3 +23,7 @@ typedef struct system_info {
 
 // Queries coarse OS, machine, and active-user information for the current host.
 func b32 system_info_query(system_info* out_info);
+
+// =========================================================================
+c_end;
+// =========================================================================

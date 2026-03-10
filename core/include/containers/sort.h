@@ -6,6 +6,10 @@
 #include "basic/primitive_types.h"
 #include "memory/allocator.h"
 
+// =========================================================================
+c_begin;
+// =========================================================================
+
 // Callback used by the generic array sort helpers.
 // Returns <0 when lhs should sort before rhs, >0 when lhs should sort after rhs,
 // and 0 when both elements compare equal.
@@ -88,3 +92,7 @@ func sz sort_radix32(u32* ptr, sz elem_count);
 // Best - worst - average: O(n * k) - O(n * k) - O(n * k), where k is the number of digits in the largest number.
 // Faster for: large arrays of integers with a small range of values.
 func sz sort_radix64(u64* ptr, sz elem_count);
+
+// =========================================================================
+c_end;
+// =========================================================================

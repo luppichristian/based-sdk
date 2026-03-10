@@ -5,6 +5,10 @@
 
 #include "../basic/primitive_types.h"
 
+// =========================================================================
+c_begin;
+// =========================================================================
+
 // Returns 1 if the host is little-endian, 0 otherwise.
 func b32 endian_is_little(void);
 
@@ -30,3 +34,7 @@ func u64 endian_native_to_le64(u64 value);
 func u16 endian_native_to_be16(u16 value);
 func u32 endian_native_to_be32(u32 value);
 func u64 endian_native_to_be64(u64 value);
+
+// =========================================================================
+c_end;
+// =========================================================================

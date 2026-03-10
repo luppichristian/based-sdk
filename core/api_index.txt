@@ -22,14 +22,14 @@
 37: typedef app_result entry_app_update_fn(void* state);
 38: typedef void entry_app_quit_fn(void* state);
 39: typedef b32 entry_run_fn(cmdline cmdl);
-41: func void entry_set_app_callbacks(
-45: func void entry_set_run_callback(entry_run_fn* run_fn);
-59: func app_result app_init(cmdline cmdl, void** state);
-62: func app_result app_update(void* state);
-65: func void app_quit(void* state);
-74: func b32 run(cmdline cmdl);
-86: func dll_export b32 mod_init(void);
-89: func dll_export void mod_quit(void);
+41: typedef struct entry_app_callbacks {
+47: typedef struct entry_run_callbacks {
+63: func app_result app_init(cmdline cmdl, void** state);
+66: func app_result app_update(void* state);
+69: func void app_quit(void* state);
+79: func b32 run(cmdline cmdl);
+92: func dll_export b32 mod_init(void);
+95: func dll_export void mod_quit(void);
 
 === include\basic\env_defines.h ===
 

@@ -6,6 +6,10 @@
 #include "basic/primitive_types.h"
 #include "basic/utility_defines.h"
 
+// =========================================================================
+c_begin;
+// =========================================================================
+
 typedef struct tree_links {
   struct tree_links* parent;
   struct tree_links* first_child;
@@ -110,3 +114,7 @@ func force_inline void* tree_next_preorder_ptr(void* root_ptr, void* node_ptr) {
 
 #define TREE_FOREACH_PREORDER(root, it) \
   for (typeof(root) it = (root); (it) != nullptr; (it) = (typeof(root))tree_next_preorder_ptr((void*)(root), (void*)(it)))
+
+// =========================================================================
+c_end;
+// =========================================================================

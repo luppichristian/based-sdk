@@ -5,6 +5,10 @@
 
 #include "window.h"
 
+// =========================================================================
+c_begin;
+// =========================================================================
+
 typedef enum dialog_message_kind {
   DIALOG_MESSAGE_KIND_INFORMATION = 1,
   DIALOG_MESSAGE_KIND_WARNING = 2,
@@ -101,3 +105,7 @@ func b32 dialog_open_folder(
     b32 allow_many,
     dialog_file_callback* callback,
     void* user_data);
+
+// =========================================================================
+c_end;
+// =========================================================================

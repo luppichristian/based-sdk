@@ -6,6 +6,10 @@
 #include "../basic/primitive_types.h"
 #include "../strings/cstrings.h"
 
+// =========================================================================
+c_begin;
+// =========================================================================
+
 typedef struct cpu_instruction_set_info {
   b32 mmx;
   b32 sse;
@@ -37,3 +41,7 @@ typedef struct cpu_info {
 
 // Queries coarse CPU identity, topology, and supported instruction sets.
 func b32 cpu_info_query(cpu_info* out_info);
+
+// =========================================================================
+c_end;
+// =========================================================================

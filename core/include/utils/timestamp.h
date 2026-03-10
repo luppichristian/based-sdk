@@ -5,6 +5,10 @@
 
 #include "../basic/primitive_types.h"
 
+// =========================================================================
+c_begin;
+// =========================================================================
+
 // Duration-like timestamp stored as signed microseconds.
 typedef struct timestamp {
   i64 microseconds;
@@ -68,3 +72,7 @@ func timestamp timestamp_clamp(timestamp value, timestamp min_value, timestamp m
 
 // Compares two timestamps. Returns 0 if equal, <0 or >0 otherwise.
 func i32 timestamp_cmp(timestamp lhs, timestamp rhs);
+
+// =========================================================================
+c_end;
+// =========================================================================

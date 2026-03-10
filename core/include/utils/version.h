@@ -6,6 +6,10 @@
 #include "../basic/primitive_types.h"
 #include "../strings/strings.h"
 
+// =========================================================================
+c_begin;
+// =========================================================================
+
 typedef union version {
   u32 packed;
   struct {
@@ -68,3 +72,7 @@ func b32 version_to_str32(version ver, str32* dst);
 
 // Parses \"major.minor.patch\".
 func b32 version_parse_cstr8(cstr8 src, version* out_ver);
+
+// =========================================================================
+c_end;
+// =========================================================================

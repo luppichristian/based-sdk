@@ -5,6 +5,10 @@
 
 #include "../basic/primitive_types.h"
 
+// =========================================================================
+c_begin;
+// =========================================================================
+
 // CRC-32 (IEEE 802.3 / PKZip) helpers.
 // Seed value for incremental CRC-32 computations.
 func u32 crc32_init(void);
@@ -24,3 +28,7 @@ func u64 crc64_update(u64 crc, const void* data, sz size);
 func u64 crc64_finalize(u64 crc);
 // One-shot CRC-64 convenience helper.
 func u64 crc64(const void* data, sz size);
+
+// =========================================================================
+c_end;
+// =========================================================================

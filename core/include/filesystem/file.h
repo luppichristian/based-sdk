@@ -7,6 +7,10 @@
 #include "../memory/buffer.h"
 #include "path.h"
 
+// =========================================================================
+c_begin;
+// =========================================================================
+
 // Creates or truncates the file at src. Returns 1 on success, 0 otherwise.
 func b32 file_create(const path* src);
 
@@ -37,3 +41,7 @@ func b32 file_append_all(const path* src, buffer data);
 
 // Writes data to a temporary sibling file, then replaces src. Returns 1 on success, 0 otherwise.
 func b32 file_write_all_atomic(const path* src, buffer data);
+
+// =========================================================================
+c_end;
+// =========================================================================

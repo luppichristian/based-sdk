@@ -7,6 +7,10 @@
 #include "../strings/strings.h"
 #include "../utils/timestamp.h"
 
+// =========================================================================
+c_begin;
+// =========================================================================
+
 typedef struct path {
   str8_medium buf;
 } path;
@@ -92,3 +96,7 @@ func b32 path_rename(const path* old_src, const path* new_src);
 
 // Returns the last write time as Unix-epoch microseconds, or zero on failure.
 func timestamp path_get_last_write_time(const path* src);
+
+// =========================================================================
+c_end;
+// =========================================================================

@@ -6,6 +6,10 @@
 #include "../threads/mutex.h"
 #include "ctx.h"
 
+// =========================================================================
+c_begin;
+// =========================================================================
+
 // Process-global context wrapper.
 // The wrapper owns a mutex and a shared ctx payload.
 typedef struct global_ctx {
@@ -72,3 +76,7 @@ func log_frame* global_log_end_frame(u32 severity_mask);
 #define global_log_debug(...)   _log(global_get_log_state(), LOG_LEVEL_DEBUG, CALLSITE_HERE, __VA_ARGS__)
 #define global_log_verbose(...) _log(global_get_log_state(), LOG_LEVEL_VERBOSE, CALLSITE_HERE, __VA_ARGS__)
 #define global_log_trace(...)   _log(global_get_log_state(), LOG_LEVEL_TRACE, CALLSITE_HERE, __VA_ARGS__)
+
+// =========================================================================
+c_end;
+// =========================================================================

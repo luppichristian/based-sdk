@@ -5,6 +5,10 @@
 
 #include "path.h"
 
+// =========================================================================
+c_begin;
+// =========================================================================
+
 typedef enum filemap_access {
   FILEMAP_ACCESS_READ = 1,
   FILEMAP_ACCESS_READ_WRITE = 2,
@@ -48,3 +52,7 @@ func b32 filemap_is_writable(const filemap* map);
 func void filemap_mark_dirty(filemap* map);
 // Returns the last filemap error reported by the current thread.
 func filemap_error filemap_get_last_error(void);
+
+// =========================================================================
+c_end;
+// =========================================================================

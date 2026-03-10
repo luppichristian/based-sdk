@@ -5,6 +5,10 @@
 
 #include "ctx.h"
 
+// =========================================================================
+c_begin;
+// =========================================================================
+
 // Backward-compatible alias for the context user-data slot count.
 #define THREAD_CTX_USER_DATA_COUNT CTX_USER_DATA_COUNT
 
@@ -65,3 +69,7 @@ func log_frame* thread_log_end_frame(u32 severity_mask);
 #define thread_log_debug(...)   _log(thread_get_log_state(), LOG_LEVEL_DEBUG, CALLSITE_HERE, __VA_ARGS__)
 #define thread_log_verbose(...) _log(thread_get_log_state(), LOG_LEVEL_VERBOSE, CALLSITE_HERE, __VA_ARGS__)
 #define thread_log_trace(...)   _log(thread_get_log_state(), LOG_LEVEL_TRACE, CALLSITE_HERE, __VA_ARGS__)
+
+// =========================================================================
+c_end;
+// =========================================================================

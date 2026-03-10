@@ -6,6 +6,10 @@
 #include "basic/primitive_types.h"
 #include "basic/utility_defines.h"
 
+// =========================================================================
+c_begin;
+// =========================================================================
+
 #define RING_LIST_EMPTY(head) ((head) == nullptr)
 
 #define RING_LIST_COUNT(head, count) expr_stmt( \
@@ -108,3 +112,7 @@
   for (typeof(head) it = ((head) != nullptr ? (head)->prev : nullptr), _ring_head_##it = (head); \
        (it) != nullptr;                                                                          \
        (it) = ((it) != _ring_head_##it ? (it)->prev : nullptr))
+
+// =========================================================================
+c_end;
+// =========================================================================

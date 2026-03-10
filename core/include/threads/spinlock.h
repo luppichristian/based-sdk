@@ -5,6 +5,10 @@
 
 #include "../basic/codespace.h"
 
+// =========================================================================
+c_begin;
+// =========================================================================
+
 // Opaque handle to a spinlock.
 // Spinlocks busy-wait and are only appropriate for very short critical sections where
 // the overhead of an OS mutex is unjustified. Prefer mutex for longer or blocking operations.
@@ -33,3 +37,7 @@ func void spinlock_unlock(spinlock sl);
 // Tries to acquire the spinlock without spinning.
 // Returns true if the lock was acquired, false if it is already held.
 func b32 spinlock_try_lock(spinlock sl);
+
+// =========================================================================
+c_end;
+// =========================================================================

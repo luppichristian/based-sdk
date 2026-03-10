@@ -5,6 +5,10 @@
 
 #include "../basic/primitive_types.h"
 
+// =========================================================================
+c_begin;
+// =========================================================================
+
 // Wraps a UTF-8 argc/argv pair from a standard main-style entry point.
 typedef struct cmdline {
   sz count;
@@ -41,3 +45,7 @@ func b32 cmdline_get_option_i64(cmdline cmdl, cstr8 name, i64* out);
 
 // Parses an option value as a floating-point number. Returns 1 on success.
 func b32 cmdline_get_option_f64(cmdline cmdl, cstr8 name, f64* out);
+
+// =========================================================================
+c_end;
+// =========================================================================

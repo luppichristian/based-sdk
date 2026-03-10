@@ -5,6 +5,10 @@
 
 #include "../basic/codespace.h"
 
+// =========================================================================
+c_begin;
+// =========================================================================
+
 // Opaque handle to a mutex.
 typedef void* mutex;
 
@@ -36,3 +40,7 @@ func b32 mutex_timed_lock(mutex mtx, i32 timeout_ms);
 // Unlocks the given mutex.
 // The mutex must be locked by the current thread before calling this function.
 func void mutex_unlock(mutex mtx);
+
+// =========================================================================
+c_end;
+// =========================================================================

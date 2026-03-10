@@ -6,6 +6,10 @@
 #include "../utils/timestamp.h"
 #include "path.h"
 
+// =========================================================================
+c_begin;
+// =========================================================================
+
 typedef enum pathinfo_type {
   PATHINFO_TYPE_NONE = 0,
   PATHINFO_TYPE_FILE = 1,
@@ -27,3 +31,7 @@ typedef struct pathinfo {
 
 // Queries metadata for src. Returns 1 on success, 0 otherwise.
 func b32 pathinfo_get(const path* src, pathinfo* out_info);
+
+// =========================================================================
+c_end;
+// =========================================================================

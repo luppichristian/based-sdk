@@ -7,6 +7,10 @@
 #include "../memory/buffer.h"
 #include "path.h"
 
+// =========================================================================
+c_begin;
+// =========================================================================
+
 typedef struct archive_entry {
   path item_path;
   u8* data_ptr;
@@ -73,3 +77,7 @@ func b32 archive_get_entry_info(const archive* arc, const path* src, archive_ent
 
 // Returns a non-owning data span for an in-memory entry.
 func b32 archive_get_entry_data(const archive* arc, const path* src, buffer* out_data);
+
+// =========================================================================
+c_end;
+// =========================================================================
