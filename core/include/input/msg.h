@@ -119,9 +119,11 @@ func void msg_clear_handlers(void);
 func void msg_set_filter(msg_filter_fn filter_fn, void* user_data);
 
 // Converts a backend-native event object into a msg. Returns 1 on success, 0 otherwise.
+// TODO: Move to internal header
 func b32 msg_from_native(const void* native_event, msg* out_msg);
 
 // Converts src into a backend-native event object. Returns 1 on success, 0 otherwise.
+// TODO: Move to internal header
 func b32 msg_to_native(const msg* src, void* native_event);
 
 // =========================================================================

@@ -47,29 +47,29 @@ func force_inline void* tree_next_preorder_ptr(void* root_ptr, void* node_ptr) {
 #define TREE_IS_LEAF(node) ((node)->first_child == nullptr)
 
 // Mutation helpers.
-#define TREE_INSERT_CHILD_FRONT(parent, node) expr_stmt( \
-    (node)->parent = (parent);                           \
-    (node)->prev_sibling = nullptr;                      \
-    (node)->next_sibling = (parent)->first_child;        \
-    if ((parent)->first_child != nullptr) {              \
-      (parent)->first_child->prev_sibling = (node);      \
-    } else {                                             \
-      (parent)->last_child = (node);                     \
-    }(parent)                                            \
+#define TREE_INSERT_CHILD_FRONT(parent, node) stmt( \
+    (node)->parent = (parent);                      \
+    (node)->prev_sibling = nullptr;                 \
+    (node)->next_sibling = (parent)->first_child;   \
+    if ((parent)->first_child != nullptr) {         \
+      (parent)->first_child->prev_sibling = (node); \
+    } else {                                        \
+      (parent)->last_child = (node);                \
+    }(parent)                                       \
         ->first_child = (node);)
 
-#define TREE_INSERT_CHILD_BACK(parent, node) expr_stmt( \
-    (node)->parent = (parent);                          \
-    (node)->next_sibling = nullptr;                     \
-    (node)->prev_sibling = (parent)->last_child;        \
-    if ((parent)->last_child != nullptr) {              \
-      (parent)->last_child->next_sibling = (node);      \
-    } else {                                            \
-      (parent)->first_child = (node);                   \
-    }(parent)                                           \
+#define TREE_INSERT_CHILD_BACK(parent, node) stmt( \
+    (node)->parent = (parent);                     \
+    (node)->next_sibling = nullptr;                \
+    (node)->prev_sibling = (parent)->last_child;   \
+    if ((parent)->last_child != nullptr) {         \
+      (parent)->last_child->next_sibling = (node); \
+    } else {                                       \
+      (parent)->first_child = (node);              \
+    }(parent)                                      \
         ->last_child = (node);)
 
-#define TREE_INSERT_BEFORE(before, node) expr_stmt(  \
+#define TREE_INSERT_BEFORE(before, node) stmt(       \
     (node)->parent = (before)->parent;               \
     (node)->next_sibling = (before);                 \
     (node)->prev_sibling = (before)->prev_sibling;   \
@@ -80,7 +80,7 @@ func force_inline void* tree_next_preorder_ptr(void* root_ptr, void* node_ptr) {
     }(before)                                        \
         ->prev_sibling = (node);)
 
-#define TREE_INSERT_AFTER(after, node) expr_stmt(   \
+#define TREE_INSERT_AFTER(after, node) stmt(        \
     (node)->parent = (after)->parent;               \
     (node)->prev_sibling = (after);                 \
     (node)->next_sibling = (after)->next_sibling;   \
@@ -91,7 +91,7 @@ func force_inline void* tree_next_preorder_ptr(void* root_ptr, void* node_ptr) {
     }(after)                                        \
         ->next_sibling = (node);)
 
-#define TREE_REMOVE(node) expr_stmt(                             \
+#define TREE_REMOVE(node) stmt(                                  \
     if ((node)->prev_sibling != nullptr) {                       \
       (node)->prev_sibling->next_sibling = (node)->next_sibling; \
     } else if ((node)->parent != nullptr) {                      \

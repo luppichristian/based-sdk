@@ -66,7 +66,7 @@
 10: #define cat(x, y) x##y
 11: #define cat_exp(x, y) cat(x, y)
 14: #define expr(x) (x)
-17: #define expr_stmt(x) do { x } while (0)
+17: #define stmt(x) do { x } while (0)
 19: #define count_of(x) (size_of(x) / size_of((x)[0]))
 20: #define size_of_each(x) size_of((x)[0])
 21: #define multiline_literal(...) strfy_exp(__VA_ARGS__)
@@ -81,8 +81,8 @@
 32: #define container_of(ptr, type, field) ((type*)((char*)(ptr) - offset_of(type, field)))
 34: #define in_range(x, lo, hi) ((x) >= (lo) && (x) <= (hi))
 35: #define in_bounds(arr, i) ((i) >= 0 && (size_t)(i) < count_of(arr))
-37: #define swap(type, a, b) expr_stmt( \
-42: #define refswap(type, a_ptr, b_ptr) expr_stmt( \
+37: #define swap(type, a, b) stmt( \
+42: #define refswap(type, a_ptr, b_ptr) stmt( \
 47: #define is_pow2(x) ((x) != 0 && ((x) & ((x) - 1)) == 0)
 48: #define align_up(x, n) (((x) + (n) - 1) & ~((n) - 1))
 49: #define align_down(x, n) ((x) & ~((n) - 1))
@@ -104,41 +104,41 @@
 78: func force_inline void* binary_tree_next_preorder_ptr(void* root_ptr, void* node_ptr) {
 104: #define BINARY_TREE_IS_ROOT(node) ((node)->parent == nullptr)
 105: #define BINARY_TREE_IS_LEAF(node) ((node)->left == nullptr && (node)->right == nullptr)
-107: #define BINARY_TREE_INSERT_LEFT(parent, node) expr_stmt( \
-111: #define BINARY_TREE_INSERT_RIGHT(parent, node) expr_stmt( \
-115: #define BINARY_TREE_REMOVE(root_ptr, node) expr_stmt( \
-125: #define BINARY_TREE_ROTATE_LEFT(root_ptr, node) expr_stmt( \
-142: #define BINARY_TREE_ROTATE_RIGHT(root_ptr, node) expr_stmt( \
+107: #define BINARY_TREE_INSERT_LEFT(parent, node) stmt( \
+111: #define BINARY_TREE_INSERT_RIGHT(parent, node) stmt( \
+115: #define BINARY_TREE_REMOVE(root_ptr, node) stmt( \
+125: #define BINARY_TREE_ROTATE_LEFT(root_ptr, node) stmt( \
+142: #define BINARY_TREE_ROTATE_RIGHT(root_ptr, node) stmt( \
 159: #define BINARY_TREE_FOREACH_PREORDER(root, it) \
 163: #define BINARY_TREE_FOREACH_INORDER(root, it) \
 167: #define BINARY_TREE_FOREACH_POSTORDER(root, it) \
 
 === include\containers\bitset.h ===
 8: #define BITSET_WORD_COUNT(n) (((n) + 63) / 64)
-10: #define BITSET_SET(arr, idx) expr_stmt((arr)[(idx) / 64] |= (1ULL << ((idx) % 64));)
-11: #define BITSET_CLEAR(arr, idx) expr_stmt((arr)[(idx) / 64] &= ~(1ULL << ((idx) % 64));)
-12: #define BITSET_TOGGLE(arr, idx) expr_stmt((arr)[(idx) / 64] ^= (1ULL << ((idx) % 64));)
+10: #define BITSET_SET(arr, idx) stmt((arr)[(idx) / 64] |= (1ULL << ((idx) % 64));)
+11: #define BITSET_CLEAR(arr, idx) stmt((arr)[(idx) / 64] &= ~(1ULL << ((idx) % 64));)
+12: #define BITSET_TOGGLE(arr, idx) stmt((arr)[(idx) / 64] ^= (1ULL << ((idx) % 64));)
 13: #define BITSET_TEST(arr, idx) (((arr)[(idx) / 64] >> ((idx) % 64)) & 1ULL)
-15: #define BITSET_CLEAR_ALL(arr, word_count) expr_stmt( \
-20: #define BITSET_SET_ALL(arr, word_count) expr_stmt( \
-25: #define BITSET_COUNT(arr, word_count, out) expr_stmt( \
-31: #define BITSET_FIRST_SET(arr, word_count, out) expr_stmt( \
-40: #define BITSET_FIRST_CLEAR(arr, word_count, out) expr_stmt( \
+15: #define BITSET_CLEAR_ALL(arr, word_count) stmt( \
+20: #define BITSET_SET_ALL(arr, word_count) stmt( \
+25: #define BITSET_COUNT(arr, word_count, out) stmt( \
+31: #define BITSET_FIRST_SET(arr, word_count, out) stmt( \
+40: #define BITSET_FIRST_CLEAR(arr, word_count, out) stmt( \
 49: func force_inline i32 bitset_find_next_set(const u64* arr, sz word_count, i32 from_idx) {
 72: #define BITSET_FOREACH_SET(arr, word_count, idx) \
 
 === include\containers\doubly_list.h ===
 9: #define DOUBLY_LIST_EMPTY(head, tail) ((head) == nullptr)
-11: #define DOUBLY_LIST_COUNT(head, tail, count) expr_stmt( \
+11: #define DOUBLY_LIST_COUNT(head, tail, count) stmt( \
 18: #define DOUBLY_LIST_HEAD(head, tail) (head)
 19: #define DOUBLY_LIST_TAIL(head, tail) (tail)
-21: #define DOUBLY_LIST_PUSH_FRONT(head, tail, node) expr_stmt( \
-31: #define DOUBLY_LIST_PUSH_BACK(head, tail, node) expr_stmt( \
-41: #define DOUBLY_LIST_POP_FRONT(head, tail, node) expr_stmt( \
-53: #define DOUBLY_LIST_POP_BACK(head, tail, node) expr_stmt( \
-65: #define DOUBLY_LIST_REMOVE(head, tail, node) expr_stmt(       \
-79: #define DOUBLY_LIST_INSERT_AFTER(head, tail, after, node) expr_stmt( \
-90: #define DOUBLY_LIST_INSERT_BEFORE(head, tail, before, node) expr_stmt( \
+21: #define DOUBLY_LIST_PUSH_FRONT(head, tail, node) stmt( \
+31: #define DOUBLY_LIST_PUSH_BACK(head, tail, node) stmt( \
+41: #define DOUBLY_LIST_POP_FRONT(head, tail, node) stmt( \
+53: #define DOUBLY_LIST_POP_BACK(head, tail, node) stmt( \
+65: #define DOUBLY_LIST_REMOVE(head, tail, node) stmt(       \
+79: #define DOUBLY_LIST_INSERT_AFTER(head, tail, after, node) stmt( \
+90: #define DOUBLY_LIST_INSERT_BEFORE(head, tail, before, node) stmt( \
 101: #define DOUBLY_LIST_FOREACH(head, tail, it) \
 104: #define DOUBLY_LIST_FOREACH_REVERSE(head, tail, it) \
 
@@ -162,27 +162,27 @@
 
 === include\containers\ring_list.h ===
 9: #define RING_LIST_EMPTY(head) ((head) == nullptr)
-11: #define RING_LIST_COUNT(head, count) expr_stmt( \
+11: #define RING_LIST_COUNT(head, count) stmt( \
 21: #define RING_LIST_HEAD(head) (head)
 22: #define RING_LIST_TAIL(head) ((head) != nullptr ? (head)->prev : nullptr)
-24: #define RING_LIST_PUSH_FRONT(head, node) expr_stmt( \
-36: #define RING_LIST_PUSH_BACK(head, node) expr_stmt( \
-48: #define RING_LIST_POP_FRONT(head, node) expr_stmt( \
-62: #define RING_LIST_POP_BACK(head, node) expr_stmt( \
-75: #define RING_LIST_REMOVE(head, node) expr_stmt( \
-88: #define RING_LIST_INSERT_AFTER(head, after, node) expr_stmt( \
-95: #define RING_LIST_INSERT_BEFORE(head, before, node) expr_stmt( \
+24: #define RING_LIST_PUSH_FRONT(head, node) stmt( \
+36: #define RING_LIST_PUSH_BACK(head, node) stmt( \
+48: #define RING_LIST_POP_FRONT(head, node) stmt( \
+62: #define RING_LIST_POP_BACK(head, node) stmt( \
+75: #define RING_LIST_REMOVE(head, node) stmt( \
+88: #define RING_LIST_INSERT_AFTER(head, after, node) stmt( \
+95: #define RING_LIST_INSERT_BEFORE(head, before, node) stmt( \
 104: #define RING_LIST_FOREACH(head, it) \
 108: #define RING_LIST_FOREACH_REVERSE(head, it) \
 
 === include\containers\singly_list.h ===
 9: #define SINGLY_LIST_EMPTY(head, tail) ((head) == nullptr)
-11: #define SINGLY_LIST_COUNT(head, tail, count) expr_stmt( \
+11: #define SINGLY_LIST_COUNT(head, tail, count) stmt( \
 18: #define SINGLY_LIST_HEAD(head, tail) (head)
 19: #define SINGLY_LIST_TAIL(head, tail) (tail)
-21: #define SINGLY_LIST_PUSH_FRONT(head, tail, node) expr_stmt( \
-28: #define SINGLY_LIST_PUSH_BACK(head, tail, node) expr_stmt( \
-37: #define SINGLY_LIST_POP_FRONT(head, tail, node) expr_stmt( \
+21: #define SINGLY_LIST_PUSH_FRONT(head, tail, node) stmt( \
+28: #define SINGLY_LIST_PUSH_BACK(head, tail, node) stmt( \
+37: #define SINGLY_LIST_POP_FRONT(head, tail, node) stmt( \
 47: #define SINGLY_LIST_FOREACH(head, tail, it) \
 
 === include\containers\sort.h ===
@@ -197,11 +197,11 @@
 
 === include\containers\stack_list.h ===
 9: #define STACK_LIST_EMPTY(head) ((head) == nullptr)
-11: #define STACK_LIST_COUNT(head, count) expr_stmt( \
+11: #define STACK_LIST_COUNT(head, count) stmt( \
 17: #define STACK_LIST_HEAD(head) (head)
 18: #define STACK_LIST_NEXT(node) ((node)->next)
-20: #define STACK_LIST_PUSH(head, node) expr_stmt( \
-24: #define STACK_LIST_POP(head, node) expr_stmt( \
+20: #define STACK_LIST_PUSH(head, node) stmt( \
+24: #define STACK_LIST_POP(head, node) stmt( \
 31: #define STACK_LIST_FOREACH(head, it) \
 
 === include\containers\tree.h ===
@@ -209,11 +209,11 @@
 17: func force_inline void* tree_next_preorder_ptr(void* root_ptr, void* node_ptr) {
 40: #define TREE_IS_ROOT(node) ((node)->parent == nullptr)
 41: #define TREE_IS_LEAF(node) ((node)->first_child == nullptr)
-43: #define TREE_INSERT_CHILD_FRONT(parent, node) expr_stmt( \
-54: #define TREE_INSERT_CHILD_BACK(parent, node) expr_stmt( \
-65: #define TREE_INSERT_BEFORE(before, node) expr_stmt( \
-76: #define TREE_INSERT_AFTER(after, node) expr_stmt( \
-87: #define TREE_REMOVE(node) expr_stmt( \
+43: #define TREE_INSERT_CHILD_FRONT(parent, node) stmt( \
+54: #define TREE_INSERT_CHILD_BACK(parent, node) stmt( \
+65: #define TREE_INSERT_BEFORE(before, node) stmt( \
+76: #define TREE_INSERT_AFTER(after, node) stmt( \
+87: #define TREE_REMOVE(node) stmt( \
 102: #define TREE_FOREACH_CHILDREN(parent, it) \
 105: #define TREE_FOREACH_CHILDREN_REVERSE(parent, it) \
 108: #define TREE_FOREACH_PREORDER(root, it) \

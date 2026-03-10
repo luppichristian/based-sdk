@@ -79,7 +79,10 @@ if(BASED_BUILD_TESTS)
     target_compile_options(based-core-tests PRIVATE ${BASED_CLANG_FOLDING_CONSTANT_WARNING})
 
     include(GoogleTest)
-    gtest_discover_tests(based-core-tests PROPERTIES RUN_SERIAL TRUE)
+    gtest_add_tests(TARGET based-core-tests TEST_LIST based-core-tests_TESTS)
+    if(based-core-tests_TESTS)
+        set_tests_properties(${based-core-tests_TESTS} PROPERTIES RUN_SERIAL TRUE)
+    endif()
 
     # libmath2 may register a gtest_discover placeholder when its test binary
     # is not built in this workspace configuration; ignore that non-project test.

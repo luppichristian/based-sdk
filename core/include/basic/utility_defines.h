@@ -27,7 +27,7 @@ c_begin;
 #define expr(x) (x)
 
 // Statement helper for block-style macro bodies.
-#define expr_stmt(x) \
+#define stmt(x) \
   do { x } while (0)
 
 // =========================================================================
@@ -44,6 +44,7 @@ c_begin;
 // =========================================================================
 
 #define bit(x)              (1 << (x))
+#define bit64(x)            (1ull << (x))
 #define bit_is_set(bits, b) ((bits) & (b))
 #define bit_set(bits, b)    ((bits) |= (b))
 #define bit_unset(bits, b)  ((bits) &= ~(b))
@@ -69,14 +70,14 @@ c_begin;
 // Swap helpers
 // =========================================================================
 
-#define swap(type, a, b) expr_stmt( \
-    type _swap_tmp = (a);           \
-    (a) = (b);                      \
+#define swap(type, a, b) stmt( \
+    type _swap_tmp = (a);      \
+    (a) = (b);                 \
     (b) = _swap_tmp;)
 
-#define refswap(type, a_ptr, b_ptr) expr_stmt( \
-    type _refswap_tmp = *(a_ptr);              \
-    *(a_ptr) = *(b_ptr);                       \
+#define refswap(type, a_ptr, b_ptr) stmt( \
+    type _refswap_tmp = *(a_ptr);         \
+    *(a_ptr) = *(b_ptr);                  \
     *(b_ptr) = _refswap_tmp;)
 
 // =========================================================================

@@ -56,6 +56,11 @@ func b32 entry_init(cmdline cmdline);
 // Returns the command line captured during the first successful entry_init().
 func cmdline entry_get_cmdline(void);
 
+// Returns the initial global allocator.
+// The allocation hierarchy is as follows:
+// Entry Allocator -> Global Context Allocator -> Thread Context Allocator
+func allocator entry_get_allocator(void);
+
 // Common shutdown hook paired with entry_init().
 // Safe to call even if initialization failed.
 func void entry_quit(void);
@@ -103,7 +108,7 @@ func app_result app_init(cmdline cmdl, void** state);
 func app_result app_update(void* state);
 
 // Called once during shutdown, even after a failed init().
-func void app_quit(void* state);
+func void app_quit(void* state, app_result result);
 
 // entry_impl.h generates a platform entry wrapper that forwards
 // this bundle into main_app(..., callbacks).

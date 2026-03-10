@@ -13,29 +13,29 @@ c_begin;
 #define BITSET_WORD_COUNT(n) (((n) + 63) / 64)
 
 // Single-bit operations.
-#define BITSET_SET(arr, idx)    expr_stmt((arr)[(idx) / 64] |= (1ULL << ((idx) % 64));)
-#define BITSET_CLEAR(arr, idx)  expr_stmt((arr)[(idx) / 64] &= ~(1ULL << ((idx) % 64));)
-#define BITSET_TOGGLE(arr, idx) expr_stmt((arr)[(idx) / 64] ^= (1ULL << ((idx) % 64));)
+#define BITSET_SET(arr, idx)    stmt((arr)[(idx) / 64] |= (1ULL << ((idx) % 64));)
+#define BITSET_CLEAR(arr, idx)  stmt((arr)[(idx) / 64] &= ~(1ULL << ((idx) % 64));)
+#define BITSET_TOGGLE(arr, idx) stmt((arr)[(idx) / 64] ^= (1ULL << ((idx) % 64));)
 #define BITSET_TEST(arr, idx)   (((arr)[(idx) / 64] >> ((idx) % 64)) & 1ULL)
 
 // Whole-set operations.
-#define BITSET_CLEAR_ALL(arr, word_count) expr_stmt(                    \
+#define BITSET_CLEAR_ALL(arr, word_count) stmt(                         \
     for (sz _word_idx = 0; _word_idx < (sz)(word_count); _word_idx++) { \
       (arr)[_word_idx] = 0ULL;                                          \
     })
 
-#define BITSET_SET_ALL(arr, word_count) expr_stmt(                      \
+#define BITSET_SET_ALL(arr, word_count) stmt(                           \
     for (sz _word_idx = 0; _word_idx < (sz)(word_count); _word_idx++) { \
       (arr)[_word_idx] = ~0ULL;                                         \
     })
 
-#define BITSET_COUNT(arr, word_count, out) expr_stmt(                   \
+#define BITSET_COUNT(arr, word_count, out) stmt(                        \
     (out) = 0;                                                          \
     for (sz _word_idx = 0; _word_idx < (sz)(word_count); _word_idx++) { \
       (out) += popcount_u64((arr)[_word_idx]);                          \
     })
 
-#define BITSET_FIRST_SET(arr, word_count, out) expr_stmt(               \
+#define BITSET_FIRST_SET(arr, word_count, out) stmt(                    \
     (out) = -1;                                                         \
     for (sz _word_idx = 0; _word_idx < (sz)(word_count); _word_idx++) { \
       if ((arr)[_word_idx] != 0ULL) {                                   \
@@ -44,7 +44,7 @@ c_begin;
       }                                                                 \
     })
 
-#define BITSET_FIRST_CLEAR(arr, word_count, out) expr_stmt(             \
+#define BITSET_FIRST_CLEAR(arr, word_count, out) stmt(                  \
     (out) = -1;                                                         \
     for (sz _word_idx = 0; _word_idx < (sz)(word_count); _word_idx++) { \
       if (~(arr)[_word_idx] != 0ULL) {                                  \
