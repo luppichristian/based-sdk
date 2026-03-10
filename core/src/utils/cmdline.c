@@ -15,7 +15,6 @@ func cmdline cmdline_build(sz count, c8** args) {
   }
   assert(count > 0);
   assert(args != NULL);
-
   cmdline cmdl = {.count = count, .args = args};
   profile_func_end;
   return cmdl;
@@ -54,7 +53,7 @@ func b32 cmdline_find(cmdline cmdl, cstr8 arg, sz* out_idx) {
 
   for (sz idx = 0; idx < cmdl.count; idx++) {
     cstr8 value = cmdline_get_arg(cmdl, idx);
-    if (value != NULL && cstr8_cmp(value, arg) == 0) {
+    if (value != NULL && cstr8_cmp(value, arg)) {
       if (out_idx != NULL) {
         *out_idx = idx;
       }
@@ -106,12 +105,12 @@ func cstr8 cmdline_get_option(cmdline cmdl, cstr8 name) {
       continue;
     }
 
-    if (cstr8_cmp(value, lookup_name) == 0) {
+    if (cstr8_cmp(value, lookup_name)) {
       profile_func_end;
       return cmdline_get_arg(cmdl, idx + 1);
     }
 
-    if (cstr8_cmp_n(value, lookup_name, lookup_len) == 0 && value[lookup_len] == '=') {
+    if (cstr8_cmp_n(value, lookup_name, lookup_len) && value[lookup_len] == '=') {
       profile_func_end;
       return value + lookup_len + 1;
     }

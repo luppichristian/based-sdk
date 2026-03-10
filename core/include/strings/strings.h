@@ -36,11 +36,11 @@ func str8 str8_from_cstr(c8* ptr, sz cap, cstr8 src);
 // Returns 1 if str has zero bytes, 0 otherwise.
 func b32 str8_is_empty(str8 str);
 
-// Lexicographically compares lhs and rhs. Returns 0 if equal, <0 or >0 otherwise.
-func i32 str8_cmp(str8 lhs, str8 rhs);
+// Returns 1 if lhs and rhs are equal, 0 otherwise.
+func b32 str8_cmp(str8 lhs, str8 rhs);
 
-// Case-insensitive lexicographic comparison (ASCII letters only). Returns 0, <0, or >0.
-func i32 str8_cmp_nocase(str8 lhs, str8 rhs);
+// Returns 1 if lhs and rhs are equal ignoring ASCII case, 0 otherwise.
+func b32 str8_cmp_nocase(str8 lhs, str8 rhs);
 
 // Returns a pointer to the first occurrence of sub in str, or nullptr if not found.
 func cstr8 str8_find(str8 str, cstr8 sub);
@@ -66,6 +66,10 @@ func b32 str8_ends_with(str8 str, cstr8 suffix);
 // Parses str as a base-10 integer and writes the result to *out.
 // Returns 1 on success, 0 on invalid input or overflow.
 func b32 str8_to_i64(str8 str, i64* out);
+
+// Parses str as an unsigned base-10 integer up to max_value and writes the result to *out.
+// Returns 1 on success, 0 on invalid input or overflow.
+func b32 str8_to_u64(str8 str, u64 max_value, u64* out);
 
 // Parses str as a floating-point number and writes the result to *out.
 // Returns 1 on success, 0 on invalid input.
@@ -157,11 +161,11 @@ func str16 str16_from_cstr(c16* ptr, sz cap, cstr16 src);
 // Returns 1 if str has zero code units, 0 otherwise.
 func b32 str16_is_empty(str16 str);
 
-// Lexicographically compares lhs and rhs. Returns 0 if equal, <0 or >0 otherwise.
-func i32 str16_cmp(str16 lhs, str16 rhs);
+// Returns 1 if lhs and rhs are equal, 0 otherwise.
+func b32 str16_cmp(str16 lhs, str16 rhs);
 
-// Case-insensitive lexicographic comparison (ASCII letters only). Returns 0, <0, or >0.
-func i32 str16_cmp_nocase(str16 lhs, str16 rhs);
+// Returns 1 if lhs and rhs are equal ignoring ASCII case, 0 otherwise.
+func b32 str16_cmp_nocase(str16 lhs, str16 rhs);
 
 // Returns a pointer to the first occurrence of sub in str, or nullptr if not found.
 func cstr16 str16_find(str16 str, cstr16 sub);
@@ -263,11 +267,11 @@ func str32 str32_from_cstr(c32* ptr, sz cap, cstr32 src);
 // Returns 1 if str has zero codepoints, 0 otherwise.
 func b32 str32_is_empty(str32 str);
 
-// Lexicographically compares lhs and rhs. Returns 0 if equal, <0 or >0 otherwise.
-func i32 str32_cmp(str32 lhs, str32 rhs);
+// Returns 1 if lhs and rhs are equal, 0 otherwise.
+func b32 str32_cmp(str32 lhs, str32 rhs);
 
-// Case-insensitive lexicographic comparison (ASCII letters only). Returns 0, <0, or >0.
-func i32 str32_cmp_nocase(str32 lhs, str32 rhs);
+// Returns 1 if lhs and rhs are equal ignoring ASCII case, 0 otherwise.
+func b32 str32_cmp_nocase(str32 lhs, str32 rhs);
 
 // Returns a pointer to the first occurrence of sub in str, or nullptr if not found.
 func cstr32 str32_find(str32 str, cstr32 sub);

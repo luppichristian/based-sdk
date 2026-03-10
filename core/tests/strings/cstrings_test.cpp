@@ -20,20 +20,29 @@ TEST(strings_cstrings_test, cstr8_clear) {
 }
 
 TEST(strings_cstrings_test, cstr8_cmp) {
-  EXPECT_EQ(0, cstr8_cmp("hello", "hello"));
-  EXPECT_LT(cstr8_cmp("abc", "abd"), 0);
-  EXPECT_GT(cstr8_cmp("abd", "abc"), 0);
+  EXPECT_TRUE(cstr8_cmp("hello", "hello"));
+  EXPECT_FALSE(cstr8_cmp("abc", "abd"));
+  EXPECT_FALSE(cstr8_cmp("abd", "abc"));
 }
 
 TEST(strings_cstrings_test, cstr8_cmp_n) {
-  EXPECT_EQ(0, cstr8_cmp_n("hello", "helium", 3));
-  EXPECT_LT(cstr8_cmp_n("abc", "abd", 10), 0);
+  EXPECT_TRUE(cstr8_cmp_n("hello", "helium", 3));
+  EXPECT_FALSE(cstr8_cmp_n("abc", "abd", 10));
 }
 
 TEST(strings_cstrings_test, cstr8_cmp_nocase) {
-  EXPECT_EQ(0, cstr8_cmp_nocase("Hello", "HELLO"));
-  EXPECT_LT(cstr8_cmp_nocase("abc", "abd"), 0);
-  EXPECT_GT(cstr8_cmp_nocase("abd", "abc"), 0);
+  EXPECT_TRUE(cstr8_cmp_nocase("Hello", "HELLO"));
+  EXPECT_FALSE(cstr8_cmp_nocase("abc", "abd"));
+  EXPECT_FALSE(cstr8_cmp_nocase("abd", "abc"));
+}
+
+TEST(strings_cstrings_test, cstr8_to_u64) {
+  u64 value = 0;
+  EXPECT_TRUE(cstr8_to_u64("42", 100, &value));
+  EXPECT_EQ(42U, value);
+  EXPECT_FALSE(cstr8_to_u64("101", 100, &value));
+  EXPECT_FALSE(cstr8_to_u64("-1", U64_MAX, &value));
+  EXPECT_FALSE(cstr8_to_u64("", U64_MAX, &value));
 }
 
 TEST(strings_cstrings_test, cstr8_copy) {
@@ -290,7 +299,7 @@ TEST(strings_cstrings_test, cstr16_is_empty) {
 TEST(strings_cstrings_test, cstr16_cmp) {
   c16 lhs[] = {'h', 'e', 'l', 'l', 'o', 0};
   c16 rhs[] = {'h', 'e', 'l', 'l', 'o', 0};
-  EXPECT_EQ(0, cstr16_cmp(lhs, rhs));
+  EXPECT_TRUE(cstr16_cmp(lhs, rhs));
 }
 
 TEST(strings_cstrings_test, cstr16_find) {
@@ -348,7 +357,7 @@ TEST(strings_cstrings_test, cstr32_is_empty) {
 TEST(strings_cstrings_test, cstr32_cmp) {
   c32 lhs[] = {'h', 'e', 'l', 'l', 'o', 0};
   c32 rhs[] = {'h', 'e', 'l', 'l', 'o', 0};
-  EXPECT_EQ(0, cstr32_cmp(lhs, rhs));
+  EXPECT_TRUE(cstr32_cmp(lhs, rhs));
 }
 
 TEST(strings_cstrings_test, cstr32_find) {

@@ -24,7 +24,7 @@ func b32 file_paths_equal(const path* lhs, const path* rhs) {
   }
 
   profile_func_end;
-  return cstr8_cmp(lhs->buf, rhs->buf) == 0 ? true : false;
+  return cstr8_cmp(lhs->buf, rhs->buf);
 }
 
 func b32 file_replace_path(const path* src, const path* dst) {

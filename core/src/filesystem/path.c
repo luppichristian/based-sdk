@@ -490,7 +490,7 @@ func path path_make_relative(const path* src, const path* root) {
     return src_abs;
   }
 
-  if (cstr8_cmp_n(src_abs.buf, root_abs.buf, root_len) != 0) {
+  if (!cstr8_cmp_n(src_abs.buf, root_abs.buf, root_len)) {
     profile_func_end;
     return src_abs;
   }

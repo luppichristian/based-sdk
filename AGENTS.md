@@ -79,6 +79,9 @@ core/                        # Core module
     basic/                   # Foundational keywords, callsite, utility macros
   src/                       # Core implementations
   tests/                     # Core tests
+  utils/                     # Core utility work areas and in-progress submodules
+    digits/                  # Digits utility module workspace
+    random_series/           # Random-series utility module workspace
   api_index.txt              # Core public API index
 CMakeLists.txt               # Top-level project configuration and module wiring
 ```

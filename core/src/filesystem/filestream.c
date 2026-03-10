@@ -110,7 +110,7 @@ func archive_entry* filestream_find_archive_entry(archive* arc, const path* src)
 
   for (item_idx = 0; item_idx < arc->entry_count; item_idx += 1) {
     path ent_path = filestream_normalize_archive_path(&arc->entries[item_idx].item_path);
-    if (cstr8_cmp(ent_path.buf, item_path.buf) == 0) {
+    if (cstr8_cmp(ent_path.buf, item_path.buf)) {
       profile_func_end;
       return &arc->entries[item_idx];
     }

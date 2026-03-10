@@ -3,6 +3,16 @@
 
 #include "test_common.hpp"
 
+namespace {
+
+  random_series make_uuid_test_series(u32 seed) {
+    random_series series = {};
+    random_series_seed(&series, seed);
+    return series;
+  }
+
+}  // namespace
+
 TEST(utils_uuid_test, zero) {
   uuid value = uuid_zero();
   EXPECT_TRUE(uuid_is_zero(value));
@@ -65,7 +75,8 @@ TEST(utils_uuid_test, string_length) {
 }
 
 TEST(utils_uuid_test, generate_v4) {
-  uuid value = uuid_generate_v4();
+  random_series series = make_uuid_test_series(12345U);
+  uuid value = uuid_generate_v4(&series);
   EXPECT_FALSE(uuid_is_zero(value));
   u8 ver = uuid_get_version(value);
   EXPECT_EQ(4U, ver);
@@ -74,7 +85,8 @@ TEST(utils_uuid_test, generate_v4) {
 }
 
 TEST(utils_uuid_test, version_nibble) {
-  uuid value = uuid_generate_v4();
+  random_series series = make_uuid_test_series(67890U);
+  uuid value = uuid_generate_v4(&series);
   u8 ver = uuid_get_version(value);
   EXPECT_GE(ver, 1U);
   EXPECT_LE(ver, 8U);

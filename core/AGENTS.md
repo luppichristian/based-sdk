@@ -78,6 +78,9 @@ include/                     # Core public headers
   threads/                   # Threading/synchronization/atomics
 src/                         # Core implementations (mirrors include/ module folders)
 tests/                       # Core GoogleTest coverage (mirrors include/ module folders)
+utils/                       # Core utility work areas for new submodules and scaffolding
+  digits/                    # Digits utility module workspace
+  random_series/             # Random-series utility module workspace
 ```
 
 Keep this tree accurate as core evolves.

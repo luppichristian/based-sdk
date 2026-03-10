@@ -994,9 +994,9 @@
 15: func sz cstr8_len(cstr8 str);
 18: func b32 cstr8_is_empty(cstr8 str);
 21: func void cstr8_clear(c8* str);
-24: func i32 cstr8_cmp(cstr8 lhs, cstr8 rhs);
-27: func i32 cstr8_cmp_n(cstr8 lhs, cstr8 rhs, sz cnt);
-30: func i32 cstr8_cmp_nocase(cstr8 lhs, cstr8 rhs);
+24: func b32 cstr8_cmp(cstr8 lhs, cstr8 rhs);
+27: func b32 cstr8_cmp_n(cstr8 lhs, cstr8 rhs, sz cnt);
+30: func b32 cstr8_cmp_nocase(cstr8 lhs, cstr8 rhs);
 34: func sz cstr8_copy(c8* dst, sz dst_size, cstr8 src);
 37: func sz cstr8_copy_n(c8* dst, sz dst_size, cstr8 src, sz cnt);
 40: func sz cstr8_cat(c8* dst, sz dst_cap, cstr8 src);
@@ -1026,17 +1026,18 @@
 116: func sz cstr8_common_prefix(cstr8 lhs, cstr8 rhs, c8* buf, sz buf_cap);
 119: func void cstr8_beautify(c8* str);
 123: func b32 cstr8_to_i64(cstr8 str, i64* out);
-127: func b32 cstr8_to_f64(cstr8 str, f64* out);
-129: typedef struct cstr8_tokenizer {
-135: func cstr8_tokenizer cstr8_tokenizer_make(cstr8 src, cstr8 delim);
-136: func b32 cstr8_tokenizer_next(cstr8_tokenizer* tok, c8* out_buf, sz out_cap);
-137: func sz cstr8_join(c8* dst, sz dst_cap, cstr8 const* parts, sz part_count, cstr8 delim);
+127: func b32 cstr8_to_u64(cstr8 str, u64 max_value, u64* out);
+131: func b32 cstr8_to_f64(cstr8 str, f64* out);
+133: typedef struct cstr8_tokenizer {
+139: func cstr8_tokenizer cstr8_tokenizer_make(cstr8 src, cstr8 delim);
+140: func b32 cstr8_tokenizer_next(cstr8_tokenizer* tok, c8* out_buf, sz out_cap);
+141: func sz cstr8_join(c8* dst, sz dst_cap, cstr8 const* parts, sz part_count, cstr8 delim);
 144: func sz cstr16_len(cstr16 str);
 147: func b32 cstr16_is_empty(cstr16 str);
 150: func void cstr16_clear(c16* str);
-153: func i32 cstr16_cmp(cstr16 lhs, cstr16 rhs);
-156: func i32 cstr16_cmp_n(cstr16 lhs, cstr16 rhs, sz cnt);
-159: func i32 cstr16_cmp_nocase(cstr16 lhs, cstr16 rhs);
+153: func b32 cstr16_cmp(cstr16 lhs, cstr16 rhs);
+156: func b32 cstr16_cmp_n(cstr16 lhs, cstr16 rhs, sz cnt);
+159: func b32 cstr16_cmp_nocase(cstr16 lhs, cstr16 rhs);
 163: func sz cstr16_copy(c16* dst, sz dst_size, cstr16 src);
 166: func sz cstr16_copy_n(c16* dst, sz dst_size, cstr16 src, sz cnt);
 169: func sz cstr16_cat(c16* dst, sz dst_cap, cstr16 src);
@@ -1065,9 +1066,9 @@
 246: func sz cstr32_len(cstr32 str);
 249: func b32 cstr32_is_empty(cstr32 str);
 252: func void cstr32_clear(c32* str);
-255: func i32 cstr32_cmp(cstr32 lhs, cstr32 rhs);
-258: func i32 cstr32_cmp_n(cstr32 lhs, cstr32 rhs, sz cnt);
-261: func i32 cstr32_cmp_nocase(cstr32 lhs, cstr32 rhs);
+255: func b32 cstr32_cmp(cstr32 lhs, cstr32 rhs);
+258: func b32 cstr32_cmp_n(cstr32 lhs, cstr32 rhs, sz cnt);
+261: func b32 cstr32_cmp_nocase(cstr32 lhs, cstr32 rhs);
 265: func sz cstr32_copy(c32* dst, sz dst_size, cstr32 src);
 268: func sz cstr32_copy_n(c32* dst, sz dst_size, cstr32 src, sz cnt);
 271: func sz cstr32_cat(c32* dst, sz dst_cap, cstr32 src);
@@ -1106,8 +1107,8 @@
 27: func str8 str8_empty(c8* ptr, sz cap);
 30: func str8 str8_from_cstr(c8* ptr, sz cap, cstr8 src);
 33: func b32 str8_is_empty(str8 str);
-36: func i32 str8_cmp(str8 lhs, str8 rhs);
-39: func i32 str8_cmp_nocase(str8 lhs, str8 rhs);
+36: func b32 str8_cmp(str8 lhs, str8 rhs);
+39: func b32 str8_cmp_nocase(str8 lhs, str8 rhs);
 42: func cstr8 str8_find(str8 str, cstr8 sub);
 45: func cstr8 str8_find_char(str8 str, c8 chr);
 48: func cstr8 str8_find_last(str8 str, cstr8 sub);
@@ -1116,23 +1117,24 @@
 57: func b32 str8_starts_with(str8 str, cstr8 prefix);
 60: func b32 str8_ends_with(str8 str, cstr8 suffix);
 64: func b32 str8_to_i64(str8 str, i64* out);
-68: func b32 str8_to_f64(str8 str, f64* out);
-71: func void str8_clear(str8* str);
-74: func sz str8_copy(str8* str, cstr8 src);
-77: func sz str8_cat(str8* str, cstr8 src);
-80: func sz str8_append_char(str8* str, c8 chr);
-83: func void str8_truncate(str8* str, sz length);
-86: func b32 str8_format(str8* str, cstr8 fmt, ...);
-89: func b32 str8_vformat(str8* str, cstr8 fmt, va_list args);
-92: func b32 str8_append_format(str8* str, cstr8 fmt, ...);
-95: func b32 str8_append_vformat(str8* str, cstr8 fmt, va_list args);
-98: func void str8_to_upper(str8* str);
-101: func void str8_to_lower(str8* str);
-104: func void str8_trim(str8* str);
-107: func void str8_replace_char(str8* str, c8 from_chr, c8 to_chr);
-110: func sz str8_remove_char(str8* str, c8 chr);
-113: func sz str8_remove_whitespace(str8* str);
-116: func b32 str8_remove_prefix(str8* str, cstr8 prefix);
+68: func b32 str8_to_u64(str8 str, u64 max_value, u64* out);
+72: func b32 str8_to_f64(str8 str, f64* out);
+75: func void str8_clear(str8* str);
+78: func sz str8_copy(str8* str, cstr8 src);
+81: func sz str8_cat(str8* str, cstr8 src);
+84: func sz str8_append_char(str8* str, c8 chr);
+87: func void str8_truncate(str8* str, sz length);
+90: func b32 str8_format(str8* str, cstr8 fmt, ...);
+93: func b32 str8_vformat(str8* str, cstr8 fmt, va_list args);
+96: func b32 str8_append_format(str8* str, cstr8 fmt, ...);
+99: func b32 str8_append_vformat(str8* str, cstr8 fmt, va_list args);
+102: func void str8_to_upper(str8* str);
+105: func void str8_to_lower(str8* str);
+108: func void str8_trim(str8* str);
+111: func void str8_replace_char(str8* str, c8 from_chr, c8 to_chr);
+114: func sz str8_remove_char(str8* str, c8 chr);
+117: func sz str8_remove_whitespace(str8* str);
+120: func b32 str8_remove_prefix(str8* str, cstr8 prefix);
 119: func b32 str8_remove_suffix(str8* str, cstr8 suffix);
 123: func sz str8_replace(str8* str, cstr8 from, cstr8 rep);
 126: func void str8_beautify(str8* str);
@@ -1143,8 +1145,8 @@
 147: func str16 str16_empty(c16* ptr, sz cap);
 150: func str16 str16_from_cstr(c16* ptr, sz cap, cstr16 src);
 153: func b32 str16_is_empty(str16 str);
-156: func i32 str16_cmp(str16 lhs, str16 rhs);
-159: func i32 str16_cmp_nocase(str16 lhs, str16 rhs);
+156: func b32 str16_cmp(str16 lhs, str16 rhs);
+159: func b32 str16_cmp_nocase(str16 lhs, str16 rhs);
 162: func cstr16 str16_find(str16 str, cstr16 sub);
 165: func cstr16 str16_find_char(str16 str, c16 chr);
 168: func cstr16 str16_find_last(str16 str, cstr16 sub);
@@ -1174,8 +1176,8 @@
 253: func str32 str32_empty(c32* ptr, sz cap);
 256: func str32 str32_from_cstr(c32* ptr, sz cap, cstr32 src);
 259: func b32 str32_is_empty(str32 str);
-262: func i32 str32_cmp(str32 lhs, str32 rhs);
-265: func i32 str32_cmp_nocase(str32 lhs, str32 rhs);
+262: func b32 str32_cmp(str32 lhs, str32 rhs);
+265: func b32 str32_cmp_nocase(str32 lhs, str32 rhs);
 268: func cstr32 str32_find(str32 str, cstr32 sub);
 271: func cstr32 str32_find_char(str32 str, c32 chr);
 274: func cstr32 str32_find_last(str32 str, cstr32 sub);
@@ -1436,6 +1438,28 @@
 17: func u64 crc64_finalize(u64 crc);
 18: func u64 crc64(const void* data, sz size);
 
+=== include\utils\digits.h ===
+13: func sz u8_digits(u8 value);
+14: func sz u16_digits(u16 value);
+15: func sz u32_digits(u32 value);
+16: func sz u64_digits(u64 value);
+20: func sz i8_digits(i8 value);
+21: func sz i16_digits(i16 value);
+22: func sz i32_digits(i32 value);
+23: func sz i64_digits(i64 value);
+26: func sz u8x_digits(u8x value);
+27: func sz u16x_digits(u16x value);
+28: func sz u32x_digits(u32x value);
+29: func sz u64x_digits(u64x value);
+30: func sz sz_digits(sz value);
+31: func sz up_digits(up value);
+35: func sz i8x_digits(i8x value);
+36: func sz i16x_digits(i16x value);
+37: func sz i32x_digits(i32x value);
+38: func sz i64x_digits(i64x value);
+39: func sz sp_digits(sp value);
+40: func sz dp_digits(dp value);
+
 === include\utils\endian.h ===
 9: func b32 endian_is_little(void);
 12: func b32 endian_is_big(void);
@@ -1532,6 +1556,8 @@
 150: #define log_state_debug(state, ...)   _log((state), LOG_LEVEL_DEBUG, CALLSITE_HERE, __VA_ARGS__)
 151: #define log_state_verbose(state, ...) _log((state), LOG_LEVEL_VERBOSE, CALLSITE_HERE, __VA_ARGS__)
 152: #define log_state_trace(state, ...)   _log((state), LOG_LEVEL_TRACE, CALLSITE_HERE, __VA_ARGS__)
+
+=== include\utils\random_series.h ===
 
 === include\utils\stacktrace.h ===
 10: #define STACKTRACE_CAPTURE_CAP 64

@@ -2,54 +2,12 @@
 // Copyright (c) 2026 Christian Luppi
 
 #include "utils/id.h"
+#include "utils/digits.h"
 #include "basic/assert.h"
 #include "basic/profiler.h"
 
 #include <errno.h>
 #include <stdlib.h>
-
-// Shared decimal digit counter reused by all ID widths.
-func sz id_u64_digits(u64 value) {
-  profile_func_begin;
-  sz digits = 1;
-  while (value >= 10ULL) {
-    value /= 10ULL;
-    digits++;
-  }
-  profile_func_end;
-  return digits;
-}
-
-// Shared unsigned decimal parser with a caller-supplied upper bound.
-func b32 id_parse_u64(cstr8 src, u64 max_value, u64* out) {
-  profile_func_begin;
-  if (src == NULL || out == NULL) {
-    profile_func_end;
-    return false;
-  }
-  assert(src != NULL);
-  assert(out != NULL);
-  if (src[0] == '\0') {
-    profile_func_end;
-    return false;
-  }
-
-  char* end_ptr;
-  errno = 0;
-  unsigned long long parsed = strtoull(src, &end_ptr, 10);
-  if (errno != 0 || end_ptr == src || *end_ptr != '\0') {
-    profile_func_end;
-    return false;
-  }
-  if ((u64)parsed > max_value) {
-    profile_func_end;
-    return false;
-  }
-
-  *out = (u64)parsed;
-  profile_func_end;
-  return true;
-}
 
 // Generates the same helper set for each fixed-width ID wrapper.
 // Only the underlying storage type and parse limit differ between variants.
@@ -102,13 +60,13 @@ func b32 id_parse_u64(cstr8 src, u64 max_value, u64* out) {
   }                                                                                \
                                                                                    \
   func sz NAME##_string_length(NAME ident) {                                       \
-    return id_u64_digits((u64)ident.value);                                        \
+    return u64_digits((u64)ident.value);                                           \
   }                                                                                \
                                                                                    \
   func b32 NAME##_parse_cstr8(cstr8 src, NAME* out) {                              \
     profile_func_begin;                                                            \
     u64 parsed = 0;                                                                \
-    if (!id_parse_u64(src, (u64)(MAX_VALUE), &parsed)) {                           \
+    if (!cstr8_to_u64(src, (u64)(MAX_VALUE), &parsed)) {                           \
       profile_func_end;                                                            \
       return false;                                                                \
     }                                                                              \

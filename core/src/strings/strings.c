@@ -51,13 +51,13 @@ func b32 str8_is_empty(str8 str) {
   return str.size == 0 ? true : false;
 }
 
-func i32 str8_cmp(str8 lhs, str8 rhs) {
+func b32 str8_cmp(str8 lhs, str8 rhs) {
   profile_func_begin;
   profile_func_end;
   return cstr8_cmp(lhs.ptr, rhs.ptr);
 }
 
-func i32 str8_cmp_nocase(str8 lhs, str8 rhs) {
+func b32 str8_cmp_nocase(str8 lhs, str8 rhs) {
   profile_func_begin;
   profile_func_end;
   return cstr8_cmp_nocase(lhs.ptr, rhs.ptr);
@@ -109,6 +109,12 @@ func b32 str8_to_i64(str8 str, i64* out) {
   profile_func_begin;
   profile_func_end;
   return cstr8_to_i64(str.ptr, out);
+}
+
+func b32 str8_to_u64(str8 str, u64 max_value, u64* out) {
+  profile_func_begin;
+  profile_func_end;
+  return cstr8_to_u64(str.ptr, max_value, out);
 }
 
 func b32 str8_to_f64(str8 str, f64* out) {
@@ -341,13 +347,13 @@ func b32 str16_is_empty(str16 str) {
   return str.size == 0 ? true : false;
 }
 
-func i32 str16_cmp(str16 lhs, str16 rhs) {
+func b32 str16_cmp(str16 lhs, str16 rhs) {
   profile_func_begin;
   profile_func_end;
   return cstr16_cmp(lhs.ptr, rhs.ptr);
 }
 
-func i32 str16_cmp_nocase(str16 lhs, str16 rhs) {
+func b32 str16_cmp_nocase(str16 lhs, str16 rhs) {
   profile_func_begin;
   profile_func_end;
   return cstr16_cmp_nocase(lhs.ptr, rhs.ptr);
@@ -560,13 +566,13 @@ func b32 str32_is_empty(str32 str) {
   return str.size == 0 ? true : false;
 }
 
-func i32 str32_cmp(str32 lhs, str32 rhs) {
+func b32 str32_cmp(str32 lhs, str32 rhs) {
   profile_func_begin;
   profile_func_end;
   return cstr32_cmp(lhs.ptr, rhs.ptr);
 }
 
-func i32 str32_cmp_nocase(str32 lhs, str32 rhs) {
+func b32 str32_cmp_nocase(str32 lhs, str32 rhs) {
   profile_func_begin;
   profile_func_end;
   return cstr32_cmp_nocase(lhs.ptr, rhs.ptr);

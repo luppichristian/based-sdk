@@ -2,20 +2,11 @@
 // Copyright (c) 2026 Christian Luppi
 
 #include "utils/version.h"
+#include "utils/digits.h"
 #include "basic/assert.h"
 #include "basic/utility_defines.h"
 #include "basic/profiler.h"
-
-func sz version_u32_digits(u32 value) {
-  profile_func_begin;
-  sz digits = 1;
-  while (value >= 10U) {
-    value /= 10U;
-    digits++;
-  }
-  profile_func_end;
-  return digits;
-}
+#include "context/thread_ctx.h"
 
 func version version_zero(void) {
   profile_func_begin;
@@ -62,10 +53,11 @@ func b32 version_is_zero(version ver) {
 
 func sz version_string_length(version ver) {
   profile_func_begin;
+  sz len = u32_digits((u32)version_get_major(ver)) +
+           u32_digits((u32)version_get_minor(ver)) +
+           u32_digits((u32)version_get_patch(ver)) + 2;
   profile_func_end;
-  return version_u32_digits((u32)version_get_major(ver)) +
-         version_u32_digits((u32)version_get_minor(ver)) +
-         version_u32_digits((u32)version_get_patch(ver)) + 2;
+  return len;
 }
 
 func i32 version_cmp(version lhs, version rhs) {
@@ -114,14 +106,16 @@ func b32 version_to_cstr8(version ver, c8* dst, sz cap) {
     return false;
   }
 
-  profile_func_end;
-  return cstr8_format(
+  b32 res = cstr8_format(
       dst,
       cap,
       "%u.%u.%u",
       (unsigned int)version_get_major(ver),
       (unsigned int)version_get_minor(ver),
       (unsigned int)version_get_patch(ver));
+
+  profile_func_end;
+  return res;
 }
 
 func b32 version_to_cstr16(version ver, c16* dst, sz cap) {
@@ -236,11 +230,13 @@ func b32 version_parse_cstr8(cstr8 src, version* out_ver) {
   unsigned int minor = 0;
   unsigned int patch = 0;
   if (!cstr8_scan(src, "%u.%u.%u", &major, &minor, &patch)) {
+    thread_log_error("Could not parse version from string: %s", src);
     profile_func_end;
     return false;
   }
 
   if (major > 0xFFU || minor > 0xFFU || patch > 0xFFFFU) {
+    thread_log_error("Could not parse version from string: %s", src);
     profile_func_end;
     return false;
   }

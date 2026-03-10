@@ -14,6 +14,7 @@
 #include "basic/primitive_types.h"
 #include "basic/profiler.h"
 #include "basic/utility_defines.h"
+#include "basic/third_party.h"
 
 // Include container modules.
 #include "containers/binary_tree.h"
@@ -88,9 +89,11 @@
 // Include utility modules.
 #include "utils/cmdline.h"
 #include "utils/crc.h"
+#include "utils/digits.h"
 #include "utils/endian.h"
 #include "utils/id.h"
 #include "utils/log_state.h"
+#include "utils/random_series.h"
 #include "utils/stacktrace.h"
 #include "utils/timer.h"
 #include "utils/timestamp.h"
@@ -112,22 +115,3 @@
 #include "threads/thread.h"
 #include "threads/thread_current.h"
 #include "threads/thread_group.h"
-
-// Include olib, my own library for dealing with file formats.
-#ifndef BASED_NO_OLIB
-#  include <olib.h>
-#endif
-
-// Include libmath2, my own math library that integrates well with the codebase.
-#ifndef BASED_NO_LIBMATH2
-#  ifndef LM2_ENABLE_UNPREFIXED_NAMES
-#    define LM2_ENABLE_UNPREFIXED_NAMES
-#  endif
-#  ifndef LM2_CUSTOM_ASSERT
-#    define LM2_CUSTOM_ASSERT
-#  endif
-#  ifndef LM2_NO_GENERICS
-#    define LM2_NO_GENERICS
-#  endif
-#  include <lm2.h>
-#endif

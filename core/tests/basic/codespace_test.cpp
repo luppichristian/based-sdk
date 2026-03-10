@@ -16,14 +16,14 @@ TEST(basic_codespace_test, callsite_here_captures_line_and_strings) {
 TEST(basic_codespace_test, callsite_struct_fields_roundtrip) {
   callsite site_val = {"fake_file.c", "fake_func", 77};
 
-  EXPECT_EQ(cstr8_cmp(site_val.filename, "fake_file.c"), 0);
-  EXPECT_EQ(cstr8_cmp(site_val.function, "fake_func"), 0);
+  EXPECT_TRUE(cstr8_cmp(site_val.filename, "fake_file.c"));
+  EXPECT_TRUE(cstr8_cmp(site_val.function, "fake_func"));
   EXPECT_EQ(site_val.line, 77U);
 }
 
 TEST(basic_codespace_test, src_loc_keeps_filename_and_line) {
   src_loc source_loc = {"module.c", 12};
 
-  EXPECT_EQ(cstr8_cmp(source_loc.filename, "module.c"), 0);
+  EXPECT_TRUE(cstr8_cmp(source_loc.filename, "module.c"));
   EXPECT_EQ(source_loc.line, 12U);
 }

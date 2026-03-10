@@ -4,8 +4,8 @@
 #include "test_common.hpp"
 
 TEST(basic_utility_defines_test, string_and_concat_macros_expand_values) {
-  EXPECT_EQ(cstr8_cmp(strfy(hello_world), "hello_world"), 0);
-  EXPECT_EQ(cstr8_cmp(strfy_exp(1234), "1234"), 0);
+  EXPECT_TRUE(cstr8_cmp(strfy(hello_world), "hello_world"));
+  EXPECT_TRUE(cstr8_cmp(strfy_exp(1234), "1234"));
 
   i32 cat_exp(value_, 42) = 77;
   EXPECT_EQ(value_42, 77);

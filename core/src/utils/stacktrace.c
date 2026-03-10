@@ -20,10 +20,7 @@ func sz stacktrace_capture(stacktrace_frame* out_frames, sz out_capacity, sz ski
   }
 
   sz frame_idx = 0;
-  sz capture_cap = out_capacity + skip_frames + 1;
-  if (capture_cap > STACKTRACE_CAPTURE_CAP) {
-    capture_cap = STACKTRACE_CAPTURE_CAP;
-  }
+  sz capture_cap = min(out_capacity + skip_frames + 1, STACKTRACE_CAPTURE_CAP);
 
   void* raw_frames[STACKTRACE_CAPTURE_CAP] = {0};
 

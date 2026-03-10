@@ -200,7 +200,7 @@ func void pathwatch_watch_bind_remove_by_path(pathwatch_id pathwatch_id, void* n
       path normalized_watch = bindings[item_idx].watch_path;
       path_normalize(&normalized_watch);
       path_remove_trailing_slash(&normalized_watch);
-      if (cstr8_cmp(normalized_watch.buf, normalized_src.buf) == 0) {
+      if (cstr8_cmp(normalized_watch.buf, normalized_src.buf)) {
         bindings[item_idx] = (pathwatch_watch_binding) {0};
       }
     }

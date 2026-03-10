@@ -5,6 +5,8 @@
 
 #include "../basic/primitive_types.h"
 #include "../strings/strings.h"
+#include "../basic/third_party.h"
+#include "random_series.h"
 
 // =========================================================================
 c_begin;
@@ -75,7 +77,7 @@ func b32 uuid_to_str16(uuid value, str16* dst);
 func b32 uuid_to_str32(uuid value, str32* dst);
 
 // Generates a random UUIDv4.
-func uuid uuid_generate_v4(void);
+func uuid uuid_generate_v4(random_series* series);
 
 // =========================================================================
 c_end;

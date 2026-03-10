@@ -74,52 +74,70 @@ func void cstr8_clear(c8* str) {
   profile_func_end;
 }
 
-func i32 cstr8_cmp(cstr8 lhs, cstr8 rhs) {
+func b32 cstr8_cmp(cstr8 lhs, cstr8 rhs) {
   profile_func_begin;
   if (lhs == NULL || rhs == NULL) {
     profile_func_end;
-    return lhs == rhs ? 0 : (lhs == NULL ? -1 : 1);
+    return lhs == rhs ? true : false;
   }
   assert(lhs != NULL);
   assert(rhs != NULL);
+  while (*lhs != '\0' && *rhs != '\0') {
+    if (*lhs != *rhs) {
+      profile_func_end;
+      return false;
+    }
+    lhs++;
+    rhs++;
+  }
   profile_func_end;
-  return strcmp(lhs, rhs);
+  return *lhs == *rhs ? true : false;
 }
 
-func i32 cstr8_cmp_n(cstr8 lhs, cstr8 rhs, sz cnt) {
+func b32 cstr8_cmp_n(cstr8 lhs, cstr8 rhs, sz cnt) {
   profile_func_begin;
+  if (cnt == 0) {
+    profile_func_end;
+    return true;
+  }
+  if (lhs == NULL || rhs == NULL) {
+    profile_func_end;
+    return lhs == rhs ? true : false;
+  }
+  for (sz idx = 0; idx < cnt; idx++) {
+    if (lhs[idx] != rhs[idx]) {
+      profile_func_end;
+      return false;
+    }
+    if (lhs[idx] == '\0') {
+      profile_func_end;
+      return true;
+    }
+  }
   profile_func_end;
-  return strncmp(lhs, rhs, cnt);
+  return true;
 }
 
-func i32 cstr8_cmp_nocase(cstr8 lhs, cstr8 rhs) {
+func b32 cstr8_cmp_nocase(cstr8 lhs, cstr8 rhs) {
   profile_func_begin;
+  if (lhs == NULL || rhs == NULL) {
+    profile_func_end;
+    return lhs == rhs ? true : false;
+  }
   while (*lhs != '\0' && *rhs != '\0') {
     u8 lchr = (u8)c8_to_lower(*lhs);
     u8 rchr = (u8)c8_to_lower(*rhs);
-    if (lchr < rchr) {
+    if (lchr != rchr) {
       profile_func_end;
-      return -1;
-    }
-    if (lchr > rchr) {
-      profile_func_end;
-      return 1;
+      return false;
     }
     lhs++;
     rhs++;
   }
   u8 lchr = (u8)c8_to_lower(*lhs);
   u8 rchr = (u8)c8_to_lower(*rhs);
-  if (lchr < rchr) {
-    profile_func_end;
-    return -1;
-  }
-  if (lchr > rchr) {
-    profile_func_end;
-    return 1;
-  }
   profile_func_end;
-  return 0;
+  return lchr == rchr ? true : false;
 }
 
 // =========================================================================
@@ -317,7 +335,7 @@ func b32 cstr8_starts_with(cstr8 str, cstr8 prefix) {
   profile_func_begin;
   sz prefix_len = cstr8_len(prefix);
   profile_func_end;
-  return strncmp(str, prefix, prefix_len) == 0 ? true : false;
+  return cstr8_cmp_n(str, prefix, prefix_len);
 }
 
 func b32 cstr8_ends_with(cstr8 str, cstr8 suffix) {
@@ -329,7 +347,7 @@ func b32 cstr8_ends_with(cstr8 str, cstr8 suffix) {
     return false;
   }
   profile_func_end;
-  return strcmp(str + str_len - suffix_len, suffix) == 0 ? true : false;
+  return cstr8_cmp(str + str_len - suffix_len, suffix);
 }
 
 // =========================================================================
@@ -412,7 +430,7 @@ func sz cstr8_remove_whitespace(c8* str) {
 func b32 cstr8_remove_prefix(c8* str, cstr8 prefix) {
   profile_func_begin;
   sz prefix_len = cstr8_len(prefix);
-  if (strncmp(str, prefix, prefix_len) != 0) {
+  if (!cstr8_cmp_n(str, prefix, prefix_len)) {
     profile_func_end;
     return false;
   }
@@ -426,7 +444,7 @@ func b32 cstr8_remove_suffix(c8* str, cstr8 suffix) {
   profile_func_begin;
   sz str_len = cstr8_len(str);
   sz suffix_len = cstr8_len(suffix);
-  if (suffix_len > str_len || strcmp(str + str_len - suffix_len, suffix) != 0) {
+  if (suffix_len > str_len || !cstr8_cmp(str + str_len - suffix_len, suffix)) {
     profile_func_end;
     return false;
   }
@@ -508,6 +526,36 @@ func b32 cstr8_to_i64(cstr8 str, i64* out) {
     return false;
   }
   *out = (i64)val;
+  profile_func_end;
+  return true;
+}
+
+func b32 cstr8_to_u64(cstr8 str, u64 max_value, u64* out) {
+  profile_func_begin;
+  if (str == NULL || out == NULL) {
+    profile_func_end;
+    return false;
+  }
+  assert(str != NULL);
+  assert(out != NULL);
+  if (str[0] == '\0') {
+    profile_func_end;
+    return false;
+  }
+
+  char* end_ptr;
+  errno = 0;
+  unsigned long long parsed = strtoull(str, &end_ptr, 10);
+  if (errno != 0 || end_ptr == str || *end_ptr != '\0') {
+    profile_func_end;
+    return false;
+  }
+  if ((u64)parsed > max_value) {
+    profile_func_end;
+    return false;
+  }
+
+  *out = (u64)parsed;
   profile_func_end;
   return true;
 }
@@ -670,68 +718,64 @@ func void cstr16_clear(c16* str) {
   profile_func_end;
 }
 
-func i32 cstr16_cmp(cstr16 lhs, cstr16 rhs) {
+func b32 cstr16_cmp(cstr16 lhs, cstr16 rhs) {
   profile_func_begin;
+  if (lhs == NULL || rhs == NULL) {
+    profile_func_end;
+    return lhs == rhs ? true : false;
+  }
   while (*lhs != 0 && *lhs == *rhs) {
     lhs++;
     rhs++;
   }
-  if (*lhs < *rhs) {
-    profile_func_end;
-    return -1;
-  }
-  if (*lhs > *rhs) {
-    profile_func_end;
-    return 1;
-  }
   profile_func_end;
-  return 0;
+  return *lhs == *rhs ? true : false;
 }
 
-func i32 cstr16_cmp_n(cstr16 lhs, cstr16 rhs, sz cnt) {
+func b32 cstr16_cmp_n(cstr16 lhs, cstr16 rhs, sz cnt) {
   profile_func_begin;
+  if (cnt == 0) {
+    profile_func_end;
+    return true;
+  }
+  if (lhs == NULL || rhs == NULL) {
+    profile_func_end;
+    return lhs == rhs ? true : false;
+  }
   for (sz idx = 0; idx < cnt; idx++) {
     if (lhs[idx] != rhs[idx]) {
       profile_func_end;
-      return lhs[idx] < rhs[idx] ? -1 : 1;
+      return false;
     }
     if (lhs[idx] == (c16)'\0') {
       profile_func_end;
-      return 0;
+      return true;
     }
   }
   profile_func_end;
-  return 0;
+  return true;
 }
 
-func i32 cstr16_cmp_nocase(cstr16 lhs, cstr16 rhs) {
+func b32 cstr16_cmp_nocase(cstr16 lhs, cstr16 rhs) {
   profile_func_begin;
+  if (lhs == NULL || rhs == NULL) {
+    profile_func_end;
+    return lhs == rhs ? true : false;
+  }
   while (*lhs != (c16)'\0' && *rhs != (c16)'\0') {
     c16 lchr = c16_to_lower(*lhs);
     c16 rchr = c16_to_lower(*rhs);
-    if (lchr < rchr) {
+    if (lchr != rchr) {
       profile_func_end;
-      return -1;
-    }
-    if (lchr > rchr) {
-      profile_func_end;
-      return 1;
+      return false;
     }
     lhs++;
     rhs++;
   }
   c16 lchr = c16_to_lower(*lhs);
   c16 rchr = c16_to_lower(*rhs);
-  if (lchr < rchr) {
-    profile_func_end;
-    return -1;
-  }
-  if (lchr > rchr) {
-    profile_func_end;
-    return 1;
-  }
   profile_func_end;
-  return 0;
+  return lchr == rchr ? true : false;
 }
 
 // =========================================================================
@@ -908,7 +952,7 @@ func b32 cstr16_starts_with(cstr16 str, cstr16 prefix) {
   profile_func_begin;
   sz prefix_len = cstr16_len_impl(prefix);
   profile_func_end;
-  return cstr16_cmp_n(str, prefix, prefix_len) == 0 ? true : false;
+  return cstr16_cmp_n(str, prefix, prefix_len);
 }
 
 func b32 cstr16_ends_with(cstr16 str, cstr16 suffix) {
@@ -1003,7 +1047,7 @@ func sz cstr16_remove_whitespace(c16* str) {
 func b32 cstr16_remove_prefix(c16* str, cstr16 prefix) {
   profile_func_begin;
   sz prefix_len = cstr16_len_impl(prefix);
-  if (cstr16_cmp_n(str, prefix, prefix_len) != 0) {
+  if (!cstr16_cmp_n(str, prefix, prefix_len)) {
     profile_func_end;
     return false;
   }
@@ -1131,68 +1175,64 @@ func void cstr32_clear(c32* str) {
   profile_func_end;
 }
 
-func i32 cstr32_cmp(cstr32 lhs, cstr32 rhs) {
+func b32 cstr32_cmp(cstr32 lhs, cstr32 rhs) {
   profile_func_begin;
+  if (lhs == NULL || rhs == NULL) {
+    profile_func_end;
+    return lhs == rhs ? true : false;
+  }
   while (*lhs != 0 && *lhs == *rhs) {
     lhs++;
     rhs++;
   }
-  if (*lhs < *rhs) {
-    profile_func_end;
-    return -1;
-  }
-  if (*lhs > *rhs) {
-    profile_func_end;
-    return 1;
-  }
   profile_func_end;
-  return 0;
+  return *lhs == *rhs ? true : false;
 }
 
-func i32 cstr32_cmp_n(cstr32 lhs, cstr32 rhs, sz cnt) {
+func b32 cstr32_cmp_n(cstr32 lhs, cstr32 rhs, sz cnt) {
   profile_func_begin;
+  if (cnt == 0) {
+    profile_func_end;
+    return true;
+  }
+  if (lhs == NULL || rhs == NULL) {
+    profile_func_end;
+    return lhs == rhs ? true : false;
+  }
   for (sz idx = 0; idx < cnt; idx++) {
     if (lhs[idx] != rhs[idx]) {
       profile_func_end;
-      return lhs[idx] < rhs[idx] ? -1 : 1;
+      return false;
     }
     if (lhs[idx] == (c32)'\0') {
       profile_func_end;
-      return 0;
+      return true;
     }
   }
   profile_func_end;
-  return 0;
+  return true;
 }
 
-func i32 cstr32_cmp_nocase(cstr32 lhs, cstr32 rhs) {
+func b32 cstr32_cmp_nocase(cstr32 lhs, cstr32 rhs) {
   profile_func_begin;
+  if (lhs == NULL || rhs == NULL) {
+    profile_func_end;
+    return lhs == rhs ? true : false;
+  }
   while (*lhs != (c32)'\0' && *rhs != (c32)'\0') {
     c32 lchr = c32_to_lower(*lhs);
     c32 rchr = c32_to_lower(*rhs);
-    if (lchr < rchr) {
+    if (lchr != rchr) {
       profile_func_end;
-      return -1;
-    }
-    if (lchr > rchr) {
-      profile_func_end;
-      return 1;
+      return false;
     }
     lhs++;
     rhs++;
   }
   c32 lchr = c32_to_lower(*lhs);
   c32 rchr = c32_to_lower(*rhs);
-  if (lchr < rchr) {
-    profile_func_end;
-    return -1;
-  }
-  if (lchr > rchr) {
-    profile_func_end;
-    return 1;
-  }
   profile_func_end;
-  return 0;
+  return lchr == rchr ? true : false;
 }
 
 // =========================================================================
@@ -1369,7 +1409,7 @@ func b32 cstr32_starts_with(cstr32 str, cstr32 prefix) {
   profile_func_begin;
   sz prefix_len = cstr32_len_impl(prefix);
   profile_func_end;
-  return cstr32_cmp_n(str, prefix, prefix_len) == 0 ? true : false;
+  return cstr32_cmp_n(str, prefix, prefix_len);
 }
 
 func b32 cstr32_ends_with(cstr32 str, cstr32 suffix) {
@@ -1464,7 +1504,7 @@ func sz cstr32_remove_whitespace(c32* str) {
 func b32 cstr32_remove_prefix(c32* str, cstr32 prefix) {
   profile_func_begin;
   sz prefix_len = cstr32_len_impl(prefix);
-  if (cstr32_cmp_n(str, prefix, prefix_len) != 0) {
+  if (!cstr32_cmp_n(str, prefix, prefix_len)) {
     profile_func_end;
     return false;
   }

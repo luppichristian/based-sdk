@@ -96,7 +96,7 @@ func path archive_normalize_entry_path(const path* src) {
 func b32 archive_path_equals(const path* lhs, const path* rhs) {
   path lhs_norm = archive_normalize_entry_path(lhs);
   path rhs_norm = archive_normalize_entry_path(rhs);
-  return cstr8_cmp(lhs_norm.buf, rhs_norm.buf) == 0 ? true : false;
+  return cstr8_cmp(lhs_norm.buf, rhs_norm.buf);
 }
 
 func sz archive_find_idx(const archive* arc, const path* src) {

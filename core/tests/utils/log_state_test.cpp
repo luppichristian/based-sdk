@@ -4,10 +4,10 @@
 #include "test_common.hpp"
 
 TEST(utils_log_state_test, level_labels_are_stable) {
-  EXPECT_EQ(cstr8_cmp(log_level_to_str(LOG_LEVEL_FATAL), "FATAL"), 0);
-  EXPECT_EQ(cstr8_cmp(log_level_to_str(LOG_LEVEL_ERROR), "ERROR"), 0);
-  EXPECT_EQ(cstr8_cmp(log_level_to_str(LOG_LEVEL_WARN), "WARN "), 0);
-  EXPECT_EQ(cstr8_cmp(log_level_to_str(LOG_LEVEL_TRACE), "TRACE"), 0);
+  EXPECT_TRUE(cstr8_cmp(log_level_to_str(LOG_LEVEL_FATAL), "FATAL"));
+  EXPECT_TRUE(cstr8_cmp(log_level_to_str(LOG_LEVEL_ERROR), "ERROR"));
+  EXPECT_TRUE(cstr8_cmp(log_level_to_str(LOG_LEVEL_WARN), "WARN "));
+  EXPECT_TRUE(cstr8_cmp(log_level_to_str(LOG_LEVEL_TRACE), "TRACE"));
 }
 
 TEST(utils_log_state_test, state_init_and_quit_toggle_init_flag) {

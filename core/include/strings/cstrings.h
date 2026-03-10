@@ -24,14 +24,14 @@ func b32 cstr8_is_empty(cstr8 str);
 // Sets str to the empty string (writes a null terminator at idx 0).
 func void cstr8_clear(c8* str);
 
-// Lexicographically compares lhs and rhs. Returns 0 if equal, <0 or >0 otherwise.
-func i32 cstr8_cmp(cstr8 lhs, cstr8 rhs);
+// Returns 1 if lhs and rhs are equal, 0 otherwise.
+func b32 cstr8_cmp(cstr8 lhs, cstr8 rhs);
 
-// Like cstr8_cmp but compares at most cnt code units.
-func i32 cstr8_cmp_n(cstr8 lhs, cstr8 rhs, sz cnt);
+// Returns 1 if lhs and rhs are equal for at most cnt code units, 0 otherwise.
+func b32 cstr8_cmp_n(cstr8 lhs, cstr8 rhs, sz cnt);
 
-// Case-insensitive lexicographic comparison (ASCII letters only). Returns 0, <0, or >0.
-func i32 cstr8_cmp_nocase(cstr8 lhs, cstr8 rhs);
+// Returns 1 if lhs and rhs are equal ignoring ASCII case, 0 otherwise.
+func b32 cstr8_cmp_nocase(cstr8 lhs, cstr8 rhs);
 
 // Copies src into dst (at most dst_size - 1 units) and null-terminates.
 // Returns the number of c8 units written, excluding the null terminator.
@@ -126,6 +126,10 @@ func void cstr8_beautify(c8* str);
 // Returns 1 on success, 0 on invalid input or overflow.
 func b32 cstr8_to_i64(cstr8 str, i64* out);
 
+// Parses str as an unsigned base-10 integer up to max_value and writes the result to *out.
+// Returns 1 on success, 0 on invalid input or overflow.
+func b32 cstr8_to_u64(cstr8 str, u64 max_value, u64* out);
+
 // Parses str as a floating-point number and writes the result to *out.
 // Returns 1 on success, 0 on invalid input.
 func b32 cstr8_to_f64(cstr8 str, f64* out);
@@ -154,14 +158,14 @@ func b32 cstr16_is_empty(cstr16 str);
 // Sets str to the empty string (writes a null terminator at idx 0).
 func void cstr16_clear(c16* str);
 
-// Lexicographically compares lhs and rhs. Returns 0 if equal, <0 or >0 otherwise.
-func i32 cstr16_cmp(cstr16 lhs, cstr16 rhs);
+// Returns 1 if lhs and rhs are equal, 0 otherwise.
+func b32 cstr16_cmp(cstr16 lhs, cstr16 rhs);
 
-// Like cstr16_cmp but compares at most cnt code units.
-func i32 cstr16_cmp_n(cstr16 lhs, cstr16 rhs, sz cnt);
+// Returns 1 if lhs and rhs are equal for at most cnt code units, 0 otherwise.
+func b32 cstr16_cmp_n(cstr16 lhs, cstr16 rhs, sz cnt);
 
-// Case-insensitive lexicographic comparison (ASCII letters only). Returns 0, <0, or >0.
-func i32 cstr16_cmp_nocase(cstr16 lhs, cstr16 rhs);
+// Returns 1 if lhs and rhs are equal ignoring ASCII case, 0 otherwise.
+func b32 cstr16_cmp_nocase(cstr16 lhs, cstr16 rhs);
 
 // Copies src into dst (at most dst_size - 1 units) and null-terminates.
 // Returns the number of c16 units written, excluding the null terminator.
@@ -256,14 +260,14 @@ func b32 cstr32_is_empty(cstr32 str);
 // Sets str to the empty string (writes a null terminator at idx 0).
 func void cstr32_clear(c32* str);
 
-// Lexicographically compares lhs and rhs. Returns 0 if equal, <0 or >0 otherwise.
-func i32 cstr32_cmp(cstr32 lhs, cstr32 rhs);
+// Returns 1 if lhs and rhs are equal, 0 otherwise.
+func b32 cstr32_cmp(cstr32 lhs, cstr32 rhs);
 
-// Like cstr32_cmp but compares at most cnt code units.
-func i32 cstr32_cmp_n(cstr32 lhs, cstr32 rhs, sz cnt);
+// Returns 1 if lhs and rhs are equal for at most cnt code units, 0 otherwise.
+func b32 cstr32_cmp_n(cstr32 lhs, cstr32 rhs, sz cnt);
 
-// Case-insensitive lexicographic comparison (ASCII letters only). Returns 0, <0, or >0.
-func i32 cstr32_cmp_nocase(cstr32 lhs, cstr32 rhs);
+// Returns 1 if lhs and rhs are equal ignoring ASCII case, 0 otherwise.
+func b32 cstr32_cmp_nocase(cstr32 lhs, cstr32 rhs);
 
 // Copies src into dst (at most dst_size - 1 units) and null-terminates.
 // Returns the number of c32 units written, excluding the null terminator.

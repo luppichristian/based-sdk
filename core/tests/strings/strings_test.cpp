@@ -41,9 +41,9 @@ TEST(strings_strings_test, str8_cmp) {
   str8 str_b = str8_from_cstr(buf2, sizeof(buf2), "hello");
   str8 str_c = str8_from_cstr(buf3, sizeof(buf3), "world");
 
-  EXPECT_EQ(0, str8_cmp(str_a, str_b));
-  EXPECT_LT(str8_cmp(str_a, str_c), 0);
-  EXPECT_GT(str8_cmp(str_c, str_a), 0);
+  EXPECT_TRUE(str8_cmp(str_a, str_b));
+  EXPECT_FALSE(str8_cmp(str_a, str_c));
+  EXPECT_FALSE(str8_cmp(str_c, str_a));
 }
 
 TEST(strings_strings_test, str8_cmp_nocase) {
@@ -52,7 +52,19 @@ TEST(strings_strings_test, str8_cmp_nocase) {
   str8 str_a = str8_from_cstr(buf1, sizeof(buf1), "Hello");
   str8 str_b = str8_from_cstr(buf2, sizeof(buf2), "HELLO");
 
-  EXPECT_EQ(0, str8_cmp_nocase(str_a, str_b));
+  EXPECT_TRUE(str8_cmp_nocase(str_a, str_b));
+}
+
+TEST(strings_strings_test, str8_to_u64) {
+  c8 buf[32];
+  str8 str = str8_from_cstr(buf, sizeof(buf), "42");
+  u64 value = 0;
+
+  EXPECT_TRUE(str8_to_u64(str, 100, &value));
+  EXPECT_EQ(42U, value);
+
+  str = str8_from_cstr(buf, sizeof(buf), "200");
+  EXPECT_FALSE(str8_to_u64(str, 100, &value));
 }
 
 TEST(strings_strings_test, str8_find) {
@@ -368,7 +380,7 @@ TEST(strings_strings_test, str16_cmp) {
   str16 str_a = str16_from_cstr(buf1, sizeof(buf1), src);
   str16 str_b = str16_from_cstr(buf2, sizeof(buf2), src);
 
-  EXPECT_EQ(0, str16_cmp(str_a, str_b));
+  EXPECT_TRUE(str16_cmp(str_a, str_b));
 }
 
 TEST(strings_strings_test, str16_find) {
@@ -585,7 +597,7 @@ TEST(strings_strings_test, str32_cmp) {
   str32 str_a = str32_from_cstr(buf1, sizeof(buf1), src);
   str32 str_b = str32_from_cstr(buf2, sizeof(buf2), src);
 
-  EXPECT_EQ(0, str32_cmp(str_a, str_b));
+  EXPECT_TRUE(str32_cmp(str_a, str_b));
 }
 
 TEST(strings_strings_test, str32_find) {

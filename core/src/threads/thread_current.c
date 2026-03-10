@@ -8,8 +8,8 @@
 #include "basic/utility_defines.h"
 #include "basic/profiler.h"
 
-// Tracks the scheduling priority of the current thread; defaults to NORMAL (OS default).
-thread_local global_var thread_priority tls_priority = THREAD_PRIORITY_NORMAL;
+// Tracks the scheduling priority of the current thread; defaults to MEDIUM (OS default).
+thread_local global_var thread_priority tls_priority = THREAD_PRIORITY_MEDIUM;
 
 // Mapping of our thread_priority enum to SDL_ThreadPriority values.
 const_var SDL_ThreadPriority sdl_priorities[] = {

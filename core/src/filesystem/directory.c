@@ -150,7 +150,7 @@ func path dir_relative_path(const path* root_path, const path* full_path) {
     return relative_path;
   }
 
-  if (cstr8_cmp_n(relative_path.buf, root_copy.buf, root_len) == 0) {
+  if (cstr8_cmp_n(relative_path.buf, root_copy.buf, root_len)) {
     if (relative_path.buf[root_len] == '/') {
       memmove(
           relative_path.buf,
@@ -399,7 +399,7 @@ func b32 dir_path_is_same_or_child(const path* root_path, const path* child_path
     return false;
   }
 
-  if (cstr8_cmp_n(root_abs.buf, child_abs.buf, root_len) != 0) {
+  if (!cstr8_cmp_n(root_abs.buf, child_abs.buf, root_len)) {
     profile_func_end;
     return false;
   }
@@ -528,7 +528,7 @@ func b32 dir_copy_recursive(const path* src, const path* dst, b32 overwrite_exis
                     src_abs.buf,
                     dst_abs.buf);
     profile_func_end;
-    return cstr8_cmp(src_abs.buf, dst_abs.buf) == 0 ? true : false;
+    return cstr8_cmp(src_abs.buf, dst_abs.buf);
   }
 
   if (path_exists(dst)) {

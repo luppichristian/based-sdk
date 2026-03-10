@@ -13,9 +13,7 @@
 #include <time.h>
 
 func uuid uuid_zero(void) {
-  profile_func_begin;
   uuid value = {0};
-  profile_func_end;
   return value;
 }
 
@@ -283,17 +281,14 @@ func b32 uuid_to_str32(uuid value, str32* dst) {
   return success;
 }
 
-func uuid uuid_generate_v4(void) {
-  profile_func_begin;
-  local_persist b32 seeded = false;
-  if (!seeded) {
-    srand((unsigned int)time(NULL));
-    seeded = 1;
+func uuid uuid_generate_v4(random_series* series) {
+  if (!series) {
+    return uuid_zero();
   }
-
+  profile_func_begin;
   uuid value = {0};
   for (sz idx = 0; idx < count_of(value.bytes); idx++) {
-    value.bytes[idx] = (u8)(rand() & 0xFF);
+    value.bytes[idx] = random_series_u8(series);
   }
 
   // RFC 4122 variant + version 4.
