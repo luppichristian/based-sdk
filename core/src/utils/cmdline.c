@@ -54,7 +54,7 @@ func b32 cmdline_find(cmdline cmdl, cstr8 arg, sz* out_idx) {
   profile_func_begin;
   if (arg == NULL || cmdl.args == NULL) {
     profile_func_end;
-    return 0;
+    return false;
   }
   assert(arg[0] != '\0');
 
@@ -65,12 +65,12 @@ func b32 cmdline_find(cmdline cmdl, cstr8 arg, sz* out_idx) {
         *out_idx = idx;
       }
       profile_func_end;
-      return 1;
+      return true;
     }
   }
 
   profile_func_end;
-  return 0;
+  return false;
 }
 
 func b32 cmdline_has(cmdline cmdl, cstr8 arg) {
@@ -133,14 +133,14 @@ func b32 cmdline_get_option_i64(cmdline cmdl, cstr8 name, i64* out) {
   profile_func_begin;
   if (out == NULL) {
     profile_func_end;
-    return 0;
+    return false;
   }
   assert(out != NULL);
 
   cstr8 value = cmdline_get_option(cmdl, name);
   if (value == NULL) {
     profile_func_end;
-    return 0;
+    return false;
   }
 
   profile_func_end;
@@ -151,14 +151,14 @@ func b32 cmdline_get_option_f64(cmdline cmdl, cstr8 name, f64* out) {
   profile_func_begin;
   if (out == NULL) {
     profile_func_end;
-    return 0;
+    return false;
   }
   assert(out != NULL);
 
   cstr8 value = cmdline_get_option(cmdl, name);
   if (value == NULL) {
     profile_func_end;
-    return 0;
+    return false;
   }
 
   profile_func_end;

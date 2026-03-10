@@ -18,6 +18,7 @@ typedef struct tree_links {
   struct tree_links* prev_sibling;
 } tree_links;
 
+// TODO: Can we convert this into a macro without using a fixed type?
 // Returns the next node in a pre-order traversal.
 func force_inline void* tree_next_preorder_ptr(void* root_ptr, void* node_ptr) {
   tree_links* root_node = (tree_links*)root_ptr;

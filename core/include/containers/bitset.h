@@ -53,6 +53,7 @@ c_begin;
       }                                                                 \
     })
 
+// TODO: Can we implement this directly in the macro?
 // Returns the first set bit at or after from_idx, or -1 when not found.
 func force_inline i32 bitset_find_next_set(const u64* arr, sz word_count, i32 from_idx) {
   i32 next_idx = from_idx < 0 ? 0 : from_idx;

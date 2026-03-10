@@ -29,6 +29,7 @@ func b32 ctx_init(ctx* context, allocator main_allocator, mutex allocator_mutex,
     return false;
   }
 
+  // TODO: Can we make these configurable?
   context->perm_arena = arena_create(main_allocator, allocator_mutex, CTX_DEFAULT_BLOCK_SIZE);
   context->temp_arena = arena_create(main_allocator, allocator_mutex, CTX_DEFAULT_BLOCK_SIZE);
   context->perm_heap = heap_create(main_allocator, allocator_mutex, CTX_DEFAULT_BLOCK_SIZE);

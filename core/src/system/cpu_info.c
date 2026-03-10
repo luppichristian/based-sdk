@@ -24,6 +24,7 @@
 #  include <cpuid.h>
 #endif
 
+// TODO: We have functions for this....
 func void cpu_copy_string(c8* dst_ptr, sz dst_cap, cstr8 src_ptr) {
   profile_func_begin;
   if (dst_ptr == NULL || dst_cap == 0) {

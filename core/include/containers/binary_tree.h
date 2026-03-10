@@ -10,6 +10,8 @@
 c_begin;
 // =========================================================================
 
+// TODO: This is all wrong....
+
 typedef struct binary_tree_links {
   struct binary_tree_links* left;
   struct binary_tree_links* right;

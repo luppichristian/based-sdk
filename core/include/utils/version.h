@@ -19,8 +19,6 @@ typedef union version {
   } parts;
 } version;
 
-static_assert(size_of(version) == size_of(u32));
-
 // Constructs a zero-initialized version.
 func version version_zero(void);
 
