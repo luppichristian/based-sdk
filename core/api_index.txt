@@ -1034,10 +1034,6 @@
 123: func b32 cstr8_to_i64(cstr8 str, i64* out);
 127: func b32 cstr8_to_u64(cstr8 str, u64 max_value, u64* out);
 131: func b32 cstr8_to_f64(cstr8 str, f64* out);
-133: typedef struct cstr8_tokenizer {
-139: func cstr8_tokenizer cstr8_tokenizer_make(cstr8 src, cstr8 delim);
-140: func b32 cstr8_tokenizer_next(cstr8_tokenizer* tok, c8* out_buf, sz out_cap);
-141: func sz cstr8_join(c8* dst, sz dst_cap, cstr8 const* parts, sz part_count, cstr8 delim);
 144: func sz cstr16_len(cstr16 str);
 147: func b32 cstr16_is_empty(cstr16 str);
 150: func void cstr16_clear(c16* str);
@@ -1144,8 +1140,6 @@
 119: func b32 str8_remove_suffix(str8* str, cstr8 suffix);
 123: func sz str8_replace(str8* str, cstr8 from, cstr8 rep);
 126: func void str8_beautify(str8* str);
-127: func b32 str8_split_next(cstr8_tokenizer* tok, str8* out_token);
-128: func b32 str8_join(str8* dst, cstr8 const* parts, sz part_count, cstr8 delim);
 137: typedef struct str16 {
 144: func str16 str16_make(c16* ptr, sz cap);
 147: func str16 str16_empty(c16* ptr, sz cap);

@@ -40,8 +40,9 @@ typedef struct dir_copy_state {
 
 func path dir_path_from_string(cstr8 src) {
   profile_func_begin;
+  path res = path_from_cstr(src != NULL ? src : "");
   profile_func_end;
-  return path_from_cstr(src != NULL ? src : "");
+  return res;
 }
 
 func path dir_path_from_owned_string(c8* src) {

@@ -235,32 +235,6 @@ TEST(strings_cstrings_test, cstr8_to_f64) {
   EXPECT_FALSE(success != 0);
 }
 
-TEST(strings_cstrings_test, cstr8_tokenizer) {
-  cstr8_tokenizer tok = cstr8_tokenizer_make("a,b,c", ",");
-  c8 buf[16];
-
-  EXPECT_TRUE(cstr8_tokenizer_next(&tok, buf, sizeof(buf)) != 0);
-  EXPECT_STREQ("a", buf);
-
-  EXPECT_TRUE(cstr8_tokenizer_next(&tok, buf, sizeof(buf)) != 0);
-  EXPECT_STREQ("b", buf);
-
-  EXPECT_TRUE(cstr8_tokenizer_next(&tok, buf, sizeof(buf)) != 0);
-  EXPECT_STREQ("c", buf);
-
-  EXPECT_TRUE(cstr8_tokenizer_next(&tok, buf, sizeof(buf)) != 0);
-  EXPECT_STREQ("", buf);
-
-  EXPECT_FALSE(cstr8_tokenizer_next(&tok, buf, sizeof(buf)) != 0);
-}
-
-TEST(strings_cstrings_test, cstr8_join) {
-  c8 buf[64];
-  c8 const* parts[] = {"a", "b", "c"};
-  sz len = cstr8_join(buf, sizeof(buf), parts, 3, ",");
-  EXPECT_STREQ("a,b,c", buf);
-}
-
 TEST(strings_cstrings_test, cstr8_to_cstr16) {
   c8 src[] = "hello";
   c16 dst[16];

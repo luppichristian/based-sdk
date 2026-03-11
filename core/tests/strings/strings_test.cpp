@@ -291,38 +291,6 @@ TEST(strings_strings_test, str8_beautify) {
   EXPECT_STREQ("Hello world", str.ptr);
 }
 
-TEST(strings_strings_test, str8_split_next) {
-  c8 buf[64];
-  str8 src = str8_from_cstr(buf, sizeof(buf), "a,b,c");
-  cstr8_tokenizer tok = cstr8_tokenizer_make(src.ptr, ",");
-  c8 token_buf[16] = {0};
-  str8 token = str8_empty(token_buf, sizeof(token_buf));
-
-  EXPECT_TRUE(str8_split_next(&tok, &token) != 0);
-  EXPECT_STREQ("a", token.ptr);
-
-  EXPECT_TRUE(str8_split_next(&tok, &token) != 0);
-  EXPECT_STREQ("b", token.ptr);
-
-  EXPECT_TRUE(str8_split_next(&tok, &token) != 0);
-  EXPECT_STREQ("c", token.ptr);
-
-  EXPECT_TRUE(str8_split_next(&tok, &token) != 0);
-  EXPECT_STREQ("", token.ptr);
-
-  EXPECT_FALSE(str8_split_next(&tok, &token) != 0);
-}
-
-TEST(strings_strings_test, str8_join) {
-  c8 buf[64];
-  str8 dst = str8_empty(buf, sizeof(buf));
-  c8 const* parts[] = {"a", "b", "c"};
-
-  b32 success = str8_join(&dst, parts, 3, ",");
-  EXPECT_TRUE(success != 0);
-  EXPECT_STREQ("a,b,c", dst.ptr);
-}
-
 TEST(strings_strings_test, str8_to_str16) {
   c8 src_buf[32];
   c16 dst_buf[32];

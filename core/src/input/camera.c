@@ -46,14 +46,10 @@ func b32 camera_id_is_valid(camera src) {
 }
 
 func camera camera_from_native_id(up native_id) {
-  profile_func_begin;
-  profile_func_end;
   return (camera)(up)native_id;
 }
 
 func up camera_to_native_id(camera src) {
-  profile_func_begin;
-  profile_func_end;
   return (up)src;
 }
 

@@ -34,14 +34,10 @@ func b32 window_id_is_valid(window src) {
 }
 
 func window window_from_native_id(up native_id) {
-  profile_func_begin;
-  profile_func_end;
   return (window)(up)native_id;
 }
 
 func up window_to_native_id(window src) {
-  profile_func_begin;
-  profile_func_end;
   return (up)src;
 }
 

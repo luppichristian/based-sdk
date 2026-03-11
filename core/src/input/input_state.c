@@ -270,8 +270,6 @@ func void input_state_apply_msg(input_state* src, const msg* event_msg) {
 }
 
 func sz input_state_serialized_size(void) {
-  profile_func_begin;
-  profile_func_end;
   return size_of(input_state_blob_header) + size_of(input_state);
 }
 

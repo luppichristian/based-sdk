@@ -211,8 +211,9 @@ func path path_join_cstr(const path* lhs, cstr8 rhs) {
 
 func path path_join(const path* lhs, const path* rhs) {
   profile_func_begin;
+  path res = path_join_cstr(lhs, path_buf(rhs));
   profile_func_end;
-  return path_join_cstr(lhs, path_buf(rhs));
+  return res;
 }
 
 func sz path_append_cstr(path* dst, cstr8 src) {

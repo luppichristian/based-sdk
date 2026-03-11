@@ -280,8 +280,9 @@ func b32 cstr8_scan(cstr8 str, cstr8 fmt, ...) {
 
 func cstr8 cstr8_find(cstr8 str, cstr8 sub) {
   profile_func_begin;
+  cstr8 res = strstr(str, sub);
   profile_func_end;
-  return strstr(str, sub);
+  return res;
 }
 
 func cstr8 cstr8_find_last(cstr8 str, cstr8 sub) {
@@ -309,14 +310,16 @@ func cstr8 cstr8_find_last(cstr8 str, cstr8 sub) {
 
 func cstr8 cstr8_find_char(cstr8 str, c8 chr) {
   profile_func_begin;
+  cstr8 res = strchr(str, (int)(unsigned char)chr);
   profile_func_end;
-  return strchr(str, (int)(unsigned char)chr);
+  return res;
 }
 
 func cstr8 cstr8_find_last_char(cstr8 str, c8 chr) {
   profile_func_begin;
+  cstr8 res = strrchr(str, (int)(unsigned char)chr);
   profile_func_end;
-  return strrchr(str, (int)(unsigned char)chr);
+  return res;
 }
 
 func sz cstr8_count_char(cstr8 str, c8 chr) {
@@ -580,86 +583,6 @@ func b32 cstr8_to_f64(cstr8 str, f64* out) {
   return true;
 }
 
-func cstr8_tokenizer cstr8_tokenizer_make(cstr8 src, cstr8 delim) {
-  profile_func_begin;
-  cstr8_tokenizer tok = {0};
-  tok.src = src != NULL ? src : "";
-  tok.delim = delim != NULL ? delim : "";
-  tok.cursor = 0;
-  profile_func_end;
-  return tok;
-}
-
-func b32 cstr8_tokenizer_next(cstr8_tokenizer* tok, c8* out_buf, sz out_cap) {
-  profile_func_begin;
-  if (tok == NULL || out_buf == NULL || out_cap == 0) {
-    profile_func_end;
-    return false;
-  }
-
-  sz src_len = cstr8_len(tok->src);
-  sz delim_len = cstr8_len(tok->delim);
-  if (tok->cursor > src_len) {
-    profile_func_end;
-    return false;
-  }
-
-  if (tok->cursor == src_len) {
-    out_buf[0] = '\0';
-    tok->cursor = src_len + 1;
-    profile_func_end;
-    return true;
-  }
-
-  sz start = tok->cursor;
-  sz end = src_len;
-  if (delim_len > 0) {
-    cstr8 found = cstr8_find(tok->src + start, tok->delim);
-    if (found != NULL) {
-      end = start + (sz)(found - (tok->src + start));
-      tok->cursor = end + delim_len;
-    } else {
-      tok->cursor = src_len;
-    }
-  } else {
-    tok->cursor = src_len;
-  }
-
-  sz token_len = end - start;
-  if (token_len >= out_cap) {
-    token_len = out_cap - 1;
-  }
-  memcpy(out_buf, tok->src + start, token_len);
-  out_buf[token_len] = '\0';
-  profile_func_end;
-  return true;
-}
-
-func sz cstr8_join(c8* dst, sz dst_cap, cstr8 const* parts, sz part_count, cstr8 delim) {
-  profile_func_begin;
-  if (dst == NULL || dst_cap == 0) {
-    profile_func_end;
-    return 0;
-  }
-  dst[0] = '\0';
-  if (parts == NULL || part_count == 0) {
-    profile_func_end;
-    return 0;
-  }
-
-  sz delim_len = cstr8_len(delim != NULL ? delim : "");
-  sz total_len = 0;
-  for (sz part_idx = 0; part_idx < part_count; part_idx++) {
-    if (part_idx > 0 && delim_len > 0) {
-      total_len = cstr8_cat(dst, dst_cap, delim);
-    }
-    total_len = cstr8_cat(dst, dst_cap, parts[part_idx] != NULL ? parts[part_idx] : "");
-  }
-
-  profile_func_end;
-  return total_len;
-}
-
 // =========================================================================
 // cstr16 — Helpers for ASCII narrowing (for parsing)
 // =========================================================================
@@ -702,13 +625,12 @@ func b32 cstr32_to_ascii(cstr32 str, c8* buf, sz buf_size) {
 
 func sz cstr16_len(cstr16 str) {
   profile_func_begin;
+  sz res = cstr16_len_impl(str);
   profile_func_end;
-  return cstr16_len_impl(str);
+  return res;
 }
 
 func b32 cstr16_is_empty(cstr16 str) {
-  profile_func_begin;
-  profile_func_end;
   return str[0] == (c16)'\0' ? true : false;
 }
 
@@ -1159,13 +1081,12 @@ func b32 cstr16_to_f64(cstr16 str, f64* out) {
 
 func sz cstr32_len(cstr32 str) {
   profile_func_begin;
+  sz res = cstr32_len_impl(str);
   profile_func_end;
-  return cstr32_len_impl(str);
+  return res;
 }
 
 func b32 cstr32_is_empty(cstr32 str) {
-  profile_func_begin;
-  profile_func_end;
   return str[0] == (c32)'\0' ? true : false;
 }
 

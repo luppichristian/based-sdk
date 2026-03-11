@@ -91,8 +91,9 @@ func b32 uuid_equal(uuid lhs, uuid rhs) {
 
 func i32 uuid_cmp(uuid lhs, uuid rhs) {
   profile_func_begin;
+  i32 res = memcmp(lhs.bytes, rhs.bytes, size_of(lhs.bytes));
   profile_func_end;
-  return memcmp(lhs.bytes, rhs.bytes, size_of(lhs.bytes));
+  return res;
 }
 
 func u8 uuid_get_version(uuid value) {

@@ -34,8 +34,9 @@ func process_options process_options_captured(void) {
 
 func process _process_create(cstr8 const* args, callsite site) {
   profile_func_begin;
+  process res = _process_create_with(args, process_options_default(), site);
   profile_func_end;
-  return _process_create_with(args, process_options_default(), site);
+  return res;
 }
 
 func process _process_create_with(cstr8 const* args, process_options options, callsite site) {

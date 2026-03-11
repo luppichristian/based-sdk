@@ -15,14 +15,10 @@ func b32 monitor_id_is_valid(monitor src) {
 }
 
 func monitor monitor_from_native_id(up native_id) {
-  profile_func_begin;
-  profile_func_end;
   return (monitor)(up)native_id;
 }
 
 func up monitor_to_native_id(monitor src) {
-  profile_func_begin;
-  profile_func_end;
   return (up)src;
 }
 

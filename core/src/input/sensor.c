@@ -46,14 +46,10 @@ func b32 sensor_id_is_valid(sensor src) {
 }
 
 func sensor sensor_from_native_id(up native_id) {
-  profile_func_begin;
-  profile_func_end;
   return (sensor)(up)native_id;
 }
 
 func up sensor_to_native_id(sensor src) {
-  profile_func_begin;
-  profile_func_end;
   return (up)src;
 }
 

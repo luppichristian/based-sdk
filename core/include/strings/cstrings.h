@@ -134,17 +134,6 @@ func b32 cstr8_to_u64(cstr8 str, u64 max_value, u64* out);
 // Returns 1 on success, 0 on invalid input.
 func b32 cstr8_to_f64(cstr8 str, f64* out);
 
-typedef struct cstr8_tokenizer {
-  cstr8 src;
-  cstr8 delim;
-  sz cursor;
-} cstr8_tokenizer;
-
-// Tokenizer and join helpers.
-func cstr8_tokenizer cstr8_tokenizer_make(cstr8 src, cstr8 delim);
-func b32 cstr8_tokenizer_next(cstr8_tokenizer* tok, c8* out_buf, sz out_cap);
-func sz cstr8_join(c8* dst, sz dst_cap, cstr8 const* parts, sz part_count, cstr8 delim);
-
 // =========================================================================
 // cstr16 — Null-terminated UTF-16 string utilities
 // =========================================================================

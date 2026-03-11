@@ -312,8 +312,6 @@ func b32 hash_map_remove(hash_map* map, u64 key) {
 // =========================================================================
 
 func hash_map_iter hash_map_iter_begin(void) {
-  profile_func_begin;
-  profile_func_end;
   return 0;
 }
 

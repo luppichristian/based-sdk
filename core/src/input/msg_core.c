@@ -33,8 +33,6 @@ func void msg_fill_core_raw(msg* src, u32 default_type, const void* core_data_pt
 }
 
 func b32 msg_core_is_valid(const msg* src, b32 matches_type) {
-  profile_func_begin;
-  profile_func_end;
   return src != NULL && src->category == MSG_CATEGORY_CORE && matches_type;
 }
 

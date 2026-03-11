@@ -349,8 +349,9 @@ func b32 bindings_remove(u32 binding_id) {
 
 func b32 bindings_has(u32 binding_id) {
   profile_func_begin;
+  b32 res = bindings_find_slot_by_id(binding_id) < BINDINGS_MAX_COUNT;
   profile_func_end;
-  return bindings_find_slot_by_id(binding_id) < BINDINGS_MAX_COUNT;
+  return res;
 }
 
 func b32 bindings_set_enabled(u32 binding_id, b32 enabled) {

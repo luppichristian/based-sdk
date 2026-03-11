@@ -53,14 +53,10 @@ global_var u32 msg_user_space_bases[MSG_CATEGORY_MAX] = {0};
 func b32 msg_remove_handler(u64 handler_id);
 
 func b32 msg_category_is_valid(msg_category category) {
-  profile_func_begin;
-  profile_func_end;
   return category >= MSG_CATEGORY_CORE && category < MSG_CATEGORY_MAX;
 }
 
 func b32 msg_category_needs_user_space(msg_category category) {
-  profile_func_begin;
-  profile_func_end;
   return category > MSG_CATEGORY_CORE && category < MSG_CATEGORY_MAX;
 }
 

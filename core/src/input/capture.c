@@ -69,8 +69,9 @@ func sz input_capture_get_slot(input_key key) {
 
 func b32 input_capture_acquire_key(input_key key) {
   profile_func_begin;
+  b32 res = input_capture_get_slot(key) < INPUT_CAPTURE_MAX_KEYS;
   profile_func_end;
-  return input_capture_get_slot(key) < INPUT_CAPTURE_MAX_KEYS;
+  return res;
 }
 
 func void input_capture_release_key(input_key key) {

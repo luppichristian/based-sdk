@@ -272,8 +272,6 @@ func void log_state_quit(log_state* state) {
 }
 
 func b32 log_state_is_init(log_state* state) {
-  profile_func_begin;
-  profile_func_end;
   return state != NULL && state->is_init;
 }
 

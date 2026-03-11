@@ -111,14 +111,10 @@ func u64 devices_audio_encode_instance(u64 native_id, audio_device_type audio_ty
 }
 
 func u64 devices_audio_decode_native_id(u64 instance) {
-  profile_func_begin;
-  profile_func_end;
   return instance & ~DEVICES_AUDIO_RECORDING_BIT;
 }
 
 func b32 audio_device_type_is_valid(audio_device_type src) {
-  profile_func_begin;
-  profile_func_end;
   return src == AUDIO_DEVICE_TYPE_PLAYBACK || src == AUDIO_DEVICE_TYPE_RECORDING;
 }
 
@@ -306,8 +302,6 @@ func b32 devices_find_tablet_info(device_id id, device_info* out_info) {
 }
 
 func b32 device_id_is_valid(device_id src) {
-  profile_func_begin;
-  profile_func_end;
   return src.type != DEVICE_TYPE_UNKNOWN && src.instance != 0;
 }
 

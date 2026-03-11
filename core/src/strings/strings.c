@@ -46,81 +46,91 @@ func str8 str8_from_cstr(c8* ptr, sz cap, cstr8 src) {
 }
 
 func b32 str8_is_empty(str8 str) {
-  profile_func_begin;
-  profile_func_end;
   return str.size == 0 ? true : false;
 }
 
 func b32 str8_cmp(str8 lhs, str8 rhs) {
   profile_func_begin;
+  b32 res = cstr8_cmp(lhs.ptr, rhs.ptr);
   profile_func_end;
-  return cstr8_cmp(lhs.ptr, rhs.ptr);
+  return res;
 }
 
 func b32 str8_cmp_nocase(str8 lhs, str8 rhs) {
   profile_func_begin;
+  b32 res = cstr8_cmp_nocase(lhs.ptr, rhs.ptr);
   profile_func_end;
-  return cstr8_cmp_nocase(lhs.ptr, rhs.ptr);
+  return res;
 }
 
 func cstr8 str8_find(str8 str, cstr8 sub) {
   profile_func_begin;
+  cstr8 res = cstr8_find(str.ptr, sub);
   profile_func_end;
-  return cstr8_find(str.ptr, sub);
+  return res;
 }
 
 func cstr8 str8_find_char(str8 str, c8 chr) {
   profile_func_begin;
+  cstr8 res = cstr8_find_char(str.ptr, chr);
   profile_func_end;
-  return cstr8_find_char(str.ptr, chr);
+  return res;
 }
 
 func cstr8 str8_find_last(str8 str, cstr8 sub) {
   profile_func_begin;
+  cstr8 res = cstr8_find_last(str.ptr, sub);
   profile_func_end;
-  return cstr8_find_last(str.ptr, sub);
+  return res;
 }
 
 func cstr8 str8_find_last_char(str8 str, c8 chr) {
   profile_func_begin;
+  cstr8 res = cstr8_find_last_char(str.ptr, chr);
   profile_func_end;
-  return cstr8_find_last_char(str.ptr, chr);
+  return res;
 }
 
 func sz str8_count_char(str8 str, c8 chr) {
   profile_func_begin;
+  sz res = cstr8_count_char(str.ptr, chr);
   profile_func_end;
-  return cstr8_count_char(str.ptr, chr);
+  return res;
 }
 
 func b32 str8_starts_with(str8 str, cstr8 prefix) {
   profile_func_begin;
+  b32 res = cstr8_starts_with(str.ptr, prefix);
   profile_func_end;
-  return cstr8_starts_with(str.ptr, prefix);
+  return res;
 }
 
 func b32 str8_ends_with(str8 str, cstr8 suffix) {
   profile_func_begin;
+  b32 res = cstr8_ends_with(str.ptr, suffix);
   profile_func_end;
-  return cstr8_ends_with(str.ptr, suffix);
+  return res;
 }
 
 func b32 str8_to_i64(str8 str, i64* out) {
   profile_func_begin;
+  b32 res = cstr8_to_i64(str.ptr, out);
   profile_func_end;
-  return cstr8_to_i64(str.ptr, out);
+  return res;
 }
 
 func b32 str8_to_u64(str8 str, u64 max_value, u64* out) {
   profile_func_begin;
+  b32 res = cstr8_to_u64(str.ptr, max_value, out);
   profile_func_end;
-  return cstr8_to_u64(str.ptr, max_value, out);
+  return res;
 }
 
 func b32 str8_to_f64(str8 str, f64* out) {
   profile_func_begin;
+  b32 res = cstr8_to_f64(str.ptr, out);
   profile_func_end;
-  return cstr8_to_f64(str.ptr, out);
+  return res;
 }
 
 func void str8_clear(str8* str) {
@@ -283,29 +293,6 @@ func void str8_beautify(str8* str) {
   profile_func_end;
 }
 
-func b32 str8_split_next(cstr8_tokenizer* tok, str8* out_token) {
-  profile_func_begin;
-  if (tok == NULL || out_token == NULL || out_token->ptr == NULL || out_token->cap == 0) {
-    profile_func_end;
-    return false;
-  }
-  b32 result = cstr8_tokenizer_next(tok, out_token->ptr, out_token->cap);
-  out_token->size = cstr8_len(out_token->ptr);
-  profile_func_end;
-  return result;
-}
-
-func b32 str8_join(str8* dst, cstr8 const* parts, sz part_count, cstr8 delim) {
-  profile_func_begin;
-  if (dst == NULL || dst->ptr == NULL || dst->cap == 0) {
-    profile_func_end;
-    return false;
-  }
-  dst->size = cstr8_join(dst->ptr, dst->cap, parts, part_count, delim);
-  profile_func_end;
-  return true;
-}
-
 // =========================================================================
 // str16
 // =========================================================================
@@ -342,75 +329,84 @@ func str16 str16_from_cstr(c16* ptr, sz cap, cstr16 src) {
 }
 
 func b32 str16_is_empty(str16 str) {
-  profile_func_begin;
-  profile_func_end;
   return str.size == 0 ? true : false;
 }
 
 func b32 str16_cmp(str16 lhs, str16 rhs) {
   profile_func_begin;
+  b32 res = cstr16_cmp(lhs.ptr, rhs.ptr);
   profile_func_end;
-  return cstr16_cmp(lhs.ptr, rhs.ptr);
+  return res;
 }
 
 func b32 str16_cmp_nocase(str16 lhs, str16 rhs) {
   profile_func_begin;
+  b32 res = cstr16_cmp_nocase(lhs.ptr, rhs.ptr);
   profile_func_end;
-  return cstr16_cmp_nocase(lhs.ptr, rhs.ptr);
+  return res;
 }
 
 func cstr16 str16_find(str16 str, cstr16 sub) {
   profile_func_begin;
+  cstr16 res = cstr16_find(str.ptr, sub);
   profile_func_end;
-  return cstr16_find(str.ptr, sub);
+  return res;
 }
 
 func cstr16 str16_find_char(str16 str, c16 chr) {
   profile_func_begin;
+  cstr16 res = cstr16_find_char(str.ptr, chr);
   profile_func_end;
-  return cstr16_find_char(str.ptr, chr);
+  return res;
 }
 
 func cstr16 str16_find_last(str16 str, cstr16 sub) {
   profile_func_begin;
+  cstr16 res = cstr16_find_last(str.ptr, sub);
   profile_func_end;
-  return cstr16_find_last(str.ptr, sub);
+  return res;
 }
 
 func cstr16 str16_find_last_char(str16 str, c16 chr) {
   profile_func_begin;
+  cstr16 res = cstr16_find_last_char(str.ptr, chr);
   profile_func_end;
-  return cstr16_find_last_char(str.ptr, chr);
+  return res;
 }
 
 func sz str16_count_char(str16 str, c16 chr) {
   profile_func_begin;
+  sz res = cstr16_count_char(str.ptr, chr);
   profile_func_end;
-  return cstr16_count_char(str.ptr, chr);
+  return res;
 }
 
 func b32 str16_starts_with(str16 str, cstr16 prefix) {
   profile_func_begin;
+  b32 res = cstr16_starts_with(str.ptr, prefix);
   profile_func_end;
-  return cstr16_starts_with(str.ptr, prefix);
+  return res;
 }
 
 func b32 str16_ends_with(str16 str, cstr16 suffix) {
   profile_func_begin;
+  b32 res = cstr16_ends_with(str.ptr, suffix);
   profile_func_end;
-  return cstr16_ends_with(str.ptr, suffix);
+  return res;
 }
 
 func b32 str16_to_i64(str16 str, i64* out) {
   profile_func_begin;
+  b32 res = cstr16_to_i64(str.ptr, out);
   profile_func_end;
-  return cstr16_to_i64(str.ptr, out);
+  return res;
 }
 
 func b32 str16_to_f64(str16 str, f64* out) {
   profile_func_begin;
+  b32 res = cstr16_to_f64(str.ptr, out);
   profile_func_end;
-  return cstr16_to_f64(str.ptr, out);
+  return res;
 }
 
 func void str16_clear(str16* str) {
@@ -561,75 +557,84 @@ func str32 str32_from_cstr(c32* ptr, sz cap, cstr32 src) {
 }
 
 func b32 str32_is_empty(str32 str) {
-  profile_func_begin;
-  profile_func_end;
   return str.size == 0 ? true : false;
 }
 
 func b32 str32_cmp(str32 lhs, str32 rhs) {
   profile_func_begin;
+  b32 res = cstr32_cmp(lhs.ptr, rhs.ptr);
   profile_func_end;
-  return cstr32_cmp(lhs.ptr, rhs.ptr);
+  return res;
 }
 
 func b32 str32_cmp_nocase(str32 lhs, str32 rhs) {
   profile_func_begin;
+  b32 res = cstr32_cmp_nocase(lhs.ptr, rhs.ptr);
   profile_func_end;
-  return cstr32_cmp_nocase(lhs.ptr, rhs.ptr);
+  return res;
 }
 
 func cstr32 str32_find(str32 str, cstr32 sub) {
   profile_func_begin;
+  cstr32 res = cstr32_find(str.ptr, sub);
   profile_func_end;
-  return cstr32_find(str.ptr, sub);
+  return res;
 }
 
 func cstr32 str32_find_char(str32 str, c32 chr) {
   profile_func_begin;
+  cstr32 res = cstr32_find_char(str.ptr, chr);
   profile_func_end;
-  return cstr32_find_char(str.ptr, chr);
+  return res;
 }
 
 func cstr32 str32_find_last(str32 str, cstr32 sub) {
   profile_func_begin;
+  cstr32 res = cstr32_find_last(str.ptr, sub);
   profile_func_end;
-  return cstr32_find_last(str.ptr, sub);
+  return res;
 }
 
 func cstr32 str32_find_last_char(str32 str, c32 chr) {
   profile_func_begin;
+  cstr32 res = cstr32_find_last_char(str.ptr, chr);
   profile_func_end;
-  return cstr32_find_last_char(str.ptr, chr);
+  return res;
 }
 
 func sz str32_count_char(str32 str, c32 chr) {
   profile_func_begin;
+  sz res = cstr32_count_char(str.ptr, chr);
   profile_func_end;
-  return cstr32_count_char(str.ptr, chr);
+  return res;
 }
 
 func b32 str32_starts_with(str32 str, cstr32 prefix) {
   profile_func_begin;
+  b32 res = cstr32_starts_with(str.ptr, prefix);
   profile_func_end;
-  return cstr32_starts_with(str.ptr, prefix);
+  return res;
 }
 
 func b32 str32_ends_with(str32 str, cstr32 suffix) {
   profile_func_begin;
+  b32 res = cstr32_ends_with(str.ptr, suffix);
   profile_func_end;
-  return cstr32_ends_with(str.ptr, suffix);
+  return res;
 }
 
 func b32 str32_to_i64(str32 str, i64* out) {
   profile_func_begin;
+  b32 res = cstr32_to_i64(str.ptr, out);
   profile_func_end;
-  return cstr32_to_i64(str.ptr, out);
+  return res;
 }
 
 func b32 str32_to_f64(str32 str, f64* out) {
   profile_func_begin;
+  b32 res = cstr32_to_f64(str.ptr, out);
   profile_func_end;
-  return cstr32_to_f64(str.ptr, out);
+  return res;
 }
 
 func void str32_clear(str32* str) {

@@ -131,8 +131,9 @@ func b32 vmem_platform_free(void* ptr, sz size) {
 
 func sz vmem_page_size(void) {
   profile_func_begin;
+  sz res = (sz)sysconf(_SC_PAGESIZE);
   profile_func_end;
-  return (sz)sysconf(_SC_PAGESIZE);
+  return res;
 }
 
 func void* vmem_reserve(sz size) {
@@ -218,8 +219,6 @@ func b32 vmem_platform_free(void* ptr, sz size) {
 #  include <stdlib.h>
 
 func sz vmem_page_size(void) {
-  profile_func_begin;
-  profile_func_end;
   return 4096;
 }
 
@@ -302,8 +301,6 @@ typedef union vmem_alloc_header {
 } vmem_alloc_header;
 
 func vmem_alloc_header* vmem_get_alloc_header(void* ptr) {
-  profile_func_begin;
-  profile_func_end;
   return ((vmem_alloc_header*)ptr) - 1;
 }
 
