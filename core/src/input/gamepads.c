@@ -7,6 +7,7 @@
 #include "input/msg_core.h"
 #include "../sdl3_include.h"
 #include "basic/profiler.h"
+#include "basic/safe.h"
 
 typedef struct gamepad_slot_state {
   SDL_JoystickID id;
@@ -53,7 +54,7 @@ func u32 gamepads_next_generation(u32 value) {
 
 func sz gamepads_find_slot_by_instance(SDL_JoystickID joystick_id) {
   profile_func_begin;
-  for (sz slot_idx = 0; slot_idx < GAMEPADS_MAX_COUNT; slot_idx += 1) {
+  safe_for (sz slot_idx = 0; slot_idx < GAMEPADS_MAX_COUNT; slot_idx += 1) {
     if (gamepad_slots[slot_idx].handle != NULL && gamepad_slots[slot_idx].id == joystick_id) {
       profile_func_end;
       return slot_idx;
@@ -71,11 +72,11 @@ func void gamepads_sync_slots(void) {
   int count = 0;
 
   ids = SDL_GetGamepads(&count);
-  for (sz slot_idx = 0; ids && slot_idx < GAMEPADS_MAX_COUNT && slot_idx < (sz)count; slot_idx += 1) {
+  safe_for (sz slot_idx = 0; ids && slot_idx < GAMEPADS_MAX_COUNT && slot_idx < (sz)count; slot_idx += 1) {
     desired_ids[slot_idx] = ids[slot_idx];
   }
 
-  for (sz slot_idx = 0; slot_idx < GAMEPADS_MAX_COUNT; slot_idx += 1) {
+  safe_for (sz slot_idx = 0; slot_idx < GAMEPADS_MAX_COUNT; slot_idx += 1) {
     if (!desired_ids[slot_idx]) {
       gamepads_release_slot(slot_idx);
       continue;
@@ -101,7 +102,7 @@ func void gamepads_sync_slots(void) {
 func sz gamepads_get_count(void) {
   gamepads_sync_slots();
 
-  for (sz slot_idx = 0; slot_idx < GAMEPADS_MAX_COUNT; slot_idx += 1) {
+  safe_for (sz slot_idx = 0; slot_idx < GAMEPADS_MAX_COUNT; slot_idx += 1) {
     if (!gamepad_slots[slot_idx].handle) {
           return slot_idx;
     }

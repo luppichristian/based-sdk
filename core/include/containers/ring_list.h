@@ -5,6 +5,7 @@
 
 #include "basic/primitive_types.h"
 #include "basic/utility_defines.h"
+#include "basic/safe.h"
 
 // =========================================================================
 c_begin;
@@ -30,10 +31,13 @@ Example:
     (count) = 0;                           \
     typeof(head) _node = (head);           \
     if (_node != nullptr) {                \
-      do {                                 \
+      safe_while (true) {                  \
         (count)++;                         \
         _node = _node->next;               \
-      } while (_node != (head));           \
+        if (_node == (head)) {             \
+          break;                           \
+        }                                  \
+      }                                    \
     })
 
 #define RING_LIST_HEAD(head) (head)
@@ -118,14 +122,14 @@ Example:
       (head) = (node);                                    \
     })
 
-#define RING_LIST_FOREACH(head, it)                                           \
-  for (typeof((head)) it = (head), _ring_head_##it = (head); (it) != nullptr; \
-       (it) = ((it)->next != _ring_head_##it ? (it)->next : nullptr))
+#define RING_LIST_FOREACH(head, it)                                               \
+  safe_for(typeof((head)) it = (head), _ring_head_##it = (head); (it) != nullptr; \
+           (it) = ((it)->next != _ring_head_##it ? (it)->next : nullptr))
 
-#define RING_LIST_FOREACH_REVERSE(head, it)                                                        \
-  for (typeof((head)) it = ((head) != nullptr ? (head)->prev : nullptr), _ring_head_##it = (head); \
-       (it) != nullptr;                                                                            \
-       (it) = ((it) != _ring_head_##it ? (it)->prev : nullptr))
+#define RING_LIST_FOREACH_REVERSE(head, it)                                                            \
+  safe_for(typeof((head)) it = ((head) != nullptr ? (head)->prev : nullptr), _ring_head_##it = (head); \
+           (it) != nullptr;                                                                            \
+           (it) = ((it) != _ring_head_##it ? (it)->prev : nullptr))
 
 // =========================================================================
 c_end;

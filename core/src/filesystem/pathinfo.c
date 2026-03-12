@@ -9,6 +9,7 @@
 #include "filesystem/file.h"
 #include "basic/profiler.h"
 #include "platform_includes.h"
+#include "basic/safe.h"
 
 #if defined(PLATFORM_WINDOWS)
 func timestamp filesystem_timestamp_from_filetime(FILETIME value) {
@@ -59,7 +60,7 @@ func cstr8 filesystem_name_ptr(cstr8 src) {
     return "";
   }
 
-  for (item_idx = 0; src[item_idx] != '\0'; item_idx += 1) {
+  safe_for (item_idx = 0; src[item_idx] != '\0'; item_idx += 1) {
     if (src[item_idx] == '/' || src[item_idx] == '\\') {
       last_sep = src + item_idx + 1;
     }
@@ -105,7 +106,7 @@ func cstr8 filesystem_name_ptr(cstr8 src) {
     return "";
   }
 
-  for (item_idx = 0; src[item_idx] != '\0'; item_idx += 1) {
+  safe_for (item_idx = 0; src[item_idx] != '\0'; item_idx += 1) {
     if (src[item_idx] == '/' || src[item_idx] == '\\') {
       last_sep = src + item_idx + 1;
     }

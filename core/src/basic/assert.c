@@ -14,6 +14,7 @@
 #include "processes/process_current.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include "basic/safe.h"
 
 // =========================================================================
 // Internal state
@@ -47,7 +48,7 @@ func void assert_log_stacktrace(callsite site) {
   }
 
   _log(thread_get_log_state(), LOG_LEVEL_FATAL, site, "Stack trace:");
-  for (sz frame_idx = 0; frame_idx < captured_count; ++frame_idx) {
+  safe_for (sz frame_idx = 0; frame_idx < captured_count; ++frame_idx) {
     _log(
         thread_get_log_state(),
         LOG_LEVEL_FATAL,
@@ -102,7 +103,7 @@ func assert_action assert_dialog(cstr8 msg, callsite site) {
   if (captured_count == 0) {
     cstr8_format(buf + write_offset, size_of(buf) - write_offset, "  <unavailable>\n");
   } else {
-    for (sz frame_idx = 0; frame_idx < captured_count; ++frame_idx) {
+    safe_for (sz frame_idx = 0; frame_idx < captured_count; ++frame_idx) {
       i32 line_len = cstr8_format(
           buf + write_offset,
           size_of(buf) - write_offset,

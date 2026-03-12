@@ -4,6 +4,7 @@
 #include "input/msg.h"
 #include "input/msg_core.h"
 #include "basic/profiler.h"
+#include "basic/safe.h"
 
 // =========================================================================
 // Core Message Packing
@@ -21,12 +22,12 @@ func void msg_fill_core_raw(msg* src, u32 default_type, const void* core_data_pt
     src->type = default_type;
   }
 
-  for (sz byte_idx = 0; byte_idx < size_of(src->data); byte_idx += 1) {
+  safe_for (sz byte_idx = 0; byte_idx < size_of(src->data); byte_idx += 1) {
     src->data[byte_idx] = 0;
   }
 
   const u8* src_bytes = (const u8*)core_data_ptr;
-  for (sz byte_idx = 0; byte_idx < core_data_size; byte_idx += 1) {
+  safe_for (sz byte_idx = 0; byte_idx < core_data_size; byte_idx += 1) {
     src->data[byte_idx] = src_bytes[byte_idx];
   }
   profile_func_end;

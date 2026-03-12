@@ -5,6 +5,7 @@
 
 #include "basic/primitive_types.h"
 #include "basic/utility_defines.h"
+#include "basic/safe.h"
 
 // =========================================================================
 c_begin;
@@ -31,7 +32,7 @@ Example:
 // Traversal helpers.
 #define BINARY_TREE_FIRST_INORDER(root, out) stmt(       \
     (out) = (root);                                      \
-    while ((out) != nullptr && (out)->left != nullptr) { \
+    safe_while ((out) != nullptr && (out)->left != nullptr) { \
       (out) = (out)->left;                               \
     })
 
@@ -42,12 +43,12 @@ Example:
     if (_binary_tree_root != nullptr && _binary_tree_cursor != nullptr) {                  \
       if (_binary_tree_cursor->right != nullptr) {                                         \
         _binary_tree_cursor = _binary_tree_cursor->right;                                  \
-        while (_binary_tree_cursor->left != nullptr) {                                     \
+        safe_while (_binary_tree_cursor->left != nullptr) {                                     \
           _binary_tree_cursor = _binary_tree_cursor->left;                                 \
         }                                                                                  \
         (out) = _binary_tree_cursor;                                                       \
       } else {                                                                             \
-        while (_binary_tree_cursor != _binary_tree_root) {                                 \
+        safe_while (_binary_tree_cursor != _binary_tree_root) {                                 \
           typeof((_binary_tree_cursor)) _binary_tree_parent = _binary_tree_cursor->parent; \
           if (_binary_tree_cursor == _binary_tree_parent->left) {                          \
             (out) = _binary_tree_parent;                                                   \
@@ -60,7 +61,7 @@ Example:
 
 #define BINARY_TREE_FIRST_POSTORDER(root, out) stmt(                                  \
     (out) = (root);                                                                   \
-    while ((out) != nullptr && ((out)->left != nullptr || (out)->right != nullptr)) { \
+    safe_while ((out) != nullptr && ((out)->left != nullptr || (out)->right != nullptr)) { \
       (out) = (out)->left != nullptr ? (out)->left : (out)->right;                    \
     })
 
@@ -74,7 +75,7 @@ Example:
         (out) = _binary_tree_parent;                                                                                           \
       } else {                                                                                                                 \
         _binary_tree_cursor = _binary_tree_parent->right;                                                                      \
-        while (_binary_tree_cursor->left != nullptr || _binary_tree_cursor->right != nullptr) {                                \
+        safe_while (_binary_tree_cursor->left != nullptr || _binary_tree_cursor->right != nullptr) {                                \
           _binary_tree_cursor = _binary_tree_cursor->left != nullptr ? _binary_tree_cursor->left : _binary_tree_cursor->right; \
         }                                                                                                                      \
         (out) = _binary_tree_cursor;                                                                                           \
@@ -91,7 +92,7 @@ Example:
       } else if (_binary_tree_cursor->right != nullptr) {                                                  \
         (out) = _binary_tree_cursor->right;                                                                \
       } else {                                                                                             \
-        while (_binary_tree_cursor != _binary_tree_root) {                                                 \
+        safe_while (_binary_tree_cursor != _binary_tree_root) {                                                 \
           typeof((_binary_tree_cursor)) _binary_tree_parent = _binary_tree_cursor->parent;                 \
           if (_binary_tree_cursor == _binary_tree_parent->left && _binary_tree_parent->right != nullptr) { \
             (out) = _binary_tree_parent->right;                                                            \
@@ -153,16 +154,16 @@ Example:
 
 // Typed traversal macros.
 #define BINARY_TREE_FOREACH_PREORDER(root, it)        \
-  for (typeof(((root))) it = (root); (it) != nullptr; \
+  safe_for (typeof(((root))) it = (root); (it) != nullptr; \
        (it) = ({ typeof((root)) _binary_tree_next = nullptr; BINARY_TREE_NEXT_PREORDER((root), (it), _binary_tree_next); _binary_tree_next; }))
 
 #define BINARY_TREE_FOREACH_INORDER(root, it) \
-  for (typeof(((root))) it = ({ typeof((root)) _binary_tree_first = nullptr; BINARY_TREE_FIRST_INORDER((root), _binary_tree_first); _binary_tree_first; });           \
+  safe_for (typeof(((root))) it = ({ typeof((root)) _binary_tree_first = nullptr; BINARY_TREE_FIRST_INORDER((root), _binary_tree_first); _binary_tree_first; });           \
        (it) != nullptr;                       \
        (it) = ({ typeof((root)) _binary_tree_next = nullptr; BINARY_TREE_NEXT_INORDER((root), (it), _binary_tree_next); _binary_tree_next; }))
 
 #define BINARY_TREE_FOREACH_POSTORDER(root, it) \
-  for (typeof(((root))) it = ({ typeof((root)) _binary_tree_first = nullptr; BINARY_TREE_FIRST_POSTORDER((root), _binary_tree_first); _binary_tree_first; });             \
+  safe_for (typeof(((root))) it = ({ typeof((root)) _binary_tree_first = nullptr; BINARY_TREE_FIRST_POSTORDER((root), _binary_tree_first); _binary_tree_first; });             \
        (it) != nullptr;                         \
        (it) = ({ typeof((root)) _binary_tree_next = nullptr; BINARY_TREE_NEXT_POSTORDER((root), (it), _binary_tree_next); _binary_tree_next; }))
 

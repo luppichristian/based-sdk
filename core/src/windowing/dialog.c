@@ -7,6 +7,7 @@
 #include "basic/profiler.h"
 #include "windowing/window.h"
 #include "../sdl3_include.h"
+#include "basic/safe.h"
 
 typedef struct dialog_callback_ctx {
   dialog_file_callback* callback;
@@ -191,7 +192,7 @@ func b32 dialog_show_message_box(
       return false;
     }
 
-    for (int idx = 0; idx < button_count; ++idx) {
+    safe_for (int idx = 0; idx < button_count; ++idx) {
       const dialog_message_box_button* button = &message_box->buttons[idx];
       sdl_buttons[idx].flags = dialog_to_sdl_message_box_button_flags(button->flags);
       sdl_buttons[idx].buttonID = button->button_id;

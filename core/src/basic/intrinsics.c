@@ -5,6 +5,7 @@
 #include "basic/assert.h"
 #include "basic/profiler.h"
 #include "../sdl3_include.h"
+#include "basic/safe.h"
 
 #if defined(COMPILER_MSVC)
 #  include <intrin.h>
@@ -27,7 +28,7 @@ func i32 popcount_u32(u32 val) {
   return res;
 #else
   i32 cnt = 0;
-  while (val) {
+  safe_while (val) {
     cnt += (i32)(val & 1U);
     val >>= 1;
   }
@@ -48,7 +49,7 @@ func i32 popcount_u64(u64 val) {
   return res;
 #else
   i32 cnt = 0;
-  while (val) {
+  safe_while (val) {
     cnt += (i32)(val & 1ULL);
     val >>= 1;
   }
@@ -80,7 +81,7 @@ func i32 ctz_u32(u32 val) {
   return res;
 #else
   i32 cnt = 0;
-  while ((val & 1U) == 0U) {
+  safe_while ((val & 1U) == 0U) {
     cnt++;
     val >>= 1;
   }
@@ -108,7 +109,7 @@ func i32 ctz_u64(u64 val) {
   return res;
 #else
   i32 cnt = 0;
-  while ((val & 1ULL) == 0ULL) {
+  safe_while ((val & 1ULL) == 0ULL) {
     cnt++;
     val >>= 1;
   }
@@ -141,7 +142,7 @@ func i32 clz_u32(u32 val) {
 #else
   i32 cnt = 0;
   u32 msk = 0x80000000U;
-  while (msk != 0U && (val & msk) == 0U) {
+  safe_while (msk != 0U && (val & msk) == 0U) {
     cnt++;
     msk >>= 1U;
   }
@@ -170,7 +171,7 @@ func i32 clz_u64(u64 val) {
 #else
   i32 cnt = 0;
   u64 msk = 0x8000000000000000ULL;
-  while (msk != 0ULL && (val & msk) == 0ULL) {
+  safe_while (msk != 0ULL && (val & msk) == 0ULL) {
     cnt++;
     msk >>= 1U;
   }
@@ -203,7 +204,7 @@ func i32 bsr_u32(u32 val) {
 #else
   i32 pos = 31;
   u32 msk = 0x80000000U;
-  while (msk != 0U) {
+  safe_while (msk != 0U) {
     if ((val & msk) != 0U) {
       profile_func_end;
       return pos;
@@ -236,7 +237,7 @@ func i32 bsr_u64(u64 val) {
 #else
   i32 pos = 63;
   u64 msk = 0x8000000000000000ULL;
-  while (msk != 0ULL) {
+  safe_while (msk != 0ULL) {
     if ((val & msk) != 0ULL) {
       profile_func_end;
       return pos;

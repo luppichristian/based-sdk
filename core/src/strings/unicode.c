@@ -4,6 +4,7 @@
 #include "strings/unicode.h"
 #include "basic/assert.h"
 #include "basic/profiler.h"
+#include "basic/safe.h"
 
 // =========================================================================
 // Validity
@@ -100,7 +101,7 @@ func c32 utf8_decode(cstr8 ptr, sz* consumed) {
   c32 codepoint = (c32)(first & LEAD_MASKS[byte_cnt - 1]);
 
   // Accumulate continuation bytes.
-  for (sz idx = 1; idx < byte_cnt; idx++) {
+  safe_for (sz idx = 1; idx < byte_cnt; idx++) {
     u8 cont = (u8)ptr[idx];
     if ((cont & 0xC0U) != 0x80U) {
       // Truncated sequence: consume what we have.
@@ -158,7 +159,7 @@ func sz utf8_codepoint_count(cstr8 src, sz src_size) {
   profile_func_begin;
   sz count = 0;
   sz idx = 0;
-  while (idx < src_size) {
+  safe_while (idx < src_size) {
     sz consumed;
     utf8_decode(src + idx, &consumed);
     idx += consumed;
@@ -235,7 +236,7 @@ func sz utf16_codepoint_count(cstr16 src, sz src_size) {
   profile_func_begin;
   sz count = 0;
   sz idx = 0;
-  while (idx < src_size) {
+  safe_while (idx < src_size) {
     sz consumed;
     utf16_decode(src + idx, &consumed);
     idx += consumed;
@@ -253,7 +254,7 @@ func sz utf16_codepoint_count(cstr16 src, sz src_size) {
 // When dst is NULL the write is skipped (count-only mode).
 static void emit_c8(c8* dst, sz dst_cap, sz* out_cnt, cstr8 units, sz unit_cnt) {
   if (dst != NULL && *out_cnt + unit_cnt <= dst_cap) {
-    for (sz idx = 0; idx < unit_cnt; idx++) {
+    safe_for (sz idx = 0; idx < unit_cnt; idx++) {
       dst[*out_cnt + idx] = units[idx];
     }
   }
@@ -262,7 +263,7 @@ static void emit_c8(c8* dst, sz dst_cap, sz* out_cnt, cstr8 units, sz unit_cnt) 
 
 static void emit_c16(c16* dst, sz dst_cap, sz* out_cnt, cstr16 units, sz unit_cnt) {
   if (dst != NULL && *out_cnt + unit_cnt <= dst_cap) {
-    for (sz idx = 0; idx < unit_cnt; idx++) {
+    safe_for (sz idx = 0; idx < unit_cnt; idx++) {
       dst[*out_cnt + idx] = units[idx];
     }
   }
@@ -284,7 +285,7 @@ func sz utf8_to_utf16(cstr8 src, sz src_size, c16* dst, sz dst_cap) {
   profile_func_begin;
   sz out_cnt = 0;
   sz idx = 0;
-  while (idx < src_size) {
+  safe_while (idx < src_size) {
     sz consumed;
     c32 codepoint = utf8_decode(src + idx, &consumed);
     idx += consumed;
@@ -301,7 +302,7 @@ func sz utf8_to_utf32(cstr8 src, sz src_size, c32* dst, sz dst_cap) {
   profile_func_begin;
   sz out_cnt = 0;
   sz idx = 0;
-  while (idx < src_size) {
+  safe_while (idx < src_size) {
     sz consumed;
     c32 codepoint = utf8_decode(src + idx, &consumed);
     idx += consumed;
@@ -319,7 +320,7 @@ func sz utf16_to_utf8(cstr16 src, sz src_size, c8* dst, sz dst_cap) {
   profile_func_begin;
   sz out_cnt = 0;
   sz idx = 0;
-  while (idx < src_size) {
+  safe_while (idx < src_size) {
     sz consumed;
     c32 codepoint = utf16_decode(src + idx, &consumed);
     idx += consumed;
@@ -336,7 +337,7 @@ func sz utf16_to_utf32(cstr16 src, sz src_size, c32* dst, sz dst_cap) {
   profile_func_begin;
   sz out_cnt = 0;
   sz idx = 0;
-  while (idx < src_size) {
+  safe_while (idx < src_size) {
     sz consumed;
     c32 codepoint = utf16_decode(src + idx, &consumed);
     idx += consumed;
@@ -353,7 +354,7 @@ func sz utf16_to_utf32(cstr16 src, sz src_size, c32* dst, sz dst_cap) {
 func sz utf32_to_utf8(cstr32 src, sz src_size, c8* dst, sz dst_cap) {
   profile_func_begin;
   sz out_cnt = 0;
-  for (sz idx = 0; idx < src_size; idx++) {
+  safe_for (sz idx = 0; idx < src_size; idx++) {
     c32 codepoint = unicode_is_valid(src[idx]) ? src[idx] : UNICODE_REPLACEMENT_CHAR;
     c8 units[4];
     sz unit_cnt = utf8_encode(codepoint, units);
@@ -366,7 +367,7 @@ func sz utf32_to_utf8(cstr32 src, sz src_size, c8* dst, sz dst_cap) {
 func sz utf32_to_utf16(cstr32 src, sz src_size, c16* dst, sz dst_cap) {
   profile_func_begin;
   sz out_cnt = 0;
-  for (sz idx = 0; idx < src_size; idx++) {
+  safe_for (sz idx = 0; idx < src_size; idx++) {
     c32 codepoint = unicode_is_valid(src[idx]) ? src[idx] : UNICODE_REPLACEMENT_CHAR;
     c16 units[2];
     sz unit_cnt = utf16_encode(codepoint, units);

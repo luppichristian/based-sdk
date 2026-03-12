@@ -4,6 +4,7 @@
 #include "input/capture.h"
 #include "basic/assert.h"
 #include "basic/profiler.h"
+#include "basic/safe.h"
 
 global_var input_key input_capture_keys[INPUT_CAPTURE_MAX_KEYS] = {0};
 global_var b32 input_capture_used[INPUT_CAPTURE_MAX_KEYS] = {0};
@@ -31,7 +32,7 @@ func void input_capture_ensure_default_slot(void) {
 
 func sz input_capture_find_slot(input_key key) {
   profile_func_begin;
-  for (sz slot_idx = 0; slot_idx < INPUT_CAPTURE_MAX_KEYS; slot_idx += 1) {
+  safe_for (sz slot_idx = 0; slot_idx < INPUT_CAPTURE_MAX_KEYS; slot_idx += 1) {
     if (input_capture_used[slot_idx] && input_capture_keys[slot_idx] == key) {
       profile_func_end;
       return slot_idx;
@@ -53,7 +54,7 @@ func sz input_capture_get_slot(input_key key) {
     return found_idx;
   }
 
-  for (sz slot_idx = 1; slot_idx < INPUT_CAPTURE_MAX_KEYS; slot_idx += 1) {
+  safe_for (sz slot_idx = 1; slot_idx < INPUT_CAPTURE_MAX_KEYS; slot_idx += 1) {
     if (!input_capture_used[slot_idx]) {
       input_capture_keys[slot_idx] = key;
       input_capture_used[slot_idx] = 1;
@@ -98,7 +99,7 @@ func void input_capture_release_all_keys(void) {
   profile_func_begin;
   input_capture_ensure_default_slot();
 
-  for (sz slot_idx = 1; slot_idx < INPUT_CAPTURE_MAX_KEYS; slot_idx += 1) {
+  safe_for (sz slot_idx = 1; slot_idx < INPUT_CAPTURE_MAX_KEYS; slot_idx += 1) {
     input_capture_keys[slot_idx] = 0;
     input_capture_used[slot_idx] = 0;
   }

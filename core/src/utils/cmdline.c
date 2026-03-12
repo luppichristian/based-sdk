@@ -5,6 +5,7 @@
 #include "basic/assert.h"
 #include "strings/cstrings.h"
 #include "basic/profiler.h"
+#include "basic/safe.h"
 
 func cmdline cmdline_build(sz count, c8** args) {
   profile_func_begin;
@@ -51,7 +52,7 @@ func b32 cmdline_find(cmdline cmdl, cstr8 arg, sz* out_idx) {
   }
   assert(arg[0] != '\0');
 
-  for (sz idx = 0; idx < cmdl.count; idx++) {
+  safe_for (sz idx = 0; idx < cmdl.count; idx++) {
     cstr8 value = cmdline_get_arg(cmdl, idx);
     if (value != NULL && cstr8_cmp(value, arg)) {
       if (out_idx != NULL) {
@@ -99,7 +100,7 @@ func cstr8 cmdline_get_option(cmdline cmdl, cstr8 name) {
     lookup_len = cstr8_len(lookup_name);
   }
 
-  for (sz idx = 1; idx < cmdl.count; idx++) {
+  safe_for (sz idx = 1; idx < cmdl.count; idx++) {
     cstr8 value = cmdline_get_arg(cmdl, idx);
     if (value == NULL) {
       continue;

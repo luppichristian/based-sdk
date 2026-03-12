@@ -13,6 +13,7 @@
 #include "memory/memops.h"
 #include <string.h>
 #include <miniz.h>
+#include "basic/safe.h"
 
 func sz archive_find_idx(const archive* arc, const path* src) {
   profile_func_begin;
@@ -23,7 +24,7 @@ func sz archive_find_idx(const archive* arc, const path* src) {
     return SZ_MAX;
   }
 
-  for (item_idx = 0; item_idx < arc->entry_count; item_idx += 1) {
+  safe_for (item_idx = 0; item_idx < arc->entry_count; item_idx += 1) {
     if (path_cmd_normd(&arc->entries[item_idx].item_path, src)) {
       profile_func_end;
       return item_idx;
@@ -51,7 +52,7 @@ func b32 archive_reserve(archive* arc, sz min_capacity) {
   }
 
   new_capacity = arc->entry_capacity == 0 ? 8 : arc->entry_capacity;
-  while (new_capacity < min_capacity) {
+  safe_while (new_capacity < min_capacity) {
     if (new_capacity > SZ_MAX / 2) {
       new_capacity = min_capacity;
       break;
@@ -291,7 +292,7 @@ func void archive_clear(archive* arc) {
   }
   assert(arc->entry_count <= arc->entry_capacity);
 
-  for (item_idx = 0; item_idx < arc->entry_count; item_idx += 1) {
+  safe_for (item_idx = 0; item_idx < arc->entry_count; item_idx += 1) {
     archive_reset_entry(arc, &arc->entries[item_idx]);
   }
 
@@ -498,7 +499,7 @@ func b32 archive_iterate(
     return false;
   }
 
-  for (item_idx = 0; item_idx < arc->entry_count; item_idx += 1) {
+  safe_for (item_idx = 0; item_idx < arc->entry_count; item_idx += 1) {
     info.item_path = arc->entries[item_idx].item_path;
     info.data_size = arc->entries[item_idx].data_size;
     info.is_directory = arc->entries[item_idx].is_directory;
@@ -608,7 +609,7 @@ func b32 archive_load_file(archive* arc, const path* src) {
   }
 
   file_count = mz_zip_reader_get_num_files(&zip_archive);
-  for (file_idx = 0; file_idx < file_count; file_idx += 1) {
+  safe_for (file_idx = 0; file_idx < file_count; file_idx += 1) {
     mz_zip_archive_file_stat file_stat;
     path item_path;
     sz item_idx = 0;
@@ -703,7 +704,7 @@ func b32 archive_save_file(const archive* arc, const path* dst) {
     return false;
   }
 
-  for (item_idx = 0; item_idx < arc->entry_count; item_idx += 1) {
+  safe_for (item_idx = 0; item_idx < arc->entry_count; item_idx += 1) {
     const archive_entry* ent = &arc->entries[item_idx];
     path item_path = ent->item_path;
 

@@ -5,6 +5,7 @@
 #include "context/thread_ctx.h"
 #include "../sdl3_include.h"
 #include "basic/profiler.h"
+#include "basic/safe.h"
 
 typedef struct sensor_state_entry {
   SDL_SensorID sensor_id;
@@ -17,7 +18,7 @@ global_var sensor_state_entry sensor_states[SENSOR_STATE_CAP] = {0};
 
 func sensor_state_entry* sensor_find_state(SDL_SensorID sensor_id, b32 create_if_missing) {
   profile_func_begin;
-  for (sz item_idx = 0; item_idx < SENSOR_STATE_CAP; item_idx += 1) {
+  safe_for (sz item_idx = 0; item_idx < SENSOR_STATE_CAP; item_idx += 1) {
     if (sensor_states[item_idx].sensor_id == sensor_id) {
       profile_func_end;
       return &sensor_states[item_idx];
@@ -27,7 +28,7 @@ func sensor_state_entry* sensor_find_state(SDL_SensorID sensor_id, b32 create_if
     profile_func_end;
     return NULL;
   }
-  for (sz item_idx = 0; item_idx < SENSOR_STATE_CAP; item_idx += 1) {
+  safe_for (sz item_idx = 0; item_idx < SENSOR_STATE_CAP; item_idx += 1) {
     if (sensor_states[item_idx].sensor_id == 0) {
       sensor_states[item_idx].sensor_id = sensor_id;
       profile_func_end;

@@ -5,6 +5,7 @@
 
 #include "basic/primitive_types.h"
 #include "basic/utility_defines.h"
+#include "basic/safe.h"
 
 // =========================================================================
 c_begin;
@@ -40,7 +41,7 @@ Example:
       if (_tree_cursor->first_child != nullptr) {                                     \
         (out) = _tree_cursor->first_child;                                            \
       } else {                                                                        \
-        while (_tree_cursor != _tree_root && _tree_cursor->next_sibling == nullptr) { \
+        safe_while (_tree_cursor != _tree_root && _tree_cursor->next_sibling == nullptr) { \
           _tree_cursor = _tree_cursor->parent;                                        \
         }                                                                             \
         if (_tree_cursor != _tree_root) {                                             \
@@ -110,13 +111,13 @@ Example:
 
 // Typed traversal macros.
 #define TREE_FOREACH_CHILDREN(parent, it) \
-  for (typeof(((parent)->first_child)) it = (parent)->first_child; (it) != nullptr; (it) = (it)->next_sibling)
+  safe_for (typeof(((parent)->first_child)) it = (parent)->first_child; (it) != nullptr; (it) = (it)->next_sibling)
 
 #define TREE_FOREACH_CHILDREN_REVERSE(parent, it) \
-  for (typeof(((parent)->last_child)) it = (parent)->last_child; (it) != nullptr; (it) = (it)->prev_sibling)
+  safe_for (typeof(((parent)->last_child)) it = (parent)->last_child; (it) != nullptr; (it) = (it)->prev_sibling)
 
 #define TREE_FOREACH_PREORDER(root, it)               \
-  for (typeof(((root))) it = (root); (it) != nullptr; \
+  safe_for (typeof(((root))) it = (root); (it) != nullptr; \
        (it) = ({ typeof((root)) _tree_next = nullptr; TREE_NEXT_PREORDER((root), (it), _tree_next); _tree_next; }))
 
 // =========================================================================

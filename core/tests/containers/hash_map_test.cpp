@@ -104,7 +104,7 @@ TEST(containers_hash_map_test, load_factor) {
 
   EXPECT_EQ(0.0F, hash_map_load_factor(&map));
 
-  for (i32 i = 0; i < 8; i++) {
+  safe_for (i32 i = 0; i < 8; i++) {
     hash_map_set(&map, (u64)i, &map);
   }
 

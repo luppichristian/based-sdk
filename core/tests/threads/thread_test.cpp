@@ -52,7 +52,7 @@ TEST(threads_thread_test, get_id) {
   EXPECT_NE(0, thread_is_valid(thd));
 
   u64 thread_identifier = 0;
-  for (i32 idx = 0; idx < 100 && thread_identifier == 0; idx++) {
+  safe_for (i32 idx = 0; idx < 100 && thread_identifier == 0; idx++) {
     thread_identifier = thread_get_id(thd);
     if (thread_identifier == 0) {
       thread_sleep(1);
@@ -75,16 +75,16 @@ TEST(threads_thread_test, multiple_threads) {
   i32 results[num_threads] = {0, 0, 0, 0};
 
   thread threads[num_threads];
-  for (i32 i = 0; i < num_threads; i++) {
+  safe_for (i32 i = 0; i < num_threads; i++) {
     threads[i] = thread_create(thread_entry_simple, &results[i], (ctx_setup) {0});
     EXPECT_NE(0, thread_is_valid(threads[i]));
   }
 
-  for (i32 i = 0; i < num_threads; i++) {
+  safe_for (i32 i = 0; i < num_threads; i++) {
     thread_join(threads[i], nullptr);
   }
 
-  for (i32 i = 0; i < num_threads; i++) {
+  safe_for (i32 i = 0; i < num_threads; i++) {
     EXPECT_EQ(42, results[i]);
   }
 }
@@ -105,22 +105,22 @@ TEST(threads_thread_test, parallel_execution) {
 
   auto entry = [](void* arg) -> i32 {
     i32* counter = static_cast<i32*>(arg);
-    for (i32 i = 0; i < iterations; i++) {
+    safe_for (i32 i = 0; i < iterations; i++) {
       (*counter)++;
     }
     return 0;
   };
 
   thread threads[num_threads];
-  for (i32 i = 0; i < num_threads; i++) {
+  safe_for (i32 i = 0; i < num_threads; i++) {
     threads[i] = thread_create(entry, &counters[i], (ctx_setup) {0});
   }
 
-  for (i32 i = 0; i < num_threads; i++) {
+  safe_for (i32 i = 0; i < num_threads; i++) {
     thread_join(threads[i], nullptr);
   }
 
-  for (i32 i = 0; i < num_threads; i++) {
+  safe_for (i32 i = 0; i < num_threads; i++) {
     EXPECT_EQ(iterations, counters[i]);
   }
 }

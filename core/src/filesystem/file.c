@@ -12,6 +12,7 @@
 #include "platform_includes.h"
 
 #include <stdio.h>
+#include "basic/safe.h"
 
 func b32 file_paths_equal(const path* lhs, const path* rhs) {
   profile_func_begin;
@@ -49,7 +50,7 @@ func b32 file_make_temp_path(const path* src, path* out_path) {
     return false;
   }
 
-  for (attempt_idx = 0; attempt_idx < 32; attempt_idx += 1) {
+  safe_for (attempt_idx = 0; attempt_idx < 32; attempt_idx += 1) {
     tmp_path = *src;
     if (!cstr8_append_format(tmp_path.buf, size_of(tmp_path.buf), ".tmp.%u", attempt_idx)) {
       profile_func_end;
@@ -187,7 +188,7 @@ func b32 file_cpy(const path* src, const path* dst, b32 overwrite_existing) {
     return false;
   }
 
-  for (;;) {
+  safe_for (;;) {
     read_size = (sz)SDL_ReadIO(src_file, cpy_buf, size_of(cpy_buf));
     if (read_size == 0) {
       break;

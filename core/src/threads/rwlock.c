@@ -9,6 +9,7 @@
 #include "../sdl3_include.h"
 #include "basic/profiler.h"
 #include "threads/atomics.h"
+#include "basic/safe.h"
 
 func rwlock _rwlock_create(callsite site) {
   profile_func_begin;
@@ -156,7 +157,7 @@ func b32 rwlock_timed_read_lock(rwlock rw, i32 timeout_ms) {
   }
 
   u64 start_ticks = SDL_GetTicks();
-  while (!rwlock_try_read_lock(rw)) {
+  safe_while (!rwlock_try_read_lock(rw)) {
     if ((i32)(SDL_GetTicks() - start_ticks) >= timeout_ms) {
       thread_log_warn("Rwlock timed read lock expired handle=%p timeout_ms=%d", rw, timeout_ms);
       profile_func_end;
@@ -179,7 +180,7 @@ func b32 rwlock_timed_write_lock(rwlock rw, i32 timeout_ms) {
   }
 
   u64 start_ticks = SDL_GetTicks();
-  while (!rwlock_try_write_lock(rw)) {
+  safe_while (!rwlock_try_write_lock(rw)) {
     if ((i32)(SDL_GetTicks() - start_ticks) >= timeout_ms) {
       thread_log_warn("Rwlock timed write lock expired handle=%p timeout_ms=%d", rw, timeout_ms);
       profile_func_end;

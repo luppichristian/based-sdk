@@ -12,6 +12,7 @@
 #include "basic/profiler.h"
 #include "memory/memops.h"
 #include <string.h>
+#include "basic/safe.h"
 
 // =========================================================================
 // Internal Helpers
@@ -249,7 +250,7 @@ func b32 arena_remove_block(arena* arn, void* ptr) {
   arena_block* prev = NULL;
   arena_block* blk = arn->blocks_head;
 
-  while (blk) {
+  safe_while (blk) {
     if ((void*)blk == ptr) {
       if (prev) {
         prev->next = blk->next;

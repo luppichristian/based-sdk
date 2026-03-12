@@ -13,8 +13,9 @@
 #include "basic/keyword_defines.h"
 #include "basic/primitive_types.h"
 #include "basic/profiler.h"
-#include "basic/utility_defines.h"
+#include "basic/safe.h"
 #include "basic/third_party.h"
+#include "basic/utility_defines.h"
 
 // Include container modules.
 #include "containers/binary_tree.h"

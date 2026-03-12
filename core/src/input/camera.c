@@ -5,6 +5,7 @@
 #include "context/thread_ctx.h"
 #include "../sdl3_include.h"
 #include "basic/profiler.h"
+#include "basic/safe.h"
 
 typedef struct camera_state_entry {
   SDL_CameraID camera_id;
@@ -17,7 +18,7 @@ global_var camera_state_entry camera_states[CAMERA_STATE_CAP] = {0};
 
 func camera_state_entry* camera_find_state(SDL_CameraID camera_id, b32 create_if_missing) {
   profile_func_begin;
-  for (sz item_idx = 0; item_idx < CAMERA_STATE_CAP; item_idx += 1) {
+  safe_for (sz item_idx = 0; item_idx < CAMERA_STATE_CAP; item_idx += 1) {
     if (camera_states[item_idx].camera_id == camera_id) {
       profile_func_end;
       return &camera_states[item_idx];
@@ -27,7 +28,7 @@ func camera_state_entry* camera_find_state(SDL_CameraID camera_id, b32 create_if
     profile_func_end;
     return NULL;
   }
-  for (sz item_idx = 0; item_idx < CAMERA_STATE_CAP; item_idx += 1) {
+  safe_for (sz item_idx = 0; item_idx < CAMERA_STATE_CAP; item_idx += 1) {
     if (camera_states[item_idx].camera_id == 0) {
       camera_states[item_idx].camera_id = camera_id;
       profile_func_end;

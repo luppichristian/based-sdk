@@ -89,7 +89,7 @@ TEST(memory_scratch_test, nested_allocations_released) {
 
   scratch scr = scratch_begin(&arn);
 
-  for (int i = 0; i < 100; i++) {
+  safe_for (int i = 0; i < 100; i++) {
     void* ptr = arena_alloc(&arn, 128, 8);
     EXPECT_NE(nullptr, ptr);
   }
@@ -119,7 +119,7 @@ TEST(memory_scratch_test, preserve_original_allocation) {
   scratch_end(&scr);
 
   bool data_preserved = true;
-  for (int i = 0; i < 100; i++) {
+  safe_for (int i = 0; i < 100; i++) {
     if (original[i] != 0xAA) {
       data_preserved = false;
       break;

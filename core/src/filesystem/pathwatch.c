@@ -9,6 +9,7 @@
 #include "basic/profiler.h"
 
 #include <efsw/efsw.h>
+#include "basic/safe.h"
 
 typedef struct pathwatch_binding {
   pathwatch_id pathwatch_id;
@@ -60,7 +61,7 @@ func pathwatch_binding* pathwatch_find_binding(void* native_handle) {
   profile_func_begin;
   pathwatch_binding* bindings = pathwatch_bindings();
 
-  for (sz item_idx = 0; item_idx < PATHWATCH_BINDING_CAP; item_idx += 1) {
+  safe_for (sz item_idx = 0; item_idx < PATHWATCH_BINDING_CAP; item_idx += 1) {
     if (bindings[item_idx].native_handle == native_handle) {
       profile_func_end;
       return &bindings[item_idx];
@@ -74,7 +75,7 @@ func b32 pathwatch_bind_create(pathwatch_id pathwatch_id, void* native_handle) {
   profile_func_begin;
   pathwatch_binding* bindings = pathwatch_bindings();
 
-  for (sz item_idx = 0; item_idx < PATHWATCH_BINDING_CAP; item_idx += 1) {
+  safe_for (sz item_idx = 0; item_idx < PATHWATCH_BINDING_CAP; item_idx += 1) {
     if (bindings[item_idx].native_handle == NULL) {
       bindings[item_idx].native_handle = native_handle;
       bindings[item_idx].pathwatch_id = pathwatch_id;
@@ -104,7 +105,7 @@ func pathwatch_watch_binding* pathwatch_find_watch_binding_by_public_id(pathwatc
   profile_func_begin;
   pathwatch_watch_binding* bindings = pathwatch_watch_bindings();
 
-  for (sz item_idx = 0; item_idx < PATHWATCH_WATCH_BINDING_CAP; item_idx += 1) {
+  safe_for (sz item_idx = 0; item_idx < PATHWATCH_WATCH_BINDING_CAP; item_idx += 1) {
     if (bindings[item_idx].watch_id == watch_id) {
       profile_func_end;
       return &bindings[item_idx];
@@ -120,7 +121,7 @@ func pathwatch_watch_binding* pathwatch_find_watch_binding_by_native(
   profile_func_begin;
   pathwatch_watch_binding* bindings = pathwatch_watch_bindings();
 
-  for (sz item_idx = 0; item_idx < PATHWATCH_WATCH_BINDING_CAP; item_idx += 1) {
+  safe_for (sz item_idx = 0; item_idx < PATHWATCH_WATCH_BINDING_CAP; item_idx += 1) {
     if (bindings[item_idx].native_handle == native_handle &&
         bindings[item_idx].native_watch_id == native_watch_id) {
       profile_func_end;
@@ -139,7 +140,7 @@ func pathwatch_watch_id pathwatch_watch_bind_create(
   profile_func_begin;
   pathwatch_watch_binding* bindings = pathwatch_watch_bindings();
 
-  for (sz item_idx = 0; item_idx < PATHWATCH_WATCH_BINDING_CAP; item_idx += 1) {
+  safe_for (sz item_idx = 0; item_idx < PATHWATCH_WATCH_BINDING_CAP; item_idx += 1) {
     if (bindings[item_idx].watch_id == 0) {
       pathwatch_watch_id watch_id = pathwatch_next_watch_id();
       bindings[item_idx].watch_id = watch_id;
@@ -178,7 +179,7 @@ func void pathwatch_watch_bind_remove_all_for_watcher(pathwatch_id pathwatch_id,
   profile_func_begin;
   pathwatch_watch_binding* bindings = pathwatch_watch_bindings();
 
-  for (sz item_idx = 0; item_idx < PATHWATCH_WATCH_BINDING_CAP; item_idx += 1) {
+  safe_for (sz item_idx = 0; item_idx < PATHWATCH_WATCH_BINDING_CAP; item_idx += 1) {
     if (bindings[item_idx].watch_id != 0 && bindings[item_idx].pathwatch_id == pathwatch_id &&
         bindings[item_idx].native_handle == native_handle) {
       bindings[item_idx] = (pathwatch_watch_binding) {0};
@@ -192,7 +193,7 @@ func void pathwatch_watch_bind_remove_by_path(pathwatch_id pathwatch_id, void* n
   pathwatch_watch_binding* bindings = pathwatch_watch_bindings();
   path normd_src = path_norm_trimmed_cpy(src);
 
-  for (sz item_idx = 0; item_idx < PATHWATCH_WATCH_BINDING_CAP; item_idx += 1) {
+  safe_for (sz item_idx = 0; item_idx < PATHWATCH_WATCH_BINDING_CAP; item_idx += 1) {
     if (bindings[item_idx].watch_id != 0 && bindings[item_idx].pathwatch_id == pathwatch_id &&
         bindings[item_idx].native_handle == native_handle) {
       path normd_watch = path_norm_trimmed_cpy(&bindings[item_idx].watch_path);

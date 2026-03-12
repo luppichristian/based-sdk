@@ -33,6 +33,7 @@ If modules are added, removed, or reorganized, update this file in the same chan
     `bit`, `bit64`, `bit_is_set`, `bit_set`, `bit_unset`, `bit_toggle`, `field_of`, `size_of_field`,
     `offset_of`, `container_of`, `in_range`, `in_bounds`, `swap`, `refswap`, `is_pow2`, `align_up`,
     `align_down`, `kb`, `mb`, `gb`, `tb`, `th`, `mil`, `bil`, `tril`.
+  - `safe.h` for loop safety helpers. Use `safe_for` and `safe_while` for fixed or regular loops, and do not convert game loops to the safe loop macros.
 
 ## Profiling Policy
 

@@ -32,7 +32,7 @@ TEST(filesystem_archive_test, write_read_and_metadata_roundtrip) {
   buffer view_buff = {0};
   ASSERT_TRUE(archive_get_entry_data(&arc_val, &item_path, &view_buff) != 0);
   ASSERT_EQ(src_buff.size, view_buff.size);
-  for (sz data_idx = 0; data_idx < src_buff.size; data_idx += 1) {
+  safe_for (sz data_idx = 0; data_idx < src_buff.size; data_idx += 1) {
     EXPECT_EQ(src_data[data_idx], ((u8*)view_buff.ptr)[data_idx]);
   }
 
@@ -42,7 +42,7 @@ TEST(filesystem_archive_test, write_read_and_metadata_roundtrip) {
   buffer read_buff = {0};
   ASSERT_TRUE(archive_read_all(&arc_val, &item_path, &alloc_val, &read_buff) != 0);
   ASSERT_EQ(src_buff.size, read_buff.size);
-  for (sz data_idx = 0; data_idx < src_buff.size; data_idx += 1) {
+  safe_for (sz data_idx = 0; data_idx < src_buff.size; data_idx += 1) {
     EXPECT_EQ(src_data[data_idx], ((u8*)read_buff.ptr)[data_idx]);
   }
   allocator_dealloc(alloc_val, read_buff.ptr);

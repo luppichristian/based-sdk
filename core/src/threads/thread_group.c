@@ -10,6 +10,7 @@
 #include "input/msg_core.h"
 #include "../sdl3_include.h"
 #include "memory/memops.h"
+#include "basic/safe.h"
 
 typedef struct thread_group_payload {
   thread_group_func entry;
@@ -48,7 +49,7 @@ func void thread_group_cleanup_failed_create(thread_group_data* group, u32 creat
     return;
   }
 
-  for (u32 idx = 0; idx < created_count; idx += 1) {
+  safe_for (u32 idx = 0; idx < created_count; idx += 1) {
     thread thd = group->threads[idx];
     if (!thread_is_valid(thd)) {
       continue;
@@ -153,7 +154,7 @@ func thread_group thread_group_create_impl(
   }
 
   group->count = count;
-  for (u32 idx = 0; idx < count; idx += 1) {
+  safe_for (u32 idx = 0; idx < count; idx += 1) {
     thread_group_payload* payload = heap_alloc_type(payload_hp, thread_group_payload);
     if (payload == NULL) {
       thread_log_error("Failed to allocate thread group worker payload idx=%u", idx);
@@ -189,7 +190,7 @@ func thread_group thread_group_create_impl(
 
   if (!thread_group_post_lifecycle(MSG_CORE_OBJECT_EVENT_CREATE, group, site)) {
     thread_log_trace("Thread group creation cancelled handle=%p", group);
-    for (u32 idx = 0; idx < count; idx += 1) {
+    safe_for (u32 idx = 0; idx < count; idx += 1) {
       thread thd = group->threads[idx];
       if (!thread_is_valid(thd)) {
         continue;
@@ -266,7 +267,7 @@ func b32 _thread_group_destroy(thread_group group, callsite site) {
     return false;
   }
 
-  for (u32 idx = 0; idx < data->count; idx += 1) {
+  safe_for (u32 idx = 0; idx < data->count; idx += 1) {
     thread thd = data->threads[idx];
     if (!thread_is_valid(thd)) {
       continue;
@@ -321,7 +322,7 @@ func b32 thread_group_join_all(thread_group group, i32* out_exit_codes) {
   }
 
   b32 success = true;
-  for (u32 idx = 0; idx < data->count; idx += 1) {
+  safe_for (u32 idx = 0; idx < data->count; idx += 1) {
     thread thd = data->threads[idx];
     if (!thread_is_valid(thd)) {
       if (out_exit_codes != NULL) {
@@ -365,7 +366,7 @@ func b32 thread_group_detach_all(thread_group group) {
   }
 
   b32 success = true;
-  for (u32 idx = 0; idx < data->count; idx += 1) {
+  safe_for (u32 idx = 0; idx < data->count; idx += 1) {
     thread thd = data->threads[idx];
     if (!thread_is_valid(thd)) {
       continue;

@@ -4,6 +4,7 @@
 #include "utils/crc.h"
 #include "basic/assert.h"
 #include "basic/profiler.h"
+#include "basic/safe.h"
 
 func u32 crc32_init(void) {
   return 0xFFFFFFFFU;
@@ -17,9 +18,9 @@ func u32 crc32_update(u32 crc, const void* data, sz size) {
   }
   assert(size == 0 || data != NULL);
   const u8* bytes = (const u8*)data;
-  for (sz idx = 0; idx < size; idx++) {
+  safe_for (sz idx = 0; idx < size; idx++) {
     crc ^= (u32)bytes[idx];
-    for (u32 bit_idx = 0; bit_idx < 8U; bit_idx++) {
+    safe_for (u32 bit_idx = 0; bit_idx < 8U; bit_idx++) {
       if ((crc & 1U) != 0U) {
         crc = (crc >> 1U) ^ 0xEDB88320U;
       } else {
@@ -51,9 +52,9 @@ func u64 crc64_update(u64 crc, const void* data, sz size) {
   }
   assert(size == 0 || data != NULL);
   const u8* bytes = (const u8*)data;
-  for (sz idx = 0; idx < size; idx++) {
+  safe_for (sz idx = 0; idx < size; idx++) {
     crc ^= (u64)bytes[idx] << 56U;
-    for (u32 bit_idx = 0; bit_idx < 8U; bit_idx++) {
+    safe_for (u32 bit_idx = 0; bit_idx < 8U; bit_idx++) {
       if ((crc & 0x8000000000000000ULL) != 0ULL) {
         crc = (crc << 1U) ^ 0x42F0E1EBA9EA3693ULL;
       } else {

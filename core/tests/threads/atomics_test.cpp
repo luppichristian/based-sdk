@@ -11,7 +11,7 @@ namespace {
 
   func i32 atomic_increment_entry(void* arg) {
     atomic_increment_ctx* ctx = (atomic_increment_ctx*)arg;
-    for (u32 idx = 0; idx < 10000; idx++) {
+    safe_for (u32 idx = 0; idx < 10000; idx++) {
       atomic_u32_add(ctx->counter, 1);
     }
     return 0;
@@ -247,12 +247,12 @@ TEST(threads_atomics_test, concurrent_increment) {
   atomic_increment_ctx ctx = {&counter};
   thread threads[num_threads] = {0};
 
-  for (u32 idx = 0; idx < num_threads; idx++) {
+  safe_for (u32 idx = 0; idx < num_threads; idx++) {
     threads[idx] = thread_create(atomic_increment_entry, &ctx, (ctx_setup) {0});
     EXPECT_NE(0, thread_is_valid(threads[idx]));
   }
 
-  for (u32 idx = 0; idx < num_threads; idx++) {
+  safe_for (u32 idx = 0; idx < num_threads; idx++) {
     thread_join(threads[idx], nullptr);
   }
 

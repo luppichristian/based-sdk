@@ -12,6 +12,7 @@
 #include "basic/profiler.h"
 #include "memory/memops.h"
 #include <string.h>
+#include "basic/safe.h"
 
 // =========================================================================
 // Internal Helpers
@@ -64,7 +65,7 @@ func void pool_block_carve(pool* pol, pool_block* blk) {
   sz header_used = size_of(pool_block) + pad;
   sz avail = blk->size > header_used ? blk->size - header_used : 0;
 
-  while (avail >= stride) {
+  safe_while (avail >= stride) {
     pool_slot_write_next(slot, pol->free_head);
     pol->free_head = slot;
     slot += stride;
@@ -273,7 +274,7 @@ func b32 pool_remove_block(pool* pol, void* ptr) {
   pool_block* prev_blk = NULL;
   pool_block* blk = pol->blocks_head;
 
-  while (blk) {
+  safe_while (blk) {
     if ((void*)blk == ptr) {
       if (prev_blk) {
         prev_blk->next = blk->next;
@@ -297,7 +298,7 @@ func b32 pool_remove_block(pool* pol, void* ptr) {
     void* prev_slot = NULL;
     void* slot = pol->free_head;
 
-    while (slot) {
+    safe_while (slot) {
       void* nxt = pool_slot_read_next(slot);
       u8* slot_bytes = (u8*)slot;
 
@@ -453,7 +454,7 @@ func sz pool_free_count(pool* pol) {
     mutex_lock(pol->opt_mutex);
   }
   sz count = 0;
-  for (void* slot = pol->free_head; slot != NULL; slot = pool_slot_read_next(slot)) {
+  safe_for (void* slot = pol->free_head; slot != NULL; slot = pool_slot_read_next(slot)) {
     count += 1;
   }
   if (pol->opt_mutex) {

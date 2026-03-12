@@ -15,7 +15,7 @@ namespace {
     rwlock_writer_ctx* ctx = (rwlock_writer_ctx*)arg;
     rwlock_write_lock(ctx->lock);
     atomic_u32_set(ctx->writer_active, 1);
-    while (atomic_u32_get(ctx->reader_can_proceed) == 0) {
+    safe_while (atomic_u32_get(ctx->reader_can_proceed) == 0) {
       thread_sleep(1);
     }
     rwlock_write_unlock(ctx->lock);
@@ -147,7 +147,7 @@ TEST(threads_rwlock_test, writer_excludes_reader) {
   thread writer = thread_create(rwlock_writer_entry, &ctx, (ctx_setup) {0});
   EXPECT_NE(0, thread_is_valid(writer));
 
-  while (atomic_u32_get(&writer_active) == 0) {
+  safe_while (atomic_u32_get(&writer_active) == 0) {
     thread_sleep(1);
   }
 

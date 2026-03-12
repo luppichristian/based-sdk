@@ -13,6 +13,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "basic/safe.h"
 
 // =========================================================================
 // Internal helpers
@@ -21,7 +22,7 @@
 func sz cstr16_len_impl(cstr16 str) {
   profile_func_begin;
   sz len = 0;
-  while (str[len] != (c16)'\0') {
+  safe_while (str[len] != (c16)'\0') {
     len++;
   }
   profile_func_end;
@@ -31,7 +32,7 @@ func sz cstr16_len_impl(cstr16 str) {
 func sz cstr32_len_impl(cstr32 str) {
   profile_func_begin;
   sz len = 0;
-  while (str[len] != (c32)'\0') {
+  safe_while (str[len] != (c32)'\0') {
     len++;
   }
   profile_func_end;
@@ -91,7 +92,7 @@ func b32 cstr8_cmp(cstr8 lhs, cstr8 rhs) {
   }
   assert(lhs != NULL);
   assert(rhs != NULL);
-  while (*lhs != '\0' && *rhs != '\0') {
+  safe_while (*lhs != '\0' && *rhs != '\0') {
     if (*lhs != *rhs) {
       profile_func_end;
       return false;
@@ -113,7 +114,7 @@ func b32 cstr8_cmp_n(cstr8 lhs, cstr8 rhs, sz cnt) {
     profile_func_end;
     return lhs == rhs ? true : false;
   }
-  for (sz idx = 0; idx < cnt; idx++) {
+  safe_for (sz idx = 0; idx < cnt; idx++) {
     if (lhs[idx] != rhs[idx]) {
       profile_func_end;
       return false;
@@ -133,7 +134,7 @@ func b32 cstr8_cmp_nocase(cstr8 lhs, cstr8 rhs) {
     profile_func_end;
     return lhs == rhs ? true : false;
   }
-  while (*lhs != '\0' && *rhs != '\0') {
+  safe_while (*lhs != '\0' && *rhs != '\0') {
     u8 lchr = (u8)c8_to_lower(*lhs);
     u8 rchr = (u8)c8_to_lower(*rhs);
     if (lchr != rchr) {
@@ -308,7 +309,7 @@ func cstr8 cstr8_find_last(cstr8 str, cstr8 sub) {
   }
   cstr8 last = NULL;
   sz limit = str_len - sub_len;
-  for (sz idx = 0; idx <= limit; idx++) {
+  safe_for (sz idx = 0; idx <= limit; idx++) {
     if (mem_cmp(str + idx, sub, sub_len)) {
       last = str + idx;
     }
@@ -334,7 +335,7 @@ func cstr8 cstr8_find_last_char(cstr8 str, c8 chr) {
 func sz cstr8_count_char(cstr8 str, c8 chr) {
   profile_func_begin;
   sz count = 0;
-  for (sz idx = 0; str[idx] != '\0'; idx++) {
+  safe_for (sz idx = 0; str[idx] != '\0'; idx++) {
     if (str[idx] == chr) {
       count++;
     }
@@ -370,7 +371,7 @@ func u32 cstr8_hash32(cstr8 str) {
   }
 
   u32 hash_value = 2166136261U;
-  for (sz idx = 0; str[idx] != '\0'; idx += 1) {
+  safe_for (sz idx = 0; str[idx] != '\0'; idx += 1) {
     hash_value = fnv1a32_step(hash_value, (u8)str[idx]);
   }
   profile_func_end;
@@ -385,7 +386,7 @@ func u64 cstr8_hash64(cstr8 str) {
   }
 
   u64 hash_value = 1469598103934665603ULL;
-  for (sz idx = 0; str[idx] != '\0'; idx += 1) {
+  safe_for (sz idx = 0; str[idx] != '\0'; idx += 1) {
     hash_value = fnv1a64_step(hash_value, (u8)str[idx]);
   }
   profile_func_end;
@@ -398,7 +399,7 @@ func u64 cstr8_hash64(cstr8 str) {
 
 func void cstr8_to_upper(c8* str) {
   profile_func_begin;
-  for (sz idx = 0; str[idx] != '\0'; idx++) {
+  safe_for (sz idx = 0; str[idx] != '\0'; idx++) {
     str[idx] = c8_to_upper(str[idx]);
   }
   profile_func_end;
@@ -406,7 +407,7 @@ func void cstr8_to_upper(c8* str) {
 
 func void cstr8_to_lower(c8* str) {
   profile_func_begin;
-  for (sz idx = 0; str[idx] != '\0'; idx++) {
+  safe_for (sz idx = 0; str[idx] != '\0'; idx++) {
     str[idx] = c8_to_lower(str[idx]);
   }
   profile_func_end;
@@ -415,11 +416,11 @@ func void cstr8_to_lower(c8* str) {
 func void cstr8_trim(c8* str) {
   profile_func_begin;
   sz start = 0;
-  while (c8_is_space(str[start])) {
+  safe_while (c8_is_space(str[start])) {
     start++;
   }
   sz len = cstr8_len(str + start);
-  while (len > 0 && c8_is_space(str[start + len - 1])) {
+  safe_while (len > 0 && c8_is_space(str[start + len - 1])) {
     len--;
   }
   mem_mv(str, str + start, len);
@@ -429,7 +430,7 @@ func void cstr8_trim(c8* str) {
 
 func void cstr8_replace_char(c8* str, c8 from_chr, c8 to_chr) {
   profile_func_begin;
-  for (sz idx = 0; str[idx] != '\0'; idx++) {
+  safe_for (sz idx = 0; str[idx] != '\0'; idx++) {
     if (str[idx] == from_chr) {
       str[idx] = to_chr;
     }
@@ -441,7 +442,7 @@ func sz cstr8_remove_char(c8* str, c8 chr) {
   profile_func_begin;
   sz write = 0;
   sz removed = 0;
-  for (sz idx = 0; str[idx] != '\0'; idx++) {
+  safe_for (sz idx = 0; str[idx] != '\0'; idx++) {
     if (str[idx] != chr) {
       str[write++] = str[idx];
     } else {
@@ -457,7 +458,7 @@ func sz cstr8_remove_whitespace(c8* str) {
   profile_func_begin;
   sz write = 0;
   sz removed = 0;
-  for (sz idx = 0; str[idx] != '\0'; idx++) {
+  safe_for (sz idx = 0; str[idx] != '\0'; idx++) {
     if (!c8_is_space(str[idx])) {
       str[write++] = str[idx];
     } else {
@@ -506,7 +507,7 @@ func sz cstr8_replace(c8* str, sz str_cap, cstr8 from, cstr8 rep) {
   sz count = 0;
   sz pos = 0;
   sz str_len = cstr8_len(str);
-  while (pos + from_len <= str_len) {
+  safe_while (pos + from_len <= str_len) {
     if (mem_cmp(str + pos, from, from_len)) {
       sz new_len = str_len - from_len + rep_len;
       if (new_len >= str_cap) {
@@ -532,7 +533,7 @@ func sz cstr8_common_prefix(cstr8 lhs, cstr8 rhs, c8* buf, sz buf_cap) {
     return 0;
   }
   sz idx = 0;
-  while (lhs[idx] != '\0' && rhs[idx] != '\0' && lhs[idx] == rhs[idx] && idx < buf_cap - 1) {
+  safe_while (lhs[idx] != '\0' && rhs[idx] != '\0' && lhs[idx] == rhs[idx] && idx < buf_cap - 1) {
     buf[idx] = lhs[idx];
     idx++;
   }
@@ -629,7 +630,7 @@ func b32 cstr8_to_f64(cstr8 str, f64* out) {
 func b32 cstr16_to_ascii(cstr16 str, c8* buf, sz buf_size) {
   profile_func_begin;
   sz idx = 0;
-  while (str[idx] != (c16)'\0') {
+  safe_while (str[idx] != (c16)'\0') {
     if (str[idx] > 0x7FU || idx >= buf_size - 1) {
       profile_func_end;
       return false;
@@ -645,7 +646,7 @@ func b32 cstr16_to_ascii(cstr16 str, c8* buf, sz buf_size) {
 func b32 cstr32_to_ascii(cstr32 str, c8* buf, sz buf_size) {
   profile_func_begin;
   sz idx = 0;
-  while (str[idx] != (c32)'\0') {
+  safe_while (str[idx] != (c32)'\0') {
     if (str[idx] > 0x7FU || idx >= buf_size - 1) {
       profile_func_end;
       return false;
@@ -685,7 +686,7 @@ func b32 cstr16_cmp(cstr16 lhs, cstr16 rhs) {
     profile_func_end;
     return lhs == rhs ? true : false;
   }
-  while (*lhs != 0 && *lhs == *rhs) {
+  safe_while (*lhs != 0 && *lhs == *rhs) {
     lhs++;
     rhs++;
   }
@@ -703,7 +704,7 @@ func b32 cstr16_cmp_n(cstr16 lhs, cstr16 rhs, sz cnt) {
     profile_func_end;
     return lhs == rhs ? true : false;
   }
-  for (sz idx = 0; idx < cnt; idx++) {
+  safe_for (sz idx = 0; idx < cnt; idx++) {
     if (lhs[idx] != rhs[idx]) {
       profile_func_end;
       return false;
@@ -723,7 +724,7 @@ func b32 cstr16_cmp_nocase(cstr16 lhs, cstr16 rhs) {
     profile_func_end;
     return lhs == rhs ? true : false;
   }
-  while (*lhs != (c16)'\0' && *rhs != (c16)'\0') {
+  safe_while (*lhs != (c16)'\0' && *rhs != (c16)'\0') {
     c16 lchr = c16_to_lower(*lhs);
     c16 rchr = c16_to_lower(*rhs);
     if (lchr != rchr) {
@@ -834,7 +835,7 @@ func cstr16 cstr16_find(cstr16 str, cstr16 sub) {
     return NULL;
   }
   sz limit = str_len - sub_len;
-  for (sz idx = 0; idx <= limit; idx++) {
+  safe_for (sz idx = 0; idx <= limit; idx++) {
     if (mem_cmp(str + idx, sub, sub_len * size_of(c16))) {
       profile_func_end;
       return str + idx;
@@ -858,7 +859,7 @@ func cstr16 cstr16_find_last(cstr16 str, cstr16 sub) {
   }
   cstr16 last = NULL;
   sz limit = str_len - sub_len;
-  for (sz idx = 0; idx <= limit; idx++) {
+  safe_for (sz idx = 0; idx <= limit; idx++) {
     if (mem_cmp(str + idx, sub, sub_len * size_of(c16))) {
       last = str + idx;
     }
@@ -869,7 +870,7 @@ func cstr16 cstr16_find_last(cstr16 str, cstr16 sub) {
 
 func cstr16 cstr16_find_char(cstr16 str, c16 chr) {
   profile_func_begin;
-  for (sz idx = 0;; idx++) {
+  safe_for (sz idx = 0;; idx++) {
     if (str[idx] == chr) {
       profile_func_end;
       return str + idx;
@@ -885,7 +886,7 @@ func cstr16 cstr16_find_char(cstr16 str, c16 chr) {
 func cstr16 cstr16_find_last_char(cstr16 str, c16 chr) {
   profile_func_begin;
   cstr16 last = NULL;
-  for (sz idx = 0;; idx++) {
+  safe_for (sz idx = 0;; idx++) {
     if (str[idx] == chr) {
       last = str + idx;
     }
@@ -900,7 +901,7 @@ func cstr16 cstr16_find_last_char(cstr16 str, c16 chr) {
 func sz cstr16_count_char(cstr16 str, c16 chr) {
   profile_func_begin;
   sz count = 0;
-  for (sz idx = 0; str[idx] != (c16)'\0'; idx++) {
+  safe_for (sz idx = 0; str[idx] != (c16)'\0'; idx++) {
     if (str[idx] == chr) {
       count++;
     }
@@ -936,7 +937,7 @@ func u32 cstr16_hash32(cstr16 str) {
   }
 
   u32 hash_value = 2166136261U;
-  for (sz idx = 0; str[idx] != (c16)'\0'; idx += 1) {
+  safe_for (sz idx = 0; str[idx] != (c16)'\0'; idx += 1) {
     hash_value = fnv1a32_step(hash_value, (u16)str[idx]);
   }
   profile_func_end;
@@ -951,7 +952,7 @@ func u64 cstr16_hash64(cstr16 str) {
   }
 
   u64 hash_value = 1469598103934665603ULL;
-  for (sz idx = 0; str[idx] != (c16)'\0'; idx += 1) {
+  safe_for (sz idx = 0; str[idx] != (c16)'\0'; idx += 1) {
     hash_value = fnv1a64_step(hash_value, (u16)str[idx]);
   }
   profile_func_end;
@@ -964,7 +965,7 @@ func u64 cstr16_hash64(cstr16 str) {
 
 func void cstr16_to_upper(c16* str) {
   profile_func_begin;
-  for (sz idx = 0; str[idx] != (c16)'\0'; idx++) {
+  safe_for (sz idx = 0; str[idx] != (c16)'\0'; idx++) {
     str[idx] = c16_to_upper(str[idx]);
   }
   profile_func_end;
@@ -972,7 +973,7 @@ func void cstr16_to_upper(c16* str) {
 
 func void cstr16_to_lower(c16* str) {
   profile_func_begin;
-  for (sz idx = 0; str[idx] != (c16)'\0'; idx++) {
+  safe_for (sz idx = 0; str[idx] != (c16)'\0'; idx++) {
     str[idx] = c16_to_lower(str[idx]);
   }
   profile_func_end;
@@ -981,11 +982,11 @@ func void cstr16_to_lower(c16* str) {
 func void cstr16_trim(c16* str) {
   profile_func_begin;
   sz start = 0;
-  while (c16_is_space(str[start])) {
+  safe_while (c16_is_space(str[start])) {
     start++;
   }
   sz len = cstr16_len_impl(str + start);
-  while (len > 0 && c16_is_space(str[start + len - 1])) {
+  safe_while (len > 0 && c16_is_space(str[start + len - 1])) {
     len--;
   }
   mem_mv(str, str + start, len * size_of(c16));
@@ -995,7 +996,7 @@ func void cstr16_trim(c16* str) {
 
 func void cstr16_replace_char(c16* str, c16 from_chr, c16 to_chr) {
   profile_func_begin;
-  for (sz idx = 0; str[idx] != (c16)'\0'; idx++) {
+  safe_for (sz idx = 0; str[idx] != (c16)'\0'; idx++) {
     if (str[idx] == from_chr) {
       str[idx] = to_chr;
     }
@@ -1007,7 +1008,7 @@ func sz cstr16_remove_char(c16* str, c16 chr) {
   profile_func_begin;
   sz write = 0;
   sz removed = 0;
-  for (sz idx = 0; str[idx] != (c16)'\0'; idx++) {
+  safe_for (sz idx = 0; str[idx] != (c16)'\0'; idx++) {
     if (str[idx] != chr) {
       str[write++] = str[idx];
     } else {
@@ -1023,7 +1024,7 @@ func sz cstr16_remove_whitespace(c16* str) {
   profile_func_begin;
   sz write = 0;
   sz removed = 0;
-  for (sz idx = 0; str[idx] != (c16)'\0'; idx++) {
+  safe_for (sz idx = 0; str[idx] != (c16)'\0'; idx++) {
     if (!c16_is_space(str[idx])) {
       str[write++] = str[idx];
     } else {
@@ -1076,7 +1077,7 @@ func sz cstr16_replace(c16* str, sz str_cap, cstr16 from, cstr16 rep) {
   sz count = 0;
   sz pos = 0;
   sz str_len = cstr16_len_impl(str);
-  while (pos + from_len <= str_len) {
+  safe_while (pos + from_len <= str_len) {
     if (mem_cmp(str + pos, from, from_len * size_of(c16))) {
       sz new_len = str_len - from_len + rep_len;
       if (new_len >= str_cap) {
@@ -1102,7 +1103,7 @@ func sz cstr16_common_prefix(cstr16 lhs, cstr16 rhs, c16* buf, sz buf_cap) {
     return 0;
   }
   sz idx = 0;
-  while (lhs[idx] != (c16)'\0' && rhs[idx] != (c16)'\0' && lhs[idx] == rhs[idx] && idx < buf_cap - 1) {
+  safe_while (lhs[idx] != (c16)'\0' && rhs[idx] != (c16)'\0' && lhs[idx] == rhs[idx] && idx < buf_cap - 1) {
     buf[idx] = lhs[idx];
     idx++;
   }
@@ -1171,7 +1172,7 @@ func b32 cstr32_cmp(cstr32 lhs, cstr32 rhs) {
     profile_func_end;
     return lhs == rhs ? true : false;
   }
-  while (*lhs != 0 && *lhs == *rhs) {
+  safe_while (*lhs != 0 && *lhs == *rhs) {
     lhs++;
     rhs++;
   }
@@ -1189,7 +1190,7 @@ func b32 cstr32_cmp_n(cstr32 lhs, cstr32 rhs, sz cnt) {
     profile_func_end;
     return lhs == rhs ? true : false;
   }
-  for (sz idx = 0; idx < cnt; idx++) {
+  safe_for (sz idx = 0; idx < cnt; idx++) {
     if (lhs[idx] != rhs[idx]) {
       profile_func_end;
       return false;
@@ -1209,7 +1210,7 @@ func b32 cstr32_cmp_nocase(cstr32 lhs, cstr32 rhs) {
     profile_func_end;
     return lhs == rhs ? true : false;
   }
-  while (*lhs != (c32)'\0' && *rhs != (c32)'\0') {
+  safe_while (*lhs != (c32)'\0' && *rhs != (c32)'\0') {
     c32 lchr = c32_to_lower(*lhs);
     c32 rchr = c32_to_lower(*rhs);
     if (lchr != rchr) {
@@ -1320,7 +1321,7 @@ func cstr32 cstr32_find(cstr32 str, cstr32 sub) {
     return NULL;
   }
   sz limit = str_len - sub_len;
-  for (sz idx = 0; idx <= limit; idx++) {
+  safe_for (sz idx = 0; idx <= limit; idx++) {
     if (mem_cmp(str + idx, sub, sub_len * size_of(c32))) {
       profile_func_end;
       return str + idx;
@@ -1344,7 +1345,7 @@ func cstr32 cstr32_find_last(cstr32 str, cstr32 sub) {
   }
   cstr32 last = NULL;
   sz limit = str_len - sub_len;
-  for (sz idx = 0; idx <= limit; idx++) {
+  safe_for (sz idx = 0; idx <= limit; idx++) {
     if (mem_cmp(str + idx, sub, sub_len * size_of(c32))) {
       last = str + idx;
     }
@@ -1355,7 +1356,7 @@ func cstr32 cstr32_find_last(cstr32 str, cstr32 sub) {
 
 func cstr32 cstr32_find_char(cstr32 str, c32 chr) {
   profile_func_begin;
-  for (sz idx = 0;; idx++) {
+  safe_for (sz idx = 0;; idx++) {
     if (str[idx] == chr) {
       profile_func_end;
       return str + idx;
@@ -1371,7 +1372,7 @@ func cstr32 cstr32_find_char(cstr32 str, c32 chr) {
 func cstr32 cstr32_find_last_char(cstr32 str, c32 chr) {
   profile_func_begin;
   cstr32 last = NULL;
-  for (sz idx = 0;; idx++) {
+  safe_for (sz idx = 0;; idx++) {
     if (str[idx] == chr) {
       last = str + idx;
     }
@@ -1386,7 +1387,7 @@ func cstr32 cstr32_find_last_char(cstr32 str, c32 chr) {
 func sz cstr32_count_char(cstr32 str, c32 chr) {
   profile_func_begin;
   sz count = 0;
-  for (sz idx = 0; str[idx] != (c32)'\0'; idx++) {
+  safe_for (sz idx = 0; str[idx] != (c32)'\0'; idx++) {
     if (str[idx] == chr) {
       count++;
     }
@@ -1422,7 +1423,7 @@ func u32 cstr32_hash32(cstr32 str) {
   }
 
   u32 hash_value = 2166136261U;
-  for (sz idx = 0; str[idx] != (c32)'\0'; idx += 1) {
+  safe_for (sz idx = 0; str[idx] != (c32)'\0'; idx += 1) {
     hash_value = fnv1a32_step(hash_value, (u32)str[idx]);
   }
   profile_func_end;
@@ -1437,7 +1438,7 @@ func u64 cstr32_hash64(cstr32 str) {
   }
 
   u64 hash_value = 1469598103934665603ULL;
-  for (sz idx = 0; str[idx] != (c32)'\0'; idx += 1) {
+  safe_for (sz idx = 0; str[idx] != (c32)'\0'; idx += 1) {
     hash_value = fnv1a64_step(hash_value, (u32)str[idx]);
   }
   profile_func_end;
@@ -1450,7 +1451,7 @@ func u64 cstr32_hash64(cstr32 str) {
 
 func void cstr32_to_upper(c32* str) {
   profile_func_begin;
-  for (sz idx = 0; str[idx] != (c32)'\0'; idx++) {
+  safe_for (sz idx = 0; str[idx] != (c32)'\0'; idx++) {
     str[idx] = c32_to_upper(str[idx]);
   }
   profile_func_end;
@@ -1458,7 +1459,7 @@ func void cstr32_to_upper(c32* str) {
 
 func void cstr32_to_lower(c32* str) {
   profile_func_begin;
-  for (sz idx = 0; str[idx] != (c32)'\0'; idx++) {
+  safe_for (sz idx = 0; str[idx] != (c32)'\0'; idx++) {
     str[idx] = c32_to_lower(str[idx]);
   }
   profile_func_end;
@@ -1467,11 +1468,11 @@ func void cstr32_to_lower(c32* str) {
 func void cstr32_trim(c32* str) {
   profile_func_begin;
   sz start = 0;
-  while (c32_is_space(str[start])) {
+  safe_while (c32_is_space(str[start])) {
     start++;
   }
   sz len = cstr32_len_impl(str + start);
-  while (len > 0 && c32_is_space(str[start + len - 1])) {
+  safe_while (len > 0 && c32_is_space(str[start + len - 1])) {
     len--;
   }
   mem_mv(str, str + start, len * size_of(c32));
@@ -1481,7 +1482,7 @@ func void cstr32_trim(c32* str) {
 
 func void cstr32_replace_char(c32* str, c32 from_chr, c32 to_chr) {
   profile_func_begin;
-  for (sz idx = 0; str[idx] != (c32)'\0'; idx++) {
+  safe_for (sz idx = 0; str[idx] != (c32)'\0'; idx++) {
     if (str[idx] == from_chr) {
       str[idx] = to_chr;
     }
@@ -1493,7 +1494,7 @@ func sz cstr32_remove_char(c32* str, c32 chr) {
   profile_func_begin;
   sz write = 0;
   sz removed = 0;
-  for (sz idx = 0; str[idx] != (c32)'\0'; idx++) {
+  safe_for (sz idx = 0; str[idx] != (c32)'\0'; idx++) {
     if (str[idx] != chr) {
       str[write++] = str[idx];
     } else {
@@ -1509,7 +1510,7 @@ func sz cstr32_remove_whitespace(c32* str) {
   profile_func_begin;
   sz write = 0;
   sz removed = 0;
-  for (sz idx = 0; str[idx] != (c32)'\0'; idx++) {
+  safe_for (sz idx = 0; str[idx] != (c32)'\0'; idx++) {
     if (!c32_is_space(str[idx])) {
       str[write++] = str[idx];
     } else {
@@ -1562,7 +1563,7 @@ func sz cstr32_replace(c32* str, sz str_cap, cstr32 from, cstr32 rep) {
   sz count = 0;
   sz pos = 0;
   sz str_len = cstr32_len_impl(str);
-  while (pos + from_len <= str_len) {
+  safe_while (pos + from_len <= str_len) {
     if (mem_cmp(str + pos, from, from_len * size_of(c32))) {
       sz new_len = str_len - from_len + rep_len;
       if (new_len >= str_cap) {
@@ -1588,7 +1589,7 @@ func sz cstr32_common_prefix(cstr32 lhs, cstr32 rhs, c32* buf, sz buf_cap) {
     return 0;
   }
   sz idx = 0;
-  while (lhs[idx] != (c32)'\0' && rhs[idx] != (c32)'\0' && lhs[idx] == rhs[idx] && idx < buf_cap - 1) {
+  safe_while (lhs[idx] != (c32)'\0' && rhs[idx] != (c32)'\0' && lhs[idx] == rhs[idx] && idx < buf_cap - 1) {
     buf[idx] = lhs[idx];
     idx++;
   }

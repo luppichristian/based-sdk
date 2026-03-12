@@ -5,6 +5,7 @@
 #include "basic/assert.h"
 #include "input/msg_core.h"
 #include "basic/profiler.h"
+#include "basic/safe.h"
 
 typedef struct binding_entry {
   b32 used;
@@ -32,7 +33,7 @@ func u32 bindings_next_generation(u32 value) {
 
 func sz bindings_find_slot_by_id(u32 binding_id) {
   profile_func_begin;
-  for (sz slot_idx = 0; slot_idx < BINDINGS_MAX_COUNT; slot_idx += 1) {
+  safe_for (sz slot_idx = 0; slot_idx < BINDINGS_MAX_COUNT; slot_idx += 1) {
     if (bindings_entries[slot_idx].used && bindings_entries[slot_idx].desc.binding_id == binding_id) {
       profile_func_end;
       return slot_idx;
@@ -45,7 +46,7 @@ func sz bindings_find_slot_by_id(u32 binding_id) {
 
 func sz bindings_find_free_slot(void) {
   profile_func_begin;
-  for (sz slot_idx = 0; slot_idx < BINDINGS_MAX_COUNT; slot_idx += 1) {
+  safe_for (sz slot_idx = 0; slot_idx < BINDINGS_MAX_COUNT; slot_idx += 1) {
     if (!bindings_entries[slot_idx].used) {
       profile_func_end;
       return slot_idx;
@@ -73,7 +74,7 @@ func b32 bindings_eval_keyboard(const binding_keyboard_combo* combo) {
     return false;
   }
 
-  for (sz item_idx = 0; item_idx < combo->count; item_idx += 1) {
+  safe_for (sz item_idx = 0; item_idx < combo->count; item_idx += 1) {
     if (!keyboard_is_key_down(INPUT_KEY_DEFAULT, combo->scancodes[item_idx])) {
       profile_func_end;
       return false;
@@ -96,7 +97,7 @@ func b32 bindings_eval_mouse(const binding_mouse_combo* combo) {
     return false;
   }
 
-  for (sz item_idx = 0; item_idx < combo->count; item_idx += 1) {
+  safe_for (sz item_idx = 0; item_idx < combo->count; item_idx += 1) {
     if (!mouse_is_button_down(INPUT_KEY_DEFAULT, combo->buttons[item_idx])) {
       profile_func_end;
       return false;
@@ -114,7 +115,7 @@ func b32 bindings_eval_gamepad_slot(const binding_gamepad_combo* combo, sz slot_
     return false;
   }
 
-  for (sz item_idx = 0; item_idx < combo->count; item_idx += 1) {
+  safe_for (sz item_idx = 0; item_idx < combo->count; item_idx += 1) {
     if (!gamepads_get_button(INPUT_KEY_DEFAULT, slot_idx, combo->buttons[item_idx])) {
       profile_func_end;
       return false;
@@ -138,7 +139,7 @@ func b32 bindings_eval_gamepad(const binding_gamepad_combo* combo) {
   }
 
   if (combo->any_slot) {
-    for (sz slot_idx = 0; slot_idx < GAMEPADS_MAX_COUNT; slot_idx += 1) {
+    safe_for (sz slot_idx = 0; slot_idx < GAMEPADS_MAX_COUNT; slot_idx += 1) {
       if (bindings_eval_gamepad_slot(combo, slot_idx)) {
         profile_func_end;
         return true;
@@ -194,7 +195,7 @@ func b32 bindings_eval_desc(const binding_desc* desc) {
 
 func void bindings_refresh_all_transitions(void) {
   profile_func_begin;
-  for (sz slot_idx = 0; slot_idx < BINDINGS_MAX_COUNT; slot_idx += 1) {
+  safe_for (sz slot_idx = 0; slot_idx < BINDINGS_MAX_COUNT; slot_idx += 1) {
     if (!bindings_entries[slot_idx].used) {
       continue;
     }
@@ -287,7 +288,7 @@ func b32 bindings_read_released_for_key_slot(sz binding_slot_idx, sz key_slot_id
 
 func void bindings_clear(void) {
   profile_func_begin;
-  for (sz slot_idx = 0; slot_idx < BINDINGS_MAX_COUNT; slot_idx += 1) {
+  safe_for (sz slot_idx = 0; slot_idx < BINDINGS_MAX_COUNT; slot_idx += 1) {
     bindings_entries[slot_idx] = (binding_entry) {0};
   }
   profile_func_end;

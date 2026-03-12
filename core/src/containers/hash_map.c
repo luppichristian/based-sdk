@@ -30,7 +30,7 @@ func b32 hash_map_raw_insert(
   incoming.probe_dist = 0;
   incoming.occupied = 1;
 
-  for (;;) {
+  safe_for (;;) {
     hash_map_slot* slot = &slots[pos];
 
     if (!slot->occupied) {
@@ -75,7 +75,7 @@ func b32 hash_map_rehash(hash_map* map, sz new_cap) {
     return false;
   }
 
-  for (sz idx = 0; idx < map->cap; idx++) {
+  safe_for (sz idx = 0; idx < map->cap; idx++) {
     hash_map_slot* slot = &map->slots[idx];
     if (slot->occupied) {
       hash_map_raw_insert(new_slots, new_cap, slot->key, slot->value);
@@ -99,7 +99,7 @@ func b32 hash_map_reserve(hash_map* map, sz min_cap) {
   }
 
   sz target_cap = map->cap > 0 ? map->cap : 16;
-  while (target_cap < min_cap) {
+  safe_while (target_cap < min_cap) {
     target_cap *= 2;
   }
 
@@ -124,7 +124,7 @@ func hash_map_slot* hash_map_find_slot(hash_map* map, u64 key) {
   sz pos = (sz)(hash_u64(key) & (u64)(map->cap - 1));
   u32 dist = 0;
 
-  for (;;) {
+  safe_for (;;) {
     hash_map_slot* slot = &map->slots[pos];
     if (!slot->occupied || slot->probe_dist < dist) {
       profile_func_end;
@@ -156,7 +156,7 @@ func hash_map hash_map_create(sz cap, allocator alloc) {
   }
 
   sz actual = 16;
-  while (actual < cap) {
+  safe_while (actual < cap) {
     actual *= 2;
   }
   map.cap = actual;
@@ -277,7 +277,7 @@ func b32 hash_map_remove(hash_map* map, u64 key) {
   sz pos = (sz)(hash_u64(key) & (u64)(map->cap - 1));
   u32 dist = 0;
 
-  for (;;) {
+  safe_for (;;) {
     hash_map_slot* slot = &map->slots[pos];
     if (!slot->occupied || slot->probe_dist < dist) {
       profile_func_end;
@@ -288,7 +288,7 @@ func b32 hash_map_remove(hash_map* map, u64 key) {
       // their ideal positions, maintaining the Robin Hood invariant without
       // needing tombstones.
       sz cur = pos;
-      for (;;) {
+      safe_for (;;) {
         sz nxt = (cur + 1) & (map->cap - 1);
         hash_map_slot* next_slot = &map->slots[nxt];
         if (!next_slot->occupied || next_slot->probe_dist == 0) {
@@ -314,7 +314,7 @@ func hash_map_slot* hash_map_next(hash_map* map, hash_map_iter* iter) {
     profile_func_end;
     return NULL;
   }
-  while (*iter < map->cap) {
+  safe_while (*iter < map->cap) {
     hash_map_slot* slot = &map->slots[*iter];
     (*iter)++;
     if (slot->occupied) {

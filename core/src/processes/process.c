@@ -8,6 +8,7 @@
 #include "input/msg_core.h"
 #include "../sdl3_include.h"
 #include "basic/profiler.h"
+#include "basic/safe.h"
 
 // Returns true if options matches process_options_default().
 func b32 process_options_is_default(process_options options) {
@@ -224,7 +225,7 @@ func b32 process_wait_timeout(process prc, i32 timeout_ms, i32* out_exit_code) {
 
   u64 start_ticks = SDL_GetTicks();
   i32 exit_code = 0;
-  while (!process_wait(prc, 0, &exit_code)) {
+  safe_while (!process_wait(prc, 0, &exit_code)) {
     if ((i32)(SDL_GetTicks() - start_ticks) >= timeout_ms) {
       thread_log_warn("Process wait timed out handle=%p timeout_ms=%d", prc, timeout_ms);
       profile_func_end;

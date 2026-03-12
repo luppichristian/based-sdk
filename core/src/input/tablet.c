@@ -8,6 +8,7 @@
 #include "../sdl3_include.h"
 #include "basic/profiler.h"
 #include <SDL3/SDL_hidapi.h>
+#include "basic/safe.h"
 
 local_persist tablet_pen_state tablet_cached_pen_state;
 
@@ -21,7 +22,7 @@ func u64 tablet_hash_path(cstr8 src) {
     return 0;
   }
 
-  while (src[idx]) {
+  safe_while (src[idx]) {
     hash_value ^= (u8)src[idx];
     hash_value *= 1099511628211ULL;
     idx += 1;
@@ -40,7 +41,7 @@ func sz tablet_get_count(void) {
   SDL_hid_device_info* entry = head;
   sz total = 0;
 
-  while (entry) {
+  safe_while (entry) {
     if (entry->usage_page == 0x0D) {
       total += 1;
     }
@@ -65,7 +66,7 @@ func b32 tablet_get_device_id(sz idx, device_id* out_id) {
     *out_id = (device_id) {0};
   }
 
-  while (entry) {
+  safe_while (entry) {
     if (entry->usage_page == 0x0D) {
       if (current_idx == idx) {
         if (out_id) {
@@ -125,11 +126,11 @@ func b32 tablet_read_hid_report(device_id id, void* dst, sz capacity, sz* out_si
   assert(dst != NULL);
   assert(capacity > 0);
 
-  while (entry) {
+  safe_while (entry) {
     if (entry->usage_page == 0x0D && tablet_hash_path(entry->path) == id.instance) {
       sz cpy_idx = 0;
 
-      while (entry->path && entry->path[cpy_idx] && (cpy_idx + 1) < size_of(path_buf)) {
+      safe_while (entry->path && entry->path[cpy_idx] && (cpy_idx + 1) < size_of(path_buf)) {
         path_buf[cpy_idx] = entry->path[cpy_idx];
         cpy_idx += 1;
       }

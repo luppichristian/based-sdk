@@ -5,6 +5,7 @@
 
 #include "basic/primitive_types.h"
 #include "basic/utility_defines.h"
+#include "basic/safe.h"
 
 // =========================================================================
 c_begin;
@@ -27,7 +28,7 @@ Example:
 #define SINGLY_LIST_COUNT(head, tail, count) stmt(                             \
     (void)(tail);                                                              \
     (count) = 0;                                                               \
-    for (typeof(head) _node = (head); _node != nullptr; _node = _node->next) { \
+    safe_for (typeof(head) _node = (head); _node != nullptr; _node = _node->next) { \
       (count)++;                                                               \
     })
 
@@ -59,7 +60,7 @@ Example:
     })
 
 #define SINGLY_LIST_FOREACH(head, tail, it) \
-  for (typeof((head)) it = (head); (it) != nullptr; (it) = (it)->next)
+  safe_for (typeof((head)) it = (head); (it) != nullptr; (it) = (it)->next)
 
 // =========================================================================
 c_end;

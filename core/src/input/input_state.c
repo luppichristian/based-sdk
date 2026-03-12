@@ -8,6 +8,7 @@
 #include "memory/memops.h"
 
 #include <string.h>
+#include "basic/safe.h"
 
 typedef struct input_state_blob_header {
   u32 magic;
@@ -26,7 +27,7 @@ func sz input_state_find_gamepad_slot(device_id device) {
     return GAMEPADS_MAX_COUNT;
   }
 
-  for (sz slot_idx = 0; slot_idx < GAMEPADS_MAX_COUNT; slot_idx += 1) {
+  safe_for (sz slot_idx = 0; slot_idx < GAMEPADS_MAX_COUNT; slot_idx += 1) {
     device_id slot_id = {0};
     if (!gamepads_get_device_id(slot_idx, &slot_id)) {
       continue;
@@ -44,16 +45,16 @@ func sz input_state_find_gamepad_slot(device_id device) {
 
 func void input_state_sync_gamepads(input_state* src, input_key key) {
   profile_func_begin;
-  for (sz slot_idx = 0; slot_idx < GAMEPADS_MAX_COUNT; slot_idx += 1) {
+  safe_for (sz slot_idx = 0; slot_idx < GAMEPADS_MAX_COUNT; slot_idx += 1) {
     b32 connected = gamepads_is_connected(slot_idx);
     src->gamepad_connected[slot_idx] = connected;
 
-    for (sz button_idx = 0; button_idx < GAMEPAD_BUTTON_COUNT; button_idx += 1) {
+    safe_for (sz button_idx = 0; button_idx < GAMEPAD_BUTTON_COUNT; button_idx += 1) {
       src->gamepad_button_down[slot_idx][button_idx] =
           connected ? gamepads_get_button(key, slot_idx, (gamepad_button)button_idx) : 0;
     }
 
-    for (sz axis_idx = 0; axis_idx < GAMEPAD_AXIS_COUNT; axis_idx += 1) {
+    safe_for (sz axis_idx = 0; axis_idx < GAMEPAD_AXIS_COUNT; axis_idx += 1) {
       src->gamepad_axis[slot_idx][axis_idx] =
           connected ? gamepads_get_axis(key, slot_idx, (gamepad_axis)axis_idx) : 0;
     }
@@ -63,7 +64,7 @@ func void input_state_sync_gamepads(input_state* src, input_key key) {
 
 func void input_state_sync_mouse_buttons_from_mask(input_state* src) {
   profile_func_begin;
-  for (sz button_idx = 0; button_idx < INPUT_STATE_MOUSE_BUTTON_CAP; button_idx += 1) {
+  safe_for (sz button_idx = 0; button_idx < INPUT_STATE_MOUSE_BUTTON_CAP; button_idx += 1) {
     if (button_idx == 0) {
       src->mouse_button_down[button_idx] = 0;
       continue;
@@ -100,7 +101,7 @@ func b32 input_state_capture(input_key key, input_state* out_state) {
   out_state->mouse_available = mouse_is_available();
   out_state->keyboard_mods = (u16)keyboard_get_mods();
 
-  for (sz scancode_idx = 0; scancode_idx < INPUT_STATE_KEY_CAP; scancode_idx += 1) {
+  safe_for (sz scancode_idx = 0; scancode_idx < INPUT_STATE_KEY_CAP; scancode_idx += 1) {
     out_state->keyboard_down[scancode_idx] = keyboard_is_key_down(key, (keyboard_scancode)scancode_idx);
     out_state->keyboard_repeat[scancode_idx] = keyboard_get_key_repeat_count(key, (keyboard_scancode)scancode_idx);
   }

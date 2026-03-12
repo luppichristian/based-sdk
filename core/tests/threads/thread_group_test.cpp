@@ -97,7 +97,7 @@ TEST(threads_thread_group_test, parallel_execution) {
 
   auto entry = [](u32 idx, void* arg) -> i32 {
     i32* counters = static_cast<i32*>(arg);
-    for (i32 i = 0; i < 1000; i++) {
+    safe_for (i32 i = 0; i < 1000; i++) {
       counters[idx]++;
     }
     return 0;
@@ -106,7 +106,7 @@ TEST(threads_thread_group_test, parallel_execution) {
   thread_group group = thread_group_create(num_threads, entry, counters, setup);
   thread_group_join_all(group, nullptr);
 
-  for (u32 i = 0; i < num_threads; i++) {
+  safe_for (u32 i = 0; i < num_threads; i++) {
     EXPECT_EQ(1000, counters[i]);
   }
 

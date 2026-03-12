@@ -12,7 +12,7 @@ namespace {
 
   func i32 spinlock_counter_entry(void* arg) {
     spinlock_counter_ctx* ctx = (spinlock_counter_ctx*)arg;
-    for (i32 i = 0; i < 10000; i++) {
+    safe_for (i32 i = 0; i < 10000; i++) {
       spinlock_lock(ctx->lock);
       (*ctx->counter)++;
       spinlock_unlock(ctx->lock);

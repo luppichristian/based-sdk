@@ -9,6 +9,7 @@
 #include "../sdl3_include.h"
 #include "basic/profiler.h"
 #include "threads/atomics.h"
+#include "basic/safe.h"
 
 func mutex _mutex_create(callsite site) {
   profile_func_begin;
@@ -106,7 +107,7 @@ func b32 mutex_timed_lock(mutex mtx, i32 timeout_ms) {
   }
 
   u64 start_ticks = SDL_GetTicks();
-  while (!mutex_trylock(mtx)) {
+  safe_while (!mutex_trylock(mtx)) {
     if ((i32)(SDL_GetTicks() - start_ticks) >= timeout_ms) {
       thread_log_warn("Mutex timed lock expired handle=%p timeout_ms=%d", mtx, timeout_ms);
       profile_func_end;

@@ -4,6 +4,7 @@
 #pragma once
 
 #include "basic/intrinsics.h"
+#include "basic/safe.h"
 
 // =========================================================================
 c_begin;
@@ -34,24 +35,24 @@ Example:
 
 // Whole-set operations.
 #define BITSET_CLEAR_ALL(arr, word_count) stmt(                         \
-    for (sz _word_idx = 0; _word_idx < (sz)(word_count); _word_idx++) { \
+    safe_for (sz _word_idx = 0; _word_idx < (sz)(word_count); _word_idx++) { \
       (arr)[_word_idx] = 0ULL;                                          \
     })
 
 #define BITSET_SET_ALL(arr, word_count) stmt(                           \
-    for (sz _word_idx = 0; _word_idx < (sz)(word_count); _word_idx++) { \
+    safe_for (sz _word_idx = 0; _word_idx < (sz)(word_count); _word_idx++) { \
       (arr)[_word_idx] = ~0ULL;                                         \
     })
 
 #define BITSET_COUNT(arr, word_count, out) stmt(                        \
     (out) = 0;                                                          \
-    for (sz _word_idx = 0; _word_idx < (sz)(word_count); _word_idx++) { \
+    safe_for (sz _word_idx = 0; _word_idx < (sz)(word_count); _word_idx++) { \
       (out) += popcount_u64((arr)[_word_idx]);                          \
     })
 
 #define BITSET_FIRST_SET(arr, word_count, out) stmt(                    \
     (out) = -1;                                                         \
-    for (sz _word_idx = 0; _word_idx < (sz)(word_count); _word_idx++) { \
+    safe_for (sz _word_idx = 0; _word_idx < (sz)(word_count); _word_idx++) { \
       if ((arr)[_word_idx] != 0ULL) {                                   \
         (out) = (i32)(_word_idx * 64U) + ctz_u64((arr)[_word_idx]);     \
         break;                                                          \
@@ -60,7 +61,7 @@ Example:
 
 #define BITSET_FIRST_CLEAR(arr, word_count, out) stmt(                  \
     (out) = -1;                                                         \
-    for (sz _word_idx = 0; _word_idx < (sz)(word_count); _word_idx++) { \
+    safe_for (sz _word_idx = 0; _word_idx < (sz)(word_count); _word_idx++) { \
       if (~(arr)[_word_idx] != 0ULL) {                                  \
         (out) = (i32)(_word_idx * 64U) + ctz_u64(~(arr)[_word_idx]);    \
         break;                                                          \
@@ -78,7 +79,7 @@ Example:
       if (_bitset_word != 0ULL) {                                                              \
         (out) = (i32)(_bitset_word_idx * 64U) + ctz_u64(_bitset_word);                         \
       } else {                                                                                 \
-        for (_bitset_word_idx += 1; _bitset_word_idx < (sz)(word_count); _bitset_word_idx++) { \
+        safe_for (_bitset_word_idx += 1; _bitset_word_idx < (sz)(word_count); _bitset_word_idx++) { \
           if (_bitset_arr[_bitset_word_idx] != 0ULL) {                                         \
             (out) = (i32)(_bitset_word_idx * 64U) + ctz_u64(_bitset_arr[_bitset_word_idx]);    \
             break;                                                                             \
@@ -89,7 +90,7 @@ Example:
 
 // Typed traversal macro over all set bits.
 #define BITSET_FOREACH_SET(arr, word_count, idx) \
-  for (i32 idx = ({ i32 _bitset_idx = -1; BITSET_FIND_NEXT_SET((arr), (word_count), 0, _bitset_idx); _bitset_idx; });                          \
+  safe_for (i32 idx = ({ i32 _bitset_idx = -1; BITSET_FIND_NEXT_SET((arr), (word_count), 0, _bitset_idx); _bitset_idx; });                          \
        (idx) != -1;                              \
        (idx) = ({ i32 _bitset_idx = -1; BITSET_FIND_NEXT_SET((arr), (word_count), (idx) + 1, _bitset_idx); _bitset_idx; }))
 

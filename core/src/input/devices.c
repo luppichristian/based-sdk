@@ -7,6 +7,7 @@
 #include <SDL3/SDL_hidapi.h>
 #include "basic/utility_defines.h"
 #include "basic/profiler.h"
+#include "basic/safe.h"
 
 const_var u64 DEVICES_AUDIO_RECORDING_BIT = 1ull << 63;
 
@@ -36,7 +37,7 @@ func void devices_cpy_cstring(c8* dst, sz capacity, cstr8 src) {
     return;
   }
 
-  while (src[idx] && (idx + 1) < capacity) {
+  safe_while (src[idx] && (idx + 1) < capacity) {
     dst[idx] = src[idx];
     idx += 1;
   }
@@ -60,7 +61,7 @@ func void devices_cpy_wide_ascii(c8* dst, sz capacity, const wchar_t* src) {
     return;
   }
 
-  while (src[idx] && (idx + 1) < capacity) {
+  safe_while (src[idx] && (idx + 1) < capacity) {
     wchar_t code_unit = src[idx];
     dst[idx] = (code_unit >= 1 && code_unit <= 0x7F) ? (c8)code_unit : '?';
     idx += 1;
@@ -80,7 +81,7 @@ func u64 devices_hash_path(cstr8 src) {
     return 0;
   }
 
-  while (src[idx]) {
+  safe_while (src[idx]) {
     hash_value ^= (u8)src[idx];
     hash_value *= 1099511628211ULL;
     idx += 1;
@@ -250,7 +251,7 @@ func b32 devices_find_tablet_by_idx(sz idx, device_id* out_id) {
   sz current_idx = 0;
   b32 found = false;
 
-  while (entry) {
+  safe_while (entry) {
     if (entry->usage_page == 0x0D) {
       if (current_idx == idx) {
         if (out_id) {
@@ -280,7 +281,7 @@ func b32 devices_find_tablet_info(device_id id, device_info* out_info) {
   SDL_hid_device_info* entry = head;
   b32 found = false;
 
-  while (entry) {
+  safe_while (entry) {
     if (entry->usage_page == 0x0D && devices_hash_path(entry->path) == id.instance) {
       if (out_info) {
         found = devices_try_fill_tablet_info(entry, out_info);
@@ -380,7 +381,7 @@ func sz devices_get_count(device_type type) {
       SDL_hid_device_info* entry = head;
       sz total = 0;
 
-      while (entry) {
+      safe_while (entry) {
         if (entry->usage_page == 0x0D) {
           total += 1;
         }
@@ -519,7 +520,7 @@ func b32 devices_get_info(device_id id, device_info* out_info) {
       SDL_KeyboardID* ids = SDL_GetKeyboards(&count);
       b32 found = false;
 
-      for (int idx = 0; ids && idx < count; idx += 1) {
+      safe_for (int idx = 0; ids && idx < count; idx += 1) {
         if ((u64)ids[idx] == id.instance) {
           found = 1;
           if (out_info) {
@@ -541,7 +542,7 @@ func b32 devices_get_info(device_id id, device_info* out_info) {
       SDL_MouseID* ids = SDL_GetMice(&count);
       b32 found = false;
 
-      for (int idx = 0; ids && idx < count; idx += 1) {
+      safe_for (int idx = 0; ids && idx < count; idx += 1) {
         if ((u64)ids[idx] == id.instance) {
           found = 1;
           if (out_info) {
@@ -563,7 +564,7 @@ func b32 devices_get_info(device_id id, device_info* out_info) {
       SDL_JoystickID* ids = SDL_GetGamepads(&count);
       b32 found = false;
 
-      for (int idx = 0; ids && idx < count; idx += 1) {
+      safe_for (int idx = 0; ids && idx < count; idx += 1) {
         if ((u64)ids[idx] == id.instance) {
           found = 1;
           if (out_info) {
@@ -585,7 +586,7 @@ func b32 devices_get_info(device_id id, device_info* out_info) {
       SDL_JoystickID* ids = SDL_GetJoysticks(&count);
       b32 found = false;
 
-      for (int idx = 0; ids && idx < count; idx += 1) {
+      safe_for (int idx = 0; ids && idx < count; idx += 1) {
         if ((u64)ids[idx] == id.instance) {
           found = 1;
           if (out_info) {
@@ -607,7 +608,7 @@ func b32 devices_get_info(device_id id, device_info* out_info) {
       SDL_TouchID* ids = SDL_GetTouchDevices(&count);
       b32 found = false;
 
-      for (int idx = 0; ids && idx < count; idx += 1) {
+      safe_for (int idx = 0; ids && idx < count; idx += 1) {
         if ((u64)ids[idx] == id.instance) {
           found = 1;
           if (out_info) {
@@ -645,7 +646,7 @@ func b32 devices_get_info(device_id id, device_info* out_info) {
         return false;
       }
 
-      for (int idx = 0; ids && idx < audio_count; idx += 1) {
+      safe_for (int idx = 0; ids && idx < audio_count; idx += 1) {
         if ((u64)ids[idx] == native_id) {
           found = 1;
           if (out_info) {

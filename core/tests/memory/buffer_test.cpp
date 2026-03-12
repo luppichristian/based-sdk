@@ -105,7 +105,7 @@ TEST(memory_buffer_test, zero) {
   buffer_set8(buffer_from(data, sizeof(data)), 0xFF);
   buffer buff = buffer_from(data, 100);
   buffer_zero(buff);
-  for (sz i = 0; i < 100; i++) {
+  safe_for (sz i = 0; i < 100; i++) {
     EXPECT_EQ(0U, data[i]);
   }
 }
@@ -114,7 +114,7 @@ TEST(memory_buffer_test, set8) {
   u8 data[100];
   buffer buff = buffer_from(data, 100);
   buffer_set8(buff, 0x42);
-  for (sz i = 0; i < 100; i++) {
+  safe_for (sz i = 0; i < 100; i++) {
     EXPECT_EQ(0x42U, data[i]);
   }
 }

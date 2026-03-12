@@ -5,6 +5,7 @@
 #include "basic/assert.h"
 #include "basic/profiler.h"
 #include "platform_includes.h"
+#include "basic/safe.h"
 
 func sz stacktrace_capture(stacktrace_frame* out_frames, sz out_capacity, sz skip_frames) {
   profile_func_begin;
@@ -28,7 +29,7 @@ func sz stacktrace_capture(stacktrace_frame* out_frames, sz out_capacity, sz ski
       raw_frames,
       NULL);
 
-  for (frame_idx = 0; frame_idx < (sz)captured && frame_idx < out_capacity; ++frame_idx) {
+  safe_for (frame_idx = 0; frame_idx < (sz)captured && frame_idx < out_capacity; ++frame_idx) {
     out_frames[frame_idx].address = (up)raw_frames[frame_idx];
     out_frames[frame_idx].symbol[0] = '\0';
 
@@ -65,7 +66,7 @@ func sz stacktrace_capture(stacktrace_frame* out_frames, sz out_capacity, sz ski
     begin_idx = captured;
   }
 
-  for (i32 idx = begin_idx; idx < captured && frame_idx < out_capacity; ++idx, ++frame_idx) {
+  safe_for (i32 idx = begin_idx; idx < captured && frame_idx < out_capacity; ++idx, ++frame_idx) {
     out_frames[frame_idx].address = (up)raw_frames[idx];
     out_frames[frame_idx].symbol[0] = '\0';
 

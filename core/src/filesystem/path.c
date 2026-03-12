@@ -12,6 +12,7 @@
 #include "platform_includes.h"
 
 #include <string.h>
+#include "basic/safe.h"
 
 func c8* path_mut_buf(path* value) {
   profile_func_begin;
@@ -76,7 +77,7 @@ func sz path_trimmed_length_cstr(cstr8 src) {
   sz root_len = path_root_length_cstr(src);
   sz src_len = cstr8_len(src);
 
-  while (src_len > root_len && path_is_separator(src[src_len - 1])) {
+  safe_while (src_len > root_len && path_is_separator(src[src_len - 1])) {
     src_len -= 1;
   }
 
@@ -94,7 +95,7 @@ func sz path_name_start_cstr(cstr8 src) {
     return 0;
   }
 
-  while (src_len > root_len) {
+  safe_while (src_len > root_len) {
     if (path_is_separator(src[src_len - 1])) {
       break;
     }
@@ -110,7 +111,7 @@ func sz path_extension_start_cstr(cstr8 src) {
   sz name_idx = path_name_start_cstr(src);
   sz src_len = path_trimmed_length_cstr(src);
 
-  while (src_len > name_idx) {
+  safe_while (src_len > name_idx) {
     if (src[src_len - 1] == '.') {
       if (src_len - 1 == name_idx) {
         profile_func_end;
@@ -189,7 +190,7 @@ func path path_join_cstr(const path* lhs, cstr8 rhs) {
   cstr8_cpy(result.buf, size_of(result.buf), path_buf(lhs));
   path_remove_trailing_slash(&result);
 
-  while (path_is_separator(*rhs)) {
+  safe_while (path_is_separator(*rhs)) {
     rhs += 1;
   }
 
@@ -248,7 +249,7 @@ func void path_norm(path* src) {
   sz write_idx = 0;
   b32 prev_sep = false;
 
-  while (src->buf[read_idx] != '\0') {
+  safe_while (src->buf[read_idx] != '\0') {
     c8 chr = src->buf[read_idx];
     if (chr == '\\') {
       chr = '/';
@@ -348,7 +349,7 @@ func void path_remove_trailing_slash(path* src) {
   sz root_len = path_root_length_cstr(path_buf(src));
   sz src_len = cstr8_len(path_buf(src));
 
-  while (src_len > root_len && path_is_separator(src->buf[src_len - 1])) {
+  safe_while (src_len > root_len && path_is_separator(src->buf[src_len - 1])) {
     src_len -= 1;
   }
 
@@ -404,7 +405,7 @@ func path path_get_common(const path* src_list, sz path_count) {
   result = src_list[0];
   path_norm(&result);
 
-  for (item_idx = 1; item_idx < path_count; item_idx += 1) {
+  safe_for (item_idx = 1; item_idx < path_count; item_idx += 1) {
     current = src_list[item_idx];
     path_norm(&current);
     cstr8_common_prefix(result.buf, current.buf, result.buf, size_of(result.buf));

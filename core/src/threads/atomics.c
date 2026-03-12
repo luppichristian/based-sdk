@@ -6,6 +6,7 @@
 #include "../sdl3_include.h"
 #include "basic/profiler.h"
 #include <stdatomic.h>
+#include "basic/safe.h"
 
 // Layout-compatibility assertions:
 //   atomic_i32 { i32 val; }  <->  SDL_AtomicInt { int value; }    (i32 == int32_t == int)
@@ -202,10 +203,10 @@ func u32 atomic_u32_add(atomic_u32* atom, u32 delta) {
     return 0;
   }
   assert(atom != NULL);
-  u32 old;
-  do {
+  u32 old = atomic_u32_get(atom);
+  safe_while (!SDL_CompareAndSwapAtomicU32((SDL_AtomicU32*)(void*)atom, (Uint32)old, (Uint32)(old + delta))) {
     old = atomic_u32_get(atom);
-  } while (!SDL_CompareAndSwapAtomicU32((SDL_AtomicU32*)(void*)atom, (Uint32)old, (Uint32)(old + delta)));
+  }
   return old;
 }
 
@@ -214,10 +215,10 @@ func u32 atomic_u32_sub(atomic_u32* atom, u32 delta) {
     return 0;
   }
   assert(atom != NULL);
-  u32 old;
-  do {
+  u32 old = atomic_u32_get(atom);
+  safe_while (!SDL_CompareAndSwapAtomicU32((SDL_AtomicU32*)(void*)atom, (Uint32)old, (Uint32)(old - delta))) {
     old = atomic_u32_get(atom);
-  } while (!SDL_CompareAndSwapAtomicU32((SDL_AtomicU32*)(void*)atom, (Uint32)old, (Uint32)(old - delta)));
+  }
   return old;
 }
 

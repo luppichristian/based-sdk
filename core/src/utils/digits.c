@@ -3,12 +3,13 @@
 
 #include "utils/digits.h"
 #include "basic/profiler.h"
+#include "basic/safe.h"
 
 #define DIGITS_DEFINE_UNSIGNED(NAME, TYPE) \
   func sz NAME(TYPE value) {               \
     profile_func_begin;                    \
     sz digits = 1;                         \
-    while (value >= (TYPE)10) {            \
+    safe_while (value >= (TYPE)10) {            \
       value /= (TYPE)10;                   \
       digits++;                            \
     }                                      \
@@ -21,7 +22,7 @@
     profile_func_begin;                  \
     TYPE current = value;                \
     sz digits = 1;                       \
-    while (current <= (TYPE) - 10 ||     \
+    safe_while (current <= (TYPE) - 10 ||     \
            current >= (TYPE)10) {        \
       current /= (TYPE)10;               \
       digits++;                          \

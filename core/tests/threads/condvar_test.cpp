@@ -30,7 +30,7 @@ namespace {
     condvar_signal_ctx* ctx = (condvar_signal_ctx*)arg;
     mutex_lock(ctx->mtx);
     atomic_u32_set(ctx->started, 1);
-    while (atomic_i32_get(ctx->counter) < 1) {
+    safe_while (atomic_i32_get(ctx->counter) < 1) {
       condvar_wait(ctx->cond, ctx->mtx);
     }
     mutex_unlock(ctx->mtx);
@@ -41,7 +41,7 @@ namespace {
     condvar_broadcast_ctx* ctx = (condvar_broadcast_ctx*)arg;
     mutex_lock(ctx->mtx);
     atomic_i32_add(ctx->started, 1);
-    while (atomic_i32_get(ctx->woken) == 0) {
+    safe_while (atomic_i32_get(ctx->woken) == 0) {
       condvar_wait(ctx->cond, ctx->mtx);
     }
     mutex_unlock(ctx->mtx);
@@ -50,11 +50,11 @@ namespace {
 
   func i32 condvar_producer_entry(void* arg) {
     condvar_producer_ctx* ctx = (condvar_producer_ctx*)arg;
-    for (i32 i = 0; i < 10; i++) {
+    safe_for (i32 i = 0; i < 10; i++) {
       mutex_lock(ctx->mtx);
       *ctx->item = i;
       condvar_signal(ctx->cond);
-      while (*ctx->item >= 0) {
+      safe_while (*ctx->item >= 0) {
         condvar_wait(ctx->cond, ctx->mtx);
       }
       mutex_unlock(ctx->mtx);
@@ -85,7 +85,7 @@ TEST(threads_condvar_test, signal_wakes_one) {
   thread thd = thread_create(condvar_signal_waiter_entry, &ctx, (ctx_setup) {0});
   EXPECT_NE(0, thread_is_valid(thd));
 
-  while (atomic_u32_get(&started) == 0) {
+  safe_while (atomic_u32_get(&started) == 0) {
     thread_sleep(1);
   }
 
@@ -110,12 +110,12 @@ TEST(threads_condvar_test, broadcast_wakes_all) {
   condvar_broadcast_ctx ctx = {mtx, cond, &started, &woken};
   thread threads[num_waiters] = {0};
 
-  for (i32 i = 0; i < num_waiters; i++) {
+  safe_for (i32 i = 0; i < num_waiters; i++) {
     threads[i] = thread_create(condvar_broadcast_waiter_entry, &ctx, (ctx_setup) {0});
     EXPECT_NE(0, thread_is_valid(threads[i]));
   }
 
-  while (atomic_i32_get(&started) < num_waiters) {
+  safe_while (atomic_i32_get(&started) < num_waiters) {
     thread_sleep(1);
   }
 
@@ -124,7 +124,7 @@ TEST(threads_condvar_test, broadcast_wakes_all) {
   condvar_broadcast(cond);
   mutex_unlock(mtx);
 
-  for (i32 i = 0; i < num_waiters; i++) {
+  safe_for (i32 i = 0; i < num_waiters; i++) {
     thread_join(threads[i], nullptr);
   }
 
@@ -158,7 +158,7 @@ TEST(threads_condvar_test, producer_consumer) {
   EXPECT_NE(0, thread_is_valid(producer));
 
   i32 last_received = -1;
-  while (atomic_u32_get(&producer_done) == 0 || item >= 0) {
+  safe_while (atomic_u32_get(&producer_done) == 0 || item >= 0) {
     mutex_lock(mtx);
     if (item >= 0) {
       last_received = item;

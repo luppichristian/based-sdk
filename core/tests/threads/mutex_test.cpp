@@ -20,7 +20,7 @@ namespace {
     mutex_lock_ctx* ctx = (mutex_lock_ctx*)arg;
     mutex_lock(ctx->mtx);
     atomic_u32_set(ctx->ready, 1);
-    while (atomic_u32_get(ctx->done) == 0) {
+    safe_while (atomic_u32_get(ctx->done) == 0) {
       thread_sleep(10);
     }
     mutex_unlock(ctx->mtx);
@@ -29,7 +29,7 @@ namespace {
 
   func i32 mutex_counter_entry(void* arg) {
     mutex_counter_ctx* ctx = (mutex_counter_ctx*)arg;
-    for (i32 i = 0; i < 100000; i++) {
+    safe_for (i32 i = 0; i < 100000; i++) {
       mutex_lock(ctx->mtx);
       (*ctx->counter)++;
       mutex_unlock(ctx->mtx);
@@ -97,7 +97,7 @@ TEST(threads_mutex_test, recursive_lock_by_different_thread) {
   thread thd = thread_create(mutex_lock_entry, &ctx, (ctx_setup) {0});
   EXPECT_NE(0, thread_is_valid(thd));
 
-  while (atomic_u32_get(&ready) == 0) {
+  safe_while (atomic_u32_get(&ready) == 0) {
     thread_sleep(1);
   }
 

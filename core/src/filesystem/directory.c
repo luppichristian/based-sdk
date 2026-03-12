@@ -13,6 +13,7 @@
 #include "memory/memops.h"
 
 #include <string.h>
+#include "basic/safe.h"
 
 typedef struct dir_iterate_state {
   path root_path;
@@ -227,7 +228,7 @@ func b32 dir_pending_pop(dir_iterate_state* state, path* out_path) {
 func void dir_pending_clear(dir_iterate_state* state) {
   profile_func_begin;
   dir_pending_dir* node = NULL;
-  while (state->pending_head != NULL) {
+  safe_while (state->pending_head != NULL) {
     SINGLY_LIST_POP_FRONT(state->pending_head, state->pending_tail, node);
     SDL_free(node);
   }
@@ -584,7 +585,7 @@ func b32 dir_create_recursive(const path* src) {
   assert(cur_path.buf[0] != '\0');
 
   root_len = dir_root_length(cur_path.buf);
-  for (item_idx = root_len; cur_path.buf[item_idx] != '\0'; item_idx += 1) {
+  safe_for (item_idx = root_len; cur_path.buf[item_idx] != '\0'; item_idx += 1) {
     if (cur_path.buf[item_idx] == '/') {
       c8 saved_chr = cur_path.buf[item_idx];
       cur_path.buf[item_idx] = '\0';

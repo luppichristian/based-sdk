@@ -16,6 +16,7 @@
 #include "memory/memops.h"
 
 #include <string.h>
+#include "basic/safe.h"
 
 func filestream_error filestream_set_error(filestream* stm, filestream_error error_code) {
   profile_func_begin;
@@ -88,7 +89,7 @@ func archive_entry* filestream_find_archive_entry(archive* arc, const path* src)
     return NULL;
   }
 
-  for (item_idx = 0; item_idx < arc->entry_count; item_idx += 1) {
+  safe_for (item_idx = 0; item_idx < arc->entry_count; item_idx += 1) {
     path ent_path = path_norm_trimmed_cpy(&arc->entries[item_idx].item_path);
     if (cstr8_cmp(ent_path.buf, item_path.buf)) {
       profile_func_end;
@@ -124,7 +125,7 @@ func b32 filestream_reserve_memory(filestream* stm, sz min_capacity) {
   }
 
   new_capacity = stm->memory_capacity == 0 ? 64 : stm->memory_capacity;
-  while (new_capacity < min_capacity) {
+  safe_while (new_capacity < min_capacity) {
     if (new_capacity > SZ_MAX / 2) {
       new_capacity = min_capacity;
       break;
@@ -454,7 +455,7 @@ func b32 filestream_read_exact(filestream* stm, void* dst, sz size) {
   sz total_read = 0;
   u8* dst_ptr = (u8*)dst;
 
-  while (total_read < size) {
+  safe_while (total_read < size) {
     sz step_size = filestream_read(stm, dst_ptr + total_read, size - total_read);
     if (step_size == 0) {
       profile_func_end;
@@ -535,7 +536,7 @@ func b32 filestream_write_exact(filestream* stm, const void* src, sz size) {
   sz total_write = 0;
   const u8* src_ptr = (const u8*)src;
 
-  while (total_write < size) {
+  safe_while (total_write < size) {
     sz step_size = filestream_write(stm, src_ptr + total_write, size - total_write);
     if (step_size == 0) {
       profile_func_end;

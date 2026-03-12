@@ -10,6 +10,7 @@
 #include "context/thread_ctx.h"
 #include "basic/profiler.h"
 #include <SDL3/SDL_hidapi.h>
+#include "basic/safe.h"
 
 func void tablet_internal_on_msg(msg* src);
 func void keyboard_internal_on_msg(msg* src);
@@ -68,11 +69,11 @@ func b32 msg_user_space_ensure(void) {
     return true;
   }
 
-  for (msg_category category = MSG_CATEGORY_GRAPHICS; category < MSG_CATEGORY_MAX; category += 1) {
+  safe_for (msg_category category = MSG_CATEGORY_GRAPHICS; category < MSG_CATEGORY_MAX; category += 1) {
     u32 base_type = SDL_RegisterEvents((int)MSG_CATEGORY_USER_TYPE_COUNT);
     if (base_type == (u32)-1) {
       thread_log_error("Failed to register SDL user event range category=%u error=%s", (u32)category, SDL_GetError());
-      for (sz idx = 0; idx < MSG_CATEGORY_MAX; idx += 1) {
+      safe_for (sz idx = 0; idx < MSG_CATEGORY_MAX; idx += 1) {
         msg_user_space_bases[idx] = 0;
       }
       msg_user_spaces_ready = false;
@@ -136,7 +137,7 @@ func b32 msg_user_space_decode_sdl_type(u32 sdl_type, msg_category* out_category
     return false;
   }
 
-  for (msg_category category = MSG_CATEGORY_GRAPHICS; category < MSG_CATEGORY_MAX; category += 1) {
+  safe_for (msg_category category = MSG_CATEGORY_GRAPHICS; category < MSG_CATEGORY_MAX; category += 1) {
     u32 base_type = msg_user_space_bases[(sz)category];
     if (sdl_type >= base_type && sdl_type < (base_type + MSG_CATEGORY_USER_TYPE_COUNT)) {
       if (out_category != NULL) {
@@ -175,7 +176,7 @@ func u64 msg_hash_path(cstr8 src) {
     return 0;
   }
 
-  while (src[idx]) {
+  safe_while (src[idx]) {
     hash_value ^= (u8)src[idx];
     hash_value *= 1099511628211ULL;
     idx += 1;
@@ -196,7 +197,7 @@ func b32 msg_device_list_contains(const device_id* list, sz count, device_id src
     return false;
   }
 
-  for (sz item_idx = 0; item_idx < count; item_idx += 1) {
+  safe_for (sz item_idx = 0; item_idx < count; item_idx += 1) {
     if (msg_device_id_equal(list[item_idx], src)) {
       profile_func_end;
       return true;
@@ -213,7 +214,7 @@ func sz msg_collect_touch_devices(device_id* out_ids, sz cap) {
   SDL_TouchID* ids = SDL_GetTouchDevices(&count);
   sz out_count = 0;
 
-  for (int item_idx = 0; ids && item_idx < count && out_count < cap; item_idx += 1) {
+  safe_for (int item_idx = 0; ids && item_idx < count && out_count < cap; item_idx += 1) {
     if (ids[item_idx] == 0) {
       continue;
     }
@@ -237,7 +238,7 @@ func sz msg_collect_tablet_devices(device_id* out_ids, sz cap) {
   SDL_hid_device_info* entry = head;
   sz out_count = 0;
 
-  while (entry && out_count < cap) {
+  safe_while (entry && out_count < cap) {
     if (entry->usage_page == 0x0D && entry->path != NULL) {
       out_ids[out_count].type = DEVICE_TYPE_TABLET;
       out_ids[out_count].instance = msg_hash_path(entry->path);
@@ -282,20 +283,20 @@ func void msg_refresh_touch_devices(void) {
   device_id current_ids[MSG_DEVICE_TRACK_CAP] = {0};
   sz current_count = msg_collect_touch_devices(current_ids, count_of(current_ids));
 
-  for (sz item_idx = 0; item_idx < current_count; item_idx += 1) {
+  safe_for (sz item_idx = 0; item_idx < current_count; item_idx += 1) {
     if (!msg_device_list_contains(previous_ids, previous_count, current_ids[item_idx])) {
       msg_post_touch_device_event(MSG_CORE_TYPE_TOUCH_ADDED, current_ids[item_idx]);
     }
   }
 
-  for (sz item_idx = 0; item_idx < previous_count; item_idx += 1) {
+  safe_for (sz item_idx = 0; item_idx < previous_count; item_idx += 1) {
     if (!msg_device_list_contains(current_ids, current_count, previous_ids[item_idx])) {
       msg_post_touch_device_event(MSG_CORE_TYPE_TOUCH_REMOVED, previous_ids[item_idx]);
     }
   }
 
   previous_count = current_count;
-  for (sz item_idx = 0; item_idx < previous_count; item_idx += 1) {
+  safe_for (sz item_idx = 0; item_idx < previous_count; item_idx += 1) {
     previous_ids[item_idx] = current_ids[item_idx];
   }
   profile_func_end;
@@ -308,20 +309,20 @@ func void msg_refresh_tablet_devices(void) {
   device_id current_ids[MSG_DEVICE_TRACK_CAP] = {0};
   sz current_count = msg_collect_tablet_devices(current_ids, count_of(current_ids));
 
-  for (sz item_idx = 0; item_idx < current_count; item_idx += 1) {
+  safe_for (sz item_idx = 0; item_idx < current_count; item_idx += 1) {
     if (!msg_device_list_contains(previous_ids, previous_count, current_ids[item_idx])) {
       msg_post_tablet_device_event(MSG_CORE_TYPE_TABLET_ADDED, current_ids[item_idx]);
     }
   }
 
-  for (sz item_idx = 0; item_idx < previous_count; item_idx += 1) {
+  safe_for (sz item_idx = 0; item_idx < previous_count; item_idx += 1) {
     if (!msg_device_list_contains(current_ids, current_count, previous_ids[item_idx])) {
       msg_post_tablet_device_event(MSG_CORE_TYPE_TABLET_REMOVED, previous_ids[item_idx]);
     }
   }
 
   previous_count = current_count;
-  for (sz item_idx = 0; item_idx < previous_count; item_idx += 1) {
+  safe_for (sz item_idx = 0; item_idx < previous_count; item_idx += 1) {
     previous_ids[item_idx] = current_ids[item_idx];
   }
   profile_func_end;
@@ -373,8 +374,8 @@ func b32 msg_handler_should_run_for_type(const msg_handler_entry* entry, u32 typ
 
 func void msg_handler_sort_entries(void) {
   profile_func_begin;
-  for (u32 outer_idx = 0; outer_idx < msg_handler_count; outer_idx += 1) {
-    for (u32 inner_idx = outer_idx + 1; inner_idx < msg_handler_count; inner_idx += 1) {
+  safe_for (u32 outer_idx = 0; outer_idx < msg_handler_count; outer_idx += 1) {
+    safe_for (u32 inner_idx = outer_idx + 1; inner_idx < msg_handler_count; inner_idx += 1) {
       msg_handler_entry* lhs = &msg_handler_entries[outer_idx];
       msg_handler_entry* rhs = &msg_handler_entries[inner_idx];
       b32 swap_needed = false;
@@ -408,11 +409,11 @@ func b32 msg_dispatch_handlers(msg* posted_msg, msg_handler_stage stage) {
     dispatch_count = dispatch_cap;
   }
 
-  for (u32 idx = 0; idx < dispatch_count; idx += 1) {
+  safe_for (u32 idx = 0; idx < dispatch_count; idx += 1) {
     dispatch_entries[idx] = msg_handler_entries[idx];
   }
 
-  for (u32 idx = 0; idx < dispatch_count; idx += 1) {
+  safe_for (u32 idx = 0; idx < dispatch_count; idx += 1) {
     msg_handler_entry* entry = &dispatch_entries[idx];
 
     if (entry->handler_fn == NULL) {
@@ -443,7 +444,7 @@ func b32 msg_dispatch_handlers(msg* posted_msg, msg_handler_stage stage) {
     }
 
     if (stage == MSG_HANDLER_STAGE_BEFORE_POST && result == MSG_HANDLER_RESULT_CANCEL_POST) {
-      for (u32 once_idx = 0; once_idx < once_handler_count; once_idx += 1) {
+      safe_for (u32 once_idx = 0; once_idx < once_handler_count; once_idx += 1) {
         (void)msg_remove_handler(once_handler_ids[once_idx]);
       }
       profile_func_end;
@@ -451,7 +452,7 @@ func b32 msg_dispatch_handlers(msg* posted_msg, msg_handler_stage stage) {
     }
   }
 
-  for (u32 once_idx = 0; once_idx < once_handler_count; once_idx += 1) {
+  safe_for (u32 once_idx = 0; once_idx < once_handler_count; once_idx += 1) {
     (void)msg_remove_handler(once_handler_ids[once_idx]);
   }
 
@@ -1436,7 +1437,7 @@ func b32 msg_to_sdl_event(msg* src, SDL_Event* out_event) {
       out_event->sensor.type = (SDL_EventType)src->type;
       out_event->sensor.timestamp = (Uint64)src->timestamp;
       out_event->sensor.which = (SDL_SensorID)sensor_to_native_id(msg_core_get_sensor(src)->sensor);
-      for (sz idx = 0; idx < count_of(msg_core_get_sensor(src)->data); idx += 1) {
+      safe_for (sz idx = 0; idx < count_of(msg_core_get_sensor(src)->data); idx += 1) {
         out_event->sensor.data[idx] = msg_core_get_sensor(src)->data[idx];
       }
       out_event->sensor.sensor_timestamp = (Uint64)msg_core_get_sensor(src)->sensor_timestamp;
@@ -1472,7 +1473,7 @@ func b32 msg_poll(msg* out_msg) {
   }
   assert(out_msg != NULL);
 
-  while (SDL_PollEvent(&native_event)) {
+  safe_while (SDL_PollEvent(&native_event)) {
     if (!msg_from_sdl(&native_event, out_msg)) {
       thread_log_verbose("Skipped SDL event during poll type=%u because translation failed", (u32)native_event.type);
       continue;
@@ -1502,7 +1503,7 @@ func b32 msg_wait(msg* out_msg) {
   assert(out_msg != NULL);
 
   msg_refresh_synthetic_device_msgs();
-  while (SDL_PollEvent(&native_event)) {
+  safe_while (SDL_PollEvent(&native_event)) {
     if (!msg_from_sdl(&native_event, out_msg)) {
       continue;
     }
@@ -1514,7 +1515,7 @@ func b32 msg_wait(msg* out_msg) {
     return true;
   }
 
-  for (;;) {
+  safe_for (;;) {
     if (!SDL_WaitEvent(&native_event)) {
       thread_log_error("SDL_WaitEvent failed error=%s", SDL_GetError());
       profile_func_end;
@@ -1551,7 +1552,7 @@ func b32 msg_wait_timeout(msg* out_msg, i32 timeout_ms) {
   assert(out_msg != NULL);
 
   msg_refresh_synthetic_device_msgs();
-  while (SDL_PollEvent(&native_event)) {
+  safe_while (SDL_PollEvent(&native_event)) {
     if (!msg_from_sdl(&native_event, out_msg)) {
       continue;
     }
@@ -1753,12 +1754,12 @@ func b32 msg_remove_handler(u64 handler_id) {
   }
   assert(handler_id != 0);
 
-  for (u32 idx = 0; idx < msg_handler_count; idx += 1) {
+  safe_for (u32 idx = 0; idx < msg_handler_count; idx += 1) {
     if (msg_handler_entries[idx].handler_id != handler_id) {
       continue;
     }
 
-    for (u32 move_idx = idx + 1; move_idx < msg_handler_count; move_idx += 1) {
+    safe_for (u32 move_idx = idx + 1; move_idx < msg_handler_count; move_idx += 1) {
       msg_handler_entries[move_idx - 1] = msg_handler_entries[move_idx];
     }
 
@@ -1776,7 +1777,7 @@ func b32 msg_remove_handler(u64 handler_id) {
 
 func void msg_clear_handlers(void) {
   profile_func_begin;
-  for (u32 idx = 0; idx < msg_handler_count; idx += 1) {
+  safe_for (u32 idx = 0; idx < msg_handler_count; idx += 1) {
     msg_handler_entries[idx] = (msg_handler_entry) {0};
   }
 

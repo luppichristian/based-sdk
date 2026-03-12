@@ -43,7 +43,7 @@ TEST(utils_random_series_test, seed_sets_seed_and_current) {
 TEST(utils_random_series_test, integer_ranges_stay_in_bounds) {
   random_series series = make_series(77U);
 
-  for (i32 idx = 0; idx < 256; ++idx) {
+  safe_for (i32 idx = 0; idx < 256; ++idx) {
     u8 u8_value = random_series_rng_u8(&series, (u8)3, (u8)9);
     u16 u16_value = random_series_rng_u16(&series, (u16)100, (u16)500);
     u32 u32_value = random_series_rng_u32(&series, 5U, 17U);
@@ -75,7 +75,7 @@ TEST(utils_random_series_test, integer_ranges_stay_in_bounds) {
 TEST(utils_random_series_test, swapped_integer_ranges_are_supported) {
   random_series series = make_series(991U);
 
-  for (i32 idx = 0; idx < 256; ++idx) {
+  safe_for (i32 idx = 0; idx < 256; ++idx) {
     u32 u32_value = random_series_rng_u32(&series, 20U, 7U);
     i64 i64_value = random_series_rng_i64(&series, 15LL, -15LL);
 
@@ -89,7 +89,7 @@ TEST(utils_random_series_test, swapped_integer_ranges_are_supported) {
 TEST(utils_random_series_test, chance_respects_extremes) {
   random_series series = make_series(44U);
 
-  for (i32 idx = 0; idx < 64; ++idx) {
+  safe_for (i32 idx = 0; idx < 64; ++idx) {
     EXPECT_EQ((b32)1, random_series_chance(&series, 0));
     EXPECT_EQ((b32)1, random_series_chance(&series, 1));
     EXPECT_EQ((b32)0, random_series_chance_f32(&series, 0.0f));
@@ -102,7 +102,7 @@ TEST(utils_random_series_test, chance_respects_extremes) {
 TEST(utils_random_series_test, floating_helpers_stay_in_domain) {
   random_series series = make_series(2026U);
 
-  for (i32 idx = 0; idx < 512; ++idx) {
+  safe_for (i32 idx = 0; idx < 512; ++idx) {
     f32 unilateral32 = random_series_u_f32(&series);
     f32 bilateral32 = random_series_b_f32(&series);
     f64 unilateral64 = random_series_u_f64(&series);

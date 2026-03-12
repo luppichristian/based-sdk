@@ -13,6 +13,7 @@
 #include <stdarg.h>
 #include <stdio.h>
 #include <string.h>
+#include "basic/safe.h"
 
 // =========================================================================
 // Internal helpers
@@ -409,7 +410,7 @@ func log_frame* log_state_end_frame(log_state* state, u32 severity_mask) {
   log_msg* kept_tail = NULL;
   sz kept_count = 0;
   log_msg* msg = NULL;
-  while (frame->msgs_head) {
+  safe_while (frame->msgs_head) {
     SINGLY_LIST_POP_FRONT(frame->msgs_head, frame->msgs_tail, msg);
     if (!log_level_matches_mask(msg->level, severity_mask)) {
       continue;

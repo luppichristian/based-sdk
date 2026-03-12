@@ -5,6 +5,7 @@
 #include "basic/profiler.h"
 
 #include <string.h>
+#include "basic/safe.h"
 
 typedef union mem_ptr_cast {
   void* ptr;
@@ -28,7 +29,7 @@ func void mem_set16(void* ptr, u16 value, sz count) {
     return;
   }
   u16* dst = (u16*)ptr;
-  for (sz idx = 0; idx < count; idx++) {
+  safe_for (sz idx = 0; idx < count; idx++) {
     dst[idx] = value;
   }
   profile_func_end;
@@ -41,7 +42,7 @@ func void mem_set32(void* ptr, u32 value, sz count) {
     return;
   }
   u32* dst = (u32*)ptr;
-  for (sz idx = 0; idx < count; idx++) {
+  safe_for (sz idx = 0; idx < count; idx++) {
     dst[idx] = value;
   }
   profile_func_end;
@@ -54,7 +55,7 @@ func void mem_set64(void* ptr, u64 value, sz count) {
     return;
   }
   u64* dst = (u64*)ptr;
-  for (sz idx = 0; idx < count; idx++) {
+  safe_for (sz idx = 0; idx < count; idx++) {
     dst[idx] = value;
   }
   profile_func_end;

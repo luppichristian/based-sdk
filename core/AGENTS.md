@@ -19,6 +19,7 @@ For project-wide policies and module organization rules, see `AGENTS.md` at repo
 - Functions starting with `_` should be called through their convenience macro so callsite info is preserved (see `include/basic/codespace.h` and `CALLSITE_HERE`).
 - Keep `include/based_core.h` up to date when creating/changing public core headers.
 - Keep `api_index.txt` up to date whenever public API signatures/macros/headers change.
+- `include/basic/safe.h` provides `safe_for` and `safe_while`; use them for fixed or regular loops, and do not convert game loops.
 
 ## Core Profiling Policy
 

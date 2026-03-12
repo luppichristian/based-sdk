@@ -4,6 +4,7 @@
 #include "memory/scratch.h"
 #include "basic/assert.h"
 #include "basic/profiler.h"
+#include "basic/safe.h"
 
 // =========================================================================
 // Create / Destroy
@@ -50,7 +51,7 @@ func void scratch_end(scratch* scr) {
 
   // Walk all blocks that were allocated after the checkpoint and free owned ones.
   arena_block* blk = scr->saved_tail ? scr->saved_tail->next : arn->blocks_head;
-  while (blk) {
+  safe_while (blk) {
     arena_block* nxt = blk->next;
     if (blk->owned && arn->parent.alloc_fn) {
       _allocator_dealloc(arn->parent, blk, CALLSITE_HERE);

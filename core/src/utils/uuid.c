@@ -12,6 +12,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <time.h>
+#include "basic/safe.h"
 
 func uuid uuid_zero(void) {
   uuid value = {0};
@@ -34,7 +35,7 @@ func uuid uuid_from_bytes(const u8* bytes) {
 func uuid uuid_from_u64(u64 upper, u64 lower) {
   profile_func_begin;
   uuid value = {0};
-  for (sz idx = 0; idx < 8; idx++) {
+  safe_for (sz idx = 0; idx < 8; idx++) {
     u32 shift = (u32)(56U - (u32)idx * 8U);
     value.bytes[idx] = (u8)((upper >> shift) & 0xFFU);
     value.bytes[idx + 8] = (u8)((lower >> shift) & 0xFFU);
@@ -57,7 +58,7 @@ func void uuid_get_bytes(uuid value, u8* dst) {
 func u64 uuid_get_upper(uuid value) {
   profile_func_begin;
   u64 result = 0;
-  for (sz idx = 0; idx < 8; idx++) {
+  safe_for (sz idx = 0; idx < 8; idx++) {
     result = (result << 8U) | (u64)value.bytes[idx];
   }
   profile_func_end;
@@ -67,7 +68,7 @@ func u64 uuid_get_upper(uuid value) {
 func u64 uuid_get_lower(uuid value) {
   profile_func_begin;
   u64 result = 0;
-  for (sz idx = 8; idx < 16; idx++) {
+  safe_for (sz idx = 8; idx < 16; idx++) {
     result = (result << 8U) | (u64)value.bytes[idx];
   }
   profile_func_end;
@@ -76,7 +77,7 @@ func u64 uuid_get_lower(uuid value) {
 
 func b32 uuid_is_zero(uuid value) {
   profile_func_begin;
-  for (sz idx = 0; idx < count_of(value.bytes); idx++) {
+  safe_for (sz idx = 0; idx < count_of(value.bytes); idx++) {
     if (value.bytes[idx] != 0U) {
       profile_func_end;
       return false;
@@ -92,7 +93,7 @@ func b32 uuid_equal(uuid lhs, uuid rhs) {
 
 func i32 uuid_cmp(uuid lhs, uuid rhs) {
   profile_func_begin;
-  for (sz idx = 0; idx < count_of(lhs.bytes); idx++) {
+  safe_for (sz idx = 0; idx < count_of(lhs.bytes); idx++) {
     if (lhs.bytes[idx] < rhs.bytes[idx]) {
       profile_func_end;
       return -1;
@@ -134,7 +135,7 @@ func b32 uuid_parse_cstr8(cstr8 src, uuid* out) {
   uuid value = {0};
   sz src_idx = 0;
   sz byte_idx = 0;
-  while (src_idx < uuid_string_length()) {
+  safe_while (src_idx < uuid_string_length()) {
     if (src_idx == 8 || src_idx == 13 || src_idx == 18 || src_idx == 23) {
       if (src[src_idx] != '-') {
         profile_func_end;
@@ -178,7 +179,7 @@ func b32 uuid_to_cstr8(uuid value, c8* dst, sz cap) {
   }
 
   sz dst_idx = 0;
-  for (sz byte_idx = 0; byte_idx < count_of(value.bytes); byte_idx++) {
+  safe_for (sz byte_idx = 0; byte_idx < count_of(value.bytes); byte_idx++) {
     if (dst_idx == 8 || dst_idx == 13 || dst_idx == 18 || dst_idx == 23) {
       dst[dst_idx++] = '-';
     }
@@ -298,7 +299,7 @@ func uuid uuid_generate_v4(random_series* series) {
   }
   profile_func_begin;
   uuid value = {0};
-  for (sz idx = 0; idx < count_of(value.bytes); idx++) {
+  safe_for (sz idx = 0; idx < count_of(value.bytes); idx++) {
     value.bytes[idx] = random_series_u8(series);
   }
 

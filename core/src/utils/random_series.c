@@ -6,6 +6,7 @@
 #include "basic/assert.h"
 #include "basic/profiler.h"
 #include "context/thread_ctx.h"
+#include "basic/safe.h"
 
 func u32 random_series_next_u32(random_series* series) {
   series->current = series->current * 1664525U + 1013904223U;
@@ -45,7 +46,7 @@ func u32 random_series_bounded_u32(random_series* series, u32 bound) {
   }
 
   u32 threshold = (u32)(0U - bound) % bound;
-  for (;;) {
+  safe_for (;;) {
     u32 value = random_series_next_u32(series);
     if (value >= threshold) {
       return value % bound;
@@ -59,7 +60,7 @@ func u64 random_series_bounded_u64(random_series* series, u64 bound) {
   }
 
   u64 threshold = (u64)(0ULL - bound) % bound;
-  for (;;) {
+  safe_for (;;) {
     u64 value = random_series_next_u64(series);
     if (value >= threshold) {
       return value % bound;

@@ -10,6 +10,7 @@
 #include "memory/memops.h"
 
 #include <string.h>
+#include "basic/safe.h"
 
 global_var global_ctx process_global_ctx = {0};
 global_var atomic_i32 process_global_ctx_init = {0};
@@ -17,7 +18,7 @@ thread_local global_var b8 global_user_data_access[CTX_USER_DATA_COUNT] = {0};
 
 func void global_user_data_access_set_all_local(b8 has_access) {
   profile_func_begin;
-  for (sz idx = 0; idx < CTX_USER_DATA_COUNT; idx += 1) {
+  safe_for (sz idx = 0; idx < CTX_USER_DATA_COUNT; idx += 1) {
     global_user_data_access[idx] = has_access ? true : false;
   }
   profile_func_end;
@@ -86,7 +87,7 @@ func b32 global_ctx_init(ctx_setup setup) {
   }
 
   global_log_verbose("Waiting for global context initialization");
-  while (atomic_i32_get(&process_global_ctx_init) == 1) {
+  safe_while (atomic_i32_get(&process_global_ctx_init) == 1) {
     atomic_pause();
   }
   atomic_fence_acquire();

@@ -71,7 +71,7 @@ TEST(memory_vmem_test, alloc_zero_init) {
 
   u8* byte_ptr = (u8*)ptr;
   bool all_zero = true;
-  for (sz i = 0; i < size; i++) {
+  safe_for (sz i = 0; i < size; i++) {
     if (byte_ptr[i] != 0) {
       all_zero = false;
       break;
@@ -88,7 +88,7 @@ TEST(memory_vmem_test, realloc_basic) {
   EXPECT_NE(nullptr, ptr);
 
   u8* byte_ptr = (u8*)ptr;
-  for (sz i = 0; i < 100; i++) {
+  safe_for (sz i = 0; i < 100; i++) {
     byte_ptr[i] = (u8)(i & 0xFF);
   }
 
@@ -98,7 +98,7 @@ TEST(memory_vmem_test, realloc_basic) {
 
   u8* new_byte_ptr = (u8*)new_ptr;
   bool data_preserved = true;
-  for (sz i = 0; i < 100; i++) {
+  safe_for (sz i = 0; i < 100; i++) {
     if (new_byte_ptr[i] != (u8)(i & 0xFF)) {
       data_preserved = false;
       break;
@@ -115,7 +115,7 @@ TEST(memory_vmem_test, realloc_shrink) {
   EXPECT_NE(nullptr, ptr);
 
   u8* byte_ptr = (u8*)ptr;
-  for (sz i = 0; i < 100; i++) {
+  safe_for (sz i = 0; i < 100; i++) {
     byte_ptr[i] = (u8)((i + 50) & 0xFF);
   }
 
@@ -125,7 +125,7 @@ TEST(memory_vmem_test, realloc_shrink) {
 
   u8* new_byte_ptr = (u8*)new_ptr;
   bool data_preserved = true;
-  for (sz i = 0; i < 100; i++) {
+  safe_for (sz i = 0; i < 100; i++) {
     if (new_byte_ptr[i] != (u8)((i + 50) & 0xFF)) {
       data_preserved = false;
       break;
@@ -179,12 +179,12 @@ TEST(memory_vmem_test, alloc_larger_than_page) {
 
 TEST(memory_vmem_test, multiple_allocations) {
   void* ptrs[10];
-  for (int i = 0; i < 10; i++) {
+  safe_for (int i = 0; i < 10; i++) {
     ptrs[i] = vmem_alloc(1024);
     EXPECT_NE(nullptr, ptrs[i]);
   }
 
-  for (int i = 0; i < 10; i++) {
+  safe_for (int i = 0; i < 10; i++) {
     b32 result = vmem_free(ptrs[i], 1024);
     EXPECT_NE(0, result);
   }

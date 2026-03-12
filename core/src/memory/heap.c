@@ -12,6 +12,7 @@
 #include "basic/profiler.h"
 #include "memory/memops.h"
 #include <string.h>
+#include "basic/safe.h"
 
 // =========================================================================
 // Internal Helpers
@@ -52,7 +53,7 @@ func b32 heap_free_list_remove(heap* hep, heap_chunk* chunk) {
   profile_func_begin;
   heap_chunk* prev = NULL;
   heap_chunk* cur = hep->free_head;
-  while (cur) {
+  safe_while (cur) {
     if (cur == chunk) {
       if (prev) {
         prev->next_free = cur->next_free;
@@ -108,7 +109,7 @@ func void* heap_try_alloc(heap* hep, sz size, sz eff_align) {
   heap_chunk* prev = NULL;
   heap_chunk* chunk = hep->free_head;
 
-  while (chunk) {
+  safe_while (chunk) {
     u8* raw = (u8*)(chunk + 1);
     // Advance past the back-reference slot, then align up.
     u8* usr = (u8*)mem_align_forward(raw + HEAP_BACK_REF_SZ, eff_align);
@@ -330,11 +331,11 @@ func b32 heap_remove_block(heap* hep, void* ptr) {
   heap_block* prev = NULL;
   heap_block* blk = hep->blocks_head;
 
-  while (blk) {
+  safe_while (blk) {
     if ((void*)blk == ptr) {
       // Purge this block's free chunks from the global free list.
       heap_chunk* chunk = (heap_chunk*)(blk + 1);
-      while (chunk) {
+      safe_while (chunk) {
         if (chunk->is_free) {
           heap_free_list_remove(hep, chunk);
         }
@@ -579,7 +580,7 @@ func sz heap_total_free(heap* hep) {
     mutex_lock(hep->opt_mutex);
   }
   sz total = 0;
-  for (heap_chunk* chunk = hep->free_head; chunk != NULL; chunk = chunk->next_free) {
+  safe_for (heap_chunk* chunk = hep->free_head; chunk != NULL; chunk = chunk->next_free) {
     total += chunk->size;
   }
   if (hep->opt_mutex) {
