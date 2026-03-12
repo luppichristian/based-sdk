@@ -95,8 +95,22 @@ const_var SDL_InitFlags SDL_INIT_FLAGS =
 
 func b32 entry_init(cmdline cmdline) {
   profile_func_begin;
-  b32 should_capture_cmdline =
-      entry_cmdline_current.args == NULL && cmdline.args != NULL && cmdline.count > 0;
+
+  if (!global_ctx_init(entry_start_setup)) {
+    global_log_error("Global context initialization failed");
+    profile_func_end;
+    return false;
+  }
+
+  global_log_info("Global context initialized");
+  global_log_verbose("Initializing thread context");
+  ctx_setup thread_setup = entry_start_setup;
+  thread_setup.main_allocator = global_get_allocator();
+  if (!thread_ctx_init(thread_setup)) {
+    global_log_error("Thread context initialization failed");
+    profile_func_end;
+    return false;
+  }
 
   global_log_info("Initializing entry runtime");
   global_log_trace("Entry init state cmdline_count=%zu has_allocator=%u has_global_ctx=%u has_thread_ctx=%u",
@@ -131,33 +145,10 @@ func b32 entry_init(cmdline cmdline) {
     profile_func_end;
     return false;
   }
-
   global_log_info("SDL initialized");
-
-  global_log_verbose("Initializing global context");
-  if (!global_ctx_init(entry_start_setup)) {
-    global_log_error("Global context initialization failed");
-    profile_func_end;
-    return false;
-  }
-
-  global_log_info("Global context initialized");
-  global_log_verbose("Initializing thread context");
-  ctx_setup thread_setup = entry_start_setup;
-  thread_setup.main_allocator = global_get_allocator();
-  if (!thread_ctx_init(thread_setup)) {
-    global_log_error("Thread context initialization failed");
-    profile_func_end;
-    return false;
-  }
 
   if (!thread_log_sync()) {
     thread_log_warn("Thread log sync failed");
-  }
-
-  if (should_capture_cmdline) {
-    entry_cmdline_current = cmdline;
-    thread_log_debug("Captured command line count=%zu", (size_t)cmdline.count);
   }
 
   thread_log_info("Entry runtime initialized");
@@ -185,6 +176,11 @@ func void entry_quit(void) {
     return;
   }
 
+  if (has_sdl) {
+    global_log_verbose("Shutting down SDL");
+    SDL_Quit();
+  }
+
   if (has_thread_ctx) {
     thread_log_verbose("Shutting down thread context");
     if (!thread_ctx_quit()) {
@@ -197,11 +193,6 @@ func void entry_quit(void) {
     if (!global_ctx_quit()) {
       thread_log_error("Failed shutting global context");
     }
-  }
-
-  if (has_sdl) {
-    global_log_verbose("Shutting down SDL");
-    SDL_Quit();
   }
 
   profile_func_end;

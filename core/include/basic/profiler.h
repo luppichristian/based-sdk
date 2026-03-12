@@ -7,36 +7,25 @@
 #include "primitive_types.h"
 
 // =========================================================================
-// Profiler configuration
-// =========================================================================
-
-// Enable profiling by default in debug/profile builds.
-// Users can override this with -DBASED_PROFILER_ENABLED=0/1.
-#ifndef BASED_PROFILER_ENABLED
-#  if defined(BUILD_DEBUG) || defined(BUILD_PROFILE)
-#    define BASED_PROFILER_ENABLED 1
-#  else
-#    define BASED_PROFILER_ENABLED 0
-#  endif
-#endif
-
-// =========================================================================
 // Tracy include
 // =========================================================================
 
 // Respect build-system definitions and only enable Tracy when profiling is on.
-#if BASED_PROFILER_ENABLED
+#ifdef BASED_PROFILER_ENABLED
 #  if !defined(TRACY_ENABLE)
-#    define TRACY_ENABLE 1
+#    define TRACY_ENABLE    1
+#    define TRACY_CALLSTACK 32
 #  endif
-#endif
-
-// Set max callstack depth
-#define TRACY_CALLSTACK 32
 
 // Include Tracy profiler, macros expand to nothing if tracy is disabled.
-#include <tracy/TracyC.h>
+#  include <tracy/TracyC.h>
 
 // Helper functions for convenience
-#define profile_func_begin TracyCZoneN(__tracy_zone_ctx, __func__, 1)
-#define profile_func_end   TracyCZoneEnd(__tracy_zone_ctx)
+#  define profile_func_begin TracyCZoneN(__tracy_zone_ctx, __func__, 1)
+#  define profile_func_end   TracyCZoneEnd(__tracy_zone_ctx)
+#else
+#  define profile_func_begin     ((void)0)
+#  define profile_func_end       ((void)0)
+#  define TracyCAlloc(ptr, size) ((void)(ptr), (void)(size))
+#  define TracyCFree(ptr)        ((void)(ptr))
+#endif

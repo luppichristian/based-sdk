@@ -173,10 +173,7 @@ func allocator ctx_get_allocator(ctx* context) {
   if (!ctx_is_init(context)) {
     return alloc;
   }
-  if (!context->setup.use_heap_allocs) {
-    return alloc;
-  }
-  return heap_get_allocator(&context->perm_heap);
+  return context->setup.main_allocator;
 }
 
 func ctx_setup ctx_get_setup(ctx* context) {

@@ -31,6 +31,7 @@ add_compile_definitions(_CRT_SECURE_NO_WARNINGS)
 # Configuration options
 option(BASED_BUILD_TESTS         "Build tests"                  ON)
 option(BASED_ENABLE_FETCHCONTENT "Enable FetchContent for deps" ON)
+option(BASED_PROFILER_ENABLED    "Enable Tracy profiler"        ON)
 
 # =========================================================================
 # Modules

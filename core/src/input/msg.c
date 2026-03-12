@@ -1629,6 +1629,8 @@ func void msg_flush(u32 type_min, u32 type_max) {
 }
 
 func b32 _msg_post(const msg* src, callsite site) {
+  return true;  // TODO: Temporary
+
   profile_func_begin;
   SDL_Event native_event;
   msg posted_msg;

@@ -112,10 +112,8 @@ func log_frame* thread_log_end_frame(u32 severity_mask) {
 
 func b32 thread_ctx_init(ctx_setup setup) {
   profile_func_begin;
-  if (!setup.main_allocator.alloc_fn || thread_ctx.is_init) {
-    thread_log_error("Invalid thread context initialization request has_alloc=%u is_init=%u",
-                     (u32)(setup.main_allocator.alloc_fn != NULL),
-                     (u32)thread_ctx.is_init);
+  if (thread_ctx.is_init) {
+    thread_log_error("Thread context already initialized");
     profile_func_end;
     return false;
   }
