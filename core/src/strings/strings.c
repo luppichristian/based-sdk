@@ -112,6 +112,20 @@ func b32 str8_ends_with(str8 str, cstr8 suffix) {
   return res;
 }
 
+func u32 str8_hash32(str8 str) {
+  profile_func_begin;
+  u32 res = cstr8_hash32(str.ptr);
+  profile_func_end;
+  return res;
+}
+
+func u64 str8_hash64(str8 str) {
+  profile_func_begin;
+  u64 res = cstr8_hash64(str.ptr);
+  profile_func_end;
+  return res;
+}
+
 func b32 str8_to_i64(str8 str, i64* out) {
   profile_func_begin;
   b32 res = cstr8_to_i64(str.ptr, out);
@@ -395,6 +409,20 @@ func b32 str16_ends_with(str16 str, cstr16 suffix) {
   return res;
 }
 
+func u32 str16_hash32(str16 str) {
+  profile_func_begin;
+  u32 res = cstr16_hash32(str.ptr);
+  profile_func_end;
+  return res;
+}
+
+func u64 str16_hash64(str16 str) {
+  profile_func_begin;
+  u64 res = cstr16_hash64(str.ptr);
+  profile_func_end;
+  return res;
+}
+
 func b32 str16_to_i64(str16 str, i64* out) {
   profile_func_begin;
   b32 res = cstr16_to_i64(str.ptr, out);
@@ -619,6 +647,20 @@ func b32 str32_starts_with(str32 str, cstr32 prefix) {
 func b32 str32_ends_with(str32 str, cstr32 suffix) {
   profile_func_begin;
   b32 res = cstr32_ends_with(str.ptr, suffix);
+  profile_func_end;
+  return res;
+}
+
+func u32 str32_hash32(str32 str) {
+  profile_func_begin;
+  u32 res = cstr32_hash32(str.ptr);
+  profile_func_end;
+  return res;
+}
+
+func u64 str32_hash64(str32 str) {
+  profile_func_begin;
+  u64 res = cstr32_hash64(str.ptr);
   profile_func_end;
   return res;
 }

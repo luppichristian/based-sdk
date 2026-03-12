@@ -22,10 +22,10 @@ func void mem_set64(void* ptr, u64 value, sz count);
 // Zeroes a raw byte range.
 func void mem_zero(void* ptr, sz size);
 
-// Copy / move / compare wrappers for raw byte ranges.
+// Copy / move / equality wrappers for raw byte ranges.
 func void* mem_cpy(void* dst, const void* src, sz size);
 func void* mem_move(void* dst, const void* src, sz size);
-func i32 mem_cmp(const void* lhs, const void* rhs, sz size);
+func b32 mem_cmp(const void* lhs, const void* rhs, sz size);
 
 // Pointer alignment helpers for generic memory addresses.
 // align should be a power of two when alignment is required.

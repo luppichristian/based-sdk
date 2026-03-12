@@ -38,6 +38,14 @@ func sz cstr32_len_impl(cstr32 str) {
   return len;
 }
 
+func u32 fnv1a32_step(u32 hash_value, u32 value) {
+  return (hash_value ^ value) * 16777619U;
+}
+
+func u64 fnv1a64_step(u64 hash_value, u64 value) {
+  return (hash_value ^ value) * 1099511628211ULL;
+}
+
 // =========================================================================
 // cstr8 — Basic
 // =========================================================================
@@ -301,7 +309,7 @@ func cstr8 cstr8_find_last(cstr8 str, cstr8 sub) {
   cstr8 last = NULL;
   sz limit = str_len - sub_len;
   for (sz idx = 0; idx <= limit; idx++) {
-    if (mem_cmp(str + idx, sub, sub_len) == 0) {
+    if (mem_cmp(str + idx, sub, sub_len)) {
       last = str + idx;
     }
   }
@@ -352,6 +360,36 @@ func b32 cstr8_ends_with(cstr8 str, cstr8 suffix) {
   }
   profile_func_end;
   return cstr8_cmp(str + str_len - suffix_len, suffix);
+}
+
+func u32 cstr8_hash32(cstr8 str) {
+  profile_func_begin;
+  if (str == NULL) {
+    profile_func_end;
+    return 0;
+  }
+
+  u32 hash_value = 2166136261U;
+  for (sz idx = 0; str[idx] != '\0'; idx += 1) {
+    hash_value = fnv1a32_step(hash_value, (u8)str[idx]);
+  }
+  profile_func_end;
+  return hash_value;
+}
+
+func u64 cstr8_hash64(cstr8 str) {
+  profile_func_begin;
+  if (str == NULL) {
+    profile_func_end;
+    return 0;
+  }
+
+  u64 hash_value = 1469598103934665603ULL;
+  for (sz idx = 0; str[idx] != '\0'; idx += 1) {
+    hash_value = fnv1a64_step(hash_value, (u8)str[idx]);
+  }
+  profile_func_end;
+  return hash_value;
 }
 
 // =========================================================================
@@ -469,7 +507,7 @@ func sz cstr8_replace(c8* str, sz str_cap, cstr8 from, cstr8 rep) {
   sz pos = 0;
   sz str_len = cstr8_len(str);
   while (pos + from_len <= str_len) {
-    if (mem_cmp(str + pos, from, from_len) == 0) {
+    if (mem_cmp(str + pos, from, from_len)) {
       sz new_len = str_len - from_len + rep_len;
       if (new_len >= str_cap) {
         break;
@@ -797,7 +835,7 @@ func cstr16 cstr16_find(cstr16 str, cstr16 sub) {
   }
   sz limit = str_len - sub_len;
   for (sz idx = 0; idx <= limit; idx++) {
-    if (mem_cmp(str + idx, sub, sub_len * size_of(c16)) == 0) {
+    if (mem_cmp(str + idx, sub, sub_len * size_of(c16))) {
       profile_func_end;
       return str + idx;
     }
@@ -821,7 +859,7 @@ func cstr16 cstr16_find_last(cstr16 str, cstr16 sub) {
   cstr16 last = NULL;
   sz limit = str_len - sub_len;
   for (sz idx = 0; idx <= limit; idx++) {
-    if (mem_cmp(str + idx, sub, sub_len * size_of(c16)) == 0) {
+    if (mem_cmp(str + idx, sub, sub_len * size_of(c16))) {
       last = str + idx;
     }
   }
@@ -887,7 +925,37 @@ func b32 cstr16_ends_with(cstr16 str, cstr16 suffix) {
     return false;
   }
   profile_func_end;
-  return mem_cmp(str + str_len - suffix_len, suffix, suffix_len * size_of(c16)) == 0 ? true : false;
+  return mem_cmp(str + str_len - suffix_len, suffix, suffix_len * size_of(c16));
+}
+
+func u32 cstr16_hash32(cstr16 str) {
+  profile_func_begin;
+  if (str == NULL) {
+    profile_func_end;
+    return 0;
+  }
+
+  u32 hash_value = 2166136261U;
+  for (sz idx = 0; str[idx] != (c16)'\0'; idx += 1) {
+    hash_value = fnv1a32_step(hash_value, (u16)str[idx]);
+  }
+  profile_func_end;
+  return hash_value;
+}
+
+func u64 cstr16_hash64(cstr16 str) {
+  profile_func_begin;
+  if (str == NULL) {
+    profile_func_end;
+    return 0;
+  }
+
+  u64 hash_value = 1469598103934665603ULL;
+  for (sz idx = 0; str[idx] != (c16)'\0'; idx += 1) {
+    hash_value = fnv1a64_step(hash_value, (u16)str[idx]);
+  }
+  profile_func_end;
+  return hash_value;
 }
 
 // =========================================================================
@@ -988,7 +1056,7 @@ func b32 cstr16_remove_suffix(c16* str, cstr16 suffix) {
     profile_func_end;
     return false;
   }
-  if (mem_cmp(str + str_len - suffix_len, suffix, suffix_len * size_of(c16)) != 0) {
+  if (!mem_cmp(str + str_len - suffix_len, suffix, suffix_len * size_of(c16))) {
     profile_func_end;
     return false;
   }
@@ -1009,7 +1077,7 @@ func sz cstr16_replace(c16* str, sz str_cap, cstr16 from, cstr16 rep) {
   sz pos = 0;
   sz str_len = cstr16_len_impl(str);
   while (pos + from_len <= str_len) {
-    if (mem_cmp(str + pos, from, from_len * size_of(c16)) == 0) {
+    if (mem_cmp(str + pos, from, from_len * size_of(c16))) {
       sz new_len = str_len - from_len + rep_len;
       if (new_len >= str_cap) {
         break;
@@ -1253,7 +1321,7 @@ func cstr32 cstr32_find(cstr32 str, cstr32 sub) {
   }
   sz limit = str_len - sub_len;
   for (sz idx = 0; idx <= limit; idx++) {
-    if (mem_cmp(str + idx, sub, sub_len * size_of(c32)) == 0) {
+    if (mem_cmp(str + idx, sub, sub_len * size_of(c32))) {
       profile_func_end;
       return str + idx;
     }
@@ -1277,7 +1345,7 @@ func cstr32 cstr32_find_last(cstr32 str, cstr32 sub) {
   cstr32 last = NULL;
   sz limit = str_len - sub_len;
   for (sz idx = 0; idx <= limit; idx++) {
-    if (mem_cmp(str + idx, sub, sub_len * size_of(c32)) == 0) {
+    if (mem_cmp(str + idx, sub, sub_len * size_of(c32))) {
       last = str + idx;
     }
   }
@@ -1343,7 +1411,37 @@ func b32 cstr32_ends_with(cstr32 str, cstr32 suffix) {
     return false;
   }
   profile_func_end;
-  return mem_cmp(str + str_len - suffix_len, suffix, suffix_len * size_of(c32)) == 0 ? true : false;
+  return mem_cmp(str + str_len - suffix_len, suffix, suffix_len * size_of(c32));
+}
+
+func u32 cstr32_hash32(cstr32 str) {
+  profile_func_begin;
+  if (str == NULL) {
+    profile_func_end;
+    return 0;
+  }
+
+  u32 hash_value = 2166136261U;
+  for (sz idx = 0; str[idx] != (c32)'\0'; idx += 1) {
+    hash_value = fnv1a32_step(hash_value, (u32)str[idx]);
+  }
+  profile_func_end;
+  return hash_value;
+}
+
+func u64 cstr32_hash64(cstr32 str) {
+  profile_func_begin;
+  if (str == NULL) {
+    profile_func_end;
+    return 0;
+  }
+
+  u64 hash_value = 1469598103934665603ULL;
+  for (sz idx = 0; str[idx] != (c32)'\0'; idx += 1) {
+    hash_value = fnv1a64_step(hash_value, (u32)str[idx]);
+  }
+  profile_func_end;
+  return hash_value;
 }
 
 // =========================================================================
@@ -1444,7 +1542,7 @@ func b32 cstr32_remove_suffix(c32* str, cstr32 suffix) {
     profile_func_end;
     return false;
   }
-  if (mem_cmp(str + str_len - suffix_len, suffix, suffix_len * size_of(c32)) != 0) {
+  if (!mem_cmp(str + str_len - suffix_len, suffix, suffix_len * size_of(c32))) {
     profile_func_end;
     return false;
   }
@@ -1465,7 +1563,7 @@ func sz cstr32_replace(c32* str, sz str_cap, cstr32 from, cstr32 rep) {
   sz pos = 0;
   sz str_len = cstr32_len_impl(str);
   while (pos + from_len <= str_len) {
-    if (mem_cmp(str + pos, from, from_len * size_of(c32)) == 0) {
+    if (mem_cmp(str + pos, from, from_len * size_of(c32))) {
       sz new_len = str_len - from_len + rep_len;
       if (new_len >= str_cap) {
         break;

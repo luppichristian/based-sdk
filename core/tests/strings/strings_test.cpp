@@ -129,6 +129,13 @@ TEST(strings_strings_test, str8_ends_with) {
   EXPECT_FALSE(str8_ends_with(str, "xyz") != 0);
 }
 
+TEST(strings_strings_test, str8_hash_forwards_to_cstr_hash) {
+  c8 buf[32];
+  str8 str = str8_from_cstr(buf, sizeof(buf), "hello");
+  EXPECT_EQ(cstr8_hash32(str.ptr), str8_hash32(str));
+  EXPECT_EQ(cstr8_hash64(str.ptr), str8_hash64(str));
+}
+
 TEST(strings_strings_test, str8_to_i64) {
   c8 buf[32];
   str8 str = str8_from_cstr(buf, sizeof(buf), "12345");
@@ -379,6 +386,14 @@ TEST(strings_strings_test, str16_ends_with) {
   EXPECT_TRUE(str16_ends_with(str, suffix) != 0);
 }
 
+TEST(strings_strings_test, str16_hash_forwards_to_cstr_hash) {
+  c16 buf[32];
+  c16 src[] = {'h', 'e', 'l', 'l', 'o', 0};
+  str16 str = str16_from_cstr(buf, sizeof(buf), src);
+  EXPECT_EQ(cstr16_hash32(str.ptr), str16_hash32(str));
+  EXPECT_EQ(cstr16_hash64(str.ptr), str16_hash64(str));
+}
+
 TEST(strings_strings_test, str16_to_upper) {
   c16 buf[32];
   c16 src[] = {'h', 'e', 'l', 'l', 'o', 0};
@@ -594,6 +609,14 @@ TEST(strings_strings_test, str32_ends_with) {
   str32 str = str32_from_cstr(buf, sizeof(buf), src);
 
   EXPECT_TRUE(str32_ends_with(str, suffix) != 0);
+}
+
+TEST(strings_strings_test, str32_hash_forwards_to_cstr_hash) {
+  c32 buf[32];
+  c32 src[] = {'h', 'e', 'l', 'l', 'o', 0};
+  str32 str = str32_from_cstr(buf, sizeof(buf), src);
+  EXPECT_EQ(cstr32_hash32(str.ptr), str32_hash32(str));
+  EXPECT_EQ(cstr32_hash64(str.ptr), str32_hash64(str));
 }
 
 TEST(strings_strings_test, str32_to_upper) {

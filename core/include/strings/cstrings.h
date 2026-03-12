@@ -87,6 +87,12 @@ func b32 cstr8_starts_with(cstr8 str, cstr8 prefix);
 // Returns 1 if str ends with suffix, 0 otherwise.
 func b32 cstr8_ends_with(cstr8 str, cstr8 suffix);
 
+// Hashes str with FNV-1a and returns a 32-bit hash value.
+func u32 cstr8_hash32(cstr8 str);
+
+// Hashes str with FNV-1a and returns a 64-bit hash value.
+func u64 cstr8_hash64(cstr8 str);
+
 // Converts all ASCII letters in str to uppercase, in place.
 func void cstr8_to_upper(c8* str);
 
@@ -193,6 +199,12 @@ func b32 cstr16_starts_with(cstr16 str, cstr16 prefix);
 // Returns 1 if str ends with suffix, 0 otherwise.
 func b32 cstr16_ends_with(cstr16 str, cstr16 suffix);
 
+// Hashes str with FNV-1a and returns a 32-bit hash value.
+func u32 cstr16_hash32(cstr16 str);
+
+// Hashes str with FNV-1a and returns a 64-bit hash value.
+func u64 cstr16_hash64(cstr16 str);
+
 // Converts all ASCII letters in str to uppercase, in place.
 func void cstr16_to_upper(c16* str);
 
@@ -294,6 +306,12 @@ func b32 cstr32_starts_with(cstr32 str, cstr32 prefix);
 
 // Returns 1 if str ends with suffix, 0 otherwise.
 func b32 cstr32_ends_with(cstr32 str, cstr32 suffix);
+
+// Hashes str with FNV-1a and returns a 32-bit hash value.
+func u32 cstr32_hash32(cstr32 str);
+
+// Hashes str with FNV-1a and returns a 64-bit hash value.
+func u64 cstr32_hash64(cstr32 str);
 
 // Converts all ASCII letters in str to uppercase, in place.
 func void cstr32_to_upper(c32* str);

@@ -10,10 +10,10 @@ TEST(memory_memops_test, set_copy_compare_and_zero_work) {
   mem_set32(src_words, 0x1234ABCDU, count_of(src_words));
   mem_cpy(dst_words, src_words, size_of(src_words));
 
-  EXPECT_EQ(0, mem_cmp(src_words, dst_words, size_of(src_words)));
+  EXPECT_TRUE(mem_cmp(src_words, dst_words, size_of(src_words)));
 
   mem_zero(dst_words, size_of(dst_words));
-  EXPECT_NE(0, mem_cmp(src_words, dst_words, size_of(src_words)));
+  EXPECT_FALSE(mem_cmp(src_words, dst_words, size_of(src_words)));
 }
 
 TEST(memory_memops_test, align_helpers_match_expected_boundaries) {

@@ -204,12 +204,6 @@ func heap _heap_create(allocator parent_alloc, mutex opt_mutex, sz default_block
   heap hep;
   mem_zero(&hep, size_of(hep));
   hep.parent = parent_alloc;
-  if (hep.parent.alloc_fn == NULL || hep.parent.dealloc_fn == NULL) {
-    hep.parent = thread_get_allocator();
-  }
-  if (hep.parent.alloc_fn == NULL || hep.parent.dealloc_fn == NULL) {
-    hep.parent = global_get_allocator();
-  }
   hep.opt_mutex = opt_mutex;
   hep.default_block_sz = default_block_sz;
   msg_core_object_lifecycle_data msg_data = {

@@ -131,6 +131,11 @@ TEST(strings_cstrings_test, cstr8_ends_with) {
   EXPECT_FALSE(cstr8_ends_with("hello", "xyz") != 0);
 }
 
+TEST(strings_cstrings_test, cstr8_hash_matches_expected_fnv1a) {
+  EXPECT_EQ(0x4F9F2CABU, cstr8_hash32("hello"));
+  EXPECT_EQ(0xA430D84680AABD0BULL, cstr8_hash64("hello"));
+}
+
 TEST(strings_cstrings_test, cstr8_to_upper) {
   c8 buf[] = "hello";
   cstr8_to_upper(buf);
@@ -295,6 +300,16 @@ TEST(strings_cstrings_test, cstr16_ends_with) {
   EXPECT_TRUE(cstr16_ends_with(src, suffix) != 0);
 }
 
+TEST(strings_cstrings_test, cstr16_hash_is_stable) {
+  c16 hello[] = {'h', 'e', 'l', 'l', 'o', 0};
+  c16 hello_again[] = {'h', 'e', 'l', 'l', 'o', 0};
+  c16 world[] = {'w', 'o', 'r', 'l', 'd', 0};
+  EXPECT_EQ(cstr16_hash32(hello), cstr16_hash32(hello_again));
+  EXPECT_EQ(cstr16_hash64(hello), cstr16_hash64(hello_again));
+  EXPECT_NE(cstr16_hash32(hello), cstr16_hash32(world));
+  EXPECT_NE(cstr16_hash64(hello), cstr16_hash64(world));
+}
+
 TEST(strings_cstrings_test, cstr16_to_upper) {
   c16 buf[] = {'h', 'e', 'l', 'l', 'o', 0};
   cstr16_to_upper(buf);
@@ -351,6 +366,11 @@ TEST(strings_cstrings_test, cstr32_ends_with) {
   c32 src[] = {'h', 'e', 'l', 'l', 'o', 0};
   c32 suffix[] = {'l', 'o', 0};
   EXPECT_TRUE(cstr32_ends_with(src, suffix) != 0);
+}
+
+TEST(strings_cstrings_test, cstr32_hash_null_is_zero) {
+  EXPECT_EQ(0U, cstr32_hash32(NULL));
+  EXPECT_EQ(0ULL, cstr32_hash64(NULL));
 }
 
 TEST(strings_cstrings_test, cstr32_to_upper) {

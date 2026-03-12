@@ -87,14 +87,23 @@ func b32 uuid_is_zero(uuid value) {
 }
 
 func b32 uuid_equal(uuid lhs, uuid rhs) {
-  return mem_cmp(lhs.bytes, rhs.bytes, size_of(lhs.bytes)) == 0 ? true : false;
+  return mem_cmp(lhs.bytes, rhs.bytes, size_of(lhs.bytes));
 }
 
 func i32 uuid_cmp(uuid lhs, uuid rhs) {
   profile_func_begin;
-  i32 res = mem_cmp(lhs.bytes, rhs.bytes, size_of(lhs.bytes));
+  for (sz idx = 0; idx < count_of(lhs.bytes); idx++) {
+    if (lhs.bytes[idx] < rhs.bytes[idx]) {
+      profile_func_end;
+      return -1;
+    }
+    if (lhs.bytes[idx] > rhs.bytes[idx]) {
+      profile_func_end;
+      return 1;
+    }
+  }
   profile_func_end;
-  return res;
+  return 0;
 }
 
 func u8 uuid_get_version(uuid value) {

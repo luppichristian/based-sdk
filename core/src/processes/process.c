@@ -39,7 +39,10 @@ func process _process_create(cstr8 const* args, callsite site) {
   return res;
 }
 
-func process _process_create_with(cstr8 const* args, process_options options, callsite site) {
+func process _process_create_with(
+    cstr8 const* args,
+    process_options options,
+    callsite site) {
   profile_func_begin;
 
   if (!args || !args[0]) {

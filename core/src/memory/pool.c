@@ -136,12 +136,6 @@ func pool _pool_create(
   pool pol;
   mem_zero(&pol, size_of(pol));
   pol.parent = parent_alloc;
-  if (pol.parent.alloc_fn == NULL || pol.parent.dealloc_fn == NULL) {
-    pol.parent = thread_get_allocator();
-  }
-  if (pol.parent.alloc_fn == NULL || pol.parent.dealloc_fn == NULL) {
-    pol.parent = global_get_allocator();
-  }
   pol.opt_mutex = opt_mutex;
   pol.default_block_sz = default_block_sz;
   pol.object_size = object_size;

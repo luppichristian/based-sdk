@@ -63,6 +63,12 @@ func b32 str8_starts_with(str8 str, cstr8 prefix);
 // Returns 1 if str ends with suffix, 0 otherwise.
 func b32 str8_ends_with(str8 str, cstr8 suffix);
 
+// Hashes str with FNV-1a and returns a 32-bit hash value.
+func u32 str8_hash32(str8 str);
+
+// Hashes str with FNV-1a and returns a 64-bit hash value.
+func u64 str8_hash64(str8 str);
+
 // Parses str as a base-10 integer and writes the result to *out.
 // Returns 1 on success, 0 on invalid input or overflow.
 func b32 str8_to_i64(str8 str, i64* out);
@@ -185,6 +191,12 @@ func b32 str16_starts_with(str16 str, cstr16 prefix);
 // Returns 1 if str ends with suffix, 0 otherwise.
 func b32 str16_ends_with(str16 str, cstr16 suffix);
 
+// Hashes str with FNV-1a and returns a 32-bit hash value.
+func u32 str16_hash32(str16 str);
+
+// Hashes str with FNV-1a and returns a 64-bit hash value.
+func u64 str16_hash64(str16 str);
+
 // Parses str as a base-10 integer and writes the result to *out.
 // Returns 1 on success, 0 on invalid input or overflow.
 func b32 str16_to_i64(str16 str, i64* out);
@@ -290,6 +302,12 @@ func b32 str32_starts_with(str32 str, cstr32 prefix);
 
 // Returns 1 if str ends with suffix, 0 otherwise.
 func b32 str32_ends_with(str32 str, cstr32 suffix);
+
+// Hashes str with FNV-1a and returns a 32-bit hash value.
+func u32 str32_hash32(str32 str);
+
+// Hashes str with FNV-1a and returns a 64-bit hash value.
+func u64 str32_hash64(str32 str);
 
 // Parses str as a base-10 integer and writes the result to *out.
 // Returns 1 on success, 0 on invalid input or overflow.

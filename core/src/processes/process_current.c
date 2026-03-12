@@ -8,7 +8,9 @@
 #include "basic/env_defines.h"
 #include "processes/process.h"
 #include "basic/profiler.h"
-
+#include "strings/cstrings.h"
+#include "../sdl3_include.h"
+#include "basic/third_party.h"
 #include <errno.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -26,7 +28,7 @@
 
 #if defined(PLATFORM_WINDOWS)
 // Mapping of our process_priority enum to Win32 priority classes.
-const_var DWORD win32_process_priorities[] = {
+const_var DWORD WIN32_PROCESS_PRIORITIES[] = {
     BELOW_NORMAL_PRIORITY_CLASS,
     NORMAL_PRIORITY_CLASS,
     HIGH_PRIORITY_CLASS,
@@ -43,22 +45,6 @@ global_var HANDLE process_unique_handle = NULL;
 global_var i32 process_unique_fd = -1;
 #endif
 
-func u64 process_hash_str(cstr8 src) {
-  profile_func_begin;
-  if (src == NULL) {
-    profile_func_end;
-    return 0;
-  }
-
-  u64 hash_value = 1469598103934665603ULL;
-  for (sz idx = 0; src[idx] != '\0'; idx += 1) {
-    hash_value ^= (u8)src[idx];
-    hash_value *= 1099511628211ULL;
-  }
-  profile_func_end;
-  return hash_value;
-}
-
 func b32 process_unique_init_once(void) {
   profile_func_begin;
   if (process_unique_init_done) {
@@ -69,7 +55,7 @@ func b32 process_unique_init_once(void) {
 
   cmdline cmdl = entry_get_cmdline();
   cstr8 exe_name = cmdline_get_program(cmdl);
-  u64 key_hash = process_hash_str(exe_name != NULL ? exe_name : "based");
+  u64 key_hash = cstr8_hash64(exe_name != NULL ? exe_name : "based");
 
 #if defined(PLATFORM_WINDOWS)
   c8 mutex_name[96] = {0};
@@ -95,7 +81,7 @@ func b32 process_unique_init_once(void) {
     }
   }
 #else
-  thread_log_warn("Single instance check is unsupported on this platform");
+  invalid_code_path;
   process_unique_is_single = false;
 #endif
 
@@ -168,7 +154,7 @@ func b32 process_set_priority(process_priority priority) {
   assert(priority >= PROCESS_PRIORITY_LOW && priority <= PROCESS_PRIORITY_REALTIME);
 
 #if defined(PLATFORM_WINDOWS)
-  b32 success = SetPriorityClass(GetCurrentProcess(), win32_process_priorities[priority]) != 0;
+  b32 success = SetPriorityClass(GetCurrentProcess(), WIN32_PROCESS_PRIORITIES[priority]) != 0;
   if (!success) {
     thread_log_error("Failed to set process priority priority=%u error=%lu",
                      (u32)priority,
@@ -212,8 +198,7 @@ func b32 process_set_priority(process_priority priority) {
   profile_func_end;
   return success;
 #else
-  (void)priority;
-  thread_log_warn("Process priority changes are unsupported on this platform");
+  invalid_code_path;
   profile_func_end;
   return false;
 #endif
@@ -254,12 +239,15 @@ func b32 process_restart(void) {
 func u64 process_id(void) {
   profile_func_begin;
 #if defined(PLATFORM_WINDOWS)
+  u64 res = (u64)GetCurrentProcessId();
   profile_func_end;
-  return (u64)GetCurrentProcessId();
+  return res;
 #elif defined(PLATFORM_UNIX)
+  u64 res = (u64)getpid();
   profile_func_end;
-  return (u64)getpid();
+  return;
 #else
+  invalid_code_path;
   profile_func_end;
   return 0;
 #endif
@@ -269,11 +257,7 @@ func no_return void process_exit(i32 exit_code) {
   profile_func_begin;
   thread_log_info("Exiting process exit_code=%d", exit_code);
   profile_func_end;
-#if defined(PLATFORM_WINDOWS)
-  ExitProcess((UINT)exit_code);
-#else
   exit(exit_code);
-#endif
 }
 
 func no_return void process_abort(void) {

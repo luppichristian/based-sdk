@@ -92,13 +92,13 @@ func void* mem_move(void* dst, const void* src, sz size) {
   return result;
 }
 
-func i32 mem_cmp(const void* lhs, const void* rhs, sz size) {
+func b32 mem_cmp(const void* lhs, const void* rhs, sz size) {
   profile_func_begin;
   if (size == 0) {
     profile_func_end;
-    return 0;
+    return true;
   }
-  i32 result = memcmp(lhs, rhs, size);
+  b32 result = memcmp(lhs, rhs, size) == 0 ? true : false;
   profile_func_end;
   return result;
 }

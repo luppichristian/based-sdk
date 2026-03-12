@@ -29,6 +29,9 @@ func void _assert(b32 condition, const char* msg, callsite site);
 // Convenience macro for assertions with a custom message. It will call the _assert function.
 #define assert_msg(condition, msg) _assert((condition), msg, CALLSITE_HERE)
 
+// Invalid codepath helper macro
+#define invalid_code_path assert(!"Invalid code path")
+
 // =========================================================================
 // Assert mode
 // =========================================================================
