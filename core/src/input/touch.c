@@ -29,15 +29,12 @@ func sz touch_get_total_count(void) {
   return result;
 }
 
-func b32 touch_get_device_id(sz idx, device_id* out_id) {
+func device touch_get_device(sz idx) {
   profile_func_begin;
   int count = 0;
   SDL_TouchID* ids = SDL_GetTouchDevices(&count);
+  device result = NULL;
   b32 found = ids && idx < (sz)count;
-
-  if (out_id) {
-    *out_id = (device_id) {0};
-  }
 
   if (ids == NULL && count != 0) {
     thread_log_error("Failed to enumerate touch devices for id lookup idx=%zu error=%s", (size_t)idx, SDL_GetError());
@@ -45,9 +42,8 @@ func b32 touch_get_device_id(sz idx, device_id* out_id) {
     thread_log_warn("Touch device lookup missed idx=%zu count=%d", (size_t)idx, count);
   }
 
-  if (found && out_id) {
-    out_id->type = DEVICE_TYPE_TOUCH;
-    out_id->instance = (u64)ids[idx];
+  if (found) {
+    result = devices_make_id(DEVICE_TYPE_TOUCH, (u64)ids[idx]);
   }
 
   if (ids) {
@@ -55,34 +51,34 @@ func b32 touch_get_device_id(sz idx, device_id* out_id) {
   }
 
   profile_func_end;
-  return found;
+  return result;
 }
 
-func touch_device_kind touch_get_device_kind(device_id id) {
+func touch_device_kind touch_get_device_kind(device dev_id) {
   profile_func_begin;
-  if (id.type != DEVICE_TYPE_TOUCH) {
-    thread_log_warn("Rejected touch device kind query for invalid device type=%u", (u32)id.type);
+  if (devices_get_type(dev_id) != DEVICE_TYPE_TOUCH) {
+    thread_log_warn("Rejected touch device kind query for invalid device type=%u", (u32)devices_get_type(dev_id));
     profile_func_end;
     return TOUCH_DEVICE_INVALID;
   }
 
-  touch_device_kind result = (touch_device_kind)SDL_GetTouchDeviceType((SDL_TouchID)id.instance);
+  touch_device_kind result = (touch_device_kind)SDL_GetTouchDeviceType((SDL_TouchID)devices_get_instance(dev_id));
   profile_func_end;
   return result;
 }
 
-func sz touch_get_finger_count(device_id id) {
+func sz touch_get_finger_count(device dev_id) {
   profile_func_begin;
   int count = 0;
   SDL_Finger** fingers = NULL;
 
-  if (id.type != DEVICE_TYPE_TOUCH) {
-    thread_log_warn("Rejected touch finger count query for invalid device type=%u", (u32)id.type);
+  if (devices_get_type(dev_id) != DEVICE_TYPE_TOUCH) {
+    thread_log_warn("Rejected touch finger count query for invalid device type=%u", (u32)devices_get_type(dev_id));
     profile_func_end;
     return 0;
   }
 
-  fingers = SDL_GetTouchFingers((SDL_TouchID)id.instance, &count);
+  fingers = SDL_GetTouchFingers((SDL_TouchID)devices_get_instance(dev_id), &count);
   if (fingers) {
     SDL_free(fingers);
   }
@@ -92,7 +88,7 @@ func sz touch_get_finger_count(device_id id) {
   return result;
 }
 
-func b32 touch_get_finger(device_id id, sz idx, touch_finger_state* out_finger) {
+func b32 touch_get_finger(device dev_id, sz idx, touch_finger_state* out_finger) {
   profile_func_begin;
   int count = 0;
   SDL_Finger** fingers = NULL;
@@ -102,17 +98,19 @@ func b32 touch_get_finger(device_id id, sz idx, touch_finger_state* out_finger) 
     *out_finger = (touch_finger_state) {0};
   }
 
-  if (id.type != DEVICE_TYPE_TOUCH || !out_finger) {
-    thread_log_error("Rejected touch finger query type=%u out_finger=%p", (u32)id.type, (void*)out_finger);
+  if (devices_get_type(dev_id) != DEVICE_TYPE_TOUCH || !out_finger) {
+    thread_log_error("Rejected touch finger query type=%u out_finger=%p",
+                     (u32)devices_get_type(dev_id),
+                     (void*)out_finger);
     profile_func_end;
     return false;
   }
   assert(out_finger != NULL);
 
-  fingers = SDL_GetTouchFingers((SDL_TouchID)id.instance, &count);
+  fingers = SDL_GetTouchFingers((SDL_TouchID)devices_get_instance(dev_id), &count);
   if (fingers == NULL && count != 0) {
     thread_log_error("Failed to enumerate touch fingers device=%llu error=%s",
-                     (unsigned long long)id.instance,
+                     (unsigned long long)devices_get_instance(dev_id),
                      SDL_GetError());
   }
   if (fingers && idx < (sz)count && fingers[idx]) {
@@ -123,7 +121,7 @@ func b32 touch_get_finger(device_id id, sz idx, touch_finger_state* out_finger) 
     found = 1;
   } else {
     thread_log_warn("Touch finger lookup missed device=%llu idx=%zu count=%d",
-                    (unsigned long long)id.instance,
+                    (unsigned long long)devices_get_instance(dev_id),
                     (size_t)idx,
                     count);
   }

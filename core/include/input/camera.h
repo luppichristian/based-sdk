@@ -6,12 +6,11 @@
 #include "../basic/primitive_types.h"
 #include "../memory/buffer.h"
 #include "../strings/cstrings.h"
+#include "devices.h"
 
 // =========================================================================
 c_begin;
 // =========================================================================
-
-typedef void* camera;
 
 typedef enum camera_pos {
   CAMERA_POS_UNKNOWN = 0,
@@ -29,17 +28,17 @@ func sz camera_get_total_count(void);
 func b32 camera_get_id(sz idx, camera* out_id);
 
 // Returns a backend-defined camera name for id, or NULL when unavailable.
-func cstr8 camera_get_name(camera id);
+func cstr8 camera_get_name(camera cam_id);
 
 // Returns the camera physical pos for id.
-func camera_pos camera_get_pos(camera id);
+func camera_pos camera_get_pos(camera cam_id);
 
 // Device lifecycle and frame retrieval.
-func b32 camera_open(camera id);
-func b32 camera_close(camera id);
-func b32 camera_start(camera id);
-func b32 camera_stop(camera id);
-func b32 camera_read(camera id, buffer* out_frame);
+func b32 camera_open(camera cam_id);
+func b32 camera_close(camera cam_id);
+func b32 camera_start(camera cam_id);
+func b32 camera_stop(camera cam_id);
+func b32 camera_read(camera cam_id, buffer* out_frame);
 
 // =========================================================================
 c_end;

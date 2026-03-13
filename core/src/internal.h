@@ -19,8 +19,10 @@ c_begin;
 func camera camera_from_native_id(up native_id);
 func up camera_to_native_id(camera src);
 
-func device_id devices_make_audio_device_id(u64 native_id, audio_device_type audio_type);
-func u64 devices_get_audio_native_id(device_id device);
+func device devices_make_id(device_type type, u64 instance);
+func device devices_make_audio_device(u64 native_id, audio_device_type audio_type);
+func u64 devices_get_instance(device src);
+func u64 devices_get_audio_native_id(device src);
 
 func b32 msg_from_native(const void* native_event, msg* out_msg);
 func b32 msg_to_native(const msg* src, void* native_event);

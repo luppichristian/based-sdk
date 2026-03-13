@@ -15,11 +15,10 @@ TEST(input_keyboard_test, invalid_scancodes_and_basic_queries) {
   (void)keyboard_get_keycode(4, KEYMOD_NONE, 0);
 }
 
-TEST(input_keyboard_test, primary_device_id_matches_availability_expectations) {
-  device_id out_id = {};
-  b32 has_primary = keyboard_get_primary_device_id(&out_id);
-  if (has_primary != 0) {
-    EXPECT_TRUE(device_id_is_valid(out_id) != 0);
-    EXPECT_EQ(DEVICE_TYPE_KEYBOARD, out_id.type);
+TEST(input_keyboard_test, primary_device_matches_availability_expectations) {
+  device out_id = keyboard_get_primary_device();
+  if (out_id != nullptr) {
+    EXPECT_TRUE(device_is_valid(out_id) != 0);
+    EXPECT_EQ(DEVICE_TYPE_KEYBOARD, devices_get_type(out_id));
   }
 }

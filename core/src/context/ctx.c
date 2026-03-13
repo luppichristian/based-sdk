@@ -94,10 +94,6 @@ func b32 ctx_init(ctx* context, ctx_setup setup) {
   ctx_setup_fill_defaults(&setup);
 
   if (!context || context->is_init || !ctx_setup_is_valid(&setup)) {
-    thread_log_error("Invalid context initialization request context=%p has_alloc=%u is_init=%u",
-                     (void*)context,
-                     (u32)(setup.main_allocator.alloc_fn != NULL && setup.main_allocator.dealloc_fn != NULL),
-                     (u32)(context != NULL && context->is_init));
     profile_func_end;
     return false;
   }
@@ -105,9 +101,6 @@ func b32 ctx_init(ctx* context, ctx_setup setup) {
   mem_zero(context, size_of(*context));
   context->setup = setup;
   if (!log_state_init(&context->log, setup.use_log_mutex, setup.main_allocator)) {
-    thread_log_error("Failed to initialize context log state context=%p use_log_mutex=%u",
-                     (void*)context,
-                     (u32)setup.use_log_mutex);
     mem_zero(context, size_of(*context));
     profile_func_end;
     return false;
@@ -128,12 +121,6 @@ func b32 ctx_init(ctx* context, ctx_setup setup) {
   }
 
   context->is_init = true;
-  thread_log_trace("Context initialized context=%p use_log_mutex=%u use_arena=%u use_heap=%u use_temp=%u",
-                   (void*)context,
-                   (u32)setup.use_log_mutex,
-                   (u32)setup.use_arena_allocs,
-                   (u32)setup.use_heap_allocs,
-                   (u32)setup.use_temp_allocs);
   profile_func_end;
   return true;
 }
@@ -234,7 +221,6 @@ func b32 ctx_set_user_data(ctx* context, ctx_user_data_idx idx, void* user_data)
 func void ctx_clear_temp(ctx* context) {
   profile_func_begin;
   if (!ctx_is_init(context)) {
-    thread_log_warn("Skipping context temp clear for uninitialized context context=%p", (void*)context);
     profile_func_end;
     return;
   }

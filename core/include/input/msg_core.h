@@ -208,13 +208,13 @@ typedef struct msg_core_window_data {
 
 // Keyboard device connection payload.
 typedef struct msg_core_keyboard_device_data {
-  device_id device;
+  device device;
 } msg_core_keyboard_device_data;
 
 // Key press and release payload.
 typedef struct msg_core_keyboard_data {
   window window;
-  device_id device;
+  device device;
   keyboard_scancode scancode;
   keyboard_keycode keycode;
   keymod modifiers;
@@ -248,13 +248,13 @@ typedef struct msg_core_text_input_data {
 
 // Mouse device connection payload.
 typedef struct msg_core_mouse_device_data {
-  device_id device;
+  device device;
 } msg_core_mouse_device_data;
 
 // Mouse motion payload.
 typedef struct msg_core_mouse_motion_data {
   window window;
-  device_id device;
+  device device;
   u32 button_mask;
   f32 x;
   f32 y;
@@ -265,7 +265,7 @@ typedef struct msg_core_mouse_motion_data {
 // Mouse button payload.
 typedef struct msg_core_mouse_button_data {
   window window;
-  device_id device;
+  device device;
   mouse_button button;
   b32 down;
   u8 clicks;
@@ -276,7 +276,7 @@ typedef struct msg_core_mouse_button_data {
 // Mouse wheel payload.
 typedef struct msg_core_mouse_wheel_data {
   window window;
-  device_id device;
+  device device;
   f32 x;
   f32 y;
   mouse_wheel_direction direction;
@@ -286,19 +286,19 @@ typedef struct msg_core_mouse_wheel_data {
 
 // Joystick device connection payload.
 typedef struct msg_core_joystick_device_data {
-  device_id device;
+  device device;
 } msg_core_joystick_device_data;
 
 // Joystick axis payload.
 typedef struct msg_core_joystick_axis_data {
-  device_id device;
+  device device;
   u8 axis;
   i16 value;
 } msg_core_joystick_axis_data;
 
 // Joystick trackball payload.
 typedef struct msg_core_joystick_ball_data {
-  device_id device;
+  device device;
   u8 ball;
   i16 xrel;
   i16 yrel;
@@ -306,47 +306,47 @@ typedef struct msg_core_joystick_ball_data {
 
 // Joystick hat payload.
 typedef struct msg_core_joystick_hat_data {
-  device_id device;
+  device device;
   u8 hat;
   joystick_hat_state value;
 } msg_core_joystick_hat_data;
 
 // Joystick button payload.
 typedef struct msg_core_joystick_button_data {
-  device_id device;
+  device device;
   u8 button;
   b32 down;
 } msg_core_joystick_button_data;
 
 // Joystick battery payload.
 typedef struct msg_core_joystick_battery_data {
-  device_id device;
+  device device;
   battery_state state;
   i32 percent;
 } msg_core_joystick_battery_data;
 
 // Gamepad device connection payload.
 typedef struct msg_core_gamepad_device_data {
-  device_id device;
+  device device;
 } msg_core_gamepad_device_data;
 
 // Gamepad axis payload.
 typedef struct msg_core_gamepad_axis_data {
-  device_id device;
+  device device;
   gamepad_axis axis;
   i16 value;
 } msg_core_gamepad_axis_data;
 
 // Gamepad button payload.
 typedef struct msg_core_gamepad_button_data {
-  device_id device;
+  device device;
   gamepad_button button;
   b32 down;
 } msg_core_gamepad_button_data;
 
 // Gamepad touchpad payload.
 typedef struct msg_core_gamepad_touchpad_data {
-  device_id device;
+  device device;
   gamepad_touchpad_idx touchpad;
   gamepad_finger_idx finger;
   f32 x;
@@ -356,7 +356,7 @@ typedef struct msg_core_gamepad_touchpad_data {
 
 // Gamepad sensor payload.
 typedef struct msg_core_gamepad_sensor_data {
-  device_id device;
+  device device;
   gamepad_sensor_kind sensor;
   f32 data[3];
   u64 sensor_timestamp;
@@ -364,7 +364,7 @@ typedef struct msg_core_gamepad_sensor_data {
 
 // Audio device payload.
 typedef struct msg_core_audio_device_data {
-  device_id device;
+  device device;
 } msg_core_audio_device_data;
 
 // Camera device payload.
@@ -379,17 +379,17 @@ typedef struct msg_core_render_data {
 
 // Touch device connection payload.
 typedef struct msg_core_touch_device_data {
-  device_id device;
+  device device;
 } msg_core_touch_device_data;
 
 // Tablet device connection payload.
 typedef struct msg_core_tablet_device_data {
-  device_id device;
+  device device;
 } msg_core_tablet_device_data;
 
 // Touch contact payload.
 typedef struct msg_core_touch_data {
-  device_id device;
+  device device;
   finger_id finger_id;
   f32 x;
   f32 y;
@@ -402,14 +402,14 @@ typedef struct msg_core_touch_data {
 // Pen proximity payload.
 typedef struct msg_core_pen_proximity_data {
   window window;
-  device_id device;
+  device device;
   pen_id pen_id;
 } msg_core_pen_proximity_data;
 
 // Pen motion payload.
 typedef struct msg_core_pen_motion_data {
   window window;
-  device_id device;
+  device device;
   pen_id pen_id;
   tablet_input_flags pen_state;
   f32 x;
@@ -419,7 +419,7 @@ typedef struct msg_core_pen_motion_data {
 // Pen touch payload.
 typedef struct msg_core_pen_touch_data {
   window window;
-  device_id device;
+  device device;
   pen_id pen_id;
   tablet_input_flags pen_state;
   f32 x;
@@ -431,7 +431,7 @@ typedef struct msg_core_pen_touch_data {
 // Pen button payload.
 typedef struct msg_core_pen_button_data {
   window window;
-  device_id device;
+  device device;
   pen_id pen_id;
   tablet_input_flags pen_state;
   f32 x;
@@ -443,7 +443,7 @@ typedef struct msg_core_pen_button_data {
 // Pen axis payload.
 typedef struct msg_core_pen_axis_data {
   window window;
-  device_id device;
+  device device;
   pen_id pen_id;
   tablet_input_flags pen_state;
   f32 x;

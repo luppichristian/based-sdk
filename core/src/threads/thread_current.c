@@ -12,7 +12,7 @@
 thread_local global_var thread_priority tls_priority = THREAD_PRIORITY_MEDIUM;
 
 // Mapping of our thread_priority enum to SDL_ThreadPriority values.
-const_var SDL_ThreadPriority sdl_priorities[] = {
+const_var SDL_ThreadPriority SDL_THREAD_PRIORITIES[] = {
     SDL_THREAD_PRIORITY_LOW,
     SDL_THREAD_PRIORITY_NORMAL,
     SDL_THREAD_PRIORITY_HIGH,
@@ -29,14 +29,14 @@ func thread_priority thread_get_priority(void) {
 
 func b32 thread_set_priority(thread_priority priority) {
   profile_func_begin;
-  if (priority >= count_of(sdl_priorities)) {
+  if (priority >= count_of(SDL_THREAD_PRIORITIES)) {
     thread_log_error("Passed invalid priority in thread_set_priority");
     profile_func_end;
     return false;  // Invalid priority
   }
-  assert(priority < count_of(sdl_priorities));
+  assert(priority < count_of(SDL_THREAD_PRIORITIES));
 
-  b32 ok = SDL_SetCurrentThreadPriority(sdl_priorities[priority]);
+  b32 ok = SDL_SetCurrentThreadPriority(SDL_THREAD_PRIORITIES[priority]);
   if (ok) {
     tls_priority = priority;
   }

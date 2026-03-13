@@ -80,8 +80,8 @@ func sz gamepads_get_count(void);
 // Returns 1 if slot_idx currently holds a connected gamepad, 0 otherwise.
 func b32 gamepads_is_connected(sz slot_idx);
 
-// Writes the device id for slot_idx into out_id. Returns 1 on success, 0 otherwise.
-func b32 gamepads_get_device_id(sz slot_idx, device_id* out_id);
+// Returns the device for slot_idx, or NULL when the slot is disconnected.
+func device gamepads_get_device(sz slot_idx);
 
 // Returns the cached gamepad name for slot_idx, or NULL when unavailable.
 func cstr8 gamepads_get_name(sz slot_idx);

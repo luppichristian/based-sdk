@@ -7,11 +7,17 @@
 #include "../strings/cstrings.h"
 #include "../basic/third_party.h"
 
+#ifndef BASED_CORE_OPAQUE_DEVICE_HANDLES_DEFINED
+#  define BASED_CORE_OPAQUE_DEVICE_HANDLES_DEFINED
+typedef void* device;
+typedef void* camera;
+typedef void* sensor;
+typedef void* monitor;
+#endif
+
 // =========================================================================
 c_begin;
 // =========================================================================
-
-typedef void* monitor;
 
 typedef struct monitor_mode {
   i32 width;
@@ -39,20 +45,20 @@ func monitor monitor_get_from_idx(sz idx);
 func monitor monitor_get_primary_id(void);
 
 // Monitor geometry.
-func r2_i32 monitor_get_bounds(monitor id);
-func r2_i32 monitor_get_usable_bounds(monitor id);
+func r2_i32 monitor_get_bounds(monitor mon_id);
+func r2_i32 monitor_get_usable_bounds(monitor mon_id);
 
 // Display mode enumeration.
-func sz monitor_get_mode_count(monitor id);
-func b32 monitor_get_mode(monitor id, sz idx, monitor_mode* out_mode);
-func b32 monitor_get_current_mode(monitor id, monitor_mode* out_mode);
-func b32 monitor_get_desktop_mode(monitor id, monitor_mode* out_mode);
+func sz monitor_get_mode_count(monitor mon_id);
+func b32 monitor_get_mode(monitor mon_id, sz idx, monitor_mode* out_mode);
+func b32 monitor_get_current_mode(monitor mon_id, monitor_mode* out_mode);
+func b32 monitor_get_desktop_mode(monitor mon_id, monitor_mode* out_mode);
 
 // Convenience queries.
-func cstr8 monitor_get_name(monitor id);
-func f32 monitor_get_refresh_rate(monitor id);
-func f32 monitor_get_content_scale(monitor id);
-func monitor_orientation monitor_get_orientation(monitor id);
+func cstr8 monitor_get_name(monitor mon_id);
+func f32 monitor_get_refresh_rate(monitor mon_id);
+func f32 monitor_get_content_scale(monitor mon_id);
+func monitor_orientation monitor_get_orientation(monitor mon_id);
 
 // =========================================================================
 c_end;

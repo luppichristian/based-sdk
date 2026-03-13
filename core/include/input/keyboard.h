@@ -16,20 +16,20 @@ c_begin;
 
 // Key modifier bitmask compatible with backend events.
 typedef enum keymod {
-  KEYMOD_NONE = 0x0000u,
-  KEYMOD_LSHIFT = 0x0001u,
-  KEYMOD_RSHIFT = 0x0002u,
-  KEYMOD_LEVEL5 = 0x0004u,
-  KEYMOD_LCTRL = 0x0040u,
-  KEYMOD_RCTRL = 0x0080u,
-  KEYMOD_LALT = 0x0100u,
-  KEYMOD_RALT = 0x0200u,
-  KEYMOD_LGUI = 0x0400u,
-  KEYMOD_RGUI = 0x0800u,
-  KEYMOD_NUM = 0x1000u,
-  KEYMOD_CAPS = 0x2000u,
-  KEYMOD_MODE = 0x4000u,
-  KEYMOD_SCROLL = 0x8000u,
+  KEYMOD_NONE = 0x0000U,
+  KEYMOD_LSHIFT = 0x0001U,
+  KEYMOD_RSHIFT = 0x0002U,
+  KEYMOD_LEVEL5 = 0x0004U,
+  KEYMOD_LCTRL = 0x0040U,
+  KEYMOD_RCTRL = 0x0080U,
+  KEYMOD_LALT = 0x0100U,
+  KEYMOD_RALT = 0x0200U,
+  KEYMOD_LGUI = 0x0400U,
+  KEYMOD_RGUI = 0x0800U,
+  KEYMOD_NUM = 0x1000U,
+  KEYMOD_CAPS = 0x2000U,
+  KEYMOD_MODE = 0x4000U,
+  KEYMOD_SCROLL = 0x8000U,
   KEYMOD_SHIFT = KEYMOD_LSHIFT | KEYMOD_RSHIFT,
   KEYMOD_CTRL = KEYMOD_LCTRL | KEYMOD_RCTRL,
   KEYMOD_ALT = KEYMOD_LALT | KEYMOD_RALT,
@@ -43,8 +43,8 @@ typedef u16 keyboard_raw_key;
 // Returns 1 if a keyboard backend is available, 0 otherwise.
 func b32 keyboard_is_available(void);
 
-// Writes the primary keyboard device id into out_id. Returns 1 on success, 0 otherwise.
-func b32 keyboard_get_primary_device_id(device_id* out_id);
+// Returns the primary keyboard device, or NULL when unavailable.
+func device keyboard_get_primary_device(void);
 
 // Returns 1 if the key identified by scancode is currently pressed, 0 otherwise.
 func b32 keyboard_is_key_down(keyboard_scancode scancode);

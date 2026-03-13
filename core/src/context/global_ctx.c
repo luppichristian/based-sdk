@@ -26,87 +26,55 @@ func void global_user_data_access_set_all_local(b8 has_access) {
 
 func b32 global_ctx_init(ctx_setup setup) {
   profile_func_begin;
-  if (!setup.main_allocator.alloc_fn) {
-    global_log_error("Missing global context allocator");
+  i32 state = atomic_i32_get(&process_global_ctx_init);
+  if (state != false) {
+    profile_func_end;
+    return true;
+  }
+
+  msg_core_global_ctx_data ctx_data = {
+      .event_kind = MSG_CORE_GLOBAL_CTX_EVENT_INIT,
+      .global_ctx_ptr = &process_global_ctx,
+  };
+
+  msg lifecycle_msg = {0};
+  msg_core_fill_global_ctx(&lifecycle_msg, &ctx_data);
+  if (!msg_post(&lifecycle_msg)) {
+    atomic_i32_set(&process_global_ctx_init, false);
+    profile_func_end;
+    return true;
+  }
+
+  mem_zero(&process_global_ctx, size_of(process_global_ctx));
+  process_global_ctx.mutex_handle = mutex_create();
+  ctx_setup global_setup = setup;
+  global_setup.allocator_mutex = process_global_ctx.mutex_handle;
+  global_setup.use_log_mutex = true;
+  if (!process_global_ctx.mutex_handle ||
+      !ctx_init(&process_global_ctx.shared_ctx, global_setup)) {
+    if (process_global_ctx.mutex_handle) {
+      mutex_destroy(process_global_ctx.mutex_handle);
+    }
+    mem_zero(&process_global_ctx, size_of(process_global_ctx));
     profile_func_end;
     return false;
   }
-  assert(setup.main_allocator.dealloc_fn != NULL);
 
-  i32 state = atomic_i32_get(&process_global_ctx_init);
-  if (state == 2) {
-    global_log_verbose("Global context already initialized");
-    profile_func_end;
-    return true;
-  }
-
-  i32 expected = 0;
-  if (atomic_i32_cmpex(&process_global_ctx_init, &expected, true)) {
-    global_log_info("Initializing global context");
-
-    msg_core_global_ctx_data ctx_data = {
-        .event_kind = MSG_CORE_GLOBAL_CTX_EVENT_INIT,
-        .global_ctx_ptr = &process_global_ctx,
-    };
-
-    msg lifecycle_msg = {0};
-    msg_core_fill_global_ctx(&lifecycle_msg, &ctx_data);
-    if (!msg_post(&lifecycle_msg)) {
-      atomic_i32_set(&process_global_ctx_init, false);
-      global_log_fatal("Global context init was cancelled");
-      profile_func_end;
-      return true;
-    }
-
-    mem_zero(&process_global_ctx, size_of(process_global_ctx));
-    process_global_ctx.mutex_handle = mutex_create();
-    ctx_setup global_setup = setup;
-    global_setup.allocator_mutex = process_global_ctx.mutex_handle;
-    global_setup.use_log_mutex = true;
-    if (!process_global_ctx.mutex_handle ||
-        !ctx_init(&process_global_ctx.shared_ctx, global_setup)) {
-      global_log_error("Global context initialization failed");
-      if (process_global_ctx.mutex_handle) {
-        mutex_destroy(process_global_ctx.mutex_handle);
-      }
-      mem_zero(&process_global_ctx, size_of(process_global_ctx));
-      atomic_fence_release();
-      atomic_i32_set(&process_global_ctx_init, 0);
-      profile_func_end;
-      return false;
-    }
-
-    // Initializer thread (main thread via entry_init) starts with full userdata access.
-    global_user_data_access_set_all_local(true);
-    process_global_ctx.is_init = true;
-    atomic_fence_release();
-    atomic_i32_set(&process_global_ctx_init, 2);
-    global_log_info("Global context initialized");
-    profile_func_end;
-    return true;
-  }
-
-  global_log_verbose("Waiting for global context initialization");
-  safe_while (atomic_i32_get(&process_global_ctx_init) == 1) {
-    atomic_pause();
-  }
-  atomic_fence_acquire();
-  b32 is_init = atomic_i32_get(&process_global_ctx_init) == 2;
-  global_log_debug("Global context wait completed initialized=%u", (u32)is_init);
+  // Initializer thread (main thread via entry_init) starts with full userdata access.
+  global_user_data_access_set_all_local(true);
+  process_global_ctx.is_init = true;
+  atomic_i32_set(&process_global_ctx_init, true);
   profile_func_end;
-  return is_init;
+  return true;
 }
 
 func b32 global_ctx_quit(void) {
   profile_func_begin;
-  i32 expected = 2;
-  if (!atomic_i32_cmpex(&process_global_ctx_init, &expected, 1)) {
-    global_log_verbose("Global context quit skipped");
+  i32 expected = 1;
+  if (!atomic_i32_cmpex(&process_global_ctx_init, &expected, true)) {
     profile_func_end;
     return false;
   }
-
-  global_log_info("Shutting down global context");
 
   msg_core_global_ctx_data ctx_data = {
       .event_kind = MSG_CORE_GLOBAL_CTX_EVENT_QUIT,
@@ -116,7 +84,6 @@ func b32 global_ctx_quit(void) {
   msg lifecycle_msg = {0};
   msg_core_fill_global_ctx(&lifecycle_msg, &ctx_data);
   if (!msg_post(&lifecycle_msg)) {
-    global_log_trace("Global context quit was cancelled");
     profile_func_end;
     return false;
   }
@@ -136,9 +103,7 @@ func b32 global_ctx_quit(void) {
 
   mem_zero(&process_global_ctx, size_of(process_global_ctx));
   global_user_data_access_set_all_local(false);
-  atomic_fence_release();
-  atomic_i32_set(&process_global_ctx_init, 0);
-  global_log_info("Global context shut down");
+  atomic_i32_set(&process_global_ctx_init, false);
   profile_func_end;
   return true;
 }
@@ -225,7 +190,6 @@ func void* global_get_user_data(ctx_user_data_idx idx) {
   profile_func_begin;
   global_ctx* wrapper = global_ctx_get();
   if (!wrapper || idx >= CTX_USER_DATA_COUNT) {
-    global_log_warn("Rejected global user data read idx=%u", (u32)idx);
     profile_func_end;
     return NULL;
   }
@@ -237,9 +201,6 @@ func void* global_get_user_data(ctx_user_data_idx idx) {
 
   b32 has_access = global_user_data_access[idx] != false;
   void* user_data = has_access ? wrapper->shared_ctx.user_data[idx] : NULL;
-  if (!has_access) {
-    global_log_warn("Denied global user data read idx=%u", (u32)idx);
-  }
 
   if (wrapper->mutex_handle) {
     mutex_unlock(wrapper->mutex_handle);
@@ -253,7 +214,6 @@ func b32 global_set_user_data(ctx_user_data_idx idx, void* user_data) {
   profile_func_begin;
   global_ctx* wrapper = global_ctx_get();
   if (!wrapper || idx >= CTX_USER_DATA_COUNT) {
-    global_log_warn("Rejected global user data write idx=%u", (u32)idx);
     profile_func_end;
     return false;
   }
@@ -266,8 +226,6 @@ func b32 global_set_user_data(ctx_user_data_idx idx, void* user_data) {
   b32 has_access = global_user_data_access[idx] != false;
   if (has_access) {
     wrapper->shared_ctx.user_data[idx] = user_data;
-  } else {
-    global_log_warn("Denied global user data write idx=%u", (u32)idx);
   }
 
   if (wrapper->mutex_handle) {

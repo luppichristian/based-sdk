@@ -461,38 +461,44 @@
 23: func b32 camera_is_valid(camera src);
 26: func sz camera_get_total_count(void);
 29: func b32 camera_get_id(sz idx, camera* out_id);
-32: func cstr8 camera_get_name(camera id);
-35: func camera_pos camera_get_pos(camera id);
-38: func b32 camera_open(camera id);
-39: func b32 camera_close(camera id);
-40: func b32 camera_start(camera id);
-41: func b32 camera_stop(camera id);
-42: func b32 camera_read(camera id, buffer* out_frame);
+32: func cstr8 camera_get_name(camera cam_id);
+35: func camera_pos camera_get_pos(camera cam_id);
+38: func b32 camera_open(camera cam_id);
+39: func b32 camera_close(camera cam_id);
+40: func b32 camera_start(camera cam_id);
+41: func b32 camera_stop(camera cam_id);
+42: func b32 camera_read(camera cam_id, buffer* out_frame);
 
 === include\input\clipboard.h ===
 13: func b32 clipboard_has_text(void);
-16: func b32 clipboard_set_text(cstr8 src);
-20: func b32 clipboard_get_text(c8* out_text, sz out_capacity);
-23: func b32 clipboard_clear(void);
+16: func b32 clipboard_has_data(cstr8 mime_type);
+19: func b32 clipboard_set_text(cstr8 src);
+22: func b32 clipboard_set_data(cstr8 mime_type, buffer src_data);
+26: func b32 clipboard_get_text(c8* out_text, sz out_capacity);
+31: func b32 clipboard_get_data(cstr8 mime_type, buffer out_data, sz* out_size);
+34: func b32 clipboard_clear(void);
 
 === include\input\devices.h ===
-14: typedef enum device_type {
-25: typedef enum battery_state {
-34: typedef enum audio_device_type {
-40: typedef enum sensor_kind {
-51: typedef enum joystick_hat_state {
-64: typedef struct device_id {
-70: typedef struct device_info {
-81: func b32 device_id_is_valid(device_id src);
-84: func b32 audio_device_type_is_valid(audio_device_type src);
-87: func cstr8 devices_get_type_name(device_type type);
-90: func cstr8 devices_get_audio_type_name(audio_device_type audio_type);
-93: func sz devices_get_count(device_type type);
-96: func b32 devices_get_device(device_type type, sz idx, device_id* out_id);
-99: func b32 devices_get_audio_device(audio_device_type audio_type, sz idx, device_id* out_id);
-102: func audio_device_type devices_get_audio_device_type(device_id id);
-105: func b32 devices_is_connected(device_id id);
-108: func b32 devices_get_info(device_id id, device_info* out_info);
+26: typedef enum device_type {
+40: typedef enum battery_state {
+49: typedef enum audio_device_type {
+55: typedef enum sensor_kind {
+66: typedef enum joystick_hat_state {
+79: typedef struct device_info {
+90: func b32 device_is_valid(device src);
+93: func device_type devices_get_type(device src);
+96: func b32 audio_device_type_is_valid(audio_device_type src);
+99: func cstr8 devices_get_type_name(device_type type);
+102: func cstr8 devices_get_audio_type_name(audio_device_type audio_type);
+105: func sz devices_get_count(device_type type);
+108: func device devices_get_device(device_type type, sz idx);
+111: func device devices_get_audio_device(audio_device_type audio_type, sz idx);
+114: func audio_device_type devices_get_audio_device_type(device dev_id);
+117: func camera camera_from_device(device src);
+120: func sensor sensor_from_device(device src);
+123: func monitor monitor_from_device(device src);
+126: func b32 devices_is_connected(device dev_id);
+129: func b32 devices_get_info(device dev_id, device_info* out_info);
 
 === include\input\gamepads.h ===
 17: typedef enum gamepad_button {
@@ -500,7 +506,7 @@
 63: typedef enum gamepad_sensor_kind {
 75: func sz gamepads_get_count(void);
 78: func b32 gamepads_is_connected(sz slot_idx);
-81: func b32 gamepads_get_device_id(sz slot_idx, device_id* out_id);
+84: func device gamepads_get_device(sz slot_idx);
 84: func cstr8 gamepads_get_name(sz slot_idx);
 87: func b32 gamepads_has_button(sz slot_idx, gamepad_button button);
 93: func b32 gamepads_get_button(sz slot_idx, gamepad_button button);
@@ -514,7 +520,7 @@
 === include\input\keyboard.h ===
 15: typedef enum keymod {
 41: func b32 keyboard_is_available(void);
-44: func b32 keyboard_get_primary_device_id(device_id* out_id);
+47: func device keyboard_get_primary_device(void);
 50: func b32 keyboard_is_key_down(keyboard_scancode scancode);
 53: func u32 keyboard_get_key_repeat_count(keyboard_scancode scancode);
 57: func keymod keyboard_get_mods(void);
@@ -533,7 +539,7 @@
 22: typedef enum mouse_wheel_direction {
 30: typedef u32 mouse_state;
 35: func b32 mouse_is_available(void);
-38: func b32 mouse_get_primary_device_id(device_id* out_id);
+38: func device mouse_get_primary_device(void);
 41: func mouse_state mouse_get_state(void);
 44: func b32 mouse_is_button_down(mouse_button button);
 
@@ -735,13 +741,13 @@
 18: func b32 sensor_is_valid(sensor src);
 21: func sz sensor_get_total_count(void);
 24: func b32 sensor_get_from_idx(sz idx, sensor* out_id);
-27: func cstr8 sensor_get_name(sensor id);
-30: func sensor_kind sensor_get_kind(sensor id);
-36: func b32 sensor_open(sensor id);
-37: func b32 sensor_close(sensor id);
-38: func b32 sensor_start(sensor id);
-39: func b32 sensor_stop(sensor id);
-40: func b32 sensor_read(sensor id, buffer* out_samples);
+25: func cstr8 sensor_get_name(sensor sen_id);
+28: func sensor_kind sensor_get_kind(sensor sen_id);
+31: func b32 sensor_open(sensor sen_id);
+32: func b32 sensor_close(sensor sen_id);
+33: func b32 sensor_start(sensor sen_id);
+34: func b32 sensor_stop(sensor sen_id);
+35: func b32 sensor_read(sensor sen_id, buffer* out_samples);
 
 === include\input\tablet.h ===
 16: typedef enum tablet_axis {
@@ -750,19 +756,19 @@
 44: typedef struct tablet_pen_state {
 58: func b32 tablet_is_available(void);
 61: func sz tablet_get_total_count(void);
-64: func b32 tablet_get_device_id(sz idx, device_id* out_id);
+68: func device tablet_get_device(sz idx);
 67: func b32 tablet_get_last_pen_state(tablet_pen_state* out_state);
-70: func b32 tablet_read_hid_report(device_id id, void* dst, sz capacity, sz* out_size, i32 timeout_ms);
+74: func b32 tablet_read_hid_report(device dev_id, void* dst, sz capacity, sz* out_size, i32 timeout_ms);
 
 === include\input\touch.h ===
 15: typedef enum touch_device_kind {
 23: typedef struct touch_finger_state {
 31: func b32 touch_is_available(void);
 34: func sz touch_get_total_count(void);
-37: func b32 touch_get_device_id(sz idx, device_id* out_id);
-40: func touch_device_kind touch_get_device_kind(device_id id);
-43: func sz touch_get_finger_count(device_id id);
-46: func b32 touch_get_finger(device_id id, sz idx, touch_finger_state* out_finger);
+41: func device touch_get_device(sz idx);
+44: func touch_device_kind touch_get_device_kind(device dev_id);
+47: func sz touch_get_finger_count(device dev_id);
+50: func b32 touch_get_finger(device dev_id, sz idx, touch_finger_state* out_finger);
 
 === include\memory\allocator.h ===
 24: typedef struct allocator {
@@ -1736,15 +1742,15 @@
 42: func monitor monitor_get_from_idx(sz idx);
 43: func monitor monitor_get_primary_id(void);
 44: func cstr8 monitor_get_name(monitor id);
-47: func r2_i32 monitor_get_bounds(monitor id);
-48: func r2_i32 monitor_get_usable_bounds(monitor id);
-51: func sz monitor_get_mode_count(monitor id);
-52: func b32 monitor_get_mode(monitor id, sz idx, monitor_mode* out_mode);
-53: func b32 monitor_get_current_mode(monitor id, monitor_mode* out_mode);
-54: func b32 monitor_get_desktop_mode(monitor id, monitor_mode* out_mode);
-57: func f32 monitor_get_refresh_rate(monitor id);
-58: func f32 monitor_get_content_scale(monitor id);
-59: func monitor_orientation monitor_get_orientation(monitor id);
+48: func r2_i32 monitor_get_bounds(monitor mon_id);
+49: func r2_i32 monitor_get_usable_bounds(monitor mon_id);
+52: func sz monitor_get_mode_count(monitor mon_id);
+53: func b32 monitor_get_mode(monitor mon_id, sz idx, monitor_mode* out_mode);
+54: func b32 monitor_get_current_mode(monitor mon_id, monitor_mode* out_mode);
+55: func b32 monitor_get_desktop_mode(monitor mon_id, monitor_mode* out_mode);
+58: func f32 monitor_get_refresh_rate(monitor mon_id);
+59: func f32 monitor_get_content_scale(monitor mon_id);
+60: func monitor_orientation monitor_get_orientation(monitor mon_id);
 
 === include\interface\window.h ===
 15: typedef void* window;

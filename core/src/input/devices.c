@@ -3,13 +3,21 @@
 
 #include "input/devices.h"
 #include "basic/assert.h"
+#include "context/thread_ctx.h"
 #include "../sdl3_include.h"
 #include <SDL3/SDL_hidapi.h>
-#include "basic/utility_defines.h"
 #include "basic/profiler.h"
 #include "basic/safe.h"
 
-const_var u64 DEVICES_AUDIO_RECORDING_BIT = 1ull << 63;
+typedef struct device_handle_entry {
+  device_type type;
+  u64 instance;
+} device_handle_entry;
+
+const_var u64 DEVICES_AUDIO_RECORDING_BIT = 1ULL << 63;
+const_var sz DEVICES_HANDLE_CAP = 1024;
+
+global_var device_handle_entry device_handles[DEVICES_HANDLE_CAP] = {0};
 
 func void devices_clear_name(c8* dst, sz capacity) {
   profile_func_begin;
@@ -91,14 +99,49 @@ func u64 devices_hash_path(cstr8 src) {
   return hash_value;
 }
 
-func device_id devices_make_id(device_type type, u64 instance) {
+func device_handle_entry* devices_lookup_entry(device src) {
+  if (!src) {
+    return NULL;
+  }
+
+  safe_for (sz item_idx = 0; item_idx < DEVICES_HANDLE_CAP; item_idx += 1) {
+    if ((device)&device_handles[item_idx] == src && device_handles[item_idx].type != DEVICE_TYPE_UNKNOWN &&
+        device_handles[item_idx].instance != 0) {
+      return &device_handles[item_idx];
+    }
+  }
+
+  return NULL;
+}
+
+func device devices_make_id(device_type type, u64 instance) {
   profile_func_begin;
-  device_id result = {0};
-  assert(type >= DEVICE_TYPE_UNKNOWN && type <= DEVICE_TYPE_AUDIO);
-  result.type = type;
-  result.instance = instance;
+  if (type <= DEVICE_TYPE_UNKNOWN || type > DEVICE_TYPE_MONITOR || instance == 0) {
+    profile_func_end;
+    return NULL;
+  }
+
+  safe_for (sz item_idx = 0; item_idx < DEVICES_HANDLE_CAP; item_idx += 1) {
+    if (device_handles[item_idx].type == type && device_handles[item_idx].instance == instance) {
+      profile_func_end;
+      return (device)&device_handles[item_idx];
+    }
+  }
+
+  safe_for (sz item_idx = 0; item_idx < DEVICES_HANDLE_CAP; item_idx += 1) {
+    if (device_handles[item_idx].type == DEVICE_TYPE_UNKNOWN && device_handles[item_idx].instance == 0) {
+      device_handles[item_idx].type = type;
+      device_handles[item_idx].instance = instance;
+      profile_func_end;
+      return (device)&device_handles[item_idx];
+    }
+  }
+
+  thread_log_error("Device handle table is full type=%u instance=%llu",
+                   (u32)type,
+                   (unsigned long long)instance);
   profile_func_end;
-  return result;
+  return NULL;
 }
 
 func u64 devices_audio_encode_instance(u64 native_id, audio_device_type audio_type) {
@@ -113,6 +156,20 @@ func u64 devices_audio_encode_instance(u64 native_id, audio_device_type audio_ty
 
 func u64 devices_audio_decode_native_id(u64 instance) {
   return instance & ~DEVICES_AUDIO_RECORDING_BIT;
+}
+
+func u64 devices_get_instance(device src) {
+  device_handle_entry* handle = devices_lookup_entry(src);
+  return handle ? handle->instance : 0;
+}
+
+func b32 device_is_valid(device src) {
+  return devices_lookup_entry(src) != NULL;
+}
+
+func device_type devices_get_type(device src) {
+  device_handle_entry* handle = devices_lookup_entry(src);
+  return handle ? handle->type : DEVICE_TYPE_UNKNOWN;
 }
 
 func b32 audio_device_type_is_valid(audio_device_type src) {
@@ -135,34 +192,59 @@ func cstr8 devices_get_audio_type_name(audio_device_type audio_type) {
   }
 }
 
-func audio_device_type devices_get_audio_device_type(device_id id) {
-  if (id.type != DEVICE_TYPE_AUDIO) {
+func audio_device_type devices_get_audio_device_type(device dev_id) {
+  if (devices_get_type(dev_id) != DEVICE_TYPE_AUDIO) {
     return AUDIO_DEVICE_TYPE_UNKNOWN;
   }
 
-  return (id.instance & DEVICES_AUDIO_RECORDING_BIT) != 0 ? AUDIO_DEVICE_TYPE_RECORDING : AUDIO_DEVICE_TYPE_PLAYBACK;
+  return (devices_get_instance(dev_id) & DEVICES_AUDIO_RECORDING_BIT) != 0 ? AUDIO_DEVICE_TYPE_RECORDING
+                                                                           : AUDIO_DEVICE_TYPE_PLAYBACK;
 }
 
-func device_id devices_make_audio_device_id(u64 native_id, audio_device_type audio_type) {
+func device devices_make_audio_device(u64 native_id, audio_device_type audio_type) {
   profile_func_begin;
   if (!audio_device_type_is_valid(audio_type)) {
     profile_func_end;
-    return (device_id) {0};
+    return NULL;
   }
 
   profile_func_end;
   return devices_make_id(DEVICE_TYPE_AUDIO, devices_audio_encode_instance(native_id, audio_type));
 }
 
-func u64 devices_get_audio_native_id(device_id id) {
+func u64 devices_get_audio_native_id(device src) {
   profile_func_begin;
-  if (id.type != DEVICE_TYPE_AUDIO) {
+  if (devices_get_type(src) != DEVICE_TYPE_AUDIO) {
     profile_func_end;
     return 0;
   }
 
   profile_func_end;
-  return devices_audio_decode_native_id(id.instance);
+  return devices_audio_decode_native_id(devices_get_instance(src));
+}
+
+func camera camera_from_device(device src) {
+  if (devices_get_type(src) != DEVICE_TYPE_CAMERA) {
+    return NULL;
+  }
+
+  return (camera)(up)devices_get_instance(src);
+}
+
+func sensor sensor_from_device(device src) {
+  if (devices_get_type(src) != DEVICE_TYPE_SENSOR) {
+    return NULL;
+  }
+
+  return (sensor)(up)devices_get_instance(src);
+}
+
+func monitor monitor_from_device(device src) {
+  if (devices_get_type(src) != DEVICE_TYPE_MONITOR) {
+    return NULL;
+  }
+
+  return (monitor)(up)devices_get_instance(src);
 }
 
 func sz devices_get_audio_count_for_type(audio_device_type audio_type) {
@@ -187,14 +269,11 @@ func sz devices_get_audio_count_for_type(audio_device_type audio_type) {
   return 0;
 }
 
-func b32 devices_get_audio_device(audio_device_type audio_type, sz idx, device_id* out_id) {
+func device devices_get_audio_device(audio_device_type audio_type, sz idx) {
   profile_func_begin;
   int count = 0;
   SDL_AudioDeviceID* ids = NULL;
-
-  if (out_id) {
-    *out_id = (device_id) {0};
-  }
+  device result = NULL;
 
   if (audio_type == AUDIO_DEVICE_TYPE_PLAYBACK) {
     ids = SDL_GetAudioPlaybackDevices(&count);
@@ -202,13 +281,11 @@ func b32 devices_get_audio_device(audio_device_type audio_type, sz idx, device_i
     ids = SDL_GetAudioRecordingDevices(&count);
   } else {
     profile_func_end;
-    return false;
+    return NULL;
   }
 
-  b32 found = ids != NULL && idx < (sz)count;
-
-  if (found && out_id) {
-    *out_id = devices_make_audio_device_id((u64)ids[idx], audio_type);
+  if (ids != NULL && idx < (sz)count) {
+    result = devices_make_audio_device((u64)ids[idx], audio_type);
   }
 
   if (ids) {
@@ -216,7 +293,7 @@ func b32 devices_get_audio_device(audio_device_type audio_type, sz idx, device_i
   }
 
   profile_func_end;
-  return found;
+  return result;
 }
 
 func b32 devices_try_fill_tablet_info(SDL_hid_device_info* entry, device_info* out_info) {
@@ -244,20 +321,17 @@ func b32 devices_try_fill_tablet_info(SDL_hid_device_info* entry, device_info* o
   return true;
 }
 
-func b32 devices_find_tablet_by_idx(sz idx, device_id* out_id) {
+func device devices_find_tablet_by_idx(sz idx) {
   profile_func_begin;
   SDL_hid_device_info* head = SDL_hid_enumerate(0, 0);
   SDL_hid_device_info* entry = head;
   sz current_idx = 0;
-  b32 found = false;
+  device result = NULL;
 
   safe_while (entry) {
     if (entry->usage_page == 0x0D) {
       if (current_idx == idx) {
-        if (out_id) {
-          *out_id = devices_make_id(DEVICE_TYPE_TABLET, devices_hash_path(entry->path));
-        }
-        found = 1;
+        result = devices_make_id(DEVICE_TYPE_TABLET, devices_hash_path(entry->path));
         break;
       }
 
@@ -272,17 +346,18 @@ func b32 devices_find_tablet_by_idx(sz idx, device_id* out_id) {
   }
 
   profile_func_end;
-  return found;
+  return result;
 }
 
-func b32 devices_find_tablet_info(device_id id, device_info* out_info) {
+func b32 devices_find_tablet_info(device dev_id, device_info* out_info) {
   profile_func_begin;
   SDL_hid_device_info* head = SDL_hid_enumerate(0, 0);
   SDL_hid_device_info* entry = head;
+  u64 instance = devices_get_instance(dev_id);
   b32 found = false;
 
   safe_while (entry) {
-    if (entry->usage_page == 0x0D && devices_hash_path(entry->path) == id.instance) {
+    if (entry->usage_page == 0x0D && devices_hash_path(entry->path) == instance) {
       if (out_info) {
         found = devices_try_fill_tablet_info(entry, out_info);
       } else {
@@ -300,10 +375,6 @@ func b32 devices_find_tablet_info(device_id id, device_info* out_info) {
 
   profile_func_end;
   return found;
-}
-
-func b32 device_id_is_valid(device_id src) {
-  return src.type != DEVICE_TYPE_UNKNOWN && src.instance != 0;
 }
 
 func cstr8 devices_get_type_name(device_type type) {
@@ -330,6 +401,15 @@ func cstr8 devices_get_type_name(device_type type) {
     case DEVICE_TYPE_AUDIO:
       profile_func_end;
       return "audio";
+    case DEVICE_TYPE_CAMERA:
+      profile_func_end;
+      return "camera";
+    case DEVICE_TYPE_SENSOR:
+      profile_func_end;
+      return "sensor";
+    case DEVICE_TYPE_MONITOR:
+      profile_func_end;
+      return "monitor";
     case DEVICE_TYPE_UNKNOWN:
     default:
       profile_func_end;
@@ -397,131 +477,153 @@ func sz devices_get_count(device_type type) {
     case DEVICE_TYPE_AUDIO:
       return devices_get_audio_count_for_type(AUDIO_DEVICE_TYPE_PLAYBACK) +
              devices_get_audio_count_for_type(AUDIO_DEVICE_TYPE_RECORDING);
+    case DEVICE_TYPE_CAMERA: {
+      SDL_CameraID* ids = SDL_GetCameras(&count);
+      if (ids) {
+        SDL_free(ids);
+      }
+      return count > 0 ? (sz)count : 0;
+    }
+    case DEVICE_TYPE_SENSOR: {
+      SDL_SensorID* ids = SDL_GetSensors(&count);
+      if (ids) {
+        SDL_free(ids);
+      }
+      return count > 0 ? (sz)count : 0;
+    }
+    case DEVICE_TYPE_MONITOR: {
+      SDL_DisplayID* ids = SDL_GetDisplays(&count);
+      if (ids) {
+        SDL_free(ids);
+      }
+      return count > 0 ? (sz)count : 0;
+    }
     case DEVICE_TYPE_UNKNOWN:
     default:
       return 0;
   }
 }
 
-func b32 devices_get_device(device_type type, sz idx, device_id* out_id) {
+func device devices_get_device(device_type type, sz idx) {
   profile_func_begin;
   int count = 0;
-
-  if (out_id) {
-    *out_id = (device_id) {0};
-  }
 
   switch (type) {
     case DEVICE_TYPE_KEYBOARD: {
       SDL_KeyboardID* ids = SDL_GetKeyboards(&count);
-      b32 found = ids && idx < (sz)count;
-
-      if (found && out_id) {
-        *out_id = devices_make_id(DEVICE_TYPE_KEYBOARD, (u64)ids[idx]);
-      }
+      device result = ids && idx < (sz)count ? devices_make_id(DEVICE_TYPE_KEYBOARD, (u64)ids[idx]) : NULL;
       if (ids) {
         SDL_free(ids);
       }
       profile_func_end;
-      return found;
+      return result;
     }
     case DEVICE_TYPE_MOUSE: {
       SDL_MouseID* ids = SDL_GetMice(&count);
-      b32 found = ids && idx < (sz)count;
-
-      if (found && out_id) {
-        *out_id = devices_make_id(DEVICE_TYPE_MOUSE, (u64)ids[idx]);
-      }
+      device result = ids && idx < (sz)count ? devices_make_id(DEVICE_TYPE_MOUSE, (u64)ids[idx]) : NULL;
       if (ids) {
         SDL_free(ids);
       }
       profile_func_end;
-      return found;
+      return result;
     }
     case DEVICE_TYPE_GAMEPAD: {
       SDL_JoystickID* ids = SDL_GetGamepads(&count);
-      b32 found = ids && idx < (sz)count;
-
-      if (found && out_id) {
-        *out_id = devices_make_id(DEVICE_TYPE_GAMEPAD, (u64)ids[idx]);
-      }
+      device result = ids && idx < (sz)count ? devices_make_id(DEVICE_TYPE_GAMEPAD, (u64)ids[idx]) : NULL;
       if (ids) {
         SDL_free(ids);
       }
       profile_func_end;
-      return found;
+      return result;
     }
     case DEVICE_TYPE_JOYSTICK: {
       SDL_JoystickID* ids = SDL_GetJoysticks(&count);
-      b32 found = ids && idx < (sz)count;
-
-      if (found && out_id) {
-        *out_id = devices_make_id(DEVICE_TYPE_JOYSTICK, (u64)ids[idx]);
-      }
+      device result = ids && idx < (sz)count ? devices_make_id(DEVICE_TYPE_JOYSTICK, (u64)ids[idx]) : NULL;
       if (ids) {
         SDL_free(ids);
       }
       profile_func_end;
-      return found;
+      return result;
     }
     case DEVICE_TYPE_TOUCH: {
       SDL_TouchID* ids = SDL_GetTouchDevices(&count);
-      b32 found = ids && idx < (sz)count;
-
-      if (found && out_id) {
-        *out_id = devices_make_id(DEVICE_TYPE_TOUCH, (u64)ids[idx]);
-      }
+      device result = ids && idx < (sz)count ? devices_make_id(DEVICE_TYPE_TOUCH, (u64)ids[idx]) : NULL;
       if (ids) {
         SDL_free(ids);
       }
       profile_func_end;
-      return found;
+      return result;
     }
     case DEVICE_TYPE_TABLET:
       profile_func_end;
-      return devices_find_tablet_by_idx(idx, out_id);
+      return devices_find_tablet_by_idx(idx);
     case DEVICE_TYPE_AUDIO: {
       sz playback_count = devices_get_audio_count_for_type(AUDIO_DEVICE_TYPE_PLAYBACK);
-      if (idx < playback_count) {
-        profile_func_end;
-        return devices_get_audio_device(AUDIO_DEVICE_TYPE_PLAYBACK, idx, out_id);
+      profile_func_end;
+      return idx < playback_count ? devices_get_audio_device(AUDIO_DEVICE_TYPE_PLAYBACK, idx)
+                                  : devices_get_audio_device(AUDIO_DEVICE_TYPE_RECORDING, idx - playback_count);
+    }
+    case DEVICE_TYPE_CAMERA: {
+      SDL_CameraID* ids = SDL_GetCameras(&count);
+      device result = ids && idx < (sz)count ? devices_make_id(DEVICE_TYPE_CAMERA, (u64)ids[idx]) : NULL;
+      if (ids) {
+        SDL_free(ids);
       }
       profile_func_end;
-      return devices_get_audio_device(AUDIO_DEVICE_TYPE_RECORDING, idx - playback_count, out_id);
+      return result;
+    }
+    case DEVICE_TYPE_SENSOR: {
+      SDL_SensorID* ids = SDL_GetSensors(&count);
+      device result = ids && idx < (sz)count ? devices_make_id(DEVICE_TYPE_SENSOR, (u64)ids[idx]) : NULL;
+      if (ids) {
+        SDL_free(ids);
+      }
+      profile_func_end;
+      return result;
+    }
+    case DEVICE_TYPE_MONITOR: {
+      SDL_DisplayID* ids = SDL_GetDisplays(&count);
+      device result = ids && idx < (sz)count ? devices_make_id(DEVICE_TYPE_MONITOR, (u64)ids[idx]) : NULL;
+      if (ids) {
+        SDL_free(ids);
+      }
+      profile_func_end;
+      return result;
     }
     case DEVICE_TYPE_UNKNOWN:
     default:
-      assert(type == DEVICE_TYPE_UNKNOWN);
       profile_func_end;
-      return false;
+      return NULL;
   }
 }
 
-func b32 devices_is_connected(device_id id) {
-  return devices_get_info(id, NULL);
+func b32 devices_is_connected(device dev_id) {
+  return devices_get_info(dev_id, NULL);
 }
 
-func b32 devices_get_info(device_id id, device_info* out_info) {
+func b32 devices_get_info(device dev_id, device_info* out_info) {
   profile_func_begin;
   int count = 0;
+  device_type type = devices_get_type(dev_id);
+  u64 instance = devices_get_instance(dev_id);
 
-  if (!device_id_is_valid(id)) {
+  if (!device_is_valid(dev_id)) {
     profile_func_end;
     return false;
   }
 
   if (out_info) {
     *out_info = (device_info) {0};
-    out_info->id = id;
+    out_info->id = dev_id;
   }
 
-  switch (id.type) {
+  switch (type) {
     case DEVICE_TYPE_KEYBOARD: {
       SDL_KeyboardID* ids = SDL_GetKeyboards(&count);
       b32 found = false;
 
       safe_for (int idx = 0; ids && idx < count; idx += 1) {
-        if ((u64)ids[idx] == id.instance) {
+        if ((u64)ids[idx] == instance) {
           found = 1;
           if (out_info) {
             out_info->connected = 1;
@@ -543,7 +645,7 @@ func b32 devices_get_info(device_id id, device_info* out_info) {
       b32 found = false;
 
       safe_for (int idx = 0; ids && idx < count; idx += 1) {
-        if ((u64)ids[idx] == id.instance) {
+        if ((u64)ids[idx] == instance) {
           found = 1;
           if (out_info) {
             out_info->connected = 1;
@@ -565,7 +667,7 @@ func b32 devices_get_info(device_id id, device_info* out_info) {
       b32 found = false;
 
       safe_for (int idx = 0; ids && idx < count; idx += 1) {
-        if ((u64)ids[idx] == id.instance) {
+        if ((u64)ids[idx] == instance) {
           found = 1;
           if (out_info) {
             out_info->connected = 1;
@@ -587,7 +689,7 @@ func b32 devices_get_info(device_id id, device_info* out_info) {
       b32 found = false;
 
       safe_for (int idx = 0; ids && idx < count; idx += 1) {
-        if ((u64)ids[idx] == id.instance) {
+        if ((u64)ids[idx] == instance) {
           found = 1;
           if (out_info) {
             out_info->connected = 1;
@@ -609,7 +711,7 @@ func b32 devices_get_info(device_id id, device_info* out_info) {
       b32 found = false;
 
       safe_for (int idx = 0; ids && idx < count; idx += 1) {
-        if ((u64)ids[idx] == id.instance) {
+        if ((u64)ids[idx] == instance) {
           found = 1;
           if (out_info) {
             out_info->connected = 1;
@@ -629,11 +731,11 @@ func b32 devices_get_info(device_id id, device_info* out_info) {
     }
     case DEVICE_TYPE_TABLET:
       profile_func_end;
-      return devices_find_tablet_info(id, out_info);
+      return devices_find_tablet_info(dev_id, out_info);
     case DEVICE_TYPE_AUDIO: {
       int audio_count = 0;
-      u64 native_id = devices_audio_decode_native_id(id.instance);
-      audio_device_type audio_type = devices_get_audio_device_type(id);
+      u64 native_id = devices_audio_decode_native_id(instance);
+      audio_device_type audio_type = devices_get_audio_device_type(dev_id);
       SDL_AudioDeviceID* ids = NULL;
       b32 found = false;
 
@@ -653,6 +755,74 @@ func b32 devices_get_info(device_id id, device_info* out_info) {
             out_info->connected = 1;
             out_info->usage = (u16)audio_type;
             devices_cpy_cstring(out_info->name, size_of(out_info->name), SDL_GetAudioDeviceName(ids[idx]));
+          }
+          break;
+        }
+      }
+
+      if (ids) {
+        SDL_free(ids);
+      }
+
+      profile_func_end;
+      return found;
+    }
+    case DEVICE_TYPE_CAMERA: {
+      SDL_CameraID* ids = SDL_GetCameras(&count);
+      b32 found = false;
+
+      safe_for (int idx = 0; ids && idx < count; idx += 1) {
+        if ((u64)ids[idx] == instance) {
+          found = 1;
+          if (out_info) {
+            out_info->connected = 1;
+            devices_cpy_cstring(out_info->name, size_of(out_info->name), SDL_GetCameraName(ids[idx]));
+            out_info->usage = (u16)SDL_GetCameraPosition(ids[idx]);
+          }
+          break;
+        }
+      }
+
+      if (ids) {
+        SDL_free(ids);
+      }
+
+      profile_func_end;
+      return found;
+    }
+    case DEVICE_TYPE_SENSOR: {
+      SDL_SensorID* ids = SDL_GetSensors(&count);
+      b32 found = false;
+
+      safe_for (int idx = 0; ids && idx < count; idx += 1) {
+        if ((u64)ids[idx] == instance) {
+          found = 1;
+          if (out_info) {
+            out_info->connected = 1;
+            devices_cpy_cstring(out_info->name, size_of(out_info->name), SDL_GetSensorNameForID(ids[idx]));
+            out_info->usage = (u16)SDL_GetSensorTypeForID(ids[idx]);
+          }
+          break;
+        }
+      }
+
+      if (ids) {
+        SDL_free(ids);
+      }
+
+      profile_func_end;
+      return found;
+    }
+    case DEVICE_TYPE_MONITOR: {
+      SDL_DisplayID* ids = SDL_GetDisplays(&count);
+      b32 found = false;
+
+      safe_for (int idx = 0; ids && idx < count; idx += 1) {
+        if ((u64)ids[idx] == instance) {
+          found = 1;
+          if (out_info) {
+            out_info->connected = 1;
+            devices_cpy_cstring(out_info->name, size_of(out_info->name), SDL_GetDisplayName(ids[idx]));
           }
           break;
         }

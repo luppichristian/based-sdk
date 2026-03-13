@@ -34,8 +34,8 @@ typedef u32 mouse_state;
 // Returns 1 if a mouse backend is available, 0 otherwise.
 func b32 mouse_is_available(void);
 
-// Writes the primary mouse device id into out_id. Returns 1 on success, 0 otherwise.
-func b32 mouse_get_primary_device_id(device_id* out_id);
+// Returns the primary mouse device, or NULL when unavailable.
+func device mouse_get_primary_device(void);
 
 // Returns the current mouse button state as a bitmask.
 func mouse_state mouse_get_state(void);

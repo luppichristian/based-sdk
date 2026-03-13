@@ -6,6 +6,14 @@
 #include "../basic/primitive_types.h"
 #include "../strings/cstrings.h"
 
+#ifndef BASED_CORE_OPAQUE_DEVICE_HANDLES_DEFINED
+#  define BASED_CORE_OPAQUE_DEVICE_HANDLES_DEFINED
+typedef void* device;
+typedef void* camera;
+typedef void* sensor;
+typedef void* monitor;
+#endif
+
 // =========================================================================
 c_begin;
 // =========================================================================
@@ -24,6 +32,9 @@ typedef enum device_type {
   DEVICE_TYPE_TABLET = 5,
   DEVICE_TYPE_TOUCH = 6,
   DEVICE_TYPE_AUDIO = 7,
+  DEVICE_TYPE_CAMERA = 8,
+  DEVICE_TYPE_SENSOR = 9,
+  DEVICE_TYPE_MONITOR = 10,
 } device_type;
 
 typedef enum battery_state {
@@ -64,15 +75,9 @@ typedef enum joystick_hat_state {
   JOYSTICK_HAT_STATE_LEFT_DOWN = 0x0C,
 } joystick_hat_state;
 
-// Backend-defined device identifier.
-typedef struct device_id {
-  device_type type;
-  u64 instance;
-} device_id;
-
 // Snapshot of the metadata currently known for an input device.
 typedef struct device_info {
-  device_id id;
+  device id;
   b32 connected;
   str8_short name;
   u16 vendor_id;
@@ -82,7 +87,10 @@ typedef struct device_info {
 } device_info;
 
 // Returns 1 if src refers to a concrete device, 0 otherwise.
-func b32 device_id_is_valid(device_id src);
+func b32 device_is_valid(device src);
+
+// Returns the stable device category encoded by src.
+func device_type devices_get_type(device src);
 
 // Returns 1 when src is a valid audio device direction, 0 otherwise.
 func b32 audio_device_type_is_valid(audio_device_type src);
@@ -96,20 +104,29 @@ func cstr8 devices_get_audio_type_name(audio_device_type audio_type);
 // Returns the number of devices of type currently known to the backend.
 func sz devices_get_count(device_type type);
 
-// Writes the device id at idx into out_id. Returns 1 on success, 0 otherwise.
-func b32 devices_get_device(device_type type, sz idx, device_id* out_id);
+// Returns the device at idx, or NULL when idx is unavailable.
+func device devices_get_device(device_type type, sz idx);
 
-// Writes the audio device id at idx for audio_type into out_id. Returns 1 on success, 0 otherwise.
-func b32 devices_get_audio_device(audio_device_type audio_type, sz idx, device_id* out_id);
+// Returns the audio device at idx for audio_type, or NULL when idx is unavailable.
+func device devices_get_audio_device(audio_device_type audio_type, sz idx);
 
 // Returns the encoded audio device direction for id.
-func audio_device_type devices_get_audio_device_type(device_id id);
+func audio_device_type devices_get_audio_device_type(device dev_id);
+
+// Converts src into a camera handle when it refers to a camera device.
+func camera camera_from_device(device src);
+
+// Converts src into a sensor handle when it refers to a sensor device.
+func sensor sensor_from_device(device src);
+
+// Converts src into a monitor handle when it refers to a monitor device.
+func monitor monitor_from_device(device src);
 
 // Returns 1 if id is still connected, 0 otherwise.
-func b32 devices_is_connected(device_id id);
+func b32 devices_is_connected(device dev_id);
 
 // Fills out_info with the latest metadata for id. Returns 1 on success, 0 otherwise.
-func b32 devices_get_info(device_id id, device_info* out_info);
+func b32 devices_get_info(device dev_id, device_info* out_info);
 
 // =========================================================================
 c_end;

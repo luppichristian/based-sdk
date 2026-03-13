@@ -85,24 +85,15 @@ func b32 gamepads_is_connected(sz slot_idx) {
   return gamepad_slots[slot_idx].handle != NULL;
 }
 
-func b32 gamepads_get_device_id(sz slot_idx, device_id* out_id) {
+func device gamepads_get_device(sz slot_idx) {
   profile_func_begin;
-  if (out_id) {
-    *out_id = (device_id) {0};
-  }
-
   if (!gamepads_is_connected(slot_idx)) {
     profile_func_end;
-    return false;
-  }
-
-  if (out_id) {
-    out_id->type = DEVICE_TYPE_GAMEPAD;
-    out_id->instance = (u64)gamepad_slots[slot_idx].id;
+    return NULL;
   }
 
   profile_func_end;
-  return true;
+  return devices_make_id(DEVICE_TYPE_GAMEPAD, (u64)gamepad_slots[slot_idx].id);
 }
 
 func cstr8 gamepads_get_name(sz slot_idx) {

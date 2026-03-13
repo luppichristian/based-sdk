@@ -55,25 +55,17 @@ func sz tablet_get_total_count(void) {
   return total;
 }
 
-func b32 tablet_get_device_id(sz idx, device_id* out_id) {
+func device tablet_get_device(sz idx) {
   profile_func_begin;
   SDL_hid_device_info* head = SDL_hid_enumerate(0, 0);
   SDL_hid_device_info* entry = head;
   sz current_idx = 0;
-  b32 found = false;
-
-  if (out_id) {
-    *out_id = (device_id) {0};
-  }
+  device result = NULL;
 
   safe_while (entry) {
     if (entry->usage_page == 0x0D) {
       if (current_idx == idx) {
-        if (out_id) {
-          out_id->type = DEVICE_TYPE_TABLET;
-          out_id->instance = tablet_hash_path(entry->path);
-        }
-        found = 1;
+        result = devices_make_id(DEVICE_TYPE_TABLET, tablet_hash_path(entry->path));
         break;
       }
 
@@ -88,7 +80,7 @@ func b32 tablet_get_device_id(sz idx, device_id* out_id) {
   }
 
   profile_func_end;
-  return found;
+  return result;
 }
 
 func b32 tablet_get_last_pen_state(tablet_pen_state* out_state) {
@@ -104,7 +96,7 @@ func b32 tablet_get_last_pen_state(tablet_pen_state* out_state) {
   return true;
 }
 
-func b32 tablet_read_hid_report(device_id id, void* dst, sz capacity, sz* out_size, i32 timeout_ms) {
+func b32 tablet_read_hid_report(device dev_id, void* dst, sz capacity, sz* out_size, i32 timeout_ms) {
   profile_func_begin;
   SDL_hid_device_info* head = SDL_hid_enumerate(0, 0);
   SDL_hid_device_info* entry = head;
@@ -116,7 +108,7 @@ func b32 tablet_read_hid_report(device_id id, void* dst, sz capacity, sz* out_si
     *out_size = 0;
   }
 
-  if (!dst || !capacity || id.type != DEVICE_TYPE_TABLET) {
+  if (!dst || !capacity || devices_get_type(dev_id) != DEVICE_TYPE_TABLET) {
     if (head) {
       SDL_hid_free_enumeration(head);
     }
@@ -127,7 +119,7 @@ func b32 tablet_read_hid_report(device_id id, void* dst, sz capacity, sz* out_si
   assert(capacity > 0);
 
   safe_while (entry) {
-    if (entry->usage_page == 0x0D && tablet_hash_path(entry->path) == id.instance) {
+    if (entry->usage_page == 0x0D && tablet_hash_path(entry->path) == devices_get_instance(dev_id)) {
       sz cpy_idx = 0;
 
       safe_while (entry->path && entry->path[cpy_idx] && (cpy_idx + 1) < size_of(path_buf)) {

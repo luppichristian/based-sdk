@@ -36,8 +36,8 @@ func b32 mouse_is_available(void) {
   return SDL_HasMouse() ? true : false;
 }
 
-func b32 mouse_get_primary_device_id(device_id* out_id) {
-  return devices_get_device(DEVICE_TYPE_MOUSE, 0, out_id);
+func device mouse_get_primary_device(void) {
+  return devices_get_device(DEVICE_TYPE_MOUSE, 0);
 }
 
 func mouse_state mouse_get_state(void) {
