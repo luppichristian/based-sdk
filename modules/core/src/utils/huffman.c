@@ -115,7 +115,7 @@ func void huffman_tree_select_smallest_internal(
   }
 
   if (*out_second_idx < *out_first_idx) {
-    swap(sz, *out_first_idx, *out_second_idx);
+    swap_ptr(out_first_idx, out_second_idx);
   }
 }
 

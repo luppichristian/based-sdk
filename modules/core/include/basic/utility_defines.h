@@ -70,14 +70,14 @@ c_begin;
 // Swap helpers
 // =========================================================================
 
-#define swap(type, a, b) stmt( \
-    type _swap_tmp = (a);      \
-    (a) = (b);                 \
+#define swap_value(a, b) stmt(  \
+    type_of(a) _swap_tmp = (a); \
+    (a) = (b);                  \
     (b) = _swap_tmp;)
 
-#define refswap(type, a_ptr, b_ptr) stmt( \
-    type _refswap_tmp = *(a_ptr);         \
-    *(a_ptr) = *(b_ptr);                  \
+#define swap_ptr(a_ptr, b_ptr) stmt(         \
+    type_of(*a_ptr) _refswap_tmp = *(a_ptr); \
+    *(a_ptr) = *(b_ptr);                     \
     *(b_ptr) = _refswap_tmp;)
 
 // =========================================================================

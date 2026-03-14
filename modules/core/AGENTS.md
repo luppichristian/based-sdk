@@ -106,4 +106,4 @@ Common macros used across core:
 - `assert(condition)` forwarding through `_assert(..., CALLSITE_HERE)`.
 - `log_state_*` and `global_log_*` logging wrappers forwarding callsite info.
 - `profile_func_begin`, `profile_func_end`.
-- Utility macros from `include/basic/utility_defines.h` (`strfy`, `cat`, `count_of`, `bit`, `align_up`, `swap`, etc.).
+- Utility macros from `include/basic/utility_defines.h` (`strfy`, `cat`, `count_of`, `bit`, `align_up`, `swap_value`, etc.).

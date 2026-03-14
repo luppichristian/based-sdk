@@ -33,7 +33,7 @@ If modules are added, removed, or reorganized, update this file in the same chan
   - `utility_defines.h` for common utility macros. Keep helpers aligned with:
     `strfy`, `strfy_exp`, `cat`, `cat_exp`, `expr`, `stmt`, `count_of`, `size_of_each`, `multiline_literal`,
     `bit`, `bit64`, `bit_is_set`, `bit_set`, `bit_unset`, `bit_toggle`, `field_of`, `size_of_field`,
-    `offset_of`, `container_of`, `in_range`, `in_bounds`, `swap`, `refswap`, `is_pow2`, `align_up`,
+    `offset_of`, `container_of`, `in_range`, `in_bounds`, `swap_value`, `swap_ptr`, `is_pow2`, `align_up`,
     `align_down`, `kb`, `mb`, `gb`, `tb`, `th`, `mil`, `bil`, `tril`.
   - `safe.h` for loop safety helpers. Use `safe_for` and `safe_while` for fixed or regular loops, and do not convert game loops to the safe loop macros.
 

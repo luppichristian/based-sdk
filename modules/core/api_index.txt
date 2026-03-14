@@ -107,8 +107,8 @@
 32: #define container_of(ptr, type, field) ((type*)((char*)(ptr) - offset_of(type, field)))
 34: #define in_range(x, lo, hi) ((x) >= (lo) && (x) <= (hi))
 35: #define in_bounds(arr, i) ((i) >= 0 && (size_t)(i) < count_of(arr))
-37: #define swap(type, a, b) stmt( \
-42: #define refswap(type, a_ptr, b_ptr) stmt( \
+37: #define swap_value(type, a, b) stmt( \
+42: #define swap_ptr(type, a_ptr, b_ptr) stmt( \
 47: #define is_pow2(x) ((x) != 0 && ((x) & ((x) - 1)) == 0)
 48: #define align_up(x, n) (((x) + (n) - 1) & ~((n) - 1))
 49: #define align_down(x, n) ((x) & ~((n) - 1))
