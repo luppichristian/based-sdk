@@ -51,9 +51,6 @@ typedef struct cpu_info {
   // This is useful for alignment and false-sharing avoidance.
   u32 cache_line_bytes;
 
-  // True when the queried CPU/runtime reports 64-bit execution capability.
-  b32 supports_64bit;
-
   // Fine-grained CPU feature bits grouped by instruction-family support.
   cpu_instruction_set_info instruction_sets;
 } cpu_info;

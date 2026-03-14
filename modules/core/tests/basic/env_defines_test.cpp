@@ -16,45 +16,15 @@ TEST(basic_env_defines_test, one_platform_and_one_arch_are_detected) {
 #endif
 
   i32 arch_count = 0;
-#if defined(ARCH_X86)
-  arch_count += 1;
-#endif
 #if defined(ARCH_X86_64)
-  arch_count += 1;
-#endif
-#if defined(ARCH_ARM)
   arch_count += 1;
 #endif
 #if defined(ARCH_ARM64)
   arch_count += 1;
 #endif
-#if defined(ARCH_RISCV)
-  arch_count += 1;
-#endif
-#if defined(ARCH_POWERPC)
-  arch_count += 1;
-#endif
-#if defined(ARCH_MIPS)
-  arch_count += 1;
-#endif
-#if defined(ARCH_SPARC)
-  arch_count += 1;
-#endif
 
   EXPECT_EQ(platform_count, 1);
   EXPECT_EQ(arch_count, 1);
-}
-
-TEST(basic_env_defines_test, one_compiler_and_one_word_size_macro_are_detected) {
-  i32 word_size_count = 0;
-#if defined(ARCH_32)
-  word_size_count += 1;
-#endif
-#if defined(ARCH_64)
-  word_size_count += 1;
-#endif
-
-  EXPECT_EQ(word_size_count, 1);
 }
 
 TEST(basic_env_defines_test, build_configuration_is_selected) {

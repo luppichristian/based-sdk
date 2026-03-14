@@ -18,33 +18,11 @@ typedef LONG(WINAPI* rtl_get_version_fn)(void* version_info);
 #endif
 
 func cstr8 system_architecture_name(void) {
-  profile_func_begin;
 #if defined(ARCH_X86_64)
-  profile_func_end;
   return "x86_64";
-#elif defined(ARCH_X86)
-  profile_func_end;
-  return "x86";
 #elif defined(ARCH_ARM64)
-  profile_func_end;
   return "arm64";
-#elif defined(ARCH_ARM)
-  profile_func_end;
-  return "arm";
-#elif defined(ARCH_RISCV)
-  profile_func_end;
-  return "riscv";
-#elif defined(ARCH_POWERPC)
-  profile_func_end;
-  return "powerpc";
-#elif defined(ARCH_MIPS)
-  profile_func_end;
-  return "mips";
-#elif defined(ARCH_SPARC)
-  profile_func_end;
-  return "sparc";
 #else
-  profile_func_end;
   return "unknown";
 #endif
 }

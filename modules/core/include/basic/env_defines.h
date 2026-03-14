@@ -29,41 +29,8 @@
 
 #if defined(_M_X64) || defined(_M_AMD64) || defined(__x86_64__) || defined(__amd64__)
 #  define ARCH_X86_64
-#  define ARCH_64
-#elif defined(_M_IX86) || defined(__i386__)
-#  define ARCH_X86
-#  define ARCH_32
 #elif defined(_M_ARM64) || defined(__aarch64__)
 #  define ARCH_ARM64
-#  define ARCH_64
-#elif defined(_M_ARM) || defined(__arm__)
-#  define ARCH_ARM
-#  define ARCH_32
-#elif defined(__riscv)
-#  define ARCH_RISCV
-#  if defined(__riscv_xlen) && __riscv_xlen == 64
-#    define ARCH_64
-#  else
-#    define ARCH_32
-#  endif
-#elif defined(__powerpc64__) || defined(__ppc64__) || defined(_M_PPC) && defined(__64BIT__)
-#  define ARCH_POWERPC
-#  define ARCH_64
-#elif defined(__powerpc__) || defined(__ppc__) || defined(_M_PPC)
-#  define ARCH_POWERPC
-#  define ARCH_32
-#elif defined(__mips64)
-#  define ARCH_MIPS
-#  define ARCH_64
-#elif defined(__mips__) || defined(__mips)
-#  define ARCH_MIPS
-#  define ARCH_32
-#elif defined(__sparc_v9__) || defined(__sparcv9)
-#  define ARCH_SPARC
-#  define ARCH_64
-#elif defined(__sparc__) || defined(__sparc)
-#  define ARCH_SPARC
-#  define ARCH_32
 #endif
 
 // =========================================================================
@@ -92,11 +59,8 @@
 #  error "env_defines.h: no supported target platform detected."
 #endif
 
-#if !defined(ARCH_X86) && !defined(ARCH_X86_64) &&    \
-    !defined(ARCH_ARM) && !defined(ARCH_ARM64) &&     \
-    !defined(ARCH_RISCV) && !defined(ARCH_POWERPC) && \
-    !defined(ARCH_MIPS) && !defined(ARCH_SPARC)
-#  error "env_defines.h: no target CPU architecture detected."
+#if !defined(ARCH_X86_64) && !defined(ARCH_ARM64)
+#  error "env_defines.h: no supported target CPU architecture detected."
 #endif
 
 #if !defined(__clang__)

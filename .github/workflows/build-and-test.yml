@@ -13,20 +13,65 @@ permissions:
 
 jobs:
   build-and-test:
-    name: ${{ matrix.os }} / ${{ matrix.build_type }}
+    name: ${{ matrix.os }} / ${{ matrix.arch }} / ${{ matrix.build_type }}
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
         os:
           - ubuntu-latest
+          - ubuntu-24.04-arm
+          - macos-13
           - macos-latest
           - windows-latest
+        arch:
+          - x86_64
+          - arm64
         build_type:
           - Debug
           - Release
-          - RelWithDebInfo
-          - MinSizeRel
+        include:
+          - os: ubuntu-latest
+            arch: x86_64
+            build_type: RelWithDebInfo
+          - os: ubuntu-latest
+            arch: x86_64
+            build_type: MinSizeRel
+          - os: ubuntu-24.04-arm
+            arch: arm64
+            build_type: RelWithDebInfo
+          - os: ubuntu-24.04-arm
+            arch: arm64
+            build_type: MinSizeRel
+          - os: macos-13
+            arch: x86_64
+            build_type: RelWithDebInfo
+          - os: macos-13
+            arch: x86_64
+            build_type: MinSizeRel
+          - os: macos-latest
+            arch: arm64
+            build_type: RelWithDebInfo
+          - os: macos-latest
+            arch: arm64
+            build_type: MinSizeRel
+          - os: windows-latest
+            arch: x86_64
+            build_type: RelWithDebInfo
+          - os: windows-latest
+            arch: x86_64
+            build_type: MinSizeRel
+        exclude:
+          - os: ubuntu-latest
+            arch: arm64
+          - os: ubuntu-24.04-arm
+            arch: x86_64
+          - os: macos-13
+            arch: arm64
+          - os: macos-latest
+            arch: x86_64
+          - os: windows-latest
+            arch: arm64
 
     env:
       BUILD_DIR: build/ci

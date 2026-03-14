@@ -28,14 +28,6 @@ TEST(system_cpu_info_test, brand_name) {
   EXPECT_GT(cstr8_len(info.brand_name), 0U);
 }
 
-TEST(system_cpu_info_test, supports_64bit) {
-  cpu_info info = {0};
-  b32 result = cpu_info_query(&info);
-  EXPECT_NE(0, result);
-
-  EXPECT_NE(0, info.supports_64bit);
-}
-
 TEST(system_cpu_info_test, instruction_sets) {
   cpu_info info = {0};
   b32 result = cpu_info_query(&info);

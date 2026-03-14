@@ -102,6 +102,7 @@ func b32 entry_init(cmdline cmdline) {
 
   global_log_info("Global context initialized");
   global_log_verbose("Initializing thread context");
+
   ctx_setup thread_setup = entry_start_setup;
   thread_setup.main_allocator = global_get_allocator();
   if (!thread_ctx_init(thread_setup)) {
@@ -312,7 +313,6 @@ SDL_AppResult SDL_AppEvent(void* appstate, SDL_Event* event) {
 
 int main_app(int argc, char** argv, ctx_setup setup, entry_app_callbacks callbacks) {
   profile_func_begin;
-  global_log_info("Starting app runtime argc=%d", argc);
   entry_start_setup = setup;
   app_callbacks = callbacks;
   entry_cmdline_current = cmdline_build((sz)argc, (c8**)argv);
@@ -355,7 +355,6 @@ int main_run_internal(int argc, char** argv) {
 
 int main_run(int argc, char** argv, ctx_setup setup, entry_run_callbacks callbacks) {
   profile_func_begin;
-  global_log_info("Starting run runtime argc=%d", argc);
   entry_start_setup = setup;
   run_callbacks = callbacks;
   entry_cmdline_current = cmdline_build((sz)argc, (c8**)argv);

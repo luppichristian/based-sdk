@@ -38,9 +38,6 @@ func u32 cpu_query_logical_cores(void) {
 
 func void cpu_set_compile_time_fallback(cpu_info* out_info) {
   profile_func_begin;
-#if defined(ARCH_64)
-  out_info->supports_64bit = 1;
-#endif
 
 #if defined(ARCH_ARM64) || defined(ARCH_ARM)
   cstr8_cpy(out_info->vendor_name, size_of(out_info->vendor_name), "ARM");
@@ -174,10 +171,6 @@ func void cpu_fill_x86_features(cpu_info* out_info) {
     out_info->instruction_sets.avx512f = (ebx_ext & (1U << 16U)) != 0U;
   }
 
-  i32 long_mode_regs[4];
-  if (cpu_read_cpuid(0x80000001U, 0, long_mode_regs)) {
-    out_info->supports_64bit = (((u32)long_mode_regs[3]) & (1U << 29U)) != 0U;
-  }
   profile_func_end;
 }
 #endif
