@@ -81,6 +81,7 @@ jobs:
         run: >-
           cmake -S . -B "${{ env.BUILD_DIR }}"
           -G Ninja
+          ${{ runner.os == 'Windows' && '-D CMAKE_C_COMPILER=clang-cl -D CMAKE_CXX_COMPILER=clang-cl' || '' }}
           -D CMAKE_BUILD_TYPE="${{ matrix.build_type }}"
           -D BASED_BUILD_TESTS=ON
           -D BASED_ENABLE_MODULE_GRAPHICS=ON

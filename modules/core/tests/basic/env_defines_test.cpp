@@ -47,12 +47,6 @@ TEST(basic_env_defines_test, one_platform_and_one_arch_are_detected) {
 
 TEST(basic_env_defines_test, one_compiler_and_one_word_size_macro_are_detected) {
   i32 compiler_count = 0;
-#if defined(COMPILER_MSVC)
-  compiler_count += 1;
-#endif
-#if defined(COMPILER_GCC)
-  compiler_count += 1;
-#endif
 #if defined(COMPILER_CLANG)
   compiler_count += 1;
 #endif

@@ -51,10 +51,7 @@ If ALL_GLOBAL_VARS_STATIC is defined, all global variables will be declared as s
 // C++11 keyword — already defined.
 #elif defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L
 #  define thread_local _Thread_local
-#elif defined(COMPILER_MSVC)
-#  define thread_local __declspec(thread)
-#elif defined(COMPILER_GCC) || defined(COMPILER_CLANG) || \
-    defined(COMPILER_APPLE_CLANG) || defined(COMPILER_INTEL)
+#elif defined(COMPILER_CLANG) || defined(COMPILER_APPLE_CLANG) || defined(COMPILER_INTEL)
 #  define thread_local __thread
 #else
 #  define thread_local
@@ -64,8 +61,7 @@ If ALL_GLOBAL_VARS_STATIC is defined, all global variables will be declared as s
 #if defined(PLATFORM_WINDOWS)
 #  define dll_export __declspec(dllexport)
 #  define dll_import __declspec(dllimport)
-#elif defined(COMPILER_GCC) || defined(COMPILER_CLANG) || \
-    defined(COMPILER_APPLE_CLANG) || defined(COMPILER_INTEL)
+#elif defined(COMPILER_CLANG) || defined(COMPILER_APPLE_CLANG) || defined(COMPILER_INTEL)
 #  define dll_export __attribute__((visibility("default")))
 #  define dll_import
 #else
@@ -91,30 +87,25 @@ If ALL_GLOBAL_VARS_STATIC is defined, all global variables will be declared as s
 #  define no_return [[noreturn]]
 #elif defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L
 #  define no_return _Noreturn
-#elif defined(COMPILER_MSVC)
-#  define no_return __declspec(noreturn)
-#elif defined(COMPILER_GCC) || defined(COMPILER_CLANG) || \
-    defined(COMPILER_APPLE_CLANG) || defined(COMPILER_INTEL)
+#elif defined(COMPILER_CLANG) || defined(COMPILER_APPLE_CLANG) || defined(COMPILER_INTEL)
 #  define no_return __attribute__((noreturn))
 #else
 #  define no_return
 #endif
 
 // force_inline — ask the compiler to always inline this function.
-#if defined(COMPILER_MSVC) || defined(COMPILER_INTEL)
+#if defined(COMPILER_INTEL)
 #  define force_inline __forceinline
-#elif defined(COMPILER_GCC) || defined(COMPILER_CLANG) || \
-    defined(COMPILER_APPLE_CLANG)
+#elif defined(COMPILER_CLANG) || defined(COMPILER_APPLE_CLANG)
 #  define force_inline __attribute__((always_inline)) inline
 #else
 #  define force_inline inline
 #endif
 
 // no_inline — ask the compiler never to inline this function.
-#if defined(COMPILER_MSVC) || defined(COMPILER_INTEL)
+#if defined(COMPILER_INTEL)
 #  define no_inline __declspec(noinline)
-#elif defined(COMPILER_GCC) || defined(COMPILER_CLANG) || \
-    defined(COMPILER_APPLE_CLANG)
+#elif defined(COMPILER_CLANG) || defined(COMPILER_APPLE_CLANG)
 #  define no_inline __attribute__((noinline))
 #else
 #  define no_inline
@@ -125,10 +116,7 @@ If ALL_GLOBAL_VARS_STATIC is defined, all global variables will be declared as s
 #  define align_as(x) alignas(x)
 #elif defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L
 #  define align_as(x) _Alignas(x)
-#elif defined(COMPILER_MSVC)
-#  define align_as(x) __declspec(align(x))
-#elif defined(COMPILER_GCC) || defined(COMPILER_CLANG) || \
-    defined(COMPILER_APPLE_CLANG) || defined(COMPILER_INTEL)
+#elif defined(COMPILER_CLANG) || defined(COMPILER_APPLE_CLANG) || defined(COMPILER_INTEL)
 #  define align_as(x) __attribute__((aligned(x)))
 #else
 #  define align_as(x)
@@ -139,10 +127,7 @@ If ALL_GLOBAL_VARS_STATIC is defined, all global variables will be declared as s
 #  define align_of(x) alignof(x)
 #elif defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L
 #  define align_of(x) _Alignof(x)
-#elif defined(COMPILER_MSVC)
-#  define align_of(x) __alignof(x)
-#elif defined(COMPILER_GCC) || defined(COMPILER_CLANG) || \
-    defined(COMPILER_APPLE_CLANG) || defined(COMPILER_INTEL)
+#elif defined(COMPILER_CLANG) || defined(COMPILER_APPLE_CLANG) || defined(COMPILER_INTEL)
 #  define align_of(x) __alignof__(x)
 #else
 #  define align_of(x) sizeof(x)
@@ -152,16 +137,14 @@ If ALL_GLOBAL_VARS_STATIC is defined, all global variables will be declared as s
 #define size_of(x) sizeof(x)
 
 // type_of — alias for compiler-supported typeof.
-#if defined(COMPILER_MSVC) || defined(COMPILER_GCC) || defined(COMPILER_CLANG) || \
-    defined(COMPILER_APPLE_CLANG) || defined(COMPILER_INTEL)
+#if defined(COMPILER_CLANG) || defined(COMPILER_APPLE_CLANG) || defined(COMPILER_INTEL)
 #  define type_of(x) typeof(x)
 #else
 #  error "keyword_defines.h: type_of requires compiler typeof support."
 #endif
 
 // likely / unlikely — branch prediction hints.
-#if defined(COMPILER_GCC) || defined(COMPILER_CLANG) || \
-    defined(COMPILER_APPLE_CLANG) || defined(COMPILER_INTEL)
+#if defined(COMPILER_CLANG) || defined(COMPILER_APPLE_CLANG) || defined(COMPILER_INTEL)
 #  define likely(x)   __builtin_expect(!!(x), 1)
 #  define unlikely(x) __builtin_expect(!!(x), 0)
 #else

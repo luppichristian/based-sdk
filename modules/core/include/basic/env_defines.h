@@ -76,10 +76,6 @@
 #  define COMPILER_APPLE_CLANG
 #elif defined(__clang__)
 #  define COMPILER_CLANG
-#elif defined(_MSC_VER)
-#  define COMPILER_MSVC
-#elif defined(__GNUC__)
-#  define COMPILER_GCC
 #endif
 
 // =========================================================================
@@ -115,18 +111,8 @@
 #  error "env_defines.h: no target CPU architecture detected."
 #endif
 
-#if !defined(COMPILER_MSVC) && !defined(COMPILER_GCC) &&    \
-    !defined(COMPILER_CLANG) && !defined(COMPILER_INTEL) && \
-    !defined(COMPILER_APPLE_CLANG)
-#  error "env_defines.h: no compiler detected."
-#endif
-
-#if defined(COMPILER_MSVC) && !defined(PLATFORM_WINDOWS)
-#  error "env_defines.h: COMPILER_MSVC is only supported on PLATFORM_WINDOWS."
-#endif
-
-#if defined(COMPILER_MSVC) && (!defined(__STDC_VERSION__) || __STDC_VERSION__ < 202311L)
-#  error "env_defines.h: MSVC builds require /std:clatest for C23 typeof support."
+#if !defined(COMPILER_CLANG) && !defined(COMPILER_APPLE_CLANG)
+#  error "env_defines.h: based currently supports only Clang-based compilers."
 #endif
 
 #if defined(COMPILER_APPLE_CLANG) && !defined(PLATFORM_MACOS)
