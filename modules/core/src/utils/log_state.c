@@ -273,15 +273,18 @@ func void _log_state_quit(log_state* state, callsite site) {
     return;
   }
 
+  mutex state_mutex = state->mutex_handle;
   log_state_lock(state);
-  arena_destroy(&state->arena_alloc);
-  log_frame_reset(&state->root_frame_storage);
+  state->is_init = false;
   state->root_frame = NULL;
   state->active_frame = NULL;
-  state->is_init = false;
   log_state_unlock(state);
 
-  mutex_destroy(state->mutex_handle);
+  arena_destroy(&state->arena_alloc);
+  log_frame_reset(&state->root_frame_storage);
+  if (state_mutex) {
+    mutex_destroy(state_mutex);
+  }
   mem_zero(state, size_of(*state));
   profile_func_end;
 }

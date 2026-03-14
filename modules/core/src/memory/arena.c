@@ -176,7 +176,8 @@ func void _arena_destroy(arena* arn, callsite site) {
     mutex_lock(arn->opt_mutex);
   }
 
-  SINGLY_LIST_FOREACH(arn->blocks_head, arn->blocks_tail, blk) {
+  arena_block* blk = arn->blocks_head;
+  safe_while (blk) {
     arena_block* nxt = blk->next;
     if (blk->owned && arn->parent.alloc_fn) {
       _allocator_dealloc(arn->parent, blk, CALLSITE_HERE);

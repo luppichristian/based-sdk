@@ -1382,7 +1382,6 @@ func b32 _msg_post(const msg* src, callsite site) {
   }
 
   if (!msg_filter_accept(&posted_msg)) {
-    thread_log_trace("Filtered message before post type=%u", posted_msg.type);
     profile_func_end;
     return false;
   }
@@ -1390,12 +1389,10 @@ func b32 _msg_post(const msg* src, callsite site) {
   msg_notify_internal_listeners(&posted_msg);
 
   if (!msg_dispatch_handlers(&posted_msg)) {
-    thread_log_trace("Cancelled posted message type=%u", posted_msg.type);
     profile_func_end;
     return false;
   }
 
-  thread_log_trace("Posted message type=%u", posted_msg.type);
   profile_func_end;
   return true;
 }

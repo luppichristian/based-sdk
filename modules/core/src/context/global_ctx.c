@@ -71,7 +71,7 @@ func b32 global_ctx_init(ctx_setup setup) {
 func b32 global_ctx_quit(void) {
   profile_func_begin;
   i32 expected = 1;
-  if (!atomic_i32_cmpex(&process_global_ctx_init, &expected, true)) {
+  if (!atomic_i32_cmpex(&process_global_ctx_init, &expected, false)) {
     profile_func_end;
     return false;
   }
@@ -84,20 +84,16 @@ func b32 global_ctx_quit(void) {
   msg lifecycle_msg = {0};
   msg_core_fill_global_ctx(&lifecycle_msg, &ctx_data);
   if (!msg_post(&lifecycle_msg)) {
+    atomic_i32_set(&process_global_ctx_init, true);
     profile_func_end;
     return false;
   }
 
   mutex wrapper_mutex = process_global_ctx.mutex_handle;
-  if (wrapper_mutex) {
-    mutex_lock(wrapper_mutex);
-  }
-
   ctx_quit(&process_global_ctx.shared_ctx);
   process_global_ctx.is_init = false;
 
   if (wrapper_mutex) {
-    mutex_unlock(wrapper_mutex);
     mutex_destroy(wrapper_mutex);
   }
 

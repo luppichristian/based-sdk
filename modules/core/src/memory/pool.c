@@ -197,7 +197,8 @@ func void _pool_destroy(pool* pol, callsite site) {
     mutex_lock(pol->opt_mutex);
   }
 
-  SINGLY_LIST_FOREACH(pol->blocks_head, pol->blocks_tail, blk) {
+  pool_block* blk = pol->blocks_head;
+  safe_while (blk) {
     pool_block* nxt = blk->next;
     if (blk->owned && pol->parent.alloc_fn) {
       _allocator_dealloc(pol->parent, blk, CALLSITE_HERE);

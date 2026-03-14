@@ -40,6 +40,12 @@ option(BASED_ENABLE_MODULE_GRAPHICS "Enable graphics module"    ON)
 # Modules
 # =========================================================================
 
+if(BASED_BUILD_TESTS)
+    enable_testing()
+    fetch_googletest()
+    include(GoogleTest)
+endif()
+
 add_subdirectory(modules/core)
 if(BASED_ENABLE_MODULE_GRAPHICS)
     add_subdirectory(modules/gfx)

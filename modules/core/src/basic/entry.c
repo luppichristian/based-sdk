@@ -12,8 +12,6 @@
 #include "basic/profiler.h"
 #include "based_core.h"
 
-func void msg_notify_internal_listeners(const msg* src);
-
 // =========================================================================
 // Entry runtime state
 // =========================================================================
@@ -23,7 +21,7 @@ global_var ctx_setup entry_start_setup = {0};
 
 func void* entry_pipeline_malloc(sz size) {
   profile_func_begin;
-  allocator alloc = thread_get_allocator();
+  allocator alloc = vmem_get_allocator();
   void* ptr = allocator_alloc(alloc, size);
   if (ptr == NULL) {
     global_log_warn("Entry pipeline allocation failed size=%zu", (size_t)size);
@@ -38,14 +36,14 @@ func void entry_pipeline_free(void* ptr) {
     profile_func_end;
     return;
   }
-  allocator alloc = thread_get_allocator();
+  allocator alloc = vmem_get_allocator();
   allocator_dealloc(alloc, ptr);
   profile_func_end;
 }
 
 func void* entry_pipeline_calloc(sz count, sz size) {
   profile_func_begin;
-  allocator alloc = thread_get_allocator();
+  allocator alloc = vmem_get_allocator();
   void* ptr = allocator_calloc(alloc, count, size);
   if (ptr == NULL) {
     global_log_warn("Entry pipeline zero-allocation failed count=%zu size=%zu",
@@ -58,7 +56,7 @@ func void* entry_pipeline_calloc(sz count, sz size) {
 
 func void* entry_pipeline_realloc(void* ptr, sz size) {
   profile_func_begin;
-  allocator alloc = thread_get_allocator();
+  allocator alloc = vmem_get_allocator();
   void* new_ptr = allocator_realloc(alloc, ptr, size);
   if (new_ptr == NULL && size > 0) {
     global_log_warn("Entry pipeline reallocation failed size=%zu", (size_t)size);
@@ -176,11 +174,6 @@ func void entry_quit(void) {
     return;
   }
 
-  if (has_sdl) {
-    global_log_verbose("Shutting down SDL");
-    SDL_Quit();
-  }
-
   if (has_thread_ctx) {
     thread_log_verbose("Shutting down thread context");
     if (!thread_ctx_quit()) {
@@ -190,9 +183,12 @@ func void entry_quit(void) {
 
   if (has_global_ctx) {
     global_log_verbose("Shutting down global context");
-    if (!global_ctx_quit()) {
-      thread_log_error("Failed shutting global context");
-    }
+    global_ctx_quit();
+  }
+
+  if (has_sdl) {
+    global_log_verbose("Shutting down SDL");
+    SDL_Quit();
   }
 
   profile_func_end;

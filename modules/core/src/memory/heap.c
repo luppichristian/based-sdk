@@ -257,7 +257,8 @@ func void _heap_destroy(heap* hep, callsite site) {
     mutex_lock(hep->opt_mutex);
   }
 
-  SINGLY_LIST_FOREACH(hep->blocks_head, hep->blocks_tail, blk) {
+  heap_block* blk = hep->blocks_head;
+  safe_while (blk) {
     heap_block* nxt = blk->next;
     if (blk->owned && hep->parent.alloc_fn) {
       _allocator_dealloc(hep->parent, blk, CALLSITE_HERE);
