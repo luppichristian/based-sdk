@@ -208,27 +208,18 @@ func cstr8 log_level_to_str(log_level level) {
   return NULL;
 }
 
-func b32 _log_state_init(log_state* state, b32 use_mutex, allocator alloc, callsite site) {
+func b32 _log_state_init(log_state* state, mutex mutex_handle, allocator alloc, callsite site) {
   profile_func_begin;
   if (!state) {
     profile_func_end;
     return false;
   }
-  assert(use_mutex == 0 || use_mutex == 1);
 
   mem_zero(state, size_of(*state));
   state->level = LOG_LEVEL_DEFAULT;
   state->arena_alloc = arena_create(alloc, NULL, LOG_STATE_ARENA_MIN_SIZE);
   state->root_frame = &state->root_frame_storage;
-  if (use_mutex) {
-    state->mutex_handle = mutex_create();
-    if (!state->mutex_handle) {
-      arena_destroy(&state->arena_alloc);
-      state->root_frame = NULL;
-      profile_func_end;
-      return false;
-    }
-  }
+  state->mutex_handle = mutex_handle;
   state->is_init = true;
   msg lifecycle_msg = {0};
   msg_core_object_lifecycle_data msg_data = {
@@ -239,9 +230,6 @@ func b32 _log_state_init(log_state* state, b32 use_mutex, allocator alloc, calls
   };
   msg_core_fill_object_lifecycle(&lifecycle_msg, &msg_data);
   if (!msg_post(&lifecycle_msg)) {
-    if (state->mutex_handle) {
-      mutex_destroy(state->mutex_handle);
-    }
     arena_destroy(&state->arena_alloc);
     mem_zero(state, size_of(*state));
     thread_log_trace("Log state initialization was suspended state=%p", (void*)state);
@@ -273,7 +261,6 @@ func void _log_state_quit(log_state* state, callsite site) {
     return;
   }
 
-  mutex state_mutex = state->mutex_handle;
   log_state_lock(state);
   state->is_init = false;
   state->root_frame = NULL;
@@ -282,9 +269,6 @@ func void _log_state_quit(log_state* state, callsite site) {
 
   arena_destroy(&state->arena_alloc);
   log_frame_reset(&state->root_frame_storage);
-  if (state_mutex) {
-    mutex_destroy(state_mutex);
-  }
   mem_zero(state, size_of(*state));
   profile_func_end;
 }

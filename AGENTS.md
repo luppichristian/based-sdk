@@ -65,8 +65,8 @@ If modules are added, removed, or reorganized, update this file in the same chan
 
 ## Global Vs Thread Context
 
-- `ctx` is the shared payload type; `global_ctx` wraps one process-global shared `ctx`, while `thread_ctx` exposes one `ctx` per thread.
+- `ctx` is the shared payload type used by both global and thread context helpers.
 - Prefer `thread_ctx`/`thread_*` helpers for thread-affine work, temporary allocations, and per-thread user data.
-- Prefer `global_ctx`/`global_*` helpers for process-wide shared state and cross-thread shared resources.
+- Prefer `global_ctx_get()`/`global_*` helpers for process-wide shared state and cross-thread shared resources.
 - When doing coordinated multi-step access to the shared global context, use `global_ctx_lock()` / `global_ctx_unlock()`.
 - Remember that `thread_get_log_state()` falls back to the global log state when the current thread context is not initialized.

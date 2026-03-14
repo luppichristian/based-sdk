@@ -52,10 +52,10 @@ For project-wide policies and module organization rules, see `AGENTS.md` at repo
 
 - `ctx` is the shared payload type used by both wrappers.
 - `thread_ctx` is thread-local: each thread must initialize its own context with `thread_ctx_init(...)` before relying on thread-owned allocators, user data, or thread-local state.
-- `global_ctx` is process-global shared state and exposes convenience wrappers through `global_*` helpers.
+- The process-global context is exposed as a shared `ctx` through `global_ctx_get()` and the `global_*` helpers.
 - Prefer `thread_*` helpers for thread-affine allocators, temporary memory, and per-thread user data.
 - Prefer `global_*` helpers for shared resources that must outlive or span threads.
-- Use `global_ctx_lock()` / `global_ctx_unlock()` for coordinated multi-step access to `global_ctx_get_shared()`.
+- Use `global_ctx_lock()` / `global_ctx_unlock()` for coordinated multi-step access to `global_ctx_get()`.
 - Remember that `thread_get_log_state()` falls back to the global log state when the current thread has no initialized context.
 
 ## Core Layout

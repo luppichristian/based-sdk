@@ -1,2 +1,3 @@
 - In memory add "guard" module
 - Multiple keyboards & mouse
+- Crash report

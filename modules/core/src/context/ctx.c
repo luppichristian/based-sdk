@@ -27,8 +27,7 @@ func b32 ctx_setup_is_valid(ctx_setup* setup) {
     return false;
   }
 
-  if ((setup->use_log_mutex != false && setup->use_log_mutex != true) ||
-      (setup->use_arena_allocs != false && setup->use_arena_allocs != true) ||
+  if ((setup->use_arena_allocs != false && setup->use_arena_allocs != true) ||
       (setup->use_heap_allocs != false && setup->use_heap_allocs != true) ||
       (setup->use_temp_allocs != false && setup->use_temp_allocs != true)) {
     thread_log_error("Context setup contains invalid boolean flags");
@@ -72,6 +71,12 @@ func void ctx_setup_fill_defaults(ctx_setup* setup) {
     return;
   }
 
+  if (!setup->use_arena_allocs && !setup->use_heap_allocs && !setup->use_temp_allocs) {
+    setup->use_arena_allocs = true;
+    setup->use_heap_allocs = true;
+    setup->use_temp_allocs = true;
+  }
+
   if (setup->perm_arena_block_size == 0) {
     setup->perm_arena_block_size = CTX_DEFAULT_BLOCK_SIZE;
   }
@@ -100,23 +105,23 @@ func b32 ctx_init(ctx* context, ctx_setup setup) {
 
   mem_zero(context, size_of(*context));
   context->setup = setup;
-  if (!log_state_init(&context->log, setup.use_log_mutex, setup.main_allocator)) {
+  if (!log_state_init(&context->log, setup.mutex_handle, setup.main_allocator)) {
     mem_zero(context, size_of(*context));
     profile_func_end;
     return false;
   }
 
   if (setup.use_arena_allocs) {
-    context->perm_arena = arena_create(setup.main_allocator, setup.allocator_mutex, setup.perm_arena_block_size);
+    context->perm_arena = arena_create(setup.main_allocator, setup.mutex_handle, setup.perm_arena_block_size);
     if (setup.use_temp_allocs) {
-      context->temp_arena = arena_create(setup.main_allocator, setup.allocator_mutex, setup.temp_arena_block_size);
+      context->temp_arena = arena_create(setup.main_allocator, setup.mutex_handle, setup.temp_arena_block_size);
     }
   }
 
   if (setup.use_heap_allocs) {
-    context->perm_heap = heap_create(setup.main_allocator, setup.allocator_mutex, setup.perm_heap_block_size);
+    context->perm_heap = heap_create(setup.main_allocator, setup.mutex_handle, setup.perm_heap_block_size);
     if (setup.use_temp_allocs) {
-      context->temp_heap = heap_create(setup.main_allocator, setup.allocator_mutex, setup.temp_heap_block_size);
+      context->temp_heap = heap_create(setup.main_allocator, setup.mutex_handle, setup.temp_heap_block_size);
     }
   }
 

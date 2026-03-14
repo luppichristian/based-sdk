@@ -13,7 +13,7 @@ TEST(utils_log_state_test, level_labels_are_stable) {
 TEST(utils_log_state_test, state_init_and_quit_toggle_init_flag) {
   log_state state_val = {0};
 
-  b32 init_ok = log_state_init(&state_val, 0, global_get_allocator());
+  b32 init_ok = log_state_init(&state_val, NULL, global_get_allocator());
   EXPECT_TRUE(init_ok != 0);
   EXPECT_TRUE(log_state_is_init(&state_val) != 0);
 
@@ -23,7 +23,7 @@ TEST(utils_log_state_test, state_init_and_quit_toggle_init_flag) {
 
 TEST(utils_log_state_test, frame_capture_and_filtering_work) {
   log_state state_val = {0};
-  b32 init_ok = log_state_init(&state_val, 0, global_get_allocator());
+  b32 init_ok = log_state_init(&state_val, NULL, global_get_allocator());
   ASSERT_TRUE(init_ok != 0);
 
   log_state_set_level(&state_val, LOG_LEVEL_TRACE);
@@ -51,8 +51,8 @@ TEST(utils_log_state_test, frame_capture_and_filtering_work) {
 TEST(utils_log_state_test, state_sync_moves_root_messages_between_states) {
   log_state dst_state = {0};
   log_state src_state = {0};
-  ASSERT_TRUE(log_state_init(&dst_state, 0, global_get_allocator()) != 0);
-  ASSERT_TRUE(log_state_init(&src_state, 0, global_get_allocator()) != 0);
+  ASSERT_TRUE(log_state_init(&dst_state, NULL, global_get_allocator()) != 0);
+  ASSERT_TRUE(log_state_init(&src_state, NULL, global_get_allocator()) != 0);
 
   log_state_set_level(&src_state, LOG_LEVEL_TRACE);
   log_state_set_level(&dst_state, LOG_LEVEL_TRACE);

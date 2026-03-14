@@ -3,20 +3,11 @@
 
 #pragma once
 
-#include "../threads/mutex.h"
 #include "ctx.h"
 
 // =========================================================================
 c_begin;
 // =========================================================================
-
-// Process-global context wrapper.
-// The wrapper owns a mutex and a shared ctx payload.
-typedef struct global_ctx {
-  b32 is_init;
-  mutex mutex_handle;
-  ctx shared_ctx;
-} global_ctx;
 
 // Initializes the process-global context singleton.
 // Returns true if already initialized.
@@ -28,13 +19,10 @@ func b32 global_ctx_quit(void);
 // Returns true when the global context singleton is initialized.
 func b32 global_ctx_is_init(void);
 
-// Returns the initialized process-global context singleton, creating it lazily.
-func global_ctx* global_ctx_get(void);
+// Returns a pointer to the initialized process-global context payload.
+func ctx* global_ctx_get(void);
 
-// Returns a pointer to the shared context payload.
-func ctx* global_ctx_get_shared(void);
-
-// Explicit lock helpers for coordinated multi-step access to global_ctx_get_shared().
+// Explicit lock helpers for coordinated multi-step access to global_ctx_get().
 func void global_ctx_lock(void);
 func void global_ctx_unlock(void);
 
@@ -49,7 +37,7 @@ func heap* global_get_perm_heap(void);
 func heap* global_get_temp_heap(void);
 
 // User-data access is protected by per-thread permissions.
-// By default, the thread that initializes global_ctx has access to every slot;
+// By default, the thread that initializes the global context has access to every slot;
 // other threads start with no access.
 func b32 global_has_user_data_access(ctx_user_data_idx idx);
 func void* global_get_user_data(ctx_user_data_idx idx);

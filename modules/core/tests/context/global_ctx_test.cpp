@@ -6,7 +6,6 @@
 TEST(context_global_ctx_test, singleton_and_wrappers_are_available_after_entry_init) {
   EXPECT_TRUE(global_ctx_is_init() != 0);
   EXPECT_NE(global_ctx_get(), nullptr);
-  EXPECT_NE(global_ctx_get_shared(), nullptr);
   EXPECT_NE(global_get_allocator().alloc_fn, nullptr);
   EXPECT_NE(global_get_main_allocator().alloc_fn, nullptr);
   EXPECT_NE(global_get_log_state(), nullptr);

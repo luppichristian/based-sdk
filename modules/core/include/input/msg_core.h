@@ -504,7 +504,7 @@ typedef struct msg_core_log_data {
 
 typedef struct msg_core_global_ctx_data {
   msg_core_global_ctx_event_kind event_kind;
-  global_ctx* global_ctx_ptr;
+  ctx* ctx_ptr;
 } msg_core_global_ctx_data;
 
 typedef struct msg_core_assert_data {

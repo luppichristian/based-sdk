@@ -20,11 +20,8 @@ typedef struct ctx_setup {
   // Parent allocator used to initialize log state and grow enabled allocators.
   allocator main_allocator;
 
-  // Optional mutex shared by enabled arena/heap allocators.
-  mutex allocator_mutex;
-
-  // When true, the embedded log_state creates and owns its own mutex.
-  b32 use_log_mutex;
+  // Optional mutex shared by enabled allocators and the embedded log state.
+  mutex mutex_handle;
 
   // Enables permanent and temporary arena allocators for this context.
   b32 use_arena_allocs;

@@ -262,38 +262,36 @@
 100: func void ctx_clear_temp(ctx* context);
 
 === include\context\global_ctx.h ===
-11: typedef struct global_ctx {
-23: func b32 global_ctx_init(ctx_setup setup);
-22: func void global_ctx_quit(void);
-25: func b32 global_ctx_is_init(void);
-28: func global_ctx* global_ctx_get(void);
-31: func ctx* global_ctx_get_shared(void);
-34: func void global_ctx_lock(void);
-35: func void global_ctx_unlock(void);
-38: func allocator global_get_allocator(void);
-43: func ctx_setup global_get_setup(void);
-44: func allocator global_get_main_allocator(void);
-45: func log_state* global_get_log_state(void);
-46: func arena* global_get_perm_arena(void);
-47: func arena* global_get_temp_arena(void);
-48: func heap* global_get_perm_heap(void);
-49: func heap* global_get_temp_heap(void);
-49: func b32 global_has_user_data_access(ctx_user_data_idx idx);
-50: func void* global_get_user_data(ctx_user_data_idx idx);
-51: func b32 global_set_user_data(ctx_user_data_idx idx, void* user_data);
-54: func b32 global_set_user_data_access(ctx_user_data_idx idx, b8 has_access);
-55: func void global_set_user_data_access_all(b8 has_access);
-57: func void global_clear_temp(void);
-60: func void global_log_set_level(log_level level);
-63: func void global_log_begin_frame(void);
-64: func log_frame* global_log_end_frame(u32 severity_mask);
-67: #define global_log_fatal(...)   _log(global_get_log_state(), LOG_LEVEL_FATAL, CALLSITE_HERE, __VA_ARGS__)
-68: #define global_log_error(...)   _log(global_get_log_state(), LOG_LEVEL_ERROR, CALLSITE_HERE, __VA_ARGS__)
-69: #define global_log_warn(...)    _log(global_get_log_state(), LOG_LEVEL_WARN, CALLSITE_HERE, __VA_ARGS__)
-70: #define global_log_info(...)    _log(global_get_log_state(), LOG_LEVEL_INFO, CALLSITE_HERE, __VA_ARGS__)
-71: #define global_log_debug(...)   _log(global_get_log_state(), LOG_LEVEL_DEBUG, CALLSITE_HERE, __VA_ARGS__)
-72: #define global_log_verbose(...) _log(global_get_log_state(), LOG_LEVEL_VERBOSE, CALLSITE_HERE, __VA_ARGS__)
-73: #define global_log_trace(...)   _log(global_get_log_state(), LOG_LEVEL_TRACE, CALLSITE_HERE, __VA_ARGS__)
+16: func b32 global_ctx_init(ctx_setup setup);
+19: func b32 global_ctx_quit(void);
+22: func b32 global_ctx_is_init(void);
+25: func ctx* global_ctx_get(void);
+28: func void global_ctx_lock(void);
+29: func void global_ctx_unlock(void);
+32: func allocator global_get_allocator(void);
+33: func ctx_setup global_get_setup(void);
+34: func allocator global_get_main_allocator(void);
+35: func log_state* global_get_log_state(void);
+36: func arena* global_get_perm_arena(void);
+37: func arena* global_get_temp_arena(void);
+38: func heap* global_get_perm_heap(void);
+39: func heap* global_get_temp_heap(void);
+44: func b32 global_has_user_data_access(ctx_user_data_idx idx);
+45: func void* global_get_user_data(ctx_user_data_idx idx);
+46: func b32 global_set_user_data(ctx_user_data_idx idx, void* user_data);
+49: func b32 global_set_user_data_access(ctx_user_data_idx idx, b8 has_access);
+50: func void global_set_user_data_access_all(b8 has_access);
+53: func void global_clear_temp(void);
+56: func void global_log_set_level(log_level level);
+59: func void global_log_begin_frame(void);
+60: func log_frame* global_log_end_frame(u32 severity_mask);
+63: #define global_log_fatal(...)   _log(global_get_log_state(), LOG_LEVEL_FATAL, CALLSITE_HERE, __VA_ARGS__)
+64: #define global_log_error(...)   _log(global_get_log_state(), LOG_LEVEL_ERROR, CALLSITE_HERE, __VA_ARGS__)
+65: #define global_log_warn(...)    _log(global_get_log_state(), LOG_LEVEL_WARN, CALLSITE_HERE, __VA_ARGS__)
+66: #define global_log_info(...)    _log(global_get_log_state(), LOG_LEVEL_INFO, CALLSITE_HERE, __VA_ARGS__)
+67: #define global_log_debug(...)   _log(global_get_log_state(), LOG_LEVEL_DEBUG, CALLSITE_HERE, __VA_ARGS__)
+68: #define global_log_verbose(...) _log(global_get_log_state(), LOG_LEVEL_VERBOSE, CALLSITE_HERE, __VA_ARGS__)
+69: #define global_log_trace(...)   _log(global_get_log_state(), LOG_LEVEL_TRACE, CALLSITE_HERE, __VA_ARGS__)
 
 === include\context\thread_ctx.h ===
 9: #define THREAD_CTX_USER_DATA_COUNT CTX_USER_DATA_COUNT
@@ -1669,9 +1667,9 @@
 84: func log_msg* log_frame_first(log_frame* frame);
 85: func log_msg* log_frame_last(log_frame* frame);
 94: typedef struct log_state {
-106: func b32 _log_state_init(log_state* state, b32 use_mutex, allocator alloc, callsite site);
+106: func b32 _log_state_init(log_state* state, mutex mutex_handle, allocator alloc, callsite site);
 110: func void _log_state_quit(log_state* state, callsite site);
-112: #define log_state_init(state, use_mutex, alloc) \
+112: #define log_state_init(state, mutex_handle, alloc) \
 114: #define log_state_quit(state) \
 113: func b32 log_state_is_init(log_state* state);
 117: func b32 log_state_clear(log_state* state);
