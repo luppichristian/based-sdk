@@ -21,8 +21,7 @@ jobs:
         os:
           - ubuntu-latest
           - ubuntu-24.04-arm
-          - macos-13
-          - macos-latest
+          - macos-14
           - windows-latest
         arch:
           - x86_64
@@ -43,16 +42,10 @@ jobs:
           - os: ubuntu-24.04-arm
             arch: arm64
             build_type: MinSizeRel
-          - os: macos-13
-            arch: x86_64
-            build_type: RelWithDebInfo
-          - os: macos-13
-            arch: x86_64
-            build_type: MinSizeRel
-          - os: macos-latest
+          - os: macos-14
             arch: arm64
             build_type: RelWithDebInfo
-          - os: macos-latest
+          - os: macos-14
             arch: arm64
             build_type: MinSizeRel
           - os: windows-latest
@@ -66,9 +59,7 @@ jobs:
             arch: arm64
           - os: ubuntu-24.04-arm
             arch: x86_64
-          - os: macos-13
-            arch: arm64
-          - os: macos-latest
+          - os: macos-14
             arch: x86_64
           - os: windows-latest
             arch: arm64
@@ -128,7 +119,7 @@ jobs:
           cmake -S . -B "${{ env.BUILD_DIR }}"
           -G Ninja
           ${{ runner.os == 'Linux' && '-D CMAKE_C_COMPILER=clang -D CMAKE_CXX_COMPILER=clang++' || '' }}
-          ${{ runner.os == 'macOS' && '-D CMAKE_C_COMPILER=clang -D CMAKE_CXX_COMPILER=clang++' || '' }}
+          ${{ runner.os == 'macOS' && format('-D CMAKE_C_COMPILER=clang -D CMAKE_CXX_COMPILER=clang++ -DCMAKE_OSX_ARCHITECTURE={0}', matrix.arch) || '' }}
           ${{ runner.os == 'Windows' && '-D CMAKE_C_COMPILER=clang-cl -D CMAKE_CXX_COMPILER=clang-cl' || '' }}
           -D CMAKE_BUILD_TYPE="${{ matrix.build_type }}"
           -D BASED_BUILD_TESTS=ON
