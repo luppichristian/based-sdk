@@ -25,11 +25,11 @@ Example:
 
 #define SINGLY_LIST_EMPTY(head, tail) ((head) == NULL)
 
-#define SINGLY_LIST_COUNT(head, tail, count) stmt(                               \
-    (void)(tail);                                                                \
-    (count) = 0;                                                                 \
-    safe_for (typeof(head) _node = (head); _node != NULL; _node = _node->next) { \
-      (count)++;                                                                 \
+#define SINGLY_LIST_COUNT(head, tail, count) stmt(                                  \
+    (void)(tail);                                                                   \
+    (count) = 0;                                                                    \
+    safe_for (type_of((head)) _node = (head); _node != NULL; _node = _node->next) { \
+      (count)++;                                                                    \
     })
 
 #define SINGLY_LIST_HEAD(head, tail) (head)
@@ -60,7 +60,7 @@ Example:
     })
 
 #define SINGLY_LIST_FOREACH(head, tail, it) \
-  safe_for (typeof((head)) it = (head); (it) != NULL; (it) = (it)->next)
+  safe_for (type_of((head)) it = (head); (it) != NULL; (it) = (it)->next)
 
 // =========================================================================
 c_end;

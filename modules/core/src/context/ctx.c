@@ -11,7 +11,7 @@
 #include <string.h>
 
 // Default reserved growth size for each context-local allocator.
-const_var sz CTX_DEFAULT_BLOCK_SIZE = kb(64);
+static const sz CTX_DEFAULT_BLOCK_SIZE = kb(64);
 
 func b32 ctx_setup_is_valid(ctx_setup* setup) {
   profile_func_begin;

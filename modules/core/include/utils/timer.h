@@ -11,7 +11,7 @@ c_begin;
 
 // A large sentinel value that can be used to force timer-based checks to pass
 // without accumulating floating-point error over long runtimes.
-const_var f32 VERY_HIGH_TIMER_VALUE = 100000.0f;
+static const f32 VERY_HIGH_TIMER_VALUE = 100000.0f;
 
 // Sets the timer to zero.
 func void timer_clear(f32* timer);

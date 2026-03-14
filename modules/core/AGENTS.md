@@ -11,7 +11,7 @@ For project-wide policies and module organization rules, see `AGENTS.md` at repo
 ## Core Rules
 - Use `#pragma once` in headers.
 - Use project primitive types (`i32`, `u64`, `u64x`, `sz`, `b32`, `c8`, `b32x`,  etc.) instead of raw C types.
-- Prefer project qualifiers and keywords (`func`, `global_var`, `local_persist`, `force_inline`, `no_inline`, `no_return`, `read_only`, `const_var`).
+- Prefer project qualifiers and keywords (`func`, `global_var`, `local_persist`, `force_inline`, `no_inline`, `no_return`).
 - Do not use the `static` keyword directly for functions; use `func`.
 - Naming is snake_case for functions, variables, typedefs, structs, and enums; macros/constants are UPPER_CASE.
 - Do not introduce project-defined `_t` types.
@@ -95,13 +95,11 @@ Keep this tree accurate as core evolves.
 
 - `func`: function declaration alias; becomes `static` when `ALL_FUNCS_STATIC` is defined.
 - `global_var`: marker for globals; becomes `static` when `ALL_GLOBAL_VARS_STATIC` is defined.
-- `const_var`: marker for header-safe constants using `read_only` internally.
 - `local_persist`: alias for local `static` storage.
-- `read_only`: readonly storage qualifier (`const` + readonly section placement when supported).
 - `thread_local`: thread-local storage qualifier.
 - `dll_export` / `dll_import`: visibility markers for shared-library symbols.
 - `static_assert(expr)`: compile-time assertion wrapper for compatible modes.
-- `no_return`, `force_inline`, `no_inline`, `align_as(x)`, `align_of(x)`, `size_of(x)`, `likely(x)`, `unlikely(x)`.
+- `no_return`, `force_inline`, `no_inline`, `align_as(x)`, `align_of(x)`, `size_of(x)`, `type_of(x)`, `likely(x)`, `unlikely(x)`.
 
 Common macros used across core:
 - `CALLSITE_HERE`.

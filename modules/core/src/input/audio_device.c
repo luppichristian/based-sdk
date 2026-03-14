@@ -7,7 +7,7 @@
 #include "../sdl3_include.h"
 #include "basic/profiler.h"
 
-const_var u64 AUDIO_DEVICE_RECORDING_BIT = 1ULL << 63;
+static const u64 AUDIO_DEVICE_RECORDING_BIT = 1ULL << 63;
 
 func u64 audio_device_encode_instance(u64 native_id, audio_device_type audio_type) {
   profile_func_begin;

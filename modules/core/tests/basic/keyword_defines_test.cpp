@@ -7,7 +7,7 @@ namespace {
   global_var i32 keyword_global_value = 17;
 }  // namespace
 
-const_var i32 KEYWORD_CONST_VALUE = 41;
+static const i32 KEYWORD_CONST_VALUE = 41;
 
 TEST(basic_keyword_defines_test, align_macros_match_storage_layout) {
   struct align_as(32) aligned_data {

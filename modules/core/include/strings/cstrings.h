@@ -377,11 +377,11 @@ func sz cstr32_to_cstr16(cstr32 src, c16* buf, sz buf_cap);
 
 // Predefined capacity values for the fixed-size string types below.
 // Macros (not variables) so they are valid in array bounds / typedefs.
-const_var sz STR_CAP_TINY = 16;
-const_var sz STR_CAP_SHORT = 64;
-const_var sz STR_CAP_MEDIUM = 512;
-const_var sz STR_CAP_LONG = 1024;
-const_var sz STR_CAP_LARGE = 2048;
+#define STR_CAP_TINY   16
+#define STR_CAP_SHORT  64
+#define STR_CAP_MEDIUM 512
+#define STR_CAP_LONG   1024
+#define STR_CAP_LARGE  2048
 
 // =========================================================================
 // str8 — Fixed-capacity UTF-8 strings

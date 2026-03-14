@@ -12,7 +12,7 @@
 thread_local global_var thread_priority tls_priority = THREAD_PRIORITY_MEDIUM;
 
 // Mapping of our thread_priority enum to SDL_ThreadPriority values.
-const_var SDL_ThreadPriority SDL_THREAD_PRIORITIES[] = {
+static const SDL_ThreadPriority SDL_THREAD_PRIORITIES[] = {
     SDL_THREAD_PRIORITY_LOW,
     SDL_THREAD_PRIORITY_NORMAL,
     SDL_THREAD_PRIORITY_HIGH,

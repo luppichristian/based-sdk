@@ -25,10 +25,10 @@ Example:
 
 #define STACK_LIST_EMPTY(head) ((head) == NULL)
 
-#define STACK_LIST_COUNT(head, count) stmt(                                      \
-    (count) = 0;                                                                 \
-    safe_for (typeof(head) _node = (head); _node != NULL; _node = _node->next) { \
-      (count)++;                                                                 \
+#define STACK_LIST_COUNT(head, count) stmt(                                         \
+    (count) = 0;                                                                    \
+    safe_for (type_of((head)) _node = (head); _node != NULL; _node = _node->next) { \
+      (count)++;                                                                    \
     })
 
 #define STACK_LIST_HEAD(head) (head)
@@ -46,7 +46,7 @@ Example:
     })
 
 #define STACK_LIST_FOREACH(head, it) \
-  safe_for (typeof((head)) it = (head); (it) != NULL; (it) = (it)->next)
+  safe_for (type_of((head)) it = (head); (it) != NULL; (it) = (it)->next)
 
 // =========================================================================
 c_end;

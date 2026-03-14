@@ -77,9 +77,9 @@
 77: func u64 rotr_u64(u64 val, i32 cnt);
 
 === include\basic\keyword_defines.h ===
-152: #define size_of(x) sizeof(x)
-201: #define local_persist static
-204: #define const_var static read_only
+151: #define size_of(x) sizeof(x)
+157: #  define type_of(x) typeof((x))
+184: #define local_persist static
 
 === include\basic\primitive_types.h ===
 

@@ -34,7 +34,7 @@ typedef enum msg_category {
   MSG_CATEGORY_MAX,
 } msg_category;
 
-const_var sz MSG_DATA_SIZE = kb(2);
+#define MSG_DATA_SIZE kb(2)
 
 // Normalized event record used by the input messaging system.
 typedef struct msg {

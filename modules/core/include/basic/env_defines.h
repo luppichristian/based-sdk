@@ -125,6 +125,10 @@
 #  error "env_defines.h: COMPILER_MSVC is only supported on PLATFORM_WINDOWS."
 #endif
 
+#if defined(COMPILER_MSVC) && (!defined(__STDC_VERSION__) || __STDC_VERSION__ < 202311L)
+#  error "env_defines.h: MSVC builds require /std:clatest for C23 typeof support."
+#endif
+
 #if defined(COMPILER_APPLE_CLANG) && !defined(PLATFORM_MACOS)
 #  error "env_defines.h: COMPILER_APPLE_CLANG is only supported on PLATFORM_MACOS."
 #endif

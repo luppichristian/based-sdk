@@ -26,8 +26,8 @@ If modules are added, removed, or reorganized, update this file in the same chan
 - Core foundational headers under `modules/core/include/basic/` define shared project language and helpers and should be treated as canonical:
   - `keyword_defines.h` for project keywords/qualifiers. Keep usage aligned with the canonical set:
     `thread_local`, `dll_export`, `dll_import`, `static_assert`, `no_return`, `force_inline`, `no_inline`,
-    `align_as(x)`, `align_of(x)`, `size_of(x)`, `likely(x)`, `unlikely(x)`, `read_only`, `c_begin`, `c_end`,
-    `local_persist`, `const_var`, `global_var`, `func`.
+    `align_as(x)`, `align_of(x)`, `size_of(x)`, `type_of(x)`, `likely(x)`, `unlikely(x)`, `c_begin`, `c_end`,
+    `local_persist`, `global_var`, `func`.
   - `codespace.h` for source-location plumbing. Keep wrappers aligned with:
     `callsite`, `src_loc`, `CALLSITE_HERE`, `SRC_LOC_HERE`.
   - `utility_defines.h` for common utility macros. Keep helpers aligned with:

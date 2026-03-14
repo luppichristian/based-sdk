@@ -13,7 +13,7 @@ c_begin;
 // =========================================================================
 
 // Fixed number of generic user-data slots available in each context.
-const_var sz CTX_USER_DATA_COUNT = 32;
+#define CTX_USER_DATA_COUNT 32
 typedef sz ctx_user_data_idx;
 
 typedef struct ctx_setup {

@@ -14,7 +14,7 @@ c_begin;
 // =========================================================================
 
 // Returned by decode functions when an invalid or malformed sequence is encountered.
-const_var c32 UNICODE_REPLACEMENT_CHAR = 0xFFFDU;
+static const c32 UNICODE_REPLACEMENT_CHAR = 0xFFFDU;
 
 // =========================================================================
 // Validity

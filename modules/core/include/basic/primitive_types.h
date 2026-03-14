@@ -67,22 +67,22 @@ typedef uint32_t u32;
 typedef int64_t i64;
 typedef uint64_t u64;
 
-const_var i8 I8_MIN = -128;
-const_var i8 I8_MAX = 127;
-const_var u8 U8_MIN = 0;
-const_var u8 U8_MAX = 255;
-const_var i16 I16_MIN = -32768;
-const_var i16 I16_MAX = 32767;
-const_var u16 U16_MIN = 0;
-const_var u16 U16_MAX = 65535;
-const_var i32 I32_MIN = -2147483647 - 1;
-const_var i32 I32_MAX = 2147483647;
-const_var u32 U32_MIN = 0;
-const_var u32 U32_MAX = 4294967295U;
-const_var i64 I64_MIN = -9223372036854775807LL - 1;
-const_var i64 I64_MAX = 9223372036854775807LL;
-const_var u64 U64_MIN = 0;
-const_var u64 U64_MAX = 18446744073709551615ULL;
+static const i8 I8_MIN = -128;
+static const i8 I8_MAX = 127;
+static const u8 U8_MIN = 0;
+static const u8 U8_MAX = 255;
+static const i16 I16_MIN = -32768;
+static const i16 I16_MAX = 32767;
+static const u16 U16_MIN = 0;
+static const u16 U16_MAX = 65535;
+static const i32 I32_MIN = -2147483647 - 1;
+static const i32 I32_MAX = 2147483647;
+static const u32 U32_MIN = 0;
+static const u32 U32_MAX = 4294967295U;
+static const i64 I64_MIN = -9223372036854775807LL - 1;
+static const i64 I64_MAX = 9223372036854775807LL;
+static const u64 U64_MIN = 0;
+static const u64 U64_MAX = 18446744073709551615ULL;
 
 // =========================================================================
 // Floating-point types
@@ -91,10 +91,10 @@ const_var u64 U64_MAX = 18446744073709551615ULL;
 typedef float f32;
 typedef double f64;
 
-const_var f32 F32_MIN = -FLT_MAX;
-const_var f32 F32_MAX = FLT_MAX;
-const_var f64 F64_MIN = -DBL_MAX;
-const_var f64 F64_MAX = DBL_MAX;
+static const f32 F32_MIN = -FLT_MAX;
+static const f32 F32_MAX = FLT_MAX;
+static const f64 F64_MIN = -DBL_MAX;
+static const f64 F64_MAX = DBL_MAX;
 
 // =========================================================================
 // Boolean types
@@ -105,14 +105,14 @@ typedef uint16_t b16;
 typedef uint32_t b32;
 typedef uint64_t b64;
 
-const_var b8 B8_MIN = 0;
-const_var b8 B8_MAX = 1;
-const_var b16 B16_MIN = 0;
-const_var b16 B16_MAX = 1;
-const_var b32 B32_MIN = 0;
-const_var b32 B32_MAX = 1;
-const_var b64 B64_MIN = 0;
-const_var b64 B64_MAX = 1;
+static const b8 B8_MIN = 0;
+static const b8 B8_MAX = 1;
+static const b16 B16_MIN = 0;
+static const b16 B16_MAX = 1;
+static const b32 B32_MIN = 0;
+static const b32 B32_MAX = 1;
+static const b64 B64_MIN = 0;
+static const b64 B64_MAX = 1;
 
 // =========================================================================
 // Character types
@@ -122,12 +122,12 @@ typedef char c8;
 typedef uint16_t c16;
 typedef uint32_t c32;
 
-const_var c8 C8_MIN = 0;
-const_var c8 C8_MAX = (c8)255;
-const_var c16 C16_MIN = 0;
-const_var c16 C16_MAX = 65535;
-const_var c32 C32_MIN = 0;
-const_var c32 C32_MAX = 4294967295U;
+static const c8 C8_MIN = 0;
+static const c8 C8_MAX = (c8)255;
+static const c16 C16_MIN = 0;
+static const c16 C16_MAX = 65535;
+static const c32 C32_MIN = 0;
+static const c32 C32_MAX = 4294967295U;
 
 // =========================================================================
 // C String definitions
@@ -154,30 +154,30 @@ typedef uint_fast16_t b16x;
 typedef uint_fast32_t b32x;
 typedef uint_fast64_t b64x;
 
-const_var i8x I8X_MIN = INT_FAST8_MIN;
-const_var i8x I8X_MAX = INT_FAST8_MAX;
-const_var u8x U8X_MIN = 0;
-const_var u8x U8X_MAX = UINT_FAST8_MAX;
-const_var i16x I16X_MIN = INT_FAST16_MIN;
-const_var i16x I16X_MAX = INT_FAST16_MAX;
-const_var u16x U16X_MIN = 0;
-const_var u16x U16X_MAX = UINT_FAST16_MAX;
-const_var i32x I32X_MIN = INT_FAST32_MIN;
-const_var i32x I32X_MAX = INT_FAST32_MAX;
-const_var u32x U32X_MIN = 0;
-const_var u32x U32X_MAX = UINT_FAST32_MAX;
-const_var i64x I64X_MIN = INT_FAST64_MIN;
-const_var i64x I64X_MAX = INT_FAST64_MAX;
-const_var u64x U64X_MIN = 0;
-const_var u64x U64X_MAX = UINT_FAST64_MAX;
-const_var b8x B8X_MIN = 0;
-const_var b8x B8X_MAX = 1;
-const_var b16x B16X_MIN = 0;
-const_var b16x B16X_MAX = 1;
-const_var b32x B32X_MIN = 0;
-const_var b32x B32X_MAX = 1;
-const_var b64x B64X_MIN = 0;
-const_var b64x B64X_MAX = 1;
+static const i8x I8X_MIN = INT_FAST8_MIN;
+static const i8x I8X_MAX = INT_FAST8_MAX;
+static const u8x U8X_MIN = 0;
+static const u8x U8X_MAX = UINT_FAST8_MAX;
+static const i16x I16X_MIN = INT_FAST16_MIN;
+static const i16x I16X_MAX = INT_FAST16_MAX;
+static const u16x U16X_MIN = 0;
+static const u16x U16X_MAX = UINT_FAST16_MAX;
+static const i32x I32X_MIN = INT_FAST32_MIN;
+static const i32x I32X_MAX = INT_FAST32_MAX;
+static const u32x U32X_MIN = 0;
+static const u32x U32X_MAX = UINT_FAST32_MAX;
+static const i64x I64X_MIN = INT_FAST64_MIN;
+static const i64x I64X_MAX = INT_FAST64_MAX;
+static const u64x U64X_MIN = 0;
+static const u64x U64X_MAX = UINT_FAST64_MAX;
+static const b8x B8X_MIN = 0;
+static const b8x B8X_MAX = 1;
+static const b16x B16X_MIN = 0;
+static const b16x B16X_MAX = 1;
+static const b32x B32X_MIN = 0;
+static const b32x B32X_MAX = 1;
+static const b64x B64X_MIN = 0;
+static const b64x B64X_MAX = 1;
 
 // =========================================================================
 // Pointer and size types
@@ -188,14 +188,14 @@ typedef uintptr_t up;
 typedef intptr_t sp;
 typedef ptrdiff_t dp;
 
-const_var sz SZ_MIN = 0;
-const_var sz SZ_MAX = SIZE_MAX;
-const_var up UP_MIN = 0;
-const_var up UP_MAX = UINTPTR_MAX;
-const_var sp SP_MIN = INTPTR_MIN;
-const_var sp SP_MAX = INTPTR_MAX;
-const_var dp DP_MIN = PTRDIFF_MIN;
-const_var dp DP_MAX = PTRDIFF_MAX;
+static const sz SZ_MIN = 0;
+static const sz SZ_MAX = SIZE_MAX;
+static const up UP_MIN = 0;
+static const up UP_MAX = UINTPTR_MAX;
+static const sp SP_MIN = INTPTR_MIN;
+static const sp SP_MAX = INTPTR_MAX;
+static const dp DP_MIN = PTRDIFF_MIN;
+static const dp DP_MAX = PTRDIFF_MAX;
 
 // =========================================================================
 // Compile-time size guarantees

@@ -11,7 +11,7 @@ For project-wide policies and module organization rules, see `AGENTS.md` at repo
 ## Gfx Rules
 - Use `#pragma once` in headers.
 - Use project primitive types (`i32`, `u64`, `u64x`, `sz`, `b32`, `c8`, `b32x`, etc.) instead of raw C types.
-- Prefer project qualifiers and keywords (`func`, `global_var`, `local_persist`, `force_inline`, `no_inline`, `no_return`, `read_only`, `const_var`).
+- Prefer project qualifiers and keywords (`func`, `global_var`, `local_persist`, `force_inline`, `no_inline`, `no_return`).
 - Do not use the `static` keyword directly for functions; use `func`.
 - Naming is snake_case for functions, variables, typedefs, structs, and enums; macros/constants are UPPER_CASE.
 - Do not introduce project-defined `_t` types.

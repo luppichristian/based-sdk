@@ -83,7 +83,7 @@ func ctx_setup entry_get_ctx_setup(void) {
 // Common lifecycle hooks
 // =========================================================================
 
-const_var SDL_InitFlags SDL_INIT_FLAGS =
+static const SDL_InitFlags SDL_INIT_FLAGS =
     SDL_INIT_AUDIO |
     SDL_INIT_VIDEO |
     SDL_INIT_JOYSTICK |

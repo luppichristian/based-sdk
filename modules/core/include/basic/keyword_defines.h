@@ -28,14 +28,13 @@ Functional keywords:
 - 'align_as' for specifying the alignment of a variable or type.
 - 'align_of' for querying the alignment requirement of a type.
 - 'size_of' alias for sizeof, but as a keyword for consistency with align_of.
+- 'type_of' alias for compiler-supported typeof.
 - 'likely' and 'unlikely' for branch prediction hints to the compiler.
-- 'read_only' for variables that are constant and should not be modified after init.
 - 'c_begin' use to mark the start of a based header.
 - 'c_end' use to mark the end of a based header.
 
 Purely cosmetic keywords:
 - 'func' as a shorthand for 'function' to improve readability.
-- 'const_var' for global constants
 - 'global_var' for global variables to make it clear they are global.
 - 'local_persist' for static variables that should persist across function calls.
 
@@ -152,6 +151,14 @@ If ALL_GLOBAL_VARS_STATIC is defined, all global variables will be declared as s
 // size_of — alias for sizeof, but as a keyword for consistency with align_of.
 #define size_of(x) sizeof(x)
 
+// type_of — alias for compiler-supported typeof.
+#if defined(COMPILER_MSVC) || defined(COMPILER_GCC) || defined(COMPILER_CLANG) || \
+    defined(COMPILER_APPLE_CLANG) || defined(COMPILER_INTEL)
+#  define type_of(x) typeof(x)
+#else
+#  error "keyword_defines.h: type_of requires compiler typeof support."
+#endif
+
 // likely / unlikely — branch prediction hints.
 #if defined(COMPILER_GCC) || defined(COMPILER_CLANG) || \
     defined(COMPILER_APPLE_CLANG) || defined(COMPILER_INTEL)
@@ -160,38 +167,6 @@ If ALL_GLOBAL_VARS_STATIC is defined, all global variables will be declared as s
 #else
 #  define likely(x)   (x)
 #  define unlikely(x) (x)
-#endif
-
-// read_only — constant variable explicitly placed in the read-only data section.
-// MSVC  → .rdata   (PE read-only data segment)
-// Linux → .rodata  (ELF read-only data segment)
-// macOS → __TEXT,__const (Mach-O read-only text segment)
-// Note: must have a compile-time constant initializer; use at global/file scope only.
-#if defined(COMPILER_MSVC)
-#  pragma section(".rdata", read)
-#  if defined(ALL_GLOBAL_VARS_STATIC)
-#    define read_only static __declspec(allocate(".rdata")) const
-#  else
-#    define read_only __declspec(allocate(".rdata")) const
-#  endif
-#elif defined(COMPILER_APPLE_CLANG)
-#  if defined(ALL_GLOBAL_VARS_STATIC)
-#    define read_only static const __attribute__((section("__TEXT,__const")))
-#  else
-#    define read_only const __attribute__((section("__TEXT,__const")))
-#  endif
-#elif defined(COMPILER_GCC) || defined(COMPILER_CLANG) || defined(COMPILER_INTEL)
-#  if defined(ALL_GLOBAL_VARS_STATIC)
-#    define read_only static const __attribute__((section(".rodata")))
-#  else
-#    define read_only const __attribute__((section(".rodata")))
-#  endif
-#else
-#  if defined(ALL_GLOBAL_VARS_STATIC)
-#    define read_only static const
-#  else
-#    define read_only const
-#  endif
 #endif
 
 // c_begin & c_end - this can be used in headers to make them C++ compatible.
@@ -211,9 +186,6 @@ If ALL_GLOBAL_VARS_STATIC is defined, all global variables will be declared as s
 
 // local_persist — static variable that retains its value across calls.
 #define local_persist static
-
-// const_var - constant variable
-#define const_var static read_only
 
 // global_var — global variable (purely cosmetic, improves readability).
 #if defined(ALL_GLOBAL_VARS_STATIC)

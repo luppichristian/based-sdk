@@ -14,7 +14,7 @@ typedef struct sensor_state_entry {
   b32 is_started;
 } sensor_state_entry;
 
-const_var sz SENSOR_STATE_CAP = 128;
+static const sz SENSOR_STATE_CAP = 128;
 global_var sensor_state_entry sensor_states[SENSOR_STATE_CAP] = {0};
 
 func sensor_state_entry* sensor_find_state(SDL_SensorID sensor_id, b32 create_if_missing) {

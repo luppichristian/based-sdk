@@ -88,7 +88,7 @@ func log_msg* log_frame_last(log_frame* frame);
 // Log State
 // =========================================================================
 
-const_var sz LOG_STATE_ARENA_MIN_SIZE = kb(4);
+static const sz LOG_STATE_ARENA_MIN_SIZE = kb(4);
 
 // The mutex is optional. When present, it serializes access to the state.
 typedef struct log_state {

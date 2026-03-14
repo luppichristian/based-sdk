@@ -26,8 +26,8 @@ typedef struct pathwatch_watch_binding {
   path watch_path;
 } pathwatch_watch_binding;
 
-const_var sz PATHWATCH_BINDING_CAP = 64;
-const_var sz PATHWATCH_WATCH_BINDING_CAP = 1024;
+static const sz PATHWATCH_BINDING_CAP = 64;
+static const sz PATHWATCH_WATCH_BINDING_CAP = 1024;
 
 func pathwatch_binding* pathwatch_bindings(void) {
   profile_func_begin;

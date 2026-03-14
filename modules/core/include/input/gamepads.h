@@ -14,7 +14,7 @@ c_begin;
 // =========================================================================
 
 // Maximum number of cached gamepad slots exposed by this module.
-const_var sz GAMEPADS_MAX_COUNT = 4;
+#define GAMEPADS_MAX_COUNT 4
 
 // Logical gamepad buttons used by the shared state cache.
 typedef enum gamepad_button {

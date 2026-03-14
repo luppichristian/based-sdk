@@ -55,7 +55,7 @@ func void msg_notify_internal_listeners(const msg* src) {
   profile_func_end;
 }
 
-const_var sz MSG_DEVICE_TRACK_CAP = 128;
+static const sz MSG_DEVICE_TRACK_CAP = 128;
 #define MSG_HANDLER_CAP 64u
 
 typedef struct msg_handler_entry {

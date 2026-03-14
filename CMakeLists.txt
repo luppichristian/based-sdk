@@ -28,6 +28,14 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 # Dont care about this
 add_compile_definitions(_CRT_SECURE_NO_WARNINGS)
 
+# Compiler options
+if(MSVC)
+    add_compile_options(
+        $<$<COMPILE_LANGUAGE:C>:/experimental:c11atomics>
+        $<$<COMPILE_LANGUAGE:C>:/std:clatest>
+    )
+endif()
+
 # Configuration options
 option(BASED_BUILD_TESTS         "Build tests"                  ON)
 option(BASED_ENABLE_FETCHCONTENT "Enable FetchContent for deps" ON)
