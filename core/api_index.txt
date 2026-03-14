@@ -467,14 +467,13 @@
 52: func b32 pathwatch_stop(pathwatch* watcher);
 53: func b32 pathwatch_pause(pathwatch* watcher);
 54: func b32 pathwatch_resume(pathwatch* watcher);
-55: func i32 pathwatch_drain(void);
-58: func pathwatch_watch_id pathwatch_add(pathwatch* watcher, const path* src, b32 recursive);
-61: func b32 pathwatch_remove(pathwatch* watcher, pathwatch_watch_id watch_id);
-64: func b32 pathwatch_remove_path(pathwatch* watcher, const path* src);
-67: func b32 pathwatch_get_path(pathwatch_watch_id watch_id, path* out_watch_path);
-70: func b32 pathwatch_follow_symlinks(pathwatch* watcher, b32 enabled);
-73: func b32 pathwatch_allow_out_of_scope_links(pathwatch* watcher, b32 enabled);
-76: func cstr8 pathwatch_get_last_error(void);
+57: func pathwatch_watch_id pathwatch_add(pathwatch* watcher, const path* src, b32 recursive);
+60: func b32 pathwatch_remove(pathwatch* watcher, pathwatch_watch_id watch_id);
+63: func b32 pathwatch_remove_path(pathwatch* watcher, const path* src);
+66: func b32 pathwatch_get_path(pathwatch_watch_id watch_id, path* out_watch_path);
+69: func b32 pathwatch_follow_symlinks(pathwatch* watcher, b32 enabled);
+72: func b32 pathwatch_allow_out_of_scope_links(pathwatch* watcher, b32 enabled);
+75: func cstr8 pathwatch_get_last_error(void);
 
 === include\input\audio_device.h ===
 14: typedef enum audio_device_type {
@@ -625,25 +624,18 @@
 46: func b32 icon_is_system(icon icon_id);
 
 === include\input\msg.h ===
-22: typedef enum msg_handler_stage {
-28: typedef enum msg_handler_result {
-34: typedef enum msg_handler_option {
-43: typedef enum msg_category {
-57: typedef struct msg {
-68: typedef struct msg_handler_desc {
-83: func void msg_pump(void);
-87: func b32 msg_poll(msg* out_msg);
-90: func b32 msg_wait(msg* out_msg);
-93: func b32 msg_wait_timeout(msg* out_msg, i32 timeout_ms);
-94: func b32 msg_peek(msg* out_msg);
-95: func i32 msg_count(u32 type_min, u32 type_max);
-96: func void msg_flush(u32 type_min, u32 type_max);
-100: func b32 _msg_post(const msg* src, callsite site);
-101: #define msg_post(src) _msg_post((src), CALLSITE_HERE)
-106: func u64 msg_add_handler(const msg_handler_desc* desc);
-109: func b32 msg_remove_handler(u64 handler_id);
-112: func void msg_clear_handlers(void);
-113: func void msg_set_filter(msg_filter_fn filter_fn, void* user_data);
+26: typedef enum msg_category {
+40: typedef struct msg {
+51: typedef struct msg_handler_desc {
+65: func b32 msg_poll(msg* out_msg);
+69: func b32 _msg_post_native(const void* native_event, msg* out_msg, callsite site);
+70: #define msg_post_native(native_event, out_msg) _msg_post_native((native_event), (out_msg), CALLSITE_HERE)
+74: func b32 _msg_post(const msg* src, callsite site);
+75: #define msg_post(src) _msg_post((src), CALLSITE_HERE)
+79: func u64 msg_add_handler(const msg_handler_desc* desc);
+82: func b32 msg_remove_handler(u64 handler_id);
+85: func void msg_clear_handlers(void);
+88: func void msg_set_filter(msg_filter_fn filter_fn, void* user_data);
 
 === include\input\msg_core.h ===
 27: typedef enum msg_core_type {

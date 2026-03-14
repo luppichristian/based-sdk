@@ -52,6 +52,11 @@ func up monitor_to_native_id(monitor src);
 func window window_from_native_id(up native_id);
 func up window_to_native_id(window src);
 
+// Translates one native SDL event into a message, dispatches it immediately
+// through msg_post, and writes the translated message to out_msg.
+func b32 _msg_post_native(const void* native_event, msg* out_msg, callsite site);
+#define msg_post_native(native_event, out_msg) _msg_post_native((native_event), (out_msg), CALLSITE_HERE)
+
 // =========================================================================
 c_end;
 // =========================================================================

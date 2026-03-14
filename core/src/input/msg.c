@@ -55,9 +55,7 @@ func void msg_notify_internal_listeners(const msg* src) {
   profile_func_end;
 }
 
-const_var i32 MSG_PAYLOAD_CODE = 0x42415345;
 const_var sz MSG_DEVICE_TRACK_CAP = 128;
-const_var u32 MSG_CATEGORY_USER_TYPE_COUNT = 0x1000u;
 #define MSG_HANDLER_CAP 64u
 
 typedef struct msg_handler_entry {
@@ -65,9 +63,8 @@ typedef struct msg_handler_entry {
   msg_handler_fn handler_fn;
   void* user_data;
   i32 priority;
-  u32 options;
-  u32 type_min;
-  u32 type_max;
+  msg_category category;
+  u32 type;
 } msg_handler_entry;
 
 global_var msg_handler_entry msg_handler_entries[MSG_HANDLER_CAP] = {0};
@@ -75,110 +72,12 @@ global_var u32 msg_handler_count = 0;
 global_var u64 msg_handler_next_id = 1;
 global_var msg_filter_fn msg_filter_current = NULL;
 global_var void* msg_filter_user_data = NULL;
-global_var b32 msg_user_spaces_ready = false;
-global_var u32 msg_user_space_bases[MSG_CATEGORY_MAX] = {0};
 
 func b32 msg_remove_handler(u64 handler_id);
+func b32 msg_from_sdl(const SDL_Event* src, msg* out_msg);
 
 func b32 msg_category_is_valid(msg_category category) {
   return category >= MSG_CATEGORY_CORE && category < MSG_CATEGORY_MAX;
-}
-
-func b32 msg_category_needs_user_space(msg_category category) {
-  return category > MSG_CATEGORY_CORE && category < MSG_CATEGORY_MAX;
-}
-
-func b32 msg_user_space_ensure(void) {
-  profile_func_begin;
-  if (msg_user_spaces_ready) {
-    profile_func_end;
-    return true;
-  }
-
-  safe_for (msg_category category = MSG_CATEGORY_GRAPHICS; category < MSG_CATEGORY_MAX; category += 1) {
-    u32 base_type = SDL_RegisterEvents((int)MSG_CATEGORY_USER_TYPE_COUNT);
-    if (base_type == (u32)-1) {
-      thread_log_error("Failed to register SDL user event range category=%u error=%s", (u32)category, SDL_GetError());
-      safe_for (sz idx = 0; idx < MSG_CATEGORY_MAX; idx += 1) {
-        msg_user_space_bases[idx] = 0;
-      }
-      msg_user_spaces_ready = false;
-      profile_func_end;
-      return false;
-    }
-    msg_user_space_bases[(sz)category] = base_type;
-  }
-
-  msg_user_spaces_ready = true;
-  thread_log_info("Registered SDL user event spaces");
-  profile_func_end;
-  return true;
-}
-
-func b32 msg_user_space_get_sdl_type(msg_category category, u32 local_type, u32* out_sdl_type) {
-  profile_func_begin;
-  if (out_sdl_type != NULL) {
-    *out_sdl_type = 0;
-  }
-
-  if (!msg_category_needs_user_space(category)) {
-    profile_func_end;
-    return false;
-  }
-  if (!msg_user_space_ensure()) {
-    profile_func_end;
-    return false;
-  }
-
-  u32 base_type = msg_user_space_bases[(sz)category];
-  u32 sdl_type = 0;
-  if (local_type >= base_type && local_type < (base_type + MSG_CATEGORY_USER_TYPE_COUNT)) {
-    sdl_type = local_type;
-  } else {
-    if (local_type >= MSG_CATEGORY_USER_TYPE_COUNT) {
-      profile_func_end;
-      return false;
-    }
-    sdl_type = base_type + local_type;
-  }
-
-  if (out_sdl_type != NULL) {
-    *out_sdl_type = sdl_type;
-  }
-  profile_func_end;
-  return true;
-}
-
-func b32 msg_user_space_decode_sdl_type(u32 sdl_type, msg_category* out_category, u32* out_local_type) {
-  profile_func_begin;
-  if (out_category != NULL) {
-    *out_category = MSG_CATEGORY_CORE;
-  }
-  if (out_local_type != NULL) {
-    *out_local_type = sdl_type;
-  }
-
-  if (!msg_user_space_ensure()) {
-    profile_func_end;
-    return false;
-  }
-
-  safe_for (msg_category category = MSG_CATEGORY_GRAPHICS; category < MSG_CATEGORY_MAX; category += 1) {
-    u32 base_type = msg_user_space_bases[(sz)category];
-    if (sdl_type >= base_type && sdl_type < (base_type + MSG_CATEGORY_USER_TYPE_COUNT)) {
-      if (out_category != NULL) {
-        *out_category = category;
-      }
-      if (out_local_type != NULL) {
-        *out_local_type = sdl_type - base_type;
-      }
-      profile_func_end;
-      return true;
-    }
-  }
-
-  profile_func_end;
-  return false;
 }
 
 func b32 msg_filter_accept(const msg* src) {
@@ -190,26 +89,6 @@ func b32 msg_filter_accept(const msg* src) {
   b32 result = msg_filter_current(src, msg_filter_user_data);
   profile_func_end;
   return result;
-}
-
-func u64 msg_hash_path(cstr8 src) {
-  profile_func_begin;
-  u64 hash_value = 1469598103934665603ULL;
-  sz idx = 0;
-
-  if (!src) {
-    profile_func_end;
-    return 0;
-  }
-
-  safe_while (src[idx]) {
-    hash_value ^= (u8)src[idx];
-    hash_value *= 1099511628211ULL;
-    idx += 1;
-  }
-
-  profile_func_end;
-  return hash_value;
 }
 
 func b32 msg_device_equal(device lhs, device rhs) {
@@ -265,7 +144,7 @@ func sz msg_collect_tablet_devices(device* out_ids, sz cap) {
 
   safe_while (entry&& out_count < cap) {
     if (entry->usage_page == 0x0D && entry->path != NULL) {
-      out_ids[out_count] = devices_make_id(DEVICE_TYPE_TABLET, msg_hash_path(entry->path));
+      out_ids[out_count] = devices_make_id(DEVICE_TYPE_TABLET, cstr8_hash64(entry->path));
       out_count += 1;
     }
 
@@ -360,40 +239,24 @@ func void msg_refresh_synthetic_device_msgs(void) {
 }
 
 // NOTE:
-// SDL uses one process-global event queue. This module intentionally mirrors
-// that model: any thread may post, while one designated thread should pump/poll/wait.
+// SDL uses one process-global event queue for native events. This module only
+// uses that queue as an input source; based messages themselves dispatch
+// immediately through msg_post on the calling thread.
 
-func b32 msg_handler_should_run_for_stage(u32 options, msg_handler_stage stage) {
-  u32 stage_options = options &
-                      (MSG_HANDLER_OPTION_STAGE_BEFORE_POST | MSG_HANDLER_OPTION_STAGE_AFTER_POST |
-                       MSG_HANDLER_OPTION_STAGE_POST_FAILED);
-
-  if (stage_options == 0) {
-    stage_options = MSG_HANDLER_OPTION_STAGE_BEFORE_POST;
+func b32 msg_handler_should_run_for_msg(const msg_handler_entry* entry, const msg* posted_msg) {
+  if (entry == NULL || posted_msg == NULL) {
+    return false;
   }
 
-  switch (stage) {
-    case MSG_HANDLER_STAGE_BEFORE_POST:
-      return (stage_options & MSG_HANDLER_OPTION_STAGE_BEFORE_POST) != 0;
-    case MSG_HANDLER_STAGE_AFTER_POST:
-      return (stage_options & MSG_HANDLER_OPTION_STAGE_AFTER_POST) != 0;
-    case MSG_HANDLER_STAGE_POST_FAILED:
-      return (stage_options & MSG_HANDLER_OPTION_STAGE_POST_FAILED) != 0;
-    default:
-      return false;
-  }
-}
-
-func b32 msg_handler_should_run_for_type(const msg_handler_entry* entry, u32 type) {
-  if (entry->type_min == 0 && entry->type_max == 0) {
-    return true;
+  if (entry->category != MSG_CATEGORY_MAX && entry->category != posted_msg->category) {
+    return false;
   }
 
-  if (entry->type_min <= entry->type_max) {
-    return in_range(type, entry->type_min, entry->type_max);
+  if (entry->type != 0 && entry->type != posted_msg->type) {
+    return false;
   }
 
-  return in_range(type, entry->type_max, entry->type_min);
+  return true;
 }
 
 func void msg_handler_sort_entries(void) {
@@ -420,14 +283,11 @@ func void msg_handler_sort_entries(void) {
   profile_func_end;
 }
 
-func b32 msg_dispatch_handlers(msg* posted_msg, msg_handler_stage stage) {
+func b32 msg_dispatch_handlers(msg* posted_msg) {
   profile_func_begin;
   msg_handler_entry dispatch_entries[MSG_HANDLER_CAP] = {0};
-  u64 once_handler_ids[MSG_HANDLER_CAP] = {0};
   u32 dispatch_cap = (u32)count_of(dispatch_entries);
-  u32 once_handler_cap = (u32)count_of(once_handler_ids);
   u32 dispatch_count = msg_handler_count;
-  u32 once_handler_count = 0;
 
   if (dispatch_count > dispatch_cap) {
     dispatch_count = dispatch_cap;
@@ -444,44 +304,52 @@ func b32 msg_dispatch_handlers(msg* posted_msg, msg_handler_stage stage) {
       continue;
     }
 
-    if ((entry->options & MSG_HANDLER_OPTION_DISABLED) != 0) {
+    if (!msg_handler_should_run_for_msg(entry, posted_msg)) {
       continue;
     }
 
-    if (!msg_handler_should_run_for_stage(entry->options, stage)) {
-      continue;
-    }
-
-    if (!msg_handler_should_run_for_type(entry, posted_msg->type)) {
-      continue;
-    }
-
-    msg_handler_result result = entry->handler_fn(posted_msg, stage, entry->user_data);
-
-    if ((entry->options & MSG_HANDLER_OPTION_ONCE) != 0 && once_handler_count < once_handler_cap) {
-      once_handler_ids[once_handler_count] = entry->handler_id;
-      once_handler_count += 1;
-    }
-
-    if (result == MSG_HANDLER_RESULT_STOP_DISPATCH) {
-      break;
-    }
-
-    if (stage == MSG_HANDLER_STAGE_BEFORE_POST && result == MSG_HANDLER_RESULT_CANCEL_POST) {
-      safe_for (u32 once_idx = 0; once_idx < once_handler_count; once_idx += 1) {
-        (void)msg_remove_handler(once_handler_ids[once_idx]);
-      }
+    if (!entry->handler_fn(posted_msg, entry->user_data)) {
       profile_func_end;
       return false;
     }
   }
 
-  safe_for (u32 once_idx = 0; once_idx < once_handler_count; once_idx += 1) {
-    (void)msg_remove_handler(once_handler_ids[once_idx]);
-  }
-
   profile_func_end;
   return true;
+}
+
+func b32 msg_dispatch_native_event_with_site(const SDL_Event* native_event, msg* out_msg, callsite site) {
+  profile_func_begin;
+  msg translated_msg = {0};
+
+  if (native_event == NULL || out_msg == NULL) {
+    thread_log_error("Rejected native event dispatch native_event=%p out_msg=%p", (void*)native_event, (void*)out_msg);
+    profile_func_end;
+    return false;
+  }
+
+  if (!msg_from_sdl(native_event, &translated_msg)) {
+    thread_log_verbose("Skipped SDL event type=%u because translation failed", (u32)native_event->type);
+    profile_func_end;
+    return false;
+  }
+
+  if (!_msg_post(&translated_msg, site)) {
+    thread_log_trace("Dropped translated SDL event type=%u", translated_msg.type);
+    profile_func_end;
+    return false;
+  }
+
+  *out_msg = translated_msg;
+  profile_func_end;
+  return true;
+}
+
+func b32 msg_dispatch_native_event(const SDL_Event* native_event, msg* out_msg) {
+  profile_func_begin;
+  b32 result = msg_dispatch_native_event_with_site(native_event, out_msg, (callsite) {0});
+  profile_func_end;
+  return result;
 }
 
 func void msg_apply_common(msg* dst, const SDL_Event* src) {
@@ -989,23 +857,7 @@ func b32 msg_from_sdl(const SDL_Event* src, msg* out_msg) {
       return true;
 
     default:
-      if (src->type >= SDL_EVENT_USER && src->user.code == (Sint32)MSG_PAYLOAD_CODE && src->user.data1 != NULL) {
-        msg* payload = (msg*)src->user.data1;
-        *out_msg = *payload;
-        SDL_free(payload);
-        profile_func_end;
-        return true;
-      }
-
       if (src->type >= SDL_EVENT_USER) {
-        msg_category category = MSG_CATEGORY_CORE;
-        u32 local_type = src->type;
-        if (msg_user_space_decode_sdl_type(src->type, &category, &local_type)) {
-          out_msg->category = category;
-          out_msg->type = local_type;
-          profile_func_end;
-          return true;
-        }
         profile_func_end;
         return false;
       }
@@ -1026,23 +878,16 @@ func b32 msg_to_sdl_event(msg* src, SDL_Event* out_event) {
   *out_event = (SDL_Event) {0};
   out_event->type = src->type;
 
-  if (msg_category_needs_user_space(src->category)) {
-    u32 sdl_type = 0;
-    if (!msg_user_space_get_sdl_type(src->category, src->type, &sdl_type)) {
-      profile_func_end;
-      return false;
-    }
-    out_event->user.type = sdl_type;
-    out_event->user.timestamp = (Uint64)src->timestamp;
+  if (src->category != MSG_CATEGORY_CORE) {
+    thread_log_warn("Cannot convert non-core message category=%u type=%u to native SDL event", (u32)src->category, src->type);
     profile_func_end;
-    return true;
+    return false;
   }
 
   if (src->type >= SDL_EVENT_USER) {
-    out_event->user.type = (Uint32)src->type;
-    out_event->user.timestamp = (Uint64)src->timestamp;
+    thread_log_warn("Cannot convert non-SDL message type=%u category=%u to native SDL event", src->type, (u32)src->category);
     profile_func_end;
-    return true;
+    return false;
   }
 
   switch (src->type) {
@@ -1478,15 +1323,6 @@ func b32 msg_to_sdl_event(msg* src, SDL_Event* out_event) {
   }
 }
 
-func void msg_pump(void) {
-  profile_func_begin;
-  // Pumps the process-global queue.
-  SDL_PumpEvents();
-  msg_refresh_synthetic_device_msgs();
-  thread_log_trace("msg_pump");
-  profile_func_end;
-}
-
 func b32 msg_poll(msg* out_msg) {
   profile_func_begin;
   SDL_Event native_event;
@@ -1500,167 +1336,32 @@ func b32 msg_poll(msg* out_msg) {
   assert(out_msg != NULL);
 
   safe_while (SDL_PollEvent(&native_event)) {
-    if (!msg_from_sdl(&native_event, out_msg)) {
-      thread_log_verbose("Skipped SDL event during poll type=%u because translation failed", (u32)native_event.type);
-      continue;
-    }
-    if (!msg_filter_accept(out_msg)) {
-      thread_log_trace("Filtered polled message type=%u", out_msg->type);
-      continue;
-    }
-    msg_notify_internal_listeners(out_msg);
-    profile_func_end;
-    return true;
-  }
-
-  profile_func_end;
-  return false;
-}
-
-func b32 msg_wait(msg* out_msg) {
-  profile_func_begin;
-  SDL_Event native_event;
-
-  if (!out_msg) {
-    thread_log_error("Rejected message wait because output buffer is NULL");
-    profile_func_end;
-    return false;
-  }
-  assert(out_msg != NULL);
-
-  msg_refresh_synthetic_device_msgs();
-  safe_while (SDL_PollEvent(&native_event)) {
-    if (!msg_from_sdl(&native_event, out_msg)) {
-      continue;
-    }
-    if (!msg_filter_accept(out_msg)) {
-      continue;
-    }
-    msg_notify_internal_listeners(out_msg);
-    profile_func_end;
-    return true;
-  }
-
-  safe_for (;;) {
-    if (!SDL_WaitEvent(&native_event)) {
-      thread_log_error("SDL_WaitEvent failed error=%s", SDL_GetError());
+    if (msg_dispatch_native_event(&native_event, out_msg)) {
       profile_func_end;
-      return false;
+      return true;
     }
-    if (!msg_from_sdl(&native_event, out_msg)) {
-      thread_log_verbose("Skipped SDL event during wait type=%u because translation failed", (u32)native_event.type);
-      continue;
-    }
-    if (!msg_filter_accept(out_msg)) {
-      thread_log_trace("Filtered waited message type=%u", out_msg->type);
-      continue;
-    }
-    msg_notify_internal_listeners(out_msg);
-    profile_func_end;
-    return true;
   }
 
-  thread_log_fatal("Message wait exceeded safe iteration limit");
   profile_func_end;
   return false;
 }
 
-func b32 msg_wait_timeout(msg* out_msg, i32 timeout_ms) {
+func b32 _msg_post_native(const void* native_event, msg* out_msg, callsite site) {
   profile_func_begin;
-  SDL_Event native_event;
-
-  if (!out_msg) {
-    thread_log_error("Rejected message wait timeout because output buffer is NULL");
-    profile_func_end;
-    return false;
-  }
-  if (timeout_ms < 0) {
-    thread_log_error("Rejected message wait timeout because timeout is negative timeout_ms=%d", timeout_ms);
-    profile_func_end;
-    return false;
-  }
-  assert(out_msg != NULL);
-
-  msg_refresh_synthetic_device_msgs();
-  safe_while (SDL_PollEvent(&native_event)) {
-    if (!msg_from_sdl(&native_event, out_msg)) {
-      continue;
-    }
-    if (!msg_filter_accept(out_msg)) {
-      continue;
-    }
-    msg_notify_internal_listeners(out_msg);
-    profile_func_end;
-    return true;
-  }
-
-  if (!SDL_WaitEventTimeout(&native_event, (Sint32)timeout_ms) || !msg_from_sdl(&native_event, out_msg) ||
-      !msg_filter_accept(out_msg)) {
-    thread_log_trace("Message wait timeout completed without accepted event timeout_ms=%d", timeout_ms);
+  if (native_event == NULL || out_msg == NULL) {
+    thread_log_error("Rejected native message post native_event=%p out_msg=%p", (void*)native_event, (void*)out_msg);
     profile_func_end;
     return false;
   }
 
-  msg_notify_internal_listeners(out_msg);
+  b32 result = msg_dispatch_native_event_with_site((const SDL_Event*)native_event, out_msg, site);
   profile_func_end;
-  return true;
-}
-
-func b32 msg_peek(msg* out_msg) {
-  profile_func_begin;
-  SDL_Event native_event = {0};
-  if (out_msg == NULL) {
-    thread_log_error("Rejected message peek because output buffer is NULL");
-    profile_func_end;
-    return false;
-  }
-
-  if (SDL_PeepEvents(&native_event, 1, SDL_PEEKEVENT, SDL_EVENT_FIRST, SDL_EVENT_LAST) <= 0) {
-    thread_log_trace("No message available to peek");
-    profile_func_end;
-    return false;
-  }
-
-  if (!msg_from_sdl(&native_event, out_msg) || !msg_filter_accept(out_msg)) {
-    profile_func_end;
-    return false;
-  }
-
-  profile_func_end;
-  return true;
-}
-
-func i32 msg_count(u32 type_min, u32 type_max) {
-  profile_func_begin;
-  if (type_min > type_max) {
-    u32 temp = type_min;
-    type_min = type_max;
-    type_max = temp;
-  }
-
-  i32 count = SDL_PeepEvents(NULL, 0, SDL_PEEKEVENT, type_min, type_max);
-  profile_func_end;
-  return count;
-}
-
-func void msg_flush(u32 type_min, u32 type_max) {
-  profile_func_begin;
-  if (type_min > type_max) {
-    u32 temp = type_min;
-    type_min = type_max;
-    type_max = temp;
-  }
-  SDL_FlushEvents(type_min, type_max);
-  profile_func_end;
+  return result;
 }
 
 func b32 _msg_post(const msg* src, callsite site) {
-  return true;  // TODO: Temporary
-
   profile_func_begin;
-  SDL_Event native_event;
   msg posted_msg;
-  msg* payload = NULL;
 
   if (!src) {
     thread_log_error("Rejected message post because source is NULL");
@@ -1685,58 +1386,15 @@ func b32 _msg_post(const msg* src, callsite site) {
     return false;
   }
 
-  if (!msg_dispatch_handlers(&posted_msg, MSG_HANDLER_STAGE_BEFORE_POST)) {
-    thread_log_trace("msg_post: cancelled type=%u", posted_msg.type);
-    profile_func_end;
-    return false;
-  }
-
-  if (msg_category_needs_user_space(posted_msg.category) ||
-      (posted_msg.category == MSG_CATEGORY_CORE && posted_msg.type >= MSG_CORE_TYPE_USER)) {
-    u32 native_event_type = posted_msg.type;
-    if (msg_category_needs_user_space(posted_msg.category)) {
-      if (!msg_user_space_get_sdl_type(posted_msg.category, posted_msg.type, &native_event_type)) {
-        thread_log_error("Failed to map message type to SDL user event category=%u type=%u",
-                         (u32)posted_msg.category,
-                         posted_msg.type);
-        profile_func_end;
-        return false;
-      }
-    }
-
-    payload = (msg*)SDL_malloc(size_of(*payload));
-    if (!payload) {
-      thread_log_error("msg_post: payload alloc failed type=%u", posted_msg.type);
-      profile_func_end;
-      return false;
-    }
-    *payload = posted_msg;
-
-    native_event = (SDL_Event) {0};
-    native_event.user.type = native_event_type;
-    native_event.user.timestamp = (Uint64)posted_msg.timestamp;
-    native_event.user.code = (Sint32)MSG_PAYLOAD_CODE;
-    native_event.user.data1 = payload;
-    native_event.user.data2 = NULL;
-  } else if (!msg_to_sdl_event(&posted_msg, &native_event)) {
-    thread_log_error("Failed to convert message to SDL event type=%u", posted_msg.type);
-    profile_func_end;
-    return false;
-  }
-
-  // Push into SDL's process-global queue.
-  if (!SDL_PushEvent(&native_event)) {
-    if (payload != NULL) {
-      SDL_free(payload);
-    }
-    (void)msg_dispatch_handlers(&posted_msg, MSG_HANDLER_STAGE_POST_FAILED);
-    thread_log_warn("msg_post: SDL_PushEvent failed type=%u", posted_msg.type);
-    profile_func_end;
-    return false;
-  }
-
-  (void)msg_dispatch_handlers(&posted_msg, MSG_HANDLER_STAGE_AFTER_POST);
   msg_notify_internal_listeners(&posted_msg);
+
+  if (!msg_dispatch_handlers(&posted_msg)) {
+    thread_log_trace("Cancelled posted message type=%u", posted_msg.type);
+    profile_func_end;
+    return false;
+  }
+
+  thread_log_trace("Posted message type=%u", posted_msg.type);
   profile_func_end;
   return true;
 }
@@ -1767,9 +1425,8 @@ func u64 msg_add_handler(const msg_handler_desc* desc) {
       .handler_fn = desc->handler_fn,
       .user_data = desc->user_data,
       .priority = desc->priority,
-      .options = desc->options,
-      .type_min = desc->type_min,
-      .type_max = desc->type_max,
+      .category = desc->category,
+      .type = desc->type,
   };
   msg_handler_count += 1;
   msg_handler_sort_entries();

@@ -35,7 +35,7 @@ typedef struct pathwatch {
 } pathwatch;
 
 // Creates a pathwatch wrapper around efsw.
-// Changes are emitted through MSG_CORE_TYPE_PATHWATCH messages.
+// Changes are posted immediately as MSG_CORE_TYPE_PATHWATCH messages.
 func pathwatch _pathwatch_create(b32 use_generic_mode, callsite site);
 
 // Releases the watcher and every active watch.
@@ -48,11 +48,10 @@ func void _pathwatch_destroy(pathwatch* watcher, callsite site);
 
 // Starts the background watch thread. Returns 1 on success, 0 otherwise.
 func b32 pathwatch_start(pathwatch* watcher);
-// Stops, pauses, resumes, or drains the watcher event stream.
+// Stops, pauses, or resumes the watcher.
 func b32 pathwatch_stop(pathwatch* watcher);
 func b32 pathwatch_pause(pathwatch* watcher);
 func b32 pathwatch_resume(pathwatch* watcher);
-func i32 pathwatch_drain(void);
 
 // Adds a watched directory. Returns a positive watch id on success, or a negative error code.
 func pathwatch_watch_id pathwatch_add(pathwatch* watcher, const path* src, b32 recursive);

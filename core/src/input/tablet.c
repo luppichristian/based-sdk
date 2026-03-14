@@ -12,26 +12,6 @@
 
 local_persist tablet_pen_state tablet_cached_pen_state;
 
-func u64 tablet_hash_path(cstr8 src) {
-  profile_func_begin;
-  u64 hash_value = 1469598103934665603ULL;
-  sz idx = 0;
-
-  if (!src) {
-    profile_func_end;
-    return 0;
-  }
-
-  safe_while (src[idx]) {
-    hash_value ^= (u8)src[idx];
-    hash_value *= 1099511628211ULL;
-    idx += 1;
-  }
-
-  profile_func_end;
-  return hash_value;
-}
-
 func b32 tablet_is_available(void) {
   return tablet_get_total_count() > 0;
 }
@@ -65,7 +45,7 @@ func device tablet_get_device(sz idx) {
   safe_while (entry) {
     if (entry->usage_page == 0x0D) {
       if (current_idx == idx) {
-        result = devices_make_id(DEVICE_TYPE_TABLET, tablet_hash_path(entry->path));
+        result = devices_make_id(DEVICE_TYPE_TABLET, cstr8_hash64(entry->path));
         break;
       }
 
@@ -119,7 +99,7 @@ func b32 tablet_read_hid_report(device dev_id, void* dst, sz capacity, sz* out_s
   assert(capacity > 0);
 
   safe_while (entry) {
-    if (entry->usage_page == 0x0D && tablet_hash_path(entry->path) == devices_get_instance(dev_id)) {
+    if (entry->usage_page == 0x0D && cstr8_hash64(entry->path) == devices_get_instance(dev_id)) {
       sz cpy_idx = 0;
 
       safe_while (entry->path && entry->path[cpy_idx] && (cpy_idx + 1) < size_of(path_buf)) {

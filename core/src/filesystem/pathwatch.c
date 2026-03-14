@@ -474,14 +474,6 @@ func b32 pathwatch_resume(pathwatch* watcher) {
   return true;
 }
 
-func i32 pathwatch_drain(void) {
-  profile_func_begin;
-  i32 count = msg_count(MSG_CORE_TYPE_PATHWATCH, MSG_CORE_TYPE_PATHWATCH);
-  msg_flush(MSG_CORE_TYPE_PATHWATCH, MSG_CORE_TYPE_PATHWATCH);
-  profile_func_end;
-  return count;
-}
-
 func pathwatch_watch_id pathwatch_add(pathwatch* watcher, const path* src, b32 recursive) {
   profile_func_begin;
   if (watcher == NULL || watcher->native_handle == NULL || src == NULL) {

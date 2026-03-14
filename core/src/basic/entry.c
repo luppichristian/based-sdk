@@ -287,7 +287,6 @@ SDL_AppResult SDL_AppIterate(void* appstate) {
 SDL_AppResult SDL_AppEvent(void* appstate, SDL_Event* event) {
   profile_func_begin;
   (void)appstate;
-  msg based_msg = {0};
 
   if (event == NULL) {
     thread_log_error("Received NULL SDL event");
@@ -297,12 +296,18 @@ SDL_AppResult SDL_AppEvent(void* appstate, SDL_Event* event) {
 
   thread_log_trace("Processing SDL event type=%u", (u32)event->type);
 
-  // TODO: What the fuck?
-  if (msg_from_native(event, &based_msg)) {
-    thread_log_trace("Translated SDL event to message type=%u", (u32)based_msg.type);
-    msg_notify_internal_listeners(&based_msg);
+  msg based_msg = {0};
+
+  if (!msg_post_native(event, &based_msg)) {
+    if (!msg_from_native(event, &based_msg)) {
+      thread_log_verbose("Ignored unsupported SDL event type=%u", (u32)event->type);
+    } else {
+      thread_log_trace("SDL event message was canceled type=%u", (u32)based_msg.type);
+      profile_func_end;
+      return SDL_APP_CONTINUE;
+    }
   } else {
-    thread_log_verbose("Ignored unsupported SDL event type=%u", (u32)event->type);
+    thread_log_trace("Translated SDL event to message type=%u", (u32)based_msg.type);
   }
 
   profile_func_end;

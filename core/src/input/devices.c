@@ -80,26 +80,6 @@ func void devices_cpy_wide_ascii(c8* dst, sz capacity, const wchar_t* src) {
   profile_func_end;
 }
 
-func u64 devices_hash_path(cstr8 src) {
-  profile_func_begin;
-  u64 hash_value = 1469598103934665603ULL;
-  sz idx = 0;
-
-  if (!src) {
-    profile_func_end;
-    return 0;
-  }
-
-  safe_while (src[idx]) {
-    hash_value ^= (u8)src[idx];
-    hash_value *= 1099511628211ULL;
-    idx += 1;
-  }
-
-  profile_func_end;
-  return hash_value;
-}
-
 func device_handle_entry* devices_lookup_entry(device src) {
   if (!src) {
     return NULL;
@@ -252,7 +232,7 @@ func b32 devices_try_fill_tablet_info(SDL_hid_device_info* entry, device_info* o
   }
 
   *out_info = (device_info) {0};
-  out_info->id = devices_make_id(DEVICE_TYPE_TABLET, devices_hash_path(entry->path));
+  out_info->id = devices_make_id(DEVICE_TYPE_TABLET, cstr8_hash64(entry->path));
   out_info->connected = 1;
   out_info->vendor_id = (u16)entry->vendor_id;
   out_info->product_id = (u16)entry->product_id;
@@ -279,7 +259,7 @@ func device devices_find_tablet_by_idx(sz idx) {
   safe_while (entry) {
     if (entry->usage_page == 0x0D) {
       if (current_idx == idx) {
-        result = devices_make_id(DEVICE_TYPE_TABLET, devices_hash_path(entry->path));
+        result = devices_make_id(DEVICE_TYPE_TABLET, cstr8_hash64(entry->path));
         break;
       }
 
@@ -305,7 +285,7 @@ func b32 devices_find_tablet_info(device dev_id, device_info* out_info) {
   b32 found = false;
 
   safe_while (entry) {
-    if (entry->usage_page == 0x0D && devices_hash_path(entry->path) == instance) {
+    if (entry->usage_page == 0x0D && cstr8_hash64(entry->path) == instance) {
       if (out_info) {
         found = devices_try_fill_tablet_info(entry, out_info);
       } else {

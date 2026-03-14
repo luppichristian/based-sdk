@@ -31,8 +31,6 @@ TEST(filesystem_pathwatch_test, lifecycle_controls_work_when_watcher_is_created)
   EXPECT_TRUE(pathwatch_allow_out_of_scope_links(&watcher, 1) != 0);
   EXPECT_TRUE(pathwatch_stop(&watcher) != 0);
 
-  i32 drained = pathwatch_drain();
-  EXPECT_GE(drained, 0);
   (void)pathwatch_get_last_error();
 
   pathwatch_destroy(&watcher);
