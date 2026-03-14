@@ -67,18 +67,6 @@
 #endif
 
 // =========================================================================
-// Compiler Detection
-// =========================================================================
-
-#if defined(__INTEL_COMPILER) || defined(__ICC)
-#  define COMPILER_INTEL
-#elif defined(__clang__) && defined(__apple_build_version__)
-#  define COMPILER_APPLE_CLANG
-#elif defined(__clang__)
-#  define COMPILER_CLANG
-#endif
-
-// =========================================================================
 // Build Configuration
 // =========================================================================
 
@@ -111,10 +99,6 @@
 #  error "env_defines.h: no target CPU architecture detected."
 #endif
 
-#if !defined(COMPILER_CLANG) && !defined(COMPILER_APPLE_CLANG)
+#if !defined(__clang__)
 #  error "env_defines.h: based currently supports only Clang-based compilers."
-#endif
-
-#if defined(COMPILER_APPLE_CLANG) && !defined(PLATFORM_MACOS)
-#  error "env_defines.h: COMPILER_APPLE_CLANG is only supported on PLATFORM_MACOS."
 #endif

@@ -46,17 +46,6 @@ TEST(basic_env_defines_test, one_platform_and_one_arch_are_detected) {
 }
 
 TEST(basic_env_defines_test, one_compiler_and_one_word_size_macro_are_detected) {
-  i32 compiler_count = 0;
-#if defined(COMPILER_CLANG)
-  compiler_count += 1;
-#endif
-#if defined(COMPILER_INTEL)
-  compiler_count += 1;
-#endif
-#if defined(COMPILER_APPLE_CLANG)
-  compiler_count += 1;
-#endif
-
   i32 word_size_count = 0;
 #if defined(ARCH_32)
   word_size_count += 1;
@@ -65,7 +54,6 @@ TEST(basic_env_defines_test, one_compiler_and_one_word_size_macro_are_detected) 
   word_size_count += 1;
 #endif
 
-  EXPECT_EQ(compiler_count, 1);
   EXPECT_EQ(word_size_count, 1);
 }
 

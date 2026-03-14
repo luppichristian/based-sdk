@@ -14,8 +14,7 @@
 
 #if defined(PLATFORM_WINDOWS) && (defined(ARCH_X86) || defined(ARCH_X86_64))
 #  include <intrin.h>
-#elif (defined(COMPILER_CLANG) || defined(COMPILER_APPLE_CLANG)) && \
-    (defined(ARCH_X86) || defined(ARCH_X86_64))
+#elif (defined(ARCH_X86) || defined(ARCH_X86_64)
 #  include <cpuid.h>
 #endif
 
@@ -75,7 +74,7 @@ func b32 cpu_read_cpuid(u32 leaf_id, u32 subleaf_id, i32 out_regs[4]) {
   __cpuidex(out_regs, (i32)leaf_id, (i32)subleaf_id);
   profile_func_end;
   return true;
-#  elif defined(COMPILER_CLANG) || defined(COMPILER_APPLE_CLANG)
+#  else
   u32 eax_reg = 0;
   u32 ebx_reg = 0;
   u32 ecx_reg = 0;
@@ -91,12 +90,6 @@ func b32 cpu_read_cpuid(u32 leaf_id, u32 subleaf_id, i32 out_regs[4]) {
   out_regs[3] = (i32)edx_reg;
   profile_func_end;
   return true;
-#  else
-  (void)leaf_id;
-  (void)subleaf_id;
-  (void)out_regs;
-  profile_func_end;
-  return false;
 #  endif
 }
 
