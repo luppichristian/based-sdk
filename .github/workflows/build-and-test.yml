@@ -125,12 +125,23 @@ jobs:
             liburing-dev
         shell: bash
 
+      - name: Validate macOS toolchain
+        if: runner.os == 'macOS'
+        run: |
+          xcode-select -p
+          xcrun --find clang
+          xcrun --find clang++
+          /usr/bin/clang --version
+          /usr/bin/clang++ --version
+          xcrun --sdk macosx --show-sdk-path
+          xcrun --sdk macosx --show-sdk-version
+
       - name: Configure
         run: >-
           cmake -S . -B "${{ env.BUILD_DIR }}"
           -G Ninja
           ${{ runner.os == 'Linux' && '-D CMAKE_C_COMPILER=clang -D CMAKE_CXX_COMPILER=clang++' || '' }}
-          ${{ runner.os == 'macOS' && format('-D CMAKE_C_COMPILER=/usr/bin/clang -D CMAKE_CXX_COMPILER=/usr/bin/clang++ -D CMAKE_OBJC_COMPILER=/usr/bin/clang -D CMAKE_OBJCXX_COMPILER=/usr/bin/clang++ -D CMAKE_OSX_ARCHITECTURE={0}', matrix.arch) || '' }}
+          ${{ runner.os == 'macOS' && format('-D CMAKE_C_COMPILER=/usr/bin/clang -D CMAKE_CXX_COMPILER=/usr/bin/clang++ -D CMAKE_OBJC_COMPILER=/usr/bin/clang -D CMAKE_OBJCXX_COMPILER=/usr/bin/clang++ -D CMAKE_OSX_SYSROOT=macosx -D CMAKE_OSX_ARCHITECTURE={0}', matrix.arch) || '' }}
           ${{ runner.os == 'Windows' && '-D CMAKE_C_COMPILER=clang-cl -D CMAKE_CXX_COMPILER=clang-cl' || '' }}
           ${{ runner.os == 'Windows' && matrix.arch == 'arm64' && '-D CMAKE_C_COMPILER_TARGET=arm64-pc-windows-msvc -D CMAKE_CXX_COMPILER_TARGET=arm64-pc-windows-msvc' || '' }}
           -D CMAKE_BUILD_TYPE="${{ matrix.build_type }}"

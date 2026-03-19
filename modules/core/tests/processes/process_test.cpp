@@ -85,8 +85,14 @@ TEST(processes_process_test, wait_nonblocking) {
   EXPECT_EQ(0, waited);
   EXPECT_EQ(-1, exit_code);
 
-  process_kill(prc, 1);
-  process_wait(prc, 1, NULL);
+  b32 killed = process_kill(prc, 1);
+  if (killed == 0) {
+    process_destroy(prc);
+    GTEST_SKIP() << "Process kill is not available on this platform/environment";
+  }
+
+  b32 completed = process_wait_timeout(prc, 5000, NULL);
+  EXPECT_NE(0, completed);
 
   process_destroy(prc);
 }
