@@ -61,12 +61,6 @@ jobs:
           - os: windows-latest
             arch: x86_64
             build_type: MinSizeRel
-          - os: windows-latest
-            arch: arm64
-            build_type: RelWithDebInfo
-          - os: windows-latest
-            arch: arm64
-            build_type: MinSizeRel
         exclude:
           - os: ubuntu-latest
             arch: arm64
@@ -75,6 +69,8 @@ jobs:
           - os: macos-14
             arch: x86_64
           - os: macos-13
+            arch: arm64
+          - os: windows-latest
             arch: arm64
 
     env:
@@ -153,4 +149,47 @@ jobs:
 
       - name: Run tests (Windows)
         if: runner.os == 'Windows'
+        run: ctest --test-dir "${{ env.BUILD_DIR }}" --build-config "${{ matrix.build_type }}" --output-on-failure
+
+  build-and-test-windows-arm64-native:
+    name: windows-arm64-native / ${{ matrix.build_type }}
+    runs-on: [self-hosted, Windows, ARM64]
+    strategy:
+      fail-fast: false
+      matrix:
+        build_type:
+          - Debug
+          - Release
+          - RelWithDebInfo
+          - MinSizeRel
+
+    env:
+      BUILD_DIR: build/ci
+      CTEST_OUTPUT_ON_FAILURE: 1
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up MSVC developer command prompt
+        uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: arm64
+
+      - name: Configure
+        run: >-
+          cmake -S . -B "${{ env.BUILD_DIR }}"
+          -G Ninja
+          -D CMAKE_C_COMPILER=clang-cl
+          -D CMAKE_CXX_COMPILER=clang-cl
+          -D CMAKE_C_COMPILER_TARGET=arm64-pc-windows-msvc
+          -D CMAKE_CXX_COMPILER_TARGET=arm64-pc-windows-msvc
+          -D CMAKE_BUILD_TYPE="${{ matrix.build_type }}"
+          -D BASED_BUILD_TESTS=ON
+          -D BASED_ENABLE_MODULE_GRAPHICS=ON
+
+      - name: Build
+        run: cmake --build "${{ env.BUILD_DIR }}" --parallel
+
+      - name: Run tests
         run: ctest --test-dir "${{ env.BUILD_DIR }}" --build-config "${{ matrix.build_type }}" --output-on-failure

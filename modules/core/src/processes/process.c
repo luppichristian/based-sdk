@@ -17,6 +17,13 @@ func b32 process_options_is_default(process_options options) {
          options.envp == NULL && options.timeout_ms == 0;
 }
 
+// Returns true if options matches process_options_captured().
+func b32 process_options_is_captured(process_options options) {
+  return !options.pipe_stdin && options.pipe_stdout && !options.pipe_stderr &&
+         options.stderr_to_stdout && !options.background && options.cwd == NULL &&
+         options.envp == NULL && options.timeout_ms == 0;
+}
+
 func process_options process_options_default(void) {
   profile_func_begin;
   process_options options = {0};
@@ -106,6 +113,35 @@ func process _process_create_with(
     }
 
     thread_log_trace("Created process command=%s options=default", args[0]);
+    profile_func_end;
+    return prc;
+  }
+
+  if (process_options_is_captured(options)) {
+    process prc = (process)SDL_CreateProcess(args, true);
+    if (prc == NULL) {
+      thread_log_error("Failed to create captured process command=%s error=%s", args[0], SDL_GetError());
+      profile_func_end;
+      return NULL;
+    }
+
+    msg_core_object_lifecycle_data msg_data = {
+        .event_kind = MSG_CORE_OBJECT_EVENT_CREATE,
+        .object_type = MSG_CORE_OBJECT_TYPE_PROCESS,
+        .object_ptr = prc,
+        .site = site,
+    };
+
+    msg lifecycle_msg = {0};
+    msg_core_fill_object_lifecycle(&lifecycle_msg, &msg_data);
+    if (!msg_post(&lifecycle_msg)) {
+      SDL_DestroyProcess((SDL_Process*)prc);
+      thread_log_trace("Captured process creation was suspended command=%s", args[0]);
+      profile_func_end;
+      return NULL;
+    }
+
+    thread_log_trace("Created process command=%s options=captured", args[0]);
     profile_func_end;
     return prc;
   }
