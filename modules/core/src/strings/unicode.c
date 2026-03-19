@@ -329,6 +329,12 @@ func sz utf16_to_utf8(cstr16 src, sz src_size, c8* dst, sz dst_cap) {
     sz unit_cnt = utf8_encode(codepoint, units);
     emit_c8(dst, dst_cap, &out_cnt, units, unit_cnt);
   }
+
+  if (dst != NULL && dst_cap > 0) {
+    sz term_idx = out_cnt < dst_cap ? out_cnt : (dst_cap - 1);
+    dst[term_idx] = '\0';
+  }
+
   profile_func_end;
   return out_cnt;
 }
@@ -360,6 +366,12 @@ func sz utf32_to_utf8(cstr32 src, sz src_size, c8* dst, sz dst_cap) {
     sz unit_cnt = utf8_encode(codepoint, units);
     emit_c8(dst, dst_cap, &out_cnt, units, unit_cnt);
   }
+
+  if (dst != NULL && dst_cap > 0) {
+    sz term_idx = out_cnt < dst_cap ? out_cnt : (dst_cap - 1);
+    dst[term_idx] = '\0';
+  }
+
   profile_func_end;
   return out_cnt;
 }

@@ -82,15 +82,78 @@ func ctx_setup entry_get_ctx_setup(void) {
 // Common lifecycle hooks
 // =========================================================================
 
-static const SDL_InitFlags SDL_INIT_FLAGS =
-    SDL_INIT_AUDIO |
-    SDL_INIT_VIDEO |
-    SDL_INIT_JOYSTICK |
-    SDL_INIT_HAPTIC |
-    SDL_INIT_GAMEPAD |
-    SDL_INIT_EVENTS |
-    SDL_INIT_SENSOR |
-    SDL_INIT_CAMERA;
+static const SDL_InitFlags SDL_INIT_REQUIRED_FLAGS = SDL_INIT_EVENTS;
+
+typedef struct entry_optional_sdl_subsystem {
+  SDL_InitFlags flags;
+  cstr8 name;
+} entry_optional_sdl_subsystem;
+
+static const entry_optional_sdl_subsystem ENTRY_OPTIONAL_SDL_SUBSYSTEMS[] = {
+    {   SDL_INIT_AUDIO,    "audio"},
+    {   SDL_INIT_VIDEO,    "video"},
+    {SDL_INIT_JOYSTICK, "joystick"},
+    {  SDL_INIT_HAPTIC,   "haptic"},
+    { SDL_INIT_GAMEPAD,  "gamepad"},
+    {  SDL_INIT_SENSOR,   "sensor"},
+    {  SDL_INIT_CAMERA,   "camera"},
+};
+
+func b32 entry_try_init_sdl_dummy_driver(SDL_InitFlags flags, cstr8 subsystem_name, cstr8 env_name) {
+  profile_func_begin;
+
+  if (SDL_getenv(env_name) != NULL) {
+    global_log_warn("SDL %s subsystem unavailable and %s is already set error=%s",
+                    subsystem_name,
+                    env_name,
+                    SDL_GetError());
+    profile_func_end;
+    return false;
+  }
+
+  if (SDL_setenv_unsafe(env_name, "dummy", 1) != 0) {
+    global_log_warn("Failed setting %s=dummy for SDL %s subsystem error=%s",
+                    env_name,
+                    subsystem_name,
+                    SDL_GetError());
+    profile_func_end;
+    return false;
+  }
+
+  global_log_warn("Retrying SDL %s subsystem with %s=dummy", subsystem_name, env_name);
+  if (SDL_InitSubSystem(flags)) {
+    global_log_info("SDL %s subsystem initialized with %s=dummy", subsystem_name, env_name);
+    profile_func_end;
+    return true;
+  }
+
+  global_log_warn("SDL %s subsystem still unavailable after %s=dummy error=%s",
+                  subsystem_name,
+                  env_name,
+                  SDL_GetError());
+  profile_func_end;
+  return false;
+}
+
+func void entry_init_optional_sdl_subsystem(SDL_InitFlags flags, cstr8 subsystem_name) {
+  profile_func_begin;
+
+  if (SDL_InitSubSystem(flags)) {
+    global_log_verbose("SDL %s subsystem initialized", subsystem_name);
+    profile_func_end;
+    return;
+  }
+
+  global_log_warn("SDL %s subsystem unavailable error=%s", subsystem_name, SDL_GetError());
+
+  if (flags == SDL_INIT_VIDEO) {
+    (void)entry_try_init_sdl_dummy_driver(flags, subsystem_name, "SDL_VIDEODRIVER");
+  } else if (flags == SDL_INIT_AUDIO) {
+    (void)entry_try_init_sdl_dummy_driver(flags, subsystem_name, "SDL_AUDIODRIVER");
+  }
+
+  profile_func_end;
+}
 
 func b32 entry_init(cmdline cmdline) {
   profile_func_begin;
@@ -154,8 +217,8 @@ func b32 entry_init(cmdline cmdline) {
     return false;
   }
 
-  global_log_verbose("Initializing SDL flags=0x%08X", (unsigned int)SDL_INIT_FLAGS);
-  if (!SDL_Init(SDL_INIT_FLAGS)) {
+  global_log_verbose("Initializing SDL required flags=0x%08X", (unsigned int)SDL_INIT_REQUIRED_FLAGS);
+  if (!SDL_Init(SDL_INIT_REQUIRED_FLAGS)) {
     global_log_error("SDL_Init failed error=%s", SDL_GetError());
     thread_log_verbose("Rolling back thread context after SDL init failure");
     if (!thread_ctx_quit()) {
@@ -166,6 +229,11 @@ func b32 entry_init(cmdline cmdline) {
     profile_func_end;
     return false;
   }
+  safe_for (sz idx = 0; idx < count_of(ENTRY_OPTIONAL_SDL_SUBSYSTEMS); idx++) {
+    entry_optional_sdl_subsystem subsystem = ENTRY_OPTIONAL_SDL_SUBSYSTEMS[idx];
+    entry_init_optional_sdl_subsystem(subsystem.flags, subsystem.name);
+  }
+
   global_log_info("SDL initialized");
 
   if (cmdline_is_empty(entry_cmdline_current)) {

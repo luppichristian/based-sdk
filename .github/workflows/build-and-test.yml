@@ -128,5 +128,13 @@ jobs:
       - name: Build
         run: cmake --build "${{ env.BUILD_DIR }}" --parallel
 
-      - name: Run tests
+      - name: Run tests (Linux/macOS)
+        if: runner.os != 'Windows'
+        env:
+          SDL_VIDEODRIVER: dummy
+          SDL_AUDIODRIVER: dummy
+        run: ctest --test-dir "${{ env.BUILD_DIR }}" --build-config "${{ matrix.build_type }}" --output-on-failure
+
+      - name: Run tests (Windows)
+        if: runner.os == 'Windows'
         run: ctest --test-dir "${{ env.BUILD_DIR }}" --build-config "${{ matrix.build_type }}" --output-on-failure
