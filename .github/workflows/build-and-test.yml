@@ -54,6 +54,12 @@ jobs:
           - os: windows-latest
             arch: x86_64
             build_type: MinSizeRel
+          - os: windows-latest
+            arch: arm64
+            build_type: RelWithDebInfo
+          - os: windows-latest
+            arch: arm64
+            build_type: MinSizeRel
         exclude:
           - os: ubuntu-latest
             arch: arm64
@@ -61,8 +67,6 @@ jobs:
             arch: x86_64
           - os: macos-14
             arch: x86_64
-          - os: windows-latest
-            arch: arm64
 
     env:
       BUILD_DIR: build/ci
@@ -75,6 +79,8 @@ jobs:
       - name: Set up MSVC developer command prompt
         if: runner.os == 'Windows'
         uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: ${{ matrix.arch == 'arm64' && 'amd64_arm64' || 'amd64' }}
 
       - name: Install Linux dependencies
         if: runner.os == 'Linux'
@@ -119,7 +125,7 @@ jobs:
           cmake -S . -B "${{ env.BUILD_DIR }}"
           -G Ninja
           ${{ runner.os == 'Linux' && '-D CMAKE_C_COMPILER=clang -D CMAKE_CXX_COMPILER=clang++' || '' }}
-          ${{ runner.os == 'macOS' && format('-D CMAKE_C_COMPILER=clang -D CMAKE_CXX_COMPILER=clang++ -DCMAKE_OSX_ARCHITECTURE={0}', matrix.arch) || '' }}
+          ${{ runner.os == 'macOS' && format('-D CMAKE_C_COMPILER=/usr/bin/clang -D CMAKE_CXX_COMPILER=/usr/bin/clang++ -D CMAKE_OBJC_COMPILER=/usr/bin/clang -D CMAKE_OBJCXX_COMPILER=/usr/bin/clang++ -D CMAKE_OSX_ARCHITECTURE={0}', matrix.arch) || '' }}
           ${{ runner.os == 'Windows' && '-D CMAKE_C_COMPILER=clang-cl -D CMAKE_CXX_COMPILER=clang-cl' || '' }}
           -D CMAKE_BUILD_TYPE="${{ matrix.build_type }}"
           -D BASED_BUILD_TESTS=ON

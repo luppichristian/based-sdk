@@ -24,12 +24,6 @@ function(fetch_sdl3)
     set(SDL_TEST_LIBRARY OFF CACHE BOOL "" FORCE)
     set(SDL_TESTS OFF CACHE BOOL "" FORCE)
     set(SDL_EXAMPLES OFF CACHE BOOL "" FORCE)
-
-    if(APPLE)
-        set(SDL_HIDAPI OFF CACHE BOOL "" FORCE)
-        set(SDL_HIDAPI_JOYSTICK OFF CACHE BOOL "" FORCE)
-    endif()
-
     FetchContent_Declare(
         SDL3
         URL https://github.com/libsdl-org/SDL/releases/download/release-3.2.0/SDL3-3.2.0.tar.gz
