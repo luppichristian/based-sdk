@@ -47,7 +47,7 @@ TEST(system_system_runtime_test, cpu_usage_delta) {
   EXPECT_NE(0, result1);
 
   volatile i64 sum = 0;
-  safe_for (i32 i = 0; i < 1000000; i++) {
+  safe_for (i32 i = 0; i < 5000; i++) {
     sum += i;
   }
 

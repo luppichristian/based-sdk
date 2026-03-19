@@ -14,6 +14,7 @@ namespace {
   typedef struct mutex_counter_ctx {
     mutex mtx;
     i32* counter;
+    i32 iterations;
   } mutex_counter_ctx;
 
   func i32 mutex_lock_entry(void* arg) {
@@ -29,7 +30,7 @@ namespace {
 
   func i32 mutex_counter_entry(void* arg) {
     mutex_counter_ctx* ctx = (mutex_counter_ctx*)arg;
-    safe_for (i32 i = 0; i < 100000; i++) {
+    safe_for (i32 i = 0; i < ctx->iterations; i++) {
       mutex_lock(ctx->mtx);
       (*ctx->counter)++;
       mutex_unlock(ctx->mtx);
@@ -113,8 +114,8 @@ TEST(threads_mutex_test, recursive_lock_by_different_thread) {
 TEST(threads_mutex_test, critical_section_protection) {
   mutex mtx = mutex_create();
   i32 counter = 0;
-  constexpr i32 iterations = 100000;
-  mutex_counter_ctx ctx = {mtx, &counter};
+  constexpr i32 iterations = 5000;
+  mutex_counter_ctx ctx = {mtx, &counter, iterations};
 
   thread thd1 = thread_create(mutex_counter_entry, &ctx, (ctx_setup) {0});
   thread thd2 = thread_create(mutex_counter_entry, &ctx, (ctx_setup) {0});

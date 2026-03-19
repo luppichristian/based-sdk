@@ -18,6 +18,7 @@
 
 global_var cmdline entry_cmdline_current = {0};
 global_var ctx_setup entry_start_setup = {0};
+global_var u32 entry_init_depth = 0;
 
 func void* entry_pipeline_malloc(sz size) {
   profile_func_begin;
@@ -94,6 +95,13 @@ static const SDL_InitFlags SDL_INIT_FLAGS =
 func b32 entry_init(cmdline cmdline) {
   profile_func_begin;
 
+  if (entry_init_depth > 0) {
+    entry_init_depth += 1;
+    global_log_trace("Entry runtime already initialized depth=%u", entry_init_depth);
+    profile_func_end;
+    return true;
+  }
+
   if (!global_ctx_init(entry_start_setup)) {
     global_log_error("Global context initialization failed");
     profile_func_end;
@@ -107,6 +115,8 @@ func b32 entry_init(cmdline cmdline) {
   thread_setup.main_allocator = global_get_allocator();
   if (!thread_ctx_init(thread_setup)) {
     global_log_error("Thread context initialization failed");
+    global_log_verbose("Rolling back global context after thread init failure");
+    global_ctx_quit();
     profile_func_end;
     return false;
   }
@@ -134,6 +144,12 @@ func b32 entry_init(cmdline cmdline) {
           entry_pipeline_realloc,
           entry_pipeline_free)) {
     global_log_error("SDL_SetMemoryFunctions failed error=%s", SDL_GetError());
+    thread_log_verbose("Rolling back thread context after SDL memory hook failure");
+    if (!thread_ctx_quit()) {
+      global_log_error("Failed rolling back thread context after SDL memory hook failure");
+    }
+    global_log_verbose("Rolling back global context after SDL memory hook failure");
+    global_ctx_quit();
     profile_func_end;
     return false;
   }
@@ -141,10 +157,24 @@ func b32 entry_init(cmdline cmdline) {
   global_log_verbose("Initializing SDL flags=0x%08X", (unsigned int)SDL_INIT_FLAGS);
   if (!SDL_Init(SDL_INIT_FLAGS)) {
     global_log_error("SDL_Init failed error=%s", SDL_GetError());
+    thread_log_verbose("Rolling back thread context after SDL init failure");
+    if (!thread_ctx_quit()) {
+      global_log_error("Failed rolling back thread context after SDL init failure");
+    }
+    global_log_verbose("Rolling back global context after SDL init failure");
+    global_ctx_quit();
     profile_func_end;
     return false;
   }
   global_log_info("SDL initialized");
+
+  if (cmdline_is_empty(entry_cmdline_current)) {
+    entry_cmdline_current = cmdline;
+    global_log_trace("Captured entry command line count=%zu", (size_t)entry_cmdline_current.count);
+  }
+
+  entry_init_depth = 1;
+  global_log_trace("Entry runtime initialized depth=%u", entry_init_depth);
 
   if (!thread_log_sync()) {
     thread_log_warn("Thread log sync failed");
@@ -157,6 +187,14 @@ func b32 entry_init(cmdline cmdline) {
 
 func void entry_quit(void) {
   profile_func_begin;
+
+  if (entry_init_depth > 1) {
+    entry_init_depth -= 1;
+    global_log_trace("Skipping shutdown while nested entry init is active depth=%u", entry_init_depth);
+    profile_func_end;
+    return;
+  }
+
   b32 has_thread_ctx = thread_ctx_is_init();
   b32 has_global_ctx = global_ctx_is_init();
   b32 has_sdl = SDL_WasInit(0) != 0;
@@ -169,6 +207,7 @@ func void entry_quit(void) {
 
   if (!has_thread_ctx && !has_global_ctx && !has_sdl) {
     global_log_verbose("Entry runtime already shut down");
+    entry_init_depth = 0;
     entry_cmdline_current = (cmdline) {0};
     entry_start_setup = (ctx_setup) {0};
     profile_func_end;
@@ -191,6 +230,10 @@ func void entry_quit(void) {
     global_log_verbose("Shutting down SDL");
     SDL_Quit();
   }
+
+  entry_init_depth = 0;
+  entry_cmdline_current = (cmdline) {0};
+  entry_start_setup = (ctx_setup) {0};
 
   profile_func_end;
 }

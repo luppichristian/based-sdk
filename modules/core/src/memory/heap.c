@@ -197,6 +197,14 @@ func void* heap_realloc_callback(
 
 func heap _heap_create(allocator parent_alloc, mutex opt_mutex, sz default_block_sz, callsite site) {
   profile_func_begin;
+
+  if (parent_alloc.alloc_fn == NULL) {
+    parent_alloc = thread_get_allocator();
+    if (parent_alloc.alloc_fn != NULL) {
+      thread_log_verbose("Using thread allocator as heap parent");
+    }
+  }
+
   heap hep;
   mem_zero(&hep, size_of(hep));
   hep.parent = parent_alloc;

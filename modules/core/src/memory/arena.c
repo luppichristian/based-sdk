@@ -111,6 +111,14 @@ func arena _arena_create(
     sz default_block_sz,
     callsite site) {
   profile_func_begin;
+
+  if (parent_alloc.alloc_fn == NULL) {
+    parent_alloc = thread_get_allocator();
+    if (parent_alloc.alloc_fn != NULL) {
+      thread_log_verbose("Using thread allocator as arena parent");
+    }
+  }
+
   arena arn;
   mem_zero(&arn, size_of(arn));
   arn.parent = parent_alloc;

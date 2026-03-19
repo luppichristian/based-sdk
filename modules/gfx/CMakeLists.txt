@@ -41,16 +41,16 @@ if(BASED_BUILD_TESTS)
     endif()
 
     file(GLOB_RECURSE TEST_SOURCES "tests/**.cpp")
-    add_executable(based-gfx-tests ${TEST_SOURCES})
     list(LENGTH TEST_SOURCES TEST_SOURCE_COUNT)
     if(TEST_SOURCE_COUNT GREATER 0)
+        add_executable(based-gfx-tests ${TEST_SOURCES})
         set_target_properties(
             based-gfx-tests
             PROPERTIES UNITY_BUILD ON UNITY_BUILD_BATCH_SIZE ${TEST_SOURCE_COUNT}
         )
+        target_link_libraries(based-gfx-tests PRIVATE ${BASED_GFX_TEST_DEP} GTest::gtest)
+        target_include_directories(based-gfx-tests PRIVATE tests)
+        target_compile_definitions(based-gfx-tests PRIVATE ENTRY_WINDOWS_CONSOLE)
+        gtest_discover_tests(based-gfx-tests DISCOVERY_MODE POST_BUILD)
     endif()
-    target_link_libraries(based-gfx-tests PRIVATE ${BASED_GFX_TEST_DEP} GTest::gtest)
-    target_include_directories(based-gfx-tests PRIVATE tests)
-    target_compile_definitions(based-gfx-tests PRIVATE ENTRY_WINDOWS_CONSOLE)
-    gtest_discover_tests(based-gfx-tests DISCOVERY_MODE POST_BUILD)
 endif()

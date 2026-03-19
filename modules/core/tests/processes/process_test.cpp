@@ -119,6 +119,7 @@ TEST(processes_process_test, read_captured) {
   EXPECT_EQ(0, exit_code);
 
   process_read_free(data);
+  process_destroy(prc);
 }
 
 TEST(processes_process_test, kill) {

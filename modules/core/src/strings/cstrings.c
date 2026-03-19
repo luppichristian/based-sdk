@@ -385,7 +385,7 @@ func u64 cstr8_hash64(cstr8 str) {
     return 0;
   }
 
-  u64 hash_value = 1469598103934665603ULL;
+  u64 hash_value = 14695981039346656037ULL;
   safe_for (sz idx = 0; str[idx] != '\0'; idx += 1) {
     hash_value = fnv1a64_step(hash_value, (u8)str[idx]);
   }
@@ -582,6 +582,10 @@ func b32 cstr8_to_u64(cstr8 str, u64 max_value, u64* out) {
   assert(str != NULL);
   assert(out != NULL);
   if (str[0] == '\0') {
+    profile_func_end;
+    return false;
+  }
+  if (str[0] == '-') {
     profile_func_end;
     return false;
   }
@@ -951,7 +955,7 @@ func u64 cstr16_hash64(cstr16 str) {
     return 0;
   }
 
-  u64 hash_value = 1469598103934665603ULL;
+  u64 hash_value = 14695981039346656037ULL;
   safe_for (sz idx = 0; str[idx] != (c16)'\0'; idx += 1) {
     hash_value = fnv1a64_step(hash_value, (u16)str[idx]);
   }
@@ -1437,7 +1441,7 @@ func u64 cstr32_hash64(cstr32 str) {
     return 0;
   }
 
-  u64 hash_value = 1469598103934665603ULL;
+  u64 hash_value = 14695981039346656037ULL;
   safe_for (sz idx = 0; str[idx] != (c32)'\0'; idx += 1) {
     hash_value = fnv1a64_step(hash_value, (u32)str[idx]);
   }
