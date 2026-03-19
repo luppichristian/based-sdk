@@ -57,6 +57,10 @@ func up window_to_native_id(window src);
 func b32 _msg_post_native(const void* native_event, msg* out_msg, callsite site);
 #define msg_post_native(native_event, out_msg) _msg_post_native((native_event), (out_msg), CALLSITE_HERE)
 
+// Thread lifecycle helpers used by entry/runtime shutdown.
+func u32 core_thread_active_count(void);
+func b32 core_thread_wait_idle(u32 timeout_ms);
+
 // =========================================================================
 c_end;
 // =========================================================================

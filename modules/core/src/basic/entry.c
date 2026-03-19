@@ -83,6 +83,7 @@ func ctx_setup entry_get_ctx_setup(void) {
 // =========================================================================
 
 static const SDL_InitFlags SDL_INIT_REQUIRED_FLAGS = SDL_INIT_EVENTS;
+static const u32 ENTRY_THREAD_IDLE_WAIT_TIMEOUT_MS = 2000;
 
 typedef struct entry_optional_sdl_subsystem {
   SDL_InitFlags flags;
@@ -272,6 +273,17 @@ func void entry_quit(void) {
                    (u32)has_thread_ctx,
                    (u32)has_global_ctx,
                    (u32)has_sdl);
+
+  if (core_thread_active_count() != 0) {
+    global_log_verbose("Waiting for worker threads before context shutdown active=%u",
+                       core_thread_active_count());
+    if (!core_thread_wait_idle(ENTRY_THREAD_IDLE_WAIT_TIMEOUT_MS)) {
+      global_log_warn("Worker threads are still running after timeout active=%u",
+                      core_thread_active_count());
+    } else {
+      global_log_trace("All worker threads completed before shutdown");
+    }
+  }
 
   if (!has_thread_ctx && !has_global_ctx && !has_sdl) {
     global_log_verbose("Entry runtime already shut down");

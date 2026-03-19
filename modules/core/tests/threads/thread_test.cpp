@@ -5,6 +5,10 @@
 
 namespace {
 
+  typedef struct thread_detach_ctx {
+    atomic_u32* done;
+  } thread_detach_ctx;
+
   func i32 thread_entry_simple(void* arg) {
     i32* val = static_cast<i32*>(arg);
     if (val != NULL) {
@@ -17,6 +21,14 @@ namespace {
     (void)arg;
     thread_sleep(50);
     return 123;
+  }
+
+  func i32 thread_entry_detach(void* arg) {
+    thread_detach_ctx* ctx = (thread_detach_ctx*)arg;
+    if (ctx != NULL && ctx->done != NULL) {
+      atomic_u32_set(ctx->done, 1);
+    }
+    return 0;
   }
 
 }  // namespace
@@ -64,10 +76,19 @@ TEST(threads_thread_test, get_id) {
 }
 
 TEST(threads_thread_test, detach) {
-  thread thd = thread_create(thread_entry_simple, NULL, (ctx_setup) {0});
+  atomic_u32 done = {0};
+  thread_detach_ctx ctx = {&done};
+
+  thread thd = thread_create(thread_entry_detach, &ctx, (ctx_setup) {0});
   EXPECT_NE(0, thread_is_valid(thd));
 
   thread_detach(thd);
+
+  safe_for (i32 idx = 0; idx < 500 && atomic_u32_get(&done) == 0; idx++) {
+    thread_sleep(1);
+  }
+
+  EXPECT_NE(0U, atomic_u32_get(&done));
 }
 
 TEST(threads_thread_test, multiple_threads) {

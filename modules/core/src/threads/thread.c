@@ -5,11 +5,16 @@
 #include "basic/assert.h"
 #include "context/global_ctx.h"
 #include "context/thread_ctx.h"
+#include "threads/atomics.h"
+#include "threads/thread_current.h"
 #include "input/msg.h"
 #include "input/msg_core.h"
 #include "../sdl3_include.h"
 #include "basic/profiler.h"
+#include "basic/safe.h"
 #include "memory/memops.h"
+
+global_var atomic_i32 core_thread_live_count = {0};
 
 // SDL_ThreadFunction is `int (SDLCALL *)(void*)`.
 // SDLCALL is __cdecl on Windows, which is the default C calling convention,
@@ -31,13 +36,7 @@ func i32 thread_entry_wrapper(void* raw) {
     thread_log_error("Rejected thread entry wrapper payload=%p has_entry=%u",
                      raw,
                      (u32)(payload != NULL && payload->entry != NULL));
-    profile_func_end;
-    return 1;
-  }
-
-  heap* hp = global_get_perm_heap();
-  if (!hp) {
-    global_log_error("Failed to acquire global heap");
+    atomic_i32_sub(&core_thread_live_count, 1);
     profile_func_end;
     return 1;
   }
@@ -45,7 +44,8 @@ func i32 thread_entry_wrapper(void* raw) {
   if (payload->setup.main_allocator.alloc_fn) {
     if (!thread_ctx_init(payload->setup)) {
       thread_log_error("Could not initialize thread ctx");
-      heap_dealloc(hp, payload);
+      SDL_free(payload);
+      atomic_i32_sub(&core_thread_live_count, 1);
       profile_func_end;
       return 1;
     }
@@ -62,7 +62,8 @@ func i32 thread_entry_wrapper(void* raw) {
     }
   }
 
-  heap_dealloc(hp, payload);
+  SDL_free(payload);
+  atomic_i32_sub(&core_thread_live_count, 1);
   profile_func_end;
   return exit_code;
 }
@@ -81,28 +82,22 @@ func thread thread_create_impl(
     return NULL;
   }
 
-  heap* hp = global_get_perm_heap();
-  if (!hp) {
-    global_log_error("Failed to acquire global heap");
-    profile_func_end;
-    return NULL;
-  }
-
-  thread_entry_payload* payload = heap_alloc_type(hp, thread_entry_payload);
+  thread_entry_payload* payload = SDL_calloc(1, size_of(thread_entry_payload));
   if (!payload) {
     thread_log_error("Failed to allocate thread payload name=%s", name != NULL ? name : "<null>");
     profile_func_end;
     return NULL;
   }
 
-  mem_zero(payload, size_of(*payload));
   payload->entry = entry;
   payload->arg = arg;
   payload->setup = setup;
 
+  atomic_i32_add(&core_thread_live_count, 1);
   thread thd = (thread)SDL_CreateThread(thread_entry_wrapper, name, payload);
   if (!thd) {
-    heap_dealloc(hp, payload);
+    atomic_i32_sub(&core_thread_live_count, 1);
+    SDL_free(payload);
     thread_log_error("Failed to create thread name=%s error=%s", name != NULL ? name : "<null>", SDL_GetError());
     profile_func_end;
     return NULL;
@@ -214,4 +209,29 @@ func u64 thread_get_id(thread thd) {
 
 func cstr8 thread_get_name(thread thd) {
   return SDL_GetThreadName((SDL_Thread*)thd);
+}
+
+func u32 core_thread_active_count(void) {
+  i32 count = atomic_i32_get(&core_thread_live_count);
+  if (count <= 0) {
+    return 0;
+  }
+  return (u32)count;
+}
+
+func b32 core_thread_wait_idle(u32 timeout_ms) {
+  profile_func_begin;
+
+  safe_for (u32 elapsed = 0; elapsed < timeout_ms; elapsed += 1) {
+    if (core_thread_active_count() == 0) {
+      profile_func_end;
+      return true;
+    }
+
+    thread_sleep(1);
+  }
+
+  b32 idle = core_thread_active_count() == 0;
+  profile_func_end;
+  return idle;
 }
