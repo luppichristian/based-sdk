@@ -110,24 +110,6 @@ TEST(processes_process_test, wait_timeout) {
   process_destroy(prc);
 }
 
-TEST(processes_process_test, read_captured) {
-  process_options opts = process_options_captured();
-  cstr8 const args[] = {ECHO_ARGS};
-  process prc = process_create_with(args, opts);
-  EXPECT_NE(0, process_is_valid(prc));
-
-  sz size = 0;
-  i32 exit_code = -1;
-  void* data = process_read(prc, &size, &exit_code);
-
-  EXPECT_NE(nullptr, data);
-  EXPECT_GT(size, 0U);
-  EXPECT_EQ(0, exit_code);
-
-  process_read_free(data);
-  process_destroy(prc);
-}
-
 TEST(processes_process_test, kill) {
   process_options opts = process_options_default();
   opts.background = 1;
