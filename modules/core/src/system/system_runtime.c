@@ -268,6 +268,10 @@ func b32 system_runtime_query(system_runtime_info* out_info) {
     thread_log_warn("Failed to query Linux process peak memory usage");
   }
 
+  if (out_info->process_memory_peak < out_info->process_memory_used) {
+    out_info->process_memory_peak = out_info->process_memory_used;
+  }
+
   runtime_cpu_sample cpu_sample;
   if (runtime_query_linux_cpu(&cpu_sample)) {
     local_persist b32 has_prev_sample = false;

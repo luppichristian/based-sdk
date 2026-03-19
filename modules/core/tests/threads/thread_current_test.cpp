@@ -65,6 +65,10 @@ TEST(threads_thread_current_test, get_set_priority) {
   thread_priority original = thread_get_priority();
 
   b32 set_result = thread_set_priority(THREAD_PRIORITY_HIGH);
+  if (set_result == 0) {
+    thread_set_priority(original);
+    GTEST_SKIP() << "High thread priority requires elevated privileges on this platform";
+  }
   EXPECT_NE(0, set_result);
 
   thread_priority new_priority = thread_get_priority();

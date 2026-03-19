@@ -35,13 +35,18 @@ TEST(processes_process_current_test, set_priority_low) {
 }
 
 TEST(processes_process_current_test, set_priority_high) {
+  process_priority original = process_get_priority();
   b32 set_result = process_set_priority(PROCESS_PRIORITY_HIGH);
+  if (set_result == 0) {
+    process_set_priority(original);
+    GTEST_SKIP() << "High process priority requires elevated privileges on this platform";
+  }
   EXPECT_NE(0, set_result);
 
   process_priority prio = process_get_priority();
   EXPECT_EQ(PROCESS_PRIORITY_HIGH, prio);
 
-  process_set_priority(PROCESS_PRIORITY_NORMAL);
+  process_set_priority(original);
 }
 
 TEST(processes_process_current_test, is_unique) {
