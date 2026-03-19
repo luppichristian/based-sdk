@@ -56,6 +56,34 @@ func process _process_create_with(
   if (process_options_is_default(options)) {
     process prc = (process)SDL_CreateProcess(args, false);
     if (prc == NULL) {
+      thread_log_warn("Default process create failed command=%s error=%s", args[0], SDL_GetError());
+      thread_log_verbose("Retrying process create with explicit null stdio");
+
+      SDL_PropertiesID fallback_props = SDL_CreateProperties();
+      b32 fallback_ok = fallback_props != 0;
+      if (fallback_ok) {
+        fallback_ok = SDL_SetPointerProperty(fallback_props, SDL_PROP_PROCESS_CREATE_ARGS_POINTER, (void*)args);
+      }
+      if (fallback_ok) {
+        fallback_ok = SDL_SetNumberProperty(
+            fallback_props, SDL_PROP_PROCESS_CREATE_STDIN_NUMBER, SDL_PROCESS_STDIO_NULL);
+      }
+      if (fallback_ok) {
+        fallback_ok = SDL_SetNumberProperty(
+            fallback_props, SDL_PROP_PROCESS_CREATE_STDOUT_NUMBER, SDL_PROCESS_STDIO_NULL);
+      }
+      if (fallback_ok) {
+        fallback_ok = SDL_SetNumberProperty(
+            fallback_props, SDL_PROP_PROCESS_CREATE_STDERR_NUMBER, SDL_PROCESS_STDIO_NULL);
+      }
+
+      prc = fallback_ok ? (process)SDL_CreateProcessWithProperties(fallback_props) : NULL;
+      if (fallback_props != 0) {
+        SDL_DestroyProperties(fallback_props);
+      }
+    }
+
+    if (prc == NULL) {
       thread_log_error("Failed to create process command=%s error=%s", args[0], SDL_GetError());
       profile_func_end;
       return NULL;

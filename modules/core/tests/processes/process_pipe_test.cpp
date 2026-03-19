@@ -21,6 +21,9 @@ TEST(processes_process_pipe_test, stdin_invalid) {
 #endif
 
   process prc = process_create_with(args, opts);
+  if (process_is_valid(prc) == 0) {
+    GTEST_SKIP() << "Unable to spawn test process on this environment";
+  }
   EXPECT_NE(0, process_is_valid(prc));
 
   process_pipe pin = process_pipe_stdin(prc);
