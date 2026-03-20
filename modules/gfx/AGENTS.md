@@ -18,6 +18,7 @@ For project-wide policies and module organization rules, see `AGENTS.md` at repo
 - Variable and parameter names should generally be at least 3 characters.
 - Keep `include/based_gfx.h` up to date when creating/changing public gfx headers.
 - Keep `api_index.txt` up to date whenever public API signatures/macros/headers change.
+- Keep `DOC.md` up to date whenever public API surface changes. `DOC.md` must include a brief module description and a categorized table of all public gfx types/functions/macros, and it must reference `./api_index.txt` as the canonical API index.
 - Build gfx features on top of `core`; prefer using `based-core` types, helpers, allocators, logging, and profiling wrappers rather than reintroducing foundational utilities locally.
 
 ## Gfx Profiling Policy
@@ -40,6 +41,7 @@ For project-wide policies and module organization rules, see `AGENTS.md` at repo
 ```text
 CMakeLists.txt               # Gfx module build targets
 api_index.txt                # Gfx public API index
+DOC.md                       # Gfx module/API docs (references ./api_index.txt)
 include/                     # Gfx public headers
   based_gfx.h                # Gfx umbrella header
   gfx/                       # Gfx public API groups

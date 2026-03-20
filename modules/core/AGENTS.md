@@ -19,6 +19,7 @@ For project-wide policies and module organization rules, see `AGENTS.md` at repo
 - Functions starting with `_` should be called through their convenience macro so callsite info is preserved (see `include/basic/codespace.h` and `CALLSITE_HERE`).
 - Keep `include/based_core.h` up to date when creating/changing public core headers.
 - Keep `api_index.txt` up to date whenever public API signatures/macros/headers change.
+- Keep `DOC.md` up to date whenever public API surface changes. `DOC.md` must include a brief module description and a categorized table of all public core types/functions/macros, and it must reference `./api_index.txt` as the canonical API index.
 - `include/basic/safe.h` provides `safe_for` and `safe_while`; use them for fixed or regular loops, and do not convert game loops.
 
 ## Core Profiling Policy
@@ -63,6 +64,7 @@ For project-wide policies and module organization rules, see `AGENTS.md` at repo
 ```text
 CMakeLists.txt               # Core module build targets
 api_index.txt                # Core public API index
+DOC.md                       # Core module/API docs (references ./api_index.txt)
 include/                     # Core public headers
   based_core.h               # Core umbrella header
   basic/                     # Primitive types, keywords, assert, profiler, intrinsics

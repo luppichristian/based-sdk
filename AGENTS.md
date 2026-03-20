@@ -9,8 +9,8 @@
 This file is the authoritative **project-wide** guide. Keep module-specific guidance in each module's own `AGENTS.md`.
 
 Current module layout:
-- `modules/core/` - the core module (see `modules/core/AGENTS.md` for all core-specific rules, API/layout notes, and maintenance requirements). Always read this, since all modules depend on the core module.
-- `modules/gfx/` - the gfx module (see `modules/gfx/AGENTS.md` for gfx-specific rules, API/layout notes, and maintenance requirements). This module builds on top of `core` and is the home for rendering, graphics device, and backend-facing graphics work.
+- `modules/core/` - the core module (see `modules/core/AGENTS.md` for core-specific rules and `modules/core/DOC.md` for user-facing module/API docs). Always read this, since all modules depend on the core module.
+- `modules/gfx/` - the gfx module (see `modules/gfx/AGENTS.md` for gfx-specific rules and `modules/gfx/DOC.md` for user-facing module/API docs). This module builds on top of `core` and is the home for rendering, graphics device, and backend-facing graphics work.
 
 If modules are added, removed, or reorganized, update this file in the same change and ensure each affected module has its own up-to-date `AGENTS.md`.
 
@@ -23,6 +23,7 @@ If modules are added, removed, or reorganized, update this file in the same chan
 - Keep cross-module build and dependency wiring in top-level CMake files coherent when module structure changes.
 - Keep `THIRD_PARTY.md` up to date whenever dependencies in `third_party/` are added, removed, renamed, re-versioned, or have license metadata changes.
 - Keep root user docs `README.md`, `HOW_TO_BUILD.md`, and `HOW_TO_USE_SDK.md` up to date whenever build flow, module layout, SDK packaging/integration, or onboarding steps change.
+- Keep each main module `DOC.md` up to date (`modules/core/DOC.md`, `modules/gfx/DOC.md`). These docs must include a brief module description and a categorized table of all public types/functions/macros, with `./api_index.txt` as the canonical relative API reference.
 - Never use functions from C/C++ standard directly. Always check for functions implemented in based modules. If you don't find the function you need, ask the user.
 - Core foundational headers under `modules/core/include/basic/` define shared project language and helpers and should be treated as canonical:
   - `keyword_defines.h` for project keywords/qualifiers. Keep usage aligned with the canonical set:

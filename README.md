@@ -12,6 +12,8 @@ Current modules:
 - Build from source: `HOW_TO_BUILD.md`
 - Integrate prebuilt SDK releases: `HOW_TO_USE_SDK.md`
 - Third-party dependencies and licenses: `THIRD_PARTY.md`
+- Core module quick guide: `modules/core/DOC.md`
+- Gfx module quick guide: `modules/gfx/DOC.md`
 
 ## Quick start (build from source)
 
