@@ -1002,22 +1002,26 @@
 15: func b32 process_open_terminal(cstr8 location);
 
 === include\processes\process.h ===
-16: typedef struct process_options {
-29: func process_options process_options_default(void);
-33: func process_options process_options_captured(void);
-37: func process _process_create(cstr8 const* args, callsite site);
-41: func process _process_create_with(cstr8 const* args, process_options options, callsite site);
-43: #define process_create(args) \
-45: #define process_create_with(args, options) \
-49: func b32 process_is_valid(process prc);
-52: func u64 process_get_id(process prc);
-57: func void* process_read(process prc, sz* out_size, i32* out_exit_code);
-60: func void process_read_free(void* ptr);
-64: func b32 process_wait(process prc, b32 block, i32* out_exit_code);
-65: func b32 process_wait_timeout(process prc, i32 timeout_ms, i32* out_exit_code);
-69: func b32 process_kill(process prc, b32 force);
-78: func void _process_destroy(process prc, callsite site);
-80: #define process_destroy(prc) \
+19: #define PROCESS_NAME_CAP 260
+22: typedef struct process_snapshot_entry {
+28: typedef struct process_options {
+41: func process_options process_options_default(void);
+45: func process_options process_options_captured(void);
+49: func process _process_create(cstr8 const* args, callsite site);
+53: func process _process_create_with(cstr8 const* args, process_options options, callsite site);
+55: #define process_create(args) \
+57: #define process_create_with(args, options) \
+61: func b32 process_is_valid(process prc);
+64: func u64 process_get_id(process prc);
+68: func process_snapshot_entry* process_snapshot_get(sz* out_count);
+71: func void process_snapshot_free(process_snapshot_entry* ptr);
+76: func void* process_read(process prc, sz* out_size, i32* out_exit_code);
+79: func void process_read_free(void* ptr);
+83: func b32 process_wait(process prc, b32 block, i32* out_exit_code);
+85: func b32 process_wait_timeout(process prc, i32 timeout_ms, i32* out_exit_code);
+89: func b32 process_kill(process prc, b32 force);
+93: func void _process_destroy(process prc, callsite site);
+95: #define process_destroy(prc) \
 
 === include\processes\process_current.h ===
 14: typedef enum process_priority {

@@ -3,12 +3,107 @@
 
 #include "processes/process.h"
 #include "basic/assert.h"
+#include "memory/memops.h"
 #include "context/thread_ctx.h"
 #include "input/msg.h"
 #include "input/msg_core.h"
+#include "strings/cstrings.h"
+#include "../platform_includes.h"
 #include "../sdl3_include.h"
 #include "basic/profiler.h"
 #include "basic/safe.h"
+
+#if defined(PLATFORM_LINUX)
+#  include <dirent.h>
+#endif
+
+func b32 process_snapshot_reserve(
+    process_snapshot_entry** entries,
+    sz required,
+    sz* capacity) {
+  profile_func_begin;
+  if (entries == NULL || capacity == NULL) {
+    profile_func_end;
+    return false;
+  }
+
+  if (required <= *capacity) {
+    profile_func_end;
+    return true;
+  }
+
+  sz new_capacity = *capacity > 0 ? *capacity : 64;
+  safe_while (new_capacity < required) {
+    if (new_capacity > (SZ_MAX / 2)) {
+      new_capacity = required;
+      break;
+    }
+    new_capacity *= 2;
+  }
+
+  if (new_capacity > (SZ_MAX / size_of(process_snapshot_entry))) {
+    profile_func_end;
+    return false;
+  }
+
+  sz alloc_size = new_capacity * size_of(process_snapshot_entry);
+  process_snapshot_entry* resized = (process_snapshot_entry*)SDL_realloc(*entries, (size_t)alloc_size);
+  if (resized == NULL) {
+    thread_log_error("Failed to resize process snapshot capacity=%zu", (size_t)new_capacity);
+    profile_func_end;
+    return false;
+  }
+
+  *entries = resized;
+  *capacity = new_capacity;
+  profile_func_end;
+  return true;
+}
+
+func b32 process_snapshot_push(
+    process_snapshot_entry** entries,
+    sz* count,
+    sz* capacity,
+    u64 proc_id,
+    cstr8 proc_name) {
+  profile_func_begin;
+  if (entries == NULL || count == NULL || capacity == NULL || proc_id == 0) {
+    profile_func_end;
+    return false;
+  }
+
+  if (!process_snapshot_reserve(entries, *count + 1, capacity)) {
+    profile_func_end;
+    return false;
+  }
+
+  process_snapshot_entry* entry = &(*entries)[*count];
+  entry->id = proc_id;
+  mem_zero(entry->name, size_of(entry->name));
+  cstr8_cpy(entry->name, size_of(entry->name), (proc_name != NULL && proc_name[0] != '\0') ? proc_name : "<unknown>");
+
+  *count += 1;
+  profile_func_end;
+  return true;
+}
+
+func b32 process_snapshot_parse_pid(cstr8 pid_name, u64* out_pid) {
+  profile_func_begin;
+  if (pid_name == NULL || out_pid == NULL || pid_name[0] == '\0') {
+    profile_func_end;
+    return false;
+  }
+
+  u64 parsed_pid = 0;
+  if (!cstr8_to_u64(pid_name, U64_MAX, &parsed_pid) || parsed_pid == 0) {
+    profile_func_end;
+    return false;
+  }
+
+  *out_pid = parsed_pid;
+  profile_func_end;
+  return true;
+}
 
 // Returns true if options matches process_options_default().
 func b32 process_options_is_default(process_options options) {
@@ -215,6 +310,205 @@ func u64 process_get_id(process prc) {
   }
 
   return (u64)SDL_GetNumberProperty(props, SDL_PROP_PROCESS_PID_NUMBER, 0);
+}
+
+func process_snapshot_entry* process_snapshot_get(sz* out_count) {
+  profile_func_begin;
+
+  process_snapshot_entry* entries = NULL;
+  sz count = 0;
+  sz capacity = 0;
+
+#if defined(PLATFORM_WINDOWS)
+  DWORD proc_ids[4096] = {0};
+  DWORD bytes_needed = 0;
+  if (!EnumProcesses(proc_ids, size_of(proc_ids), &bytes_needed)) {
+    thread_log_error("Failed to enumerate process ids error=%lu", (unsigned long)GetLastError());
+    if (out_count != NULL) {
+      *out_count = 0;
+    }
+    profile_func_end;
+    return NULL;
+  }
+
+  sz pid_count = (sz)(bytes_needed / size_of(DWORD));
+  safe_for (sz pid_idx = 0; pid_idx < pid_count; ++pid_idx) {
+    u64 proc_id = (u64)proc_ids[pid_idx];
+    if (proc_id == 0) {
+      continue;
+    }
+
+    c8 proc_name[PROCESS_NAME_CAP] = {0};
+    HANDLE proc_handle = OpenProcess(
+        PROCESS_QUERY_LIMITED_INFORMATION | PROCESS_VM_READ,
+        FALSE,
+        (DWORD)proc_id);
+    if (proc_handle != NULL) {
+      DWORD name_size = (DWORD)size_of(proc_name);
+      if (!QueryFullProcessImageNameA(proc_handle, 0, proc_name, &name_size) || proc_name[0] == '\0') {
+        if (GetModuleBaseNameA(proc_handle, NULL, proc_name, (DWORD)size_of(proc_name)) == 0) {
+          cstr8_cpy(proc_name, size_of(proc_name), "<unknown>");
+        }
+      }
+      CloseHandle(proc_handle);
+    }
+    if (proc_name[0] == '\0') {
+      cstr8_cpy(proc_name, size_of(proc_name), "<unknown>");
+    } else {
+      cstr8 last_backslash = cstr8_find_last_char(proc_name, '\\');
+      cstr8 last_forward_slash = cstr8_find_last_char(proc_name, '/');
+      cstr8 base_name = proc_name;
+      if (last_backslash != NULL) {
+        base_name = last_backslash + 1;
+      }
+      if (last_forward_slash != NULL && last_forward_slash + 1 > base_name) {
+        base_name = last_forward_slash + 1;
+      }
+      if (base_name != proc_name) {
+        c8 normalized_name[PROCESS_NAME_CAP] = {0};
+        cstr8_cpy(normalized_name, size_of(normalized_name), base_name);
+        cstr8_cpy(proc_name, size_of(proc_name), normalized_name);
+      }
+    }
+
+    if (!process_snapshot_push(&entries, &count, &capacity, proc_id, proc_name)) {
+      thread_log_error("Failed to append process snapshot entry on Windows");
+      SDL_free(entries);
+      if (out_count != NULL) {
+        *out_count = 0;
+      }
+      profile_func_end;
+      return NULL;
+    }
+  }
+#elif defined(PLATFORM_LINUX)
+  DIR* proc_dir = opendir("/proc");
+  if (proc_dir == NULL) {
+    thread_log_error("Failed to open proc filesystem path=/proc");
+    if (out_count != NULL) {
+      *out_count = 0;
+    }
+    profile_func_end;
+    return NULL;
+  }
+
+  struct dirent* dir_entry = NULL;
+  safe_while ((dir_entry = readdir(proc_dir)) != NULL) {
+    u64 proc_id = 0;
+    if (!process_snapshot_parse_pid((cstr8)dir_entry->d_name, &proc_id)) {
+      continue;
+    }
+
+    c8 comm_path[64] = {0};
+    if (!cstr8_format(comm_path, size_of(comm_path), "/proc/%s/comm", dir_entry->d_name)) {
+      continue;
+    }
+
+    i32 comm_fd = open(comm_path, O_RDONLY);
+    if (comm_fd < 0) {
+      continue;
+    }
+
+    c8 proc_name[PROCESS_NAME_CAP] = {0};
+    ssize_t read_size = read(comm_fd, proc_name, size_of(proc_name) - 1);
+    close(comm_fd);
+    if (read_size <= 0) {
+      continue;
+    }
+
+    safe_for (sz char_idx = 0; char_idx < (sz)read_size; ++char_idx) {
+      if (proc_name[char_idx] == '\n' || proc_name[char_idx] == '\r') {
+        proc_name[char_idx] = '\0';
+        break;
+      }
+    }
+
+    if (!process_snapshot_push(&entries, &count, &capacity, proc_id, proc_name)) {
+      thread_log_error("Failed to append process snapshot entry on Linux");
+      SDL_free(entries);
+      closedir(proc_dir);
+      if (out_count != NULL) {
+        *out_count = 0;
+      }
+      profile_func_end;
+      return NULL;
+    }
+  }
+
+  closedir(proc_dir);
+#elif defined(PLATFORM_MACOS)
+  i32 mib[] = {CTL_KERN, KERN_PROC, KERN_PROC_ALL, 0};
+  size_t proc_bytes = 0;
+  if (sysctl(mib, count_of(mib), NULL, &proc_bytes, NULL, 0) != 0 || proc_bytes == 0) {
+    thread_log_error("Failed to query process table on macOS");
+    if (out_count != NULL) {
+      *out_count = 0;
+    }
+    profile_func_end;
+    return NULL;
+  }
+
+  struct kinfo_proc* proc_list = (struct kinfo_proc*)SDL_malloc(proc_bytes);
+  if (proc_list == NULL) {
+    thread_log_error("Failed to allocate process list bytes=%zu", proc_bytes);
+    if (out_count != NULL) {
+      *out_count = 0;
+    }
+    profile_func_end;
+    return NULL;
+  }
+
+  if (sysctl(mib, count_of(mib), proc_list, &proc_bytes, NULL, 0) != 0) {
+    thread_log_error("Failed to read process table on macOS");
+    SDL_free(proc_list);
+    if (out_count != NULL) {
+      *out_count = 0;
+    }
+    profile_func_end;
+    return NULL;
+  }
+
+  sz proc_count = (sz)(proc_bytes / size_of(struct kinfo_proc));
+  safe_for (sz idx = 0; idx < proc_count; ++idx) {
+    u64 proc_id = (u64)proc_list[idx].kp_proc.p_pid;
+    if (proc_id == 0) {
+      continue;
+    }
+
+    if (!process_snapshot_push(&entries, &count, &capacity, proc_id, proc_list[idx].kp_proc.p_comm)) {
+      thread_log_error("Failed to append process snapshot entry on macOS");
+      SDL_free(proc_list);
+      SDL_free(entries);
+      if (out_count != NULL) {
+        *out_count = 0;
+      }
+      profile_func_end;
+      return NULL;
+    }
+  }
+
+  SDL_free(proc_list);
+#else
+  invalid_code_path;
+  if (out_count != NULL) {
+    *out_count = 0;
+  }
+  profile_func_end;
+  return NULL;
+#endif
+
+  if (out_count != NULL) {
+    *out_count = count;
+  }
+  thread_log_trace("Enumerated process snapshot count=%zu", (size_t)count);
+  profile_func_end;
+  return entries;
+}
+
+func void process_snapshot_free(process_snapshot_entry* ptr) {
+  profile_func_begin;
+  SDL_free(ptr);
+  profile_func_end;
 }
 
 func void* process_read(process prc, sz* out_size, i32* out_exit_code) {

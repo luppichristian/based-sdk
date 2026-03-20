@@ -58,6 +58,25 @@ TEST(processes_process_test, get_id) {
   process_destroy(prc);
 }
 
+TEST(processes_process_test, snapshot_get) {
+  sz proc_count = 0;
+  process_snapshot_entry* entries = process_snapshot_get(&proc_count);
+  EXPECT_NE(nullptr, entries);
+  EXPECT_GT(proc_count, (sz)0);
+
+  u64 current_proc_id = process_id();
+  b32 found_current = 0;
+  safe_for (sz idx = 0; idx < proc_count; ++idx) {
+    if (entries[idx].id == current_proc_id) {
+      found_current = 1;
+      break;
+    }
+  }
+  EXPECT_NE(0, found_current);
+
+  process_snapshot_free(entries);
+}
+
 TEST(processes_process_test, wait_blocking) {
   cstr8 const args[] = {ECHO_ARGS};
   process prc = process_create(args);

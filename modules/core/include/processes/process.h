@@ -16,6 +16,14 @@ c_begin;
 // Opaque handle to a spawned process.
 typedef void* process;
 
+#define PROCESS_NAME_CAP 260
+
+// Snapshot entry for an operating-system process.
+typedef struct process_snapshot_entry {
+  u64 id;
+  c8 name[PROCESS_NAME_CAP];
+} process_snapshot_entry;
+
 // Spawn-time process I/O and lifecycle options.
 typedef struct process_options {
   b32 pipe_stdin;
@@ -54,6 +62,13 @@ func b32 process_is_valid(process prc);
 
 // Returns the OS-level identifier of a spawned process.
 func u64 process_get_id(process prc);
+
+// Returns a newly allocated snapshot of currently running OS processes.
+// The returned array must be released with process_snapshot_free.
+func process_snapshot_entry* process_snapshot_get(sz* out_count);
+
+// Releases a process snapshot returned by process_snapshot_get.
+func void process_snapshot_free(process_snapshot_entry* ptr);
 
 // Reads the entire piped stdout stream, blocking until the process exits.
 // The returned pointer is allocated by SDL and must be released with process_read_free.
