@@ -1,4 +1,4 @@
-# based
+# based-sdk
 
 `based` is a cross-platform C utility library organized as modules.
 

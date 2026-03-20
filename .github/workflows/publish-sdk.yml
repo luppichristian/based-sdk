@@ -121,6 +121,6 @@ jobs:
               --title "$TAG_NAME" \
               --notes "SDK binaries for $TAG_NAME"
           fi
-          gh release upload "$TAG_NAME" dist/* \
+          gh release upload "$TAG_NAME" dist/*.zip dist/SHA256SUMS \
             --repo "${{ github.repository }}" \
             --clobber
