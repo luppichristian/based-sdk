@@ -36,7 +36,7 @@ TEST(processes_process_pipe_test, stdin_invalid) {
 #if defined(_WIN32)
   cstr8 const args[] = {"cmd.exe", "/c", "exit 0", NULL};
 #else
-  cstr8 const args[] = {"/bin/true", NULL};
+  cstr8 const args[] = {"/bin/echo", "stdin-invalid", NULL};
 #endif
 
   process prc = process_create_with(args, opts);

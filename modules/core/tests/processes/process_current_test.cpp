@@ -38,8 +38,10 @@ TEST(processes_process_current_test, set_priority_high) {
   process_priority original = process_get_priority();
   b32 set_result = process_set_priority(PROCESS_PRIORITY_HIGH);
   if (set_result == 0) {
+    process_priority current = process_get_priority();
+    EXPECT_NE(PROCESS_PRIORITY_HIGH, current);
     process_set_priority(original);
-    GTEST_SKIP() << "High process priority requires elevated privileges on this platform";
+    return;
   }
   EXPECT_NE(0, set_result);
 
