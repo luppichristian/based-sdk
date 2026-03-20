@@ -22,6 +22,7 @@ If modules are added, removed, or reorganized, update this file in the same chan
 - Use modular naming in CMake targets to avoid collisions: `based-<module>` (for example `based-core`).
 - Keep cross-module build and dependency wiring in top-level CMake files coherent when module structure changes.
 - Keep `THIRD_PARTY.md` up to date whenever dependencies in `third_party/` are added, removed, renamed, re-versioned, or have license metadata changes.
+- Keep root user docs `README.md`, `HOW_TO_BUILD.md`, and `HOW_TO_USE_SDK.md` up to date whenever build flow, module layout, SDK packaging/integration, or onboarding steps change.
 - Never use functions from C/C++ standard directly. Always check for functions implemented in based modules. If you don't find the function you need, ask the user.
 - Core foundational headers under `modules/core/include/basic/` define shared project language and helpers and should be treated as canonical:
   - `keyword_defines.h` for project keywords/qualifiers. Keep usage aligned with the canonical set:
@@ -70,3 +71,26 @@ If modules are added, removed, or reorganized, update this file in the same chan
 - Prefer `global_ctx_get()`/`global_*` helpers for process-wide shared state and cross-thread shared resources.
 - When doing coordinated multi-step access to the shared global context, use `global_ctx_lock()` / `global_ctx_unlock()`.
 - Remember that `thread_get_log_state()` falls back to the global log state when the current thread context is not initialized.
+
+## SDK Release Maintenance
+
+- SDK automation files are:
+  - `.github/workflows/ci.yml` (one build+test per OS)
+  - `.github/workflows/release-sdk.yml` (compile matrix and per-variant SDK payload artifacts)
+  - `.github/workflows/publish-sdk.yml` (packages releases, full bundle, checksums, uploads assets)
+  - `.github/sdk/cmake/based-sdk-targets.cmake` (CMake integration shipped in full bundle)
+  - `.github/sdk/premake5.lua` (Premake integration shipped in full bundle)
+  - `.github/sdk/README.md` (full bundle quick usage)
+- SDK release operation is manual: create/push the version tag (for example `v1.2.3`), let `release-sdk.yml` run, then run `publish-sdk.yml` manually with matching `release_tag` and `run_id` when needed.
+- Target names in SDK integration must match real CMake targets from module CMake files (`based-<module>`). Keep names exact (current: `based-core`, `based-gfx`).
+- For SDK packaging, include headers for every dependency linked as `PUBLIC` by exported based targets (current `based-core` set includes `olib::static`, `libmath2`, and optional `Tracy::TracyClient`, so their headers must be staged under SDK `include/third_party/...`).
+- When adding/removing/renaming modules, update all of the following in the same change:
+  - module list in this `AGENTS.md`
+  - root `CMakeLists.txt` module wiring
+  - `.github/workflows/release-sdk.yml` staging logic so headers/libs for the module are included in each SDK variant
+  - `.github/sdk/cmake/based-sdk-targets.cmake` so imported targets and config-specific library resolution include the module
+  - `.github/sdk/premake5.lua` so include directories, links, and per-config library directories include the module
+  - `.github/sdk/README.md` examples and notes if integration surface changes
+- When `PUBLIC` dependencies change on SDK-exported targets, update both `.github/workflows/release-sdk.yml` (header staging) and SDK integration files (`.github/sdk/cmake/based-sdk-targets.cmake`, `.github/sdk/premake5.lua`) in the same change.
+- The full SDK archive (`based-sdk-<version>-full.zip`) must always include every variant plus current CMake/Premake integration files.
+- SDK payloads should continue copying all root `*.md` files so licensing and distribution docs stay bundled without hardcoding filenames.

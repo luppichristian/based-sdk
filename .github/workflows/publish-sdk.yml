@@ -1,0 +1,126 @@
+name: Publish SDK
+
+on:
+  workflow_run:
+    workflows:
+      - Release SDK
+    types:
+      - completed
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: Tag name to publish (for example v1.2.3)
+        required: true
+      run_id:
+        description: Release SDK run id containing artifacts
+        required: true
+
+permissions:
+  contents: write
+  actions: read
+
+jobs:
+  publish:
+    if: >-
+      (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success') ||
+      (github.event_name == 'workflow_dispatch')
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Resolve inputs
+        id: meta
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          WORKFLOW_RUN_ID: ${{ github.event.workflow_run.id }}
+          WORKFLOW_HEAD_BRANCH: ${{ github.event.workflow_run.head_branch }}
+          INPUT_RELEASE_TAG: ${{ inputs.release_tag }}
+          INPUT_RUN_ID: ${{ inputs.run_id }}
+        run: |
+          set -euo pipefail
+          if [ "$EVENT_NAME" = "workflow_dispatch" ]; then
+            tag_name="$INPUT_RELEASE_TAG"
+            run_id="$INPUT_RUN_ID"
+          else
+            tag_name="$WORKFLOW_HEAD_BRANCH"
+            run_id="$WORKFLOW_RUN_ID"
+          fi
+          if [ -z "$tag_name" ] || [ -z "$run_id" ]; then
+            echo "Could not resolve release tag or run id" >&2
+            exit 1
+          fi
+          case "$tag_name" in
+            v*) ;;
+            *)
+              echo "Resolved tag '$tag_name' does not match expected v* format" >&2
+              exit 1
+              ;;
+          esac
+          printf 'tag=%s\n' "$tag_name" >> "$GITHUB_OUTPUT"
+          printf 'run_id=%s\n' "$run_id" >> "$GITHUB_OUTPUT"
+
+      - name: Download SDK artifacts from Release SDK run
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts
+          gh run download "${{ steps.meta.outputs.run_id }}" \
+            --repo "${{ github.repository }}" \
+            --pattern "sdk-build-*" \
+            --dir artifacts
+
+      - name: Checkout repository for SDK templates
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ steps.meta.outputs.tag }}
+
+      - name: Package SDK archives and checksums
+        env:
+          TAG_NAME: ${{ steps.meta.outputs.tag }}
+        run: |
+          set -euo pipefail
+          mkdir -p dist
+          version="${TAG_NAME#v}"
+
+          full_dir="dist/based-sdk-${version}-full"
+          mkdir -p "$full_dir/variants" "$full_dir/cmake"
+
+          for artifact_dir in artifacts/sdk-build-*; do
+            if [ ! -d "$artifact_dir" ]; then
+              continue
+            fi
+            artifact_name="$(basename "$artifact_dir")"
+            target_name="${artifact_name#sdk-build-}"
+            archive_path="dist/based-sdk-${version}-${target_name}.zip"
+            (
+              cd "$artifact_dir"
+              zip -r "${GITHUB_WORKSPACE}/${archive_path}" .
+            )
+            cp -R "$artifact_dir" "$full_dir/variants/$target_name"
+          done
+
+          cp -R .github/sdk/. "$full_dir/"
+
+          (
+            cd dist
+            zip -r "based-sdk-${version}-full.zip" "based-sdk-${version}-full"
+          )
+
+          cd dist
+          sha256sum *.zip > SHA256SUMS
+
+      - name: Create or update GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG_NAME: ${{ steps.meta.outputs.tag }}
+        run: |
+          set -euo pipefail
+          if ! gh release view "$TAG_NAME" --repo "${{ github.repository }}" >/dev/null 2>&1; then
+            gh release create "$TAG_NAME" \
+              --repo "${{ github.repository }}" \
+              --title "$TAG_NAME" \
+              --notes "SDK binaries for $TAG_NAME"
+          fi
+          gh release upload "$TAG_NAME" dist/* \
+            --repo "${{ github.repository }}" \
+            --clobber

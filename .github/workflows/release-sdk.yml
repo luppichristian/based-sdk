@@ -1,0 +1,319 @@
+name: Release SDK
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  compile-linux:
+    name: linux-${{ matrix.arch }} / ${{ matrix.build_type }}
+    runs-on: ${{ matrix.arch == 'arm64' && 'ubuntu-24.04-arm' || 'ubuntu-latest' }}
+    strategy:
+      fail-fast: false
+      matrix:
+        arch:
+          - x86_64
+          - arm64
+        build_type:
+          - Debug
+          - Release
+          - RelWithDebInfo
+          - MinSizeRel
+
+    env:
+      BUILD_DIR: build/release-sdk
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Linux dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            clang \
+            ninja-build \
+            pkg-config \
+            libasound2-dev \
+            libpulse-dev \
+            libaudio-dev \
+            libfribidi-dev \
+            libjack-dev \
+            libsndio-dev \
+            libx11-dev \
+            libxext-dev \
+            libxrandr-dev \
+            libxcursor-dev \
+            libxfixes-dev \
+            libxi-dev \
+            libxss-dev \
+            libxtst-dev \
+            libxkbcommon-dev \
+            libdrm-dev \
+            libgbm-dev \
+            libgl1-mesa-dev \
+            libgles2-mesa-dev \
+            libegl1-mesa-dev \
+            libdbus-1-dev \
+            libibus-1.0-dev \
+            libudev-dev \
+            libthai-dev \
+            libpipewire-0.3-dev \
+            libwayland-dev \
+            libdecor-0-dev \
+            liburing-dev
+        shell: bash
+
+      - name: Configure
+        run: >-
+          cmake -S . -B "${{ env.BUILD_DIR }}"
+          -G Ninja
+          -D CMAKE_C_COMPILER=clang
+          -D CMAKE_CXX_COMPILER=clang++
+          -D CMAKE_BUILD_TYPE="${{ matrix.build_type }}"
+          -D BASED_BUILD_TESTS=OFF
+          -D BASED_ENABLE_MODULE_GRAPHICS=ON
+
+      - name: Build
+        run: cmake --build "${{ env.BUILD_DIR }}" --parallel
+
+      - name: Stage SDK payload
+        run: |
+          set -euo pipefail
+          STAGE_DIR="${{ runner.temp }}/sdk/linux-${{ matrix.arch }}-${{ matrix.build_type }}"
+          mkdir -p "$STAGE_DIR/include/core" "$STAGE_DIR/include/gfx" "$STAGE_DIR/include/third_party" "$STAGE_DIR/lib"
+          cp -R modules/core/include/. "$STAGE_DIR/include/core/"
+          cp -R modules/gfx/include/. "$STAGE_DIR/include/gfx/"
+          if [ -d "${{ env.BUILD_DIR }}/_deps/olib-src/include" ]; then
+            mkdir -p "$STAGE_DIR/include/third_party/olib"
+            cp -R "${{ env.BUILD_DIR }}/_deps/olib-src/include/." "$STAGE_DIR/include/third_party/olib/"
+          fi
+          if [ -d "${{ env.BUILD_DIR }}/_deps/libmath2-src/include" ]; then
+            mkdir -p "$STAGE_DIR/include/third_party/libmath2"
+            cp -R "${{ env.BUILD_DIR }}/_deps/libmath2-src/include/." "$STAGE_DIR/include/third_party/libmath2/"
+          fi
+          if [ -d "${{ env.BUILD_DIR }}/_deps/tracy-src/public" ]; then
+            mkdir -p "$STAGE_DIR/include/third_party/tracy"
+            cp -R "${{ env.BUILD_DIR }}/_deps/tracy-src/public/." "$STAGE_DIR/include/third_party/tracy/"
+          fi
+          for md_file in ./*.md; do
+            if [ -f "$md_file" ]; then
+              cp "$md_file" "$STAGE_DIR/"
+            fi
+          done
+          while IFS= read -r file_path; do
+            cp "$file_path" "$STAGE_DIR/lib/"
+          done < <(find "${{ env.BUILD_DIR }}" -type f \( -name 'libbased-core.a' -o -name 'libbased-gfx.a' -o -name 'based-core.lib' -o -name 'based-gfx.lib' -o -name 'based-core.dll' -o -name 'based-gfx.dll' -o -name 'libbased-core.dylib' -o -name 'libbased-gfx.dylib' -o -name 'libbased-core.so' -o -name 'libbased-gfx.so' \))
+          if [ -z "$(ls -A "$STAGE_DIR/lib")" ]; then
+            echo "No SDK libraries found" >&2
+            exit 1
+          fi
+        shell: bash
+
+      - name: Upload SDK payload
+        uses: actions/upload-artifact@v4
+        with:
+          name: sdk-build-linux-${{ matrix.arch }}-${{ matrix.build_type }}
+          path: ${{ runner.temp }}/sdk/linux-${{ matrix.arch }}-${{ matrix.build_type }}
+          if-no-files-found: error
+
+  compile-macos:
+    name: macos-${{ matrix.arch }} / ${{ matrix.build_type }}
+    runs-on: macos-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        arch:
+          - x86_64
+          - arm64
+        build_type:
+          - Debug
+          - Release
+          - RelWithDebInfo
+          - MinSizeRel
+
+    env:
+      BUILD_DIR: build/release-sdk
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Xcode
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: latest-stable
+
+      - name: Resolve macOS SDK path
+        id: macos-sdk
+        run: |
+          sdk_path="$(xcrun --sdk macosx --show-sdk-path)"
+          printf 'sdk_path=%s\n' "$sdk_path" >> "$GITHUB_OUTPUT"
+
+      - name: Configure
+        run: >-
+          cmake -S . -B "${{ env.BUILD_DIR }}"
+          -G Ninja
+          -D CMAKE_C_COMPILER=/usr/bin/clang
+          -D CMAKE_CXX_COMPILER=/usr/bin/clang++
+          -D CMAKE_OBJC_COMPILER=/usr/bin/clang
+          -D CMAKE_OBJCXX_COMPILER=/usr/bin/clang++
+          -D CMAKE_OSX_SYSROOT="${{ steps.macos-sdk.outputs.sdk_path }}"
+          -D CMAKE_OSX_ARCHITECTURES="${{ matrix.arch }}"
+          -D CMAKE_OSX_DEPLOYMENT_TARGET=11.0
+          -D CMAKE_BUILD_TYPE="${{ matrix.build_type }}"
+          -D BASED_BUILD_TESTS=OFF
+          -D BASED_ENABLE_MODULE_GRAPHICS=ON
+
+      - name: Build
+        run: cmake --build "${{ env.BUILD_DIR }}" --parallel
+
+      - name: Stage SDK payload
+        run: |
+          set -euo pipefail
+          STAGE_DIR="${{ runner.temp }}/sdk/macos-${{ matrix.arch }}-${{ matrix.build_type }}"
+          mkdir -p "$STAGE_DIR/include/core" "$STAGE_DIR/include/gfx" "$STAGE_DIR/include/third_party" "$STAGE_DIR/lib"
+          cp -R modules/core/include/. "$STAGE_DIR/include/core/"
+          cp -R modules/gfx/include/. "$STAGE_DIR/include/gfx/"
+          if [ -d "${{ env.BUILD_DIR }}/_deps/olib-src/include" ]; then
+            mkdir -p "$STAGE_DIR/include/third_party/olib"
+            cp -R "${{ env.BUILD_DIR }}/_deps/olib-src/include/." "$STAGE_DIR/include/third_party/olib/"
+          fi
+          if [ -d "${{ env.BUILD_DIR }}/_deps/libmath2-src/include" ]; then
+            mkdir -p "$STAGE_DIR/include/third_party/libmath2"
+            cp -R "${{ env.BUILD_DIR }}/_deps/libmath2-src/include/." "$STAGE_DIR/include/third_party/libmath2/"
+          fi
+          if [ -d "${{ env.BUILD_DIR }}/_deps/tracy-src/public" ]; then
+            mkdir -p "$STAGE_DIR/include/third_party/tracy"
+            cp -R "${{ env.BUILD_DIR }}/_deps/tracy-src/public/." "$STAGE_DIR/include/third_party/tracy/"
+          fi
+          for md_file in ./*.md; do
+            if [ -f "$md_file" ]; then
+              cp "$md_file" "$STAGE_DIR/"
+            fi
+          done
+          while IFS= read -r file_path; do
+            cp "$file_path" "$STAGE_DIR/lib/"
+          done < <(find "${{ env.BUILD_DIR }}" -type f \( -name 'libbased-core.a' -o -name 'libbased-gfx.a' -o -name 'based-core.lib' -o -name 'based-gfx.lib' -o -name 'based-core.dll' -o -name 'based-gfx.dll' -o -name 'libbased-core.dylib' -o -name 'libbased-gfx.dylib' -o -name 'libbased-core.so' -o -name 'libbased-gfx.so' \))
+          if [ -z "$(ls -A "$STAGE_DIR/lib")" ]; then
+            echo "No SDK libraries found" >&2
+            exit 1
+          fi
+        shell: bash
+
+      - name: Upload SDK payload
+        uses: actions/upload-artifact@v4
+        with:
+          name: sdk-build-macos-${{ matrix.arch }}-${{ matrix.build_type }}
+          path: ${{ runner.temp }}/sdk/macos-${{ matrix.arch }}-${{ matrix.build_type }}
+          if-no-files-found: error
+
+  compile-windows:
+    name: windows-${{ matrix.arch }} / ${{ matrix.build_type }}
+    runs-on: windows-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        arch:
+          - x86_64
+          - arm64
+        build_type:
+          - Debug
+          - Release
+          - RelWithDebInfo
+          - MinSizeRel
+
+    env:
+      BUILD_DIR: build/release-sdk
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up MSVC developer command prompt
+        uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: ${{ matrix.arch == 'arm64' && 'amd64_arm64' || 'amd64' }}
+
+      - name: Configure
+        run: >-
+          cmake -S . -B "${{ env.BUILD_DIR }}"
+          -G Ninja
+          -D CMAKE_C_COMPILER=clang-cl
+          -D CMAKE_CXX_COMPILER=clang-cl
+          ${{ matrix.arch == 'arm64' && '-D CMAKE_C_COMPILER_TARGET=arm64-pc-windows-msvc -D CMAKE_CXX_COMPILER_TARGET=arm64-pc-windows-msvc' || '' }}
+          -D CMAKE_BUILD_TYPE="${{ matrix.build_type }}"
+          -D BASED_BUILD_TESTS=OFF
+          -D BASED_ENABLE_MODULE_GRAPHICS=ON
+
+      - name: Build
+        run: cmake --build "${{ env.BUILD_DIR }}" --parallel
+
+      - name: Stage SDK payload
+        shell: pwsh
+        run: |
+          $stageDir = "${{ runner.temp }}\sdk\windows-${{ matrix.arch }}-${{ matrix.build_type }}"
+          New-Item -ItemType Directory -Path "$stageDir\include\core" -Force | Out-Null
+          New-Item -ItemType Directory -Path "$stageDir\include\gfx" -Force | Out-Null
+          New-Item -ItemType Directory -Path "$stageDir\include\third_party" -Force | Out-Null
+          New-Item -ItemType Directory -Path "$stageDir\lib" -Force | Out-Null
+
+          Copy-Item -Path "modules/core/include/*" -Destination "$stageDir\include\core" -Recurse -Force
+          Copy-Item -Path "modules/gfx/include/*" -Destination "$stageDir\include\gfx" -Recurse -Force
+
+          if (Test-Path "${{ env.BUILD_DIR }}\_deps\olib-src\include") {
+            New-Item -ItemType Directory -Path "$stageDir\include\third_party\olib" -Force | Out-Null
+            Copy-Item -Path "${{ env.BUILD_DIR }}\_deps\olib-src\include\*" -Destination "$stageDir\include\third_party\olib" -Recurse -Force
+          }
+
+          if (Test-Path "${{ env.BUILD_DIR }}\_deps\libmath2-src\include") {
+            New-Item -ItemType Directory -Path "$stageDir\include\third_party\libmath2" -Force | Out-Null
+            Copy-Item -Path "${{ env.BUILD_DIR }}\_deps\libmath2-src\include\*" -Destination "$stageDir\include\third_party\libmath2" -Recurse -Force
+          }
+
+          if (Test-Path "${{ env.BUILD_DIR }}\_deps\tracy-src\public") {
+            New-Item -ItemType Directory -Path "$stageDir\include\third_party\tracy" -Force | Out-Null
+            Copy-Item -Path "${{ env.BUILD_DIR }}\_deps\tracy-src\public\*" -Destination "$stageDir\include\third_party\tracy" -Recurse -Force
+          }
+          $mdFiles = Get-ChildItem -Path . -Filter "*.md" -File -ErrorAction SilentlyContinue
+          foreach ($mdFile in $mdFiles) {
+            Copy-Item -Path $mdFile.FullName -Destination $stageDir -Force
+          }
+
+          $patterns = @(
+            "based-core.lib",
+            "based-gfx.lib",
+            "based-core.dll",
+            "based-gfx.dll",
+            "libbased-core.a",
+            "libbased-gfx.a",
+            "libbased-core.dylib",
+            "libbased-gfx.dylib",
+            "libbased-core.so",
+            "libbased-gfx.so"
+          )
+
+          $found = @()
+          foreach ($pattern in $patterns) {
+            $matches = Get-ChildItem -Path "${{ env.BUILD_DIR }}" -Filter $pattern -File -Recurse -ErrorAction SilentlyContinue
+            foreach ($match in $matches) {
+              Copy-Item -Path $match.FullName -Destination "$stageDir\lib" -Force
+              $found += $match.FullName
+            }
+          }
+
+          if ($found.Count -eq 0) {
+            throw "No SDK libraries found"
+          }
+
+      - name: Upload SDK payload
+        uses: actions/upload-artifact@v4
+        with:
+          name: sdk-build-windows-${{ matrix.arch }}-${{ matrix.build_type }}
+          path: ${{ runner.temp }}/sdk/windows-${{ matrix.arch }}-${{ matrix.build_type }}
+          if-no-files-found: error
