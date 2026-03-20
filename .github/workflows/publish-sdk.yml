@@ -58,6 +58,11 @@ jobs:
           printf 'tag=%s\n' "$tag_name" >> "$GITHUB_OUTPUT"
           printf 'run_id=%s\n' "$run_id" >> "$GITHUB_OUTPUT"
 
+      - name: Checkout repository for SDK templates
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ steps.meta.outputs.tag }}
+
       - name: Download SDK artifacts from Release SDK run
         env:
           GH_TOKEN: ${{ github.token }}
@@ -69,10 +74,14 @@ jobs:
             --pattern "sdk-build-*" \
             --dir artifacts
 
-      - name: Checkout repository for SDK templates
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ steps.meta.outputs.tag }}
+          artifact_count="$(find artifacts -mindepth 1 -maxdepth 1 -type d -name 'sdk-build-*' | wc -l)"
+          echo "Downloaded SDK artifact directories: ${artifact_count}"
+          find artifacts -mindepth 1 -maxdepth 2 -print
+          if [ "$artifact_count" -eq 0 ]; then
+            echo "No sdk-build-* artifacts were downloaded for run_id=${{ steps.meta.outputs.run_id }}" >&2
+            echo "Ensure run_id points to a successful 'Release SDK' workflow run" >&2
+            exit 1
+          fi
 
       - name: Package SDK archives and checksums
         env:
@@ -84,6 +93,8 @@ jobs:
 
           full_dir="dist/based-sdk-${version}-full"
           mkdir -p "$full_dir/variants" "$full_dir/cmake"
+
+          packaged_count=0
 
           for artifact_dir in artifacts/sdk-build-*; do
             if [ ! -d "$artifact_dir" ]; then
@@ -97,7 +108,13 @@ jobs:
               zip -r "${GITHUB_WORKSPACE}/${archive_path}" .
             )
             cp -R "$artifact_dir" "$full_dir/variants/$target_name"
+            packaged_count=$((packaged_count + 1))
           done
+
+          if [ "$packaged_count" -eq 0 ]; then
+            echo "No SDK variant artifacts were packaged" >&2
+            exit 1
+          fi
 
           cp -R .github/sdk/. "$full_dir/"
 
