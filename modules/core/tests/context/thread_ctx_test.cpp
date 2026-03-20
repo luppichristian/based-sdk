@@ -26,9 +26,6 @@ TEST(context_thread_ctx_test, user_data_roundtrip_and_bounds_checks_work) {
 }
 
 TEST(context_thread_ctx_test, log_helpers_capture_and_filter_messages) {
-#if defined(_WIN32)
-  GTEST_SKIP() << "thread log frame filtering is unstable on this target";
-#endif
   log_state* state_ptr = thread_get_log_state();
   ASSERT_NE(state_ptr, nullptr);
 

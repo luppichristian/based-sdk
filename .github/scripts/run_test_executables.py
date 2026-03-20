@@ -16,6 +16,12 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--build-config", required=True, help="CTest build configuration"
     )
+    parser.add_argument(
+        "--timeout-sec",
+        type=int,
+        default=1800,
+        help="Per-executable timeout in seconds (default: 1800)",
+    )
     return parser.parse_args()
 
 
@@ -59,7 +65,7 @@ def discover_test_executables(build_dir: Path, build_config: str) -> list[str]:
     return executables
 
 
-def run_executables(executables: list[str]) -> int:
+def run_executables(executables: list[str], timeout_sec: int) -> int:
     if not executables:
         print(
             "No *-tests executables found from discovered CTest metadata",
@@ -73,7 +79,14 @@ def run_executables(executables: list[str]) -> int:
 
     for exe in executables:
         print(f"\n=== Running {exe} ===", flush=True)
-        proc = subprocess.run([exe], check=False)
+        try:
+            proc = subprocess.run([exe], check=False, timeout=timeout_sec)
+        except subprocess.TimeoutExpired:
+            print(
+                f"Test executable timed out after {timeout_sec}s: {exe}",
+                file=sys.stderr,
+            )
+            return 124
         if proc.returncode != 0:
             print(
                 f"Test executable failed: {exe} (exit={proc.returncode})",
@@ -88,7 +101,7 @@ def main() -> int:
     args = parse_args()
     build_dir = Path(args.build_dir)
     executables = discover_test_executables(build_dir, args.build_config)
-    return run_executables(executables)
+    return run_executables(executables, args.timeout_sec)
 
 
 if __name__ == "__main__":

@@ -74,6 +74,11 @@ TEST(utils_random_series_test, integer_ranges_stay_in_bounds) {
 
 TEST(utils_random_series_test, swapped_integer_ranges_are_supported) {
   random_series series = make_series(991U);
+  log_state* log_state_ptr = thread_get_log_state();
+  ASSERT_NE(log_state_ptr, nullptr);
+
+  log_level old_level = log_state_ptr->level;
+  thread_log_set_level(LOG_LEVEL_ERROR);
 
   safe_for (i32 idx = 0; idx < 256; ++idx) {
     u32 u32_value = random_series_rng_u32(&series, 20U, 7U);
@@ -84,6 +89,8 @@ TEST(utils_random_series_test, swapped_integer_ranges_are_supported) {
     EXPECT_GE(i64_value, -15LL);
     EXPECT_LE(i64_value, 15LL);
   }
+
+  thread_log_set_level(old_level);
 }
 
 TEST(utils_random_series_test, chance_respects_extremes) {

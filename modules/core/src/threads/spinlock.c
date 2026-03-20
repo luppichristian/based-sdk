@@ -27,6 +27,8 @@ func spinlock _spinlock_create(callsite site) {
     return NULL;
   }
 
+  *spl = 0;
+
   msg_core_object_lifecycle_data msg_data = {
       .event_kind = MSG_CORE_OBJECT_EVENT_CREATE,
       .object_type = MSG_CORE_OBJECT_TYPE_SPINLOCK,

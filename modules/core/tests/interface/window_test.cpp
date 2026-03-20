@@ -45,9 +45,6 @@ TEST(interface_window_test, invalid_window_id_paths_return_failure) {
 }
 
 TEST(interface_window_test, create_modify_and_destroy_window_when_available) {
-#if defined(_WIN32)
-  GTEST_SKIP() << "window creation is unstable on this target";
-#endif
   window win_id = window_create("based test", 320, 200, WINDOW_MODE_WINDOWED, 0);
   if (win_id == NULL) {
     GTEST_SKIP() << "window backend not available";

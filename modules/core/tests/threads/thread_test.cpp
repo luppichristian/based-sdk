@@ -47,9 +47,6 @@ TEST(threads_thread_test, create_join) {
 }
 
 TEST(threads_thread_test, create_named) {
-#if defined(_WIN32)
-  GTEST_SKIP() << "thread naming is unstable on this target";
-#endif
   thread thd = thread_create_named(thread_entry_simple, NULL, "test_thread", (ctx_setup) {0});
   EXPECT_NE(0, thread_is_valid(thd));
 
