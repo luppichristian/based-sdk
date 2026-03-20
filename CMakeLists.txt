@@ -24,6 +24,7 @@ set(CMAKE_C_STANDARD 17)
 set(CMAKE_C_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+find_package(Python3 REQUIRED COMPONENTS Interpreter)
 
 # Dont care about this
 add_compile_definitions(_CRT_SECURE_NO_WARNINGS)

@@ -1,7 +1,8 @@
 === include\based_gfx.h ===
 6: #include <based_core.h>
-7: #include "gfx/module.h"
+8: #include "gfx/module.h"
 
 === include\gfx\module.h ===
+6: #include <based_core.h>
 10: func b32 gfx_module_is_available(void);
 11: func cstr8 gfx_module_get_name(void);

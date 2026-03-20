@@ -1,4 +1,43 @@
 === include\based_core.h ===
+7: #include "basic/assert.h"
+8: #include "basic/codespace.h"
+9: #include "basic/entry.h"
+10: #include "basic/entry_impl.h"
+11: #include "basic/env_defines.h"
+12: #include "basic/intrinsics.h"
+13: #include "basic/keyword_defines.h"
+14: #include "basic/primitive_types.h"
+15: #include "basic/profiler.h"
+16: #include "basic/safe.h"
+17: #include "basic/third_party.h"
+18: #include "basic/utility_defines.h"
+21: #include "containers/binary_tree.h"
+22: #include "containers/bitset.h"
+23: #include "containers/doubly_list.h"
+24: #include "containers/hash_map.h"
+25: #include "containers/ring_list.h"
+26: #include "containers/singly_list.h"
+27: #include "containers/sort.h"
+28: #include "containers/stack_list.h"
+29: #include "containers/tree.h"
+32: #include "memory/allocator.h"
+33: #include "memory/arena.h"
+34: #include "memory/buffer.h"
+35: #include "memory/heap.h"
+36: #include "memory/memops.h"
+37: #include "memory/pool.h"
+38: #include "memory/ring.h"
+39: #include "memory/scratch.h"
+40: #include "memory/vmem.h"
+43: #include "filesystem/archive.h"
+44: #include "filesystem/directory.h"
+45: #include "filesystem/file.h"
+46: #include "filesystem/filemap.h"
+47: #include "filesystem/filestream.h"
+48: #include "filesystem/module.h"
+49: #include "filesystem/path.h"
+50: #include "filesystem/pathinfo.h"
+51: #include "filesystem/pathwatch.h"
 54: #include "input/audio_device.h"
 55: #include "input/camera.h"
 56: #include "input/clipboard.h"
@@ -14,203 +53,416 @@
 66: #include "input/touch.h"
 67: #include "input/vkeys.h"
 70: #include "interface/cursor.h"
-71: #include "interface/dpi.h"
-72: #include "interface/dialog.h"
+71: #include "interface/dialog.h"
+72: #include "interface/dpi.h"
 73: #include "interface/icon.h"
 74: #include "interface/monitor.h"
 75: #include "interface/text_input.h"
 76: #include "interface/window.h"
-82: #include "system/cpu_info.h"
-83: #include "system/hardware_info.h"
-84: #include "system/language.h"
-85: #include "system/system_info.h"
-86: #include "system/system_runtime.h"
+79: #include "processes/common_processes.h"
+80: #include "processes/process.h"
+81: #include "processes/process_current.h"
+82: #include "processes/process_pipe.h"
+85: #include "system/cpu_info.h"
+86: #include "system/hardware_info.h"
+87: #include "system/language.h"
+88: #include "system/system_info.h"
+89: #include "system/system_runtime.h"
+92: #include "strings/char.h"
+93: #include "strings/cstrings.h"
+94: #include "strings/strings.h"
+95: #include "strings/unicode.h"
+98: #include "utils/cmdline.h"
+99: #include "utils/compress.h"
+100: #include "utils/crc.h"
+101: #include "utils/digits.h"
+102: #include "utils/endian.h"
+103: #include "utils/huffman.h"
+104: #include "utils/id.h"
+105: #include "utils/log_state.h"
+106: #include "utils/random_series.h"
+107: #include "utils/stacktrace.h"
+108: #include "utils/timer.h"
+109: #include "utils/timestamp.h"
+110: #include "utils/uuid.h"
+111: #include "utils/version.h"
+114: #include "context/ctx.h"
+115: #include "context/global_ctx.h"
+116: #include "context/thread_ctx.h"
+119: #include "threads/atomics.h"
+120: #include "threads/condvar.h"
+121: #include "threads/mutex.h"
+122: #include "threads/rwlock.h"
+123: #include "threads/semaphore.h"
+124: #include "threads/spinlock.h"
+125: #include "threads/thread.h"
+126: #include "threads/thread_current.h"
+127: #include "threads/thread_group.h"
 
 === include\basic\assert.h ===
-20: func void _assert(b32 condition, const char* msg, callsite site);
-23: #define assert(condition) _assert((condition), #condition, CALLSITE_HERE)
-30: typedef enum assert_mode {
-51: func void assert_set_mode(assert_mode mode);
-54: func assert_mode assert_get_mode(void);
-57: func void assert_set_hook(assert_hook_fn hook_fn, void* user_data);
+6: #include "codespace.h"
+7: #include "primitive_types.h"
+24: func void _assert(b32 condition, const char* msg, callsite site);
+27: #define assert(condition) _assert((condition), #condition, CALLSITE_HERE)
+30: #define assert_msg(condition, msg) _assert((condition), msg, CALLSITE_HERE)
+33: #define invalid_code_path assert(!"Invalid code path")
+42: #  define ASSERT_STACKTRACE_DEPTH 8
+46: typedef enum assert_mode {
+70: #    define ASSERT_MODE_DEFAULT ASSERT_MODE_DEBUG
+72: #    define ASSERT_MODE_DEFAULT ASSERT_MODE_LOG
+77: func void assert_set_mode(assert_mode mode);
+80: func assert_mode assert_get_mode(void);
 
 === include\basic\codespace.h ===
-13: typedef struct callsite {
-20: #define CALLSITE_HERE ((callsite) {__FILE__, __FUNCTION__, __LINE__})
-27: typedef struct src_loc {
+6: #include "primitive_types.h"
+17: typedef struct callsite {
+24: #define CALLSITE_HERE ((callsite) {__FILE__, __FUNCTION__, __LINE__})
+31: typedef struct src_loc {
+37: #define SRC_LOC_HERE ((callsite) {__FILE__, __LINE__})
 
 === include\basic\entry.h ===
-19: func b32 entry_init(cmdline cmdline);
-22: func cmdline entry_get_cmdline(void);
-26: func void entry_quit(void);
-29: typedef enum app_result {
-36: typedef app_result entry_app_init_fn(cmdline cmdl, void** state);
-37: typedef app_result entry_app_update_fn(void* state);
-38: typedef void entry_app_quit_fn(void* state);
-39: typedef b32 entry_run_fn(cmdline cmdl);
-41: typedef struct entry_app_callbacks {
-47: typedef struct entry_run_callbacks {
-63: func app_result app_init(cmdline cmdl, void** state);
-66: func app_result app_update(void* state);
-69: func void app_quit(void* state);
-79: func b32 run(cmdline cmdl);
-92: func dll_export b32 mod_init(void);
-95: func dll_export void mod_quit(void);
+6: #include "../context/ctx.h"
+7: #include "../memory/allocator.h"
+8: #include "../memory/vmem.h"
+9: #include "../utils/cmdline.h"
+10: #include "env_defines.h"
+11: #include "primitive_types.h"
+52: #  define ENTRY_GET_GLOBAL_ALLOCATOR vmem_get_allocator
+56: #  define ENTRY_GET_GLOBAL_CTX_SETUP() ((ctx_setup) {.main_allocator = ENTRY_GET_GLOBAL_ALLOCATOR()})
+62: func b32 entry_init(cmdline cmdline);
+65: func cmdline entry_get_cmdline(void);
+70: func allocator entry_get_allocator(void);
+73: func ctx_setup entry_get_ctx_setup(void);
+77: func void entry_quit(void);
+80: typedef enum app_result {
+89: typedef app_result entry_app_init_fn(cmdline cmdl, void** state);
+90: typedef app_result entry_app_update_fn(void* state);
+91: typedef void entry_app_quit_fn(void* state, app_result result);
+92: typedef struct entry_app_callbacks {
+100: typedef b32 entry_run_fn(cmdline cmdl);
+101: typedef struct entry_run_callbacks {
+116: func app_result app_init(cmdline cmdl, void** state);
+119: func app_result app_update(void* state);
+122: func void app_quit(void* state, app_result result);
+126: #  define ENTRY_FUNCTION_NAME    main_app
+127: #  define ENTRY_CALLBACKS_TYPE   entry_app_callbacks
+128: #  define ENTRY_CALLBACKS_INIT() ((entry_app_callbacks) {app_init, app_update, app_quit})
+138: func b32 run(cmdline cmdl);
+142: #  define ENTRY_FUNCTION_NAME    main_run
+143: #  define ENTRY_CALLBACKS_TYPE   entry_run_callbacks
+144: #  define ENTRY_CALLBACKS_INIT() ((entry_run_callbacks) {run})
+156: func dll_export b32 mod_init(void);
+159: func dll_export void mod_quit(void);
+
+=== include\basic\entry_impl.h ===
+6: #include "entry.h"
+14: #    define ENTRY_IMPL
+27: #    define ENTRY_BOOT(argc, argv) ENTRY_FUNCTION_NAME((argc), (argv), ENTRY_GET_GLOBAL_CTX_SETUP(), ENTRY_CALLBACKS_INIT())
+32: #        define WINAPI __stdcall
+35: typedef struct HINSTANCE__* HINSTANCE;
+36: typedef char* LPSTR;
+37: typedef wchar_t* PWSTR;
 
 === include\basic\env_defines.h ===
+11: #  define PLATFORM_WINDOWS
+13: #  define PLATFORM_LINUX
+15: #  define PLATFORM_MACOS
+19: #  define PLATFORM_UNIX
+23: #  define PLATFORM_DESKTOP
+31: #  define ARCH_X86_64
+33: #  define ARCH_ARM64
+44: #    define BUILD_RELEASE
+46: #    define BUILD_DEBUG
+48: #    define BUILD_DEBUG
+50: #    define BUILD_RELEASE
 
 === include\basic\intrinsics.h ===
-15: func i32 popcount_u32(u32 val);
-18: func i32 popcount_u64(u64 val);
-25: func i32 ctz_u32(u32 val);
-28: func i32 ctz_u64(u64 val);
-35: func i32 clz_u32(u32 val);
-38: func i32 clz_u64(u64 val);
-45: func i32 bsr_u32(u32 val);
-48: func i32 bsr_u64(u64 val);
-55: func u16 bswap_u16(u16 val);
-58: func u32 bswap_u32(u32 val);
-61: func u64 bswap_u64(u64 val);
-68: func u32 rotl_u32(u32 val, i32 cnt);
-71: func u64 rotl_u64(u64 val, i32 cnt);
-74: func u32 rotr_u32(u32 val, i32 cnt);
-77: func u64 rotr_u64(u64 val, i32 cnt);
+6: #include "env_defines.h"
+7: #include "keyword_defines.h"
+8: #include "primitive_types.h"
+19: func i32 popcount_u32(u32 val);
+22: func i32 popcount_u64(u64 val);
+29: func i32 ctz_u32(u32 val);
+32: func i32 ctz_u64(u64 val);
+39: func i32 clz_u32(u32 val);
+42: func i32 clz_u64(u64 val);
+49: func i32 bsr_u32(u32 val);
+52: func i32 bsr_u64(u64 val);
+59: func u16 bswap_u16(u16 val);
+62: func u32 bswap_u32(u32 val);
+65: func u64 bswap_u64(u64 val);
+72: func u32 rotl_u32(u32 val, i32 cnt);
+75: func u64 rotl_u64(u64 val, i32 cnt);
+78: func u32 rotr_u32(u32 val, i32 cnt);
+81: func u64 rotr_u64(u64 val, i32 cnt);
 
 === include\basic\keyword_defines.h ===
-151: #define size_of(x) sizeof(x)
-157: #  define type_of(x) typeof((x))
-184: #define local_persist static
+7: #include "env_defines.h"
+10: #include <assert.h>
+11: #include <stdbool.h>
+53: #  define thread_local _Thread_local
+55: #  define thread_local __thread
+60: #  define dll_export __declspec(dllexport)
+61: #  define dll_import __declspec(dllimport)
+63: #  define dll_export __attribute__((visibility("default")))
+64: #  define dll_import
+74: #    define static_assert(expr) _Static_assert(expr, #expr)
+76: #    define static_assert(expr) typedef char static_assert_##__COUNTER__[(expr) ? 1 : -1]
+82: #  define no_return [[noreturn]]
+84: #  define no_return _Noreturn
+86: #  define no_return __attribute__((noreturn))
+90: #define force_inline __attribute__((always_inline)) inline
+93: #define no_inline __attribute__((noinline))
+97: #  define align_as(x) alignas(x)
+99: #  define align_as(x) _Alignas(x)
+101: #  define align_as(x) __attribute__((aligned(x)))
+106: #  define align_of(x) alignof(x)
+108: #  define align_of(x) _Alignof(x)
+110: #  define align_of(x) __alignof__(x)
+114: #define size_of(x) sizeof(x)
+117: #define type_of(x) __typeof__(x)
+120: #define likely(x)   __builtin_expect(!!(x), 1)
+121: #define unlikely(x) __builtin_expect(!!(x), 0)
+127: #  define c_begin extern "C" {
+128: #  define c_end   }
+130: #  define c_begin
+131: #  define c_end
+139: #define local_persist static
+143: #  define global_var static
+145: #  define global_var
+150: #  define func static
+152: #  define func
 
 === include\basic\primitive_types.h ===
+6: #include "keyword_defines.h"
+8: #include <float.h>
+9: #include <stddef.h>
+10: #include <stdint.h>
+61: typedef int8_t i8;
+62: typedef uint8_t u8;
+63: typedef int16_t i16;
+64: typedef uint16_t u16;
+65: typedef int32_t i32;
+66: typedef uint32_t u32;
+67: typedef int64_t i64;
+68: typedef uint64_t u64;
+91: typedef float f32;
+92: typedef double f64;
+103: typedef uint8_t b8;
+104: typedef uint16_t b16;
+105: typedef uint32_t b32;
+106: typedef uint64_t b64;
+121: typedef char c8;
+122: typedef uint16_t c16;
+123: typedef uint32_t c32;
+136: typedef const c8* cstr8;    // Null terminated UTF-8 C String
+137: typedef const c16* cstr16;  // Null terminated UTF-16 C String
+138: typedef const c32* cstr32;  // Null terminated UTF-32 C String
+144: typedef int_fast8_t i8x;
+145: typedef uint_fast8_t u8x;
+146: typedef int_fast16_t i16x;
+147: typedef uint_fast16_t u16x;
+148: typedef int_fast32_t i32x;
+149: typedef uint_fast32_t u32x;
+150: typedef int_fast64_t i64x;
+151: typedef uint_fast64_t u64x;
+152: typedef uint_fast8_t b8x;
+153: typedef uint_fast16_t b16x;
+154: typedef uint_fast32_t b32x;
+155: typedef uint_fast64_t b64x;
+186: typedef size_t sz;
+187: typedef uintptr_t up;
+188: typedef intptr_t sp;
+189: typedef ptrdiff_t dp;
 
 === include\basic\profiler.h ===
-35: #define TRACY_CALLSTACK 32
+6: #include "env_defines.h"
+7: #include "primitive_types.h"
+16: #    define TRACY_ENABLE    1
+17: #    define TRACY_CALLSTACK 32
+19: #  include <tracy/TracyC.h>
+20: #  define profile_func_begin TracyCZoneN(__tracy_zone_ctx, __func__, 1)
+21: #  define profile_func_end   TracyCZoneEnd(__tracy_zone_ctx)
+23: #  define profile_func_begin     ((void)0)
+24: #  define profile_func_end       ((void)0)
+25: #  define TracyCAlloc(ptr, size) ((void)(ptr), (void)(size))
+26: #  define TracyCFree(ptr)        ((void)(ptr))
+
+=== include\basic\safe.h ===
+6: #include "assert.h"
+7: #include "utility_defines.h"
+12: #define SAFE_LOOP_MAX_ITERATION_COUNT 10000
+20: #define SAFE_WHILE_IMPL(cond, id)        \
+25: #  define safe_while(cond) while (cond)
+27: #  define safe_while(cond) SAFE_WHILE_IMPL(cond, __COUNTER__)
+34: #define SAFE_FOR_IMPL(id, ...)                                                         \
+42: #  define safe_for(...) for (__VA_ARGS__)
+44: #  define safe_for(...) SAFE_FOR_IMPL(__COUNTER__, __VA_ARGS__)
+
+=== include\basic\third_party.h ===
+8: #  include <olib.h>
+14: #    define LM2_ENABLE_UNPREFIXED_NAMES
+17: #    define LM2_CUSTOM_ASSERT
+20: #    define LM2_NO_GENERICS
+22: #  include <lm2.h>
 
 === include\basic\utility_defines.h ===
-8: #define strfy(x) #x
-9: #define strfy_exp(x) strfy(x)
-10: #define cat(x, y) x##y
-11: #define cat_exp(x, y) cat(x, y)
-14: #define expr(x) (x)
-17: #define stmt(x) do { x } while (0)
-19: #define count_of(x) (size_of(x) / size_of((x)[0]))
-20: #define size_of_each(x) size_of((x)[0])
-21: #define multiline_literal(...) strfy_exp(__VA_ARGS__)
-23: #define bit(x) (1 << (x))
-24: #define bit_is_set(bits, b) ((bits) & (b))
-25: #define bit_set(bits, b) ((bits) |= (b))
-26: #define bit_unset(bits, b) ((bits) &= ~(b))
-27: #define bit_toggle(bits, b) ((bits) ^= (b))
-29: #define field_of(type, field) ((type*)0)->field
-30: #define size_of_field(type, field) size_of(field_of(type, field))
-31: #define offset_of(type, field) offsetof(type, field)
-32: #define container_of(ptr, type, field) ((type*)((char*)(ptr) - offset_of(type, field)))
-34: #define in_range(x, lo, hi) ((x) >= (lo) && (x) <= (hi))
-35: #define in_bounds(arr, i) ((i) >= 0 && (size_t)(i) < count_of(arr))
-37: #define swap_value(type, a, b) stmt( \
-42: #define swap_ptr(type, a_ptr, b_ptr) stmt( \
-47: #define is_pow2(x) ((x) != 0 && ((x) & ((x) - 1)) == 0)
-48: #define align_up(x, n) (((x) + (n) - 1) & ~((n) - 1))
-49: #define align_down(x, n) ((x) & ~((n) - 1))
-51: #define kb(b) ((b) * 1024ll)
-52: #define mb(b) (kb(b) * 1024ll)
-53: #define gb(b) (mb(b) * 1024ll)
-54: #define tb(b) (gb(b) * 1024ll)
-56: #define th(x)   ((x) * 1000ll)
-57: #define mil(x)  (th(x) * 1000ll)
-58: #define bil(x)  (mil(x) * 1000ll)
-59: #define tril(x) (bil(x) * 1000ll)
+6: #include <stddef.h>
+17: #define strfy(x)      #x
+18: #define strfy_exp(x)  strfy(x)
+19: #define cat(x, y)     x##y
+20: #define cat_exp(x, y) cat(x, y)
+27: #define expr(x) (x)
+30: #define stmt(x) \
+38: #define count_of(x)            (size_of(x) / size_of((x)[0]))
+39: #define size_of_each(x)        size_of((x)[0])
+40: #define multiline_literal(...) strfy_exp(__VA_ARGS__)
+46: #define bit(x)              (1 << (x))
+47: #define bit64(x)            (1ull << (x))
+48: #define bit_is_set(bits, b) ((bits) & (b))
+49: #define bit_set(bits, b)    ((bits) |= (b))
+50: #define bit_unset(bits, b)  ((bits) &= ~(b))
+51: #define bit_toggle(bits, b) ((bits) ^= (b))
+57: #define field_of(type, field)          ((type*)0)->field
+58: #define size_of_field(type, field)     size_of(field_of(type, field))
+59: #define offset_of(type, field)         offsetof(type, field)
+60: #define container_of(ptr, type, field) ((type*)((char*)(ptr) - offset_of(type, field)))
+66: #define in_range(x, lo, hi) ((x) >= (lo) && (x) <= (hi))
+67: #define in_bounds(arr, i)   ((i) >= 0 && (size_t)(i) < count_of(arr))
+73: #define swap_value(a, b) stmt(  \
+78: #define swap_ptr(a_ptr, b_ptr) stmt(         \
+87: #define is_pow2(x)       ((x) != 0 && ((x) & ((x) - 1)) == 0)
+88: #define align_up(x, n)   (((x) + (n) - 1) & ~((n) - 1))
+89: #define align_down(x, n) ((x) & ~((n) - 1))
+96: #define kb(b) ((b) * 1024ll)
+97: #define mb(b) (kb(b) * 1024ll)
+98: #define gb(b) (mb(b) * 1024ll)
+99: #define tb(b) (gb(b) * 1024ll)
+102: #define th(x)   ((x) * 1000ll)
+103: #define mil(x)  (th(x) * 1000ll)
+104: #define bil(x)  (mil(x) * 1000ll)
+105: #define tril(x) (bil(x) * 1000ll)
 
 === include\containers\binary_tree.h ===
-28: #define BINARY_TREE_IS_ROOT(node) ((node)->parent == NULL)
-29: #define BINARY_TREE_IS_LEAF(node) ((node)->left == NULL && (node)->right == NULL)
-32: #define BINARY_TREE_FIRST_INORDER(root, out) stmt( \
-38: #define BINARY_TREE_NEXT_INORDER(root, node, out) stmt( \
-61: #define BINARY_TREE_FIRST_POSTORDER(root, out) stmt( \
-67: #define BINARY_TREE_NEXT_POSTORDER(root, node, out) stmt( \
-84: #define BINARY_TREE_NEXT_PREORDER(root, node, out) stmt( \
-106: #define BINARY_TREE_INSERT_LEFT(parent, node) stmt( \
-110: #define BINARY_TREE_INSERT_RIGHT(parent, node) stmt( \
-114: #define BINARY_TREE_REMOVE(root_ptr, node) stmt( \
-124: #define BINARY_TREE_ROTATE_LEFT(root_ptr, node) stmt( \
-139: #define BINARY_TREE_ROTATE_RIGHT(root_ptr, node) stmt( \
-155: #define BINARY_TREE_FOREACH_PREORDER(root, it) \
-159: #define BINARY_TREE_FOREACH_INORDER(root, it) \
-164: #define BINARY_TREE_FOREACH_POSTORDER(root, it) \
+6: #include "basic/primitive_types.h"
+7: #include "basic/safe.h"
+8: #include "basic/utility_defines.h"
+20: typedef struct bst_node {
+29: #define BINARY_TREE_IS_ROOT(node) ((node)->parent == NULL)
+30: #define BINARY_TREE_IS_LEAF(node) ((node)->left == NULL && (node)->right == NULL)
+33: #define BINARY_TREE_FIRST_INORDER(root, out) stmt(      \
+39: #define BINARY_TREE_NEXT_INORDER(root, node, out) stmt(                                     \
+62: #define BINARY_TREE_FIRST_POSTORDER(root, out) stmt(                              \
+68: #define BINARY_TREE_NEXT_POSTORDER(root, node, out) stmt(                                                                   \
+85: #define BINARY_TREE_NEXT_PREORDER(root, node, out) stmt(                                                \
+107: #define BINARY_TREE_INSERT_LEFT(parent, node) stmt( \
+111: #define BINARY_TREE_INSERT_RIGHT(parent, node) stmt( \
+115: #define BINARY_TREE_REMOVE(root_ptr, node) stmt( \
+125: #define BINARY_TREE_ROTATE_LEFT(root_ptr, node) stmt( \
+140: #define BINARY_TREE_ROTATE_RIGHT(root_ptr, node) stmt( \
+156: #define BINARY_TREE_FOREACH_PREORDER(root, it)           \
+160: #define BINARY_TREE_FOREACH_INORDER(root, it) \
+165: #define BINARY_TREE_FOREACH_POSTORDER(root, it) \
 
 === include\containers\bitset.h ===
-27: #define BITSET_WORD_COUNT(n) (((n) + 63) / 64)
-30: #define BITSET_SET(arr, idx) stmt((arr)[(idx) / 64] |= (1ULL << ((idx) % 64));)
-31: #define BITSET_CLEAR(arr, idx) stmt((arr)[(idx) / 64] &= ~(1ULL << ((idx) % 64));)
-32: #define BITSET_TOGGLE(arr, idx) stmt((arr)[(idx) / 64] ^= (1ULL << ((idx) % 64));)
-33: #define BITSET_TEST(arr, idx) (((arr)[(idx) / 64] >> ((idx) % 64)) & 1ULL)
-36: #define BITSET_CLEAR_ALL(arr, word_count) stmt( \
-41: #define BITSET_SET_ALL(arr, word_count) stmt( \
-46: #define BITSET_COUNT(arr, word_count, out) stmt( \
-52: #define BITSET_FIRST_SET(arr, word_count, out) stmt( \
-61: #define BITSET_FIRST_CLEAR(arr, word_count, out) stmt( \
-70: #define BITSET_FIND_NEXT_SET(arr, word_count, from_idx, out) stmt( \
-91: #define BITSET_FOREACH_SET(arr, word_count, idx) \
+6: #include "basic/intrinsics.h"
+7: #include "basic/safe.h"
+28: #define BITSET_WORD_COUNT(n) (((n) + 63) / 64)
+31: #define BITSET_SET(arr, idx)    stmt((arr)[(idx) / 64] |= (1ULL << ((idx) % 64));)
+32: #define BITSET_CLEAR(arr, idx)  stmt((arr)[(idx) / 64] &= ~(1ULL << ((idx) % 64));)
+33: #define BITSET_TOGGLE(arr, idx) stmt((arr)[(idx) / 64] ^= (1ULL << ((idx) % 64));)
+34: #define BITSET_TEST(arr, idx)   (((arr)[(idx) / 64] >> ((idx) % 64)) & 1ULL)
+37: #define BITSET_CLEAR_ALL(arr, word_count) stmt(                              \
+42: #define BITSET_SET_ALL(arr, word_count) stmt(                                \
+47: #define BITSET_COUNT(arr, word_count, out) stmt(                             \
+53: #define BITSET_FIRST_SET(arr, word_count, out) stmt(                         \
+62: #define BITSET_FIRST_CLEAR(arr, word_count, out) stmt(                       \
+71: #define BITSET_FIND_NEXT_SET(arr, word_count, from_idx, out) stmt(                                  \
+92: #define BITSET_FOREACH_SET(arr, word_count, idx) \
 
 === include\containers\doubly_list.h ===
-26: #define DOUBLY_LIST_EMPTY(head, tail) ((head) == NULL)
-28: #define DOUBLY_LIST_COUNT(head, tail, count) stmt( \
-35: #define DOUBLY_LIST_HEAD(head, tail) (head)
-36: #define DOUBLY_LIST_TAIL(head, tail) (tail)
-38: #define DOUBLY_LIST_PUSH_FRONT(head, tail, node) stmt( \
-47: #define DOUBLY_LIST_PUSH_BACK(head, tail, node) stmt( \
-56: #define DOUBLY_LIST_POP_FRONT(head, tail, node) stmt( \
-68: #define DOUBLY_LIST_POP_BACK(head, tail, node) stmt( \
-80: #define DOUBLY_LIST_REMOVE(head, tail, node) stmt( \
-93: #define DOUBLY_LIST_INSERT_AFTER(head, tail, after, node) stmt( \
-104: #define DOUBLY_LIST_INSERT_BEFORE(head, tail, before, node) stmt( \
-115: #define DOUBLY_LIST_FOREACH(head, tail, it) \
-118: #define DOUBLY_LIST_FOREACH_REVERSE(head, tail, it) \
+6: #include "basic/primitive_types.h"
+7: #include "basic/safe.h"
+8: #include "basic/utility_defines.h"
+20: typedef struct job_node {
+27: #define DOUBLY_LIST_EMPTY(head, tail) ((head) == NULL)
+29: #define DOUBLY_LIST_COUNT(head, tail, count) stmt(                                \
+36: #define DOUBLY_LIST_HEAD(head, tail) (head)
+37: #define DOUBLY_LIST_TAIL(head, tail) (tail)
+39: #define DOUBLY_LIST_PUSH_FRONT(head, tail, node) stmt( \
+48: #define DOUBLY_LIST_PUSH_BACK(head, tail, node) stmt( \
+57: #define DOUBLY_LIST_POP_FRONT(head, tail, node) stmt( \
+69: #define DOUBLY_LIST_POP_BACK(head, tail, node) stmt( \
+81: #define DOUBLY_LIST_REMOVE(head, tail, node) stmt( \
+94: #define DOUBLY_LIST_INSERT_AFTER(head, tail, after, node) stmt( \
+105: #define DOUBLY_LIST_INSERT_BEFORE(head, tail, before, node) stmt( \
+116: #define DOUBLY_LIST_FOREACH(head, tail, it) \
+119: #define DOUBLY_LIST_FOREACH_REVERSE(head, tail, it) \
 
 === include\containers\hash_map.h ===
-15: typedef struct hash_map_slot {
-22: typedef struct hash_map {
-53: func hash_map hash_map_create(sz cap, allocator alloc);
-54: func void hash_map_destroy(hash_map* map);
-55: func void hash_map_clear(hash_map* map);
-58: func sz hash_map_count(hash_map const* map);
-59: func sz hash_map_capacity(hash_map const* map);
-60: func f32 hash_map_load_factor(hash_map const* map);
-63: func b32 hash_map_rehash(hash_map* map, sz new_cap);
-64: func b32 hash_map_reserve(hash_map* map, sz min_cap);
-67: func b32 hash_map_set(hash_map* map, u64 key, void* value);
-68: func void* hash_map_get(hash_map* map, u64 key);
-69: func b32 hash_map_has(hash_map* map, u64 key);
-70: func b32 hash_map_remove(hash_map* map, u64 key);
-73: func hash_map_slot* hash_map_next(hash_map* map, hash_map_iter* iter);
-75: #define HASH_MAP_FOREACH(map, it) \
+6: #include "basic/keyword_defines.h"
+7: #include "basic/primitive_types.h"
+8: #include "basic/safe.h"
+9: #include "basic/utility_defines.h"
+10: #include "memory/allocator.h"
+16: typedef struct hash_map_slot {
+23: typedef struct hash_map {
+30: typedef sz hash_map_iter;
+38: typedef struct asset_record {
+54: func hash_map hash_map_create(sz cap, allocator alloc);
+55: func void hash_map_destroy(hash_map* map);
+56: func void hash_map_clear(hash_map* map);
+59: func sz hash_map_count(hash_map const* map);
+60: func sz hash_map_capacity(hash_map const* map);
+61: func f32 hash_map_load_factor(hash_map const* map);
+64: func b32 hash_map_rehash(hash_map* map, sz new_cap);
+65: func b32 hash_map_reserve(hash_map* map, sz min_cap);
+68: func b32 hash_map_set(hash_map* map, u64 key, void* value);
+69: func void* hash_map_get(hash_map* map, u64 key);
+70: func b32 hash_map_has(hash_map* map, u64 key);
+71: func b32 hash_map_remove(hash_map* map, u64 key);
+74: func hash_map_slot* hash_map_next(hash_map* map, hash_map_iter* iter);
+76: #define HASH_MAP_FOREACH(map, it)                                                                                     \
 
 === include\containers\ring_list.h ===
-27: #define RING_LIST_EMPTY(head) ((head) == NULL)
-29: #define RING_LIST_COUNT(head, count) stmt( \
-39: #define RING_LIST_HEAD(head) (head)
-40: #define RING_LIST_TAIL(head) ((head) != NULL ? (head)->prev : NULL)
-42: #define RING_LIST_PUSH_FRONT(head, node) stmt( \
-53: #define RING_LIST_PUSH_BACK(head, node) stmt( \
-65: #define RING_LIST_POP_FRONT(head, node) stmt( \
-79: #define RING_LIST_POP_BACK(head, node) stmt( \
-92: #define RING_LIST_REMOVE(head, node) stmt( \
-105: #define RING_LIST_INSERT_AFTER(head, after, node) stmt( \
-112: #define RING_LIST_INSERT_BEFORE(head, before, node) stmt( \
-121: #define RING_LIST_FOREACH(head, it) \
-125: #define RING_LIST_FOREACH_REVERSE(head, it) \
+6: #include "basic/primitive_types.h"
+7: #include "basic/safe.h"
+8: #include "basic/utility_defines.h"
+21: typedef struct frame_node {
+28: #define RING_LIST_EMPTY(head) ((head) == NULL)
+30: #define RING_LIST_COUNT(head, count) stmt( \
+43: #define RING_LIST_HEAD(head) (head)
+44: #define RING_LIST_TAIL(head) ((head) != NULL ? (head)->prev : NULL)
+46: #define RING_LIST_PUSH_FRONT(head, node) stmt( \
+57: #define RING_LIST_PUSH_BACK(head, node) stmt( \
+69: #define RING_LIST_POP_FRONT(head, node) stmt( \
+83: #define RING_LIST_POP_BACK(head, node) stmt(         \
+96: #define RING_LIST_REMOVE(head, node) stmt( \
+109: #define RING_LIST_INSERT_AFTER(head, after, node) stmt( \
+116: #define RING_LIST_INSERT_BEFORE(head, before, node) stmt( \
+125: #define RING_LIST_FOREACH(head, it)                                              \
+129: #define RING_LIST_FOREACH_REVERSE(head, it)                                                        \
 
 === include\containers\singly_list.h ===
-25: #define SINGLY_LIST_EMPTY(head, tail) ((head) == NULL)
-27: #define SINGLY_LIST_COUNT(head, tail, count) stmt( \
-34: #define SINGLY_LIST_HEAD(head, tail) (head)
-35: #define SINGLY_LIST_TAIL(head, tail) (tail)
-37: #define SINGLY_LIST_PUSH_FRONT(head, tail, node) stmt( \
-43: #define SINGLY_LIST_PUSH_BACK(head, tail, node) stmt( \
-51: #define SINGLY_LIST_POP_FRONT(head, tail, node) stmt( \
-61: #define SINGLY_LIST_FOREACH(head, tail, it) \
+6: #include "basic/primitive_types.h"
+7: #include "basic/safe.h"
+8: #include "basic/utility_defines.h"
+20: typedef struct packet_node {
+26: #define SINGLY_LIST_EMPTY(head, tail) ((head) == NULL)
+28: #define SINGLY_LIST_COUNT(head, tail, count) stmt(                                  \
+35: #define SINGLY_LIST_HEAD(head, tail) (head)
+36: #define SINGLY_LIST_TAIL(head, tail) (tail)
+38: #define SINGLY_LIST_PUSH_FRONT(head, tail, node) stmt( \
+44: #define SINGLY_LIST_PUSH_BACK(head, tail, node) stmt( \
+52: #define SINGLY_LIST_POP_FRONT(head, tail, node) stmt( \
+62: #define SINGLY_LIST_FOREACH(head, tail, it) \
 
 === include\containers\sort.h ===
+6: #include "basic/primitive_types.h"
+7: #include "memory/allocator.h"
+18: typedef struct score_entry {
+22: func i32 score_compare(const void* lhs_ptr, const void* rhs_ptr, void* user_data) {
+33: typedef i32 sort_compare_fn(const void* lhs_ptr, const void* rhs_ptr, void* user_data);
 37: func b32 sort_check(
 48: func sz sort_bubble(
 59: func sz sort_quick(
@@ -221,85 +473,101 @@
 111: func sz sort_radix64(u64* ptr, sz elem_count);
 
 === include\containers\stack_list.h ===
-25: #define STACK_LIST_EMPTY(head) ((head) == NULL)
-27: #define STACK_LIST_COUNT(head, count) stmt( \
-33: #define STACK_LIST_HEAD(head) (head)
-34: #define STACK_LIST_NEXT(node) ((node)->next)
-36: #define STACK_LIST_PUSH(head, node) stmt( \
-40: #define STACK_LIST_POP(head, node) stmt( \
-47: #define STACK_LIST_FOREACH(head, it) \
+6: #include "basic/primitive_types.h"
+7: #include "basic/safe.h"
+8: #include "basic/utility_defines.h"
+20: typedef struct free_node {
+26: #define STACK_LIST_EMPTY(head) ((head) == NULL)
+28: #define STACK_LIST_COUNT(head, count) stmt(                                         \
+34: #define STACK_LIST_HEAD(head) (head)
+35: #define STACK_LIST_NEXT(node) ((node)->next)
+37: #define STACK_LIST_PUSH(head, node) stmt( \
+41: #define STACK_LIST_POP(head, node) stmt( \
+48: #define STACK_LIST_FOREACH(head, it) \
 
 === include\containers\tree.h ===
-31: #define TREE_IS_ROOT(node) ((node)->parent == NULL)
-32: #define TREE_IS_LEAF(node) ((node)->first_child == NULL)
-35: #define TREE_NEXT_PREORDER(root, node, out) stmt( \
-53: #define TREE_INSERT_CHILD_FRONT(parent, node) stmt( \
-64: #define TREE_INSERT_CHILD_BACK(parent, node) stmt( \
-75: #define TREE_INSERT_BEFORE(before, node) stmt( \
-86: #define TREE_INSERT_AFTER(after, node) stmt( \
-97: #define TREE_REMOVE(node) stmt( \
-112: #define TREE_FOREACH_CHILDREN(parent, it) \
-115: #define TREE_FOREACH_CHILDREN_REVERSE(parent, it) \
-118: #define TREE_FOREACH_PREORDER(root, it) \
+6: #include "basic/primitive_types.h"
+7: #include "basic/safe.h"
+8: #include "basic/utility_defines.h"
+21: typedef struct scene_node {
+32: #define TREE_IS_ROOT(node) ((node)->parent == NULL)
+33: #define TREE_IS_LEAF(node) ((node)->first_child == NULL)
+36: #define TREE_NEXT_PREORDER(root, node, out) stmt(                                       \
+54: #define TREE_INSERT_CHILD_FRONT(parent, node) stmt( \
+65: #define TREE_INSERT_CHILD_BACK(parent, node) stmt( \
+76: #define TREE_INSERT_BEFORE(before, node) stmt(       \
+87: #define TREE_INSERT_AFTER(after, node) stmt(        \
+98: #define TREE_REMOVE(node) stmt(                                  \
+113: #define TREE_FOREACH_CHILDREN(parent, it) \
+116: #define TREE_FOREACH_CHILDREN_REVERSE(parent, it) \
+119: #define TREE_FOREACH_PREORDER(root, it)                  \
 
 === include\context\ctx.h ===
-21: typedef struct ctx_setup {
-52: func b32 ctx_setup_is_valid(ctx_setup* setup);
-56: func void ctx_setup_fill_defaults(ctx_setup* setup);
-59: typedef struct ctx {
-68: func b32 ctx_init(ctx* context, ctx_setup setup);
-71: func b32 ctx_quit(ctx* context);
-74: func b32 ctx_is_init(ctx* context);
-78: func allocator ctx_get_allocator(ctx* context);
-81: func ctx_setup ctx_get_setup(ctx* context);
-84: func log_state* ctx_get_log_state(ctx* context);
-87: func arena* ctx_get_perm_arena(ctx* context);
-88: func arena* ctx_get_temp_arena(ctx* context);
-89: func heap* ctx_get_perm_heap(ctx* context);
-90: func heap* ctx_get_temp_heap(ctx* context);
-94: func void* ctx_get_user_data(ctx* context, ctx_user_data_idx idx);
-97: func b32 ctx_set_user_data(ctx* context, ctx_user_data_idx idx, void* user_data);
-100: func void ctx_clear_temp(ctx* context);
+6: #include "../memory/arena.h"
+7: #include "../memory/heap.h"
+8: #include "../threads/mutex.h"
+9: #include "../utils/log_state.h"
+16: #define CTX_USER_DATA_COUNT 32
+17: typedef sz ctx_user_data_idx;
+19: typedef struct ctx_setup {
+49: func b32 ctx_setup_is_valid(ctx_setup* setup);
+53: func void ctx_setup_fill_defaults(ctx_setup* setup);
+56: typedef struct ctx {
+83: func b32 ctx_init(ctx* context, ctx_setup setup);
+86: func b32 ctx_quit(ctx* context);
+89: func b32 ctx_is_init(ctx* context);
+93: func allocator ctx_get_allocator(ctx* context);
+96: func ctx_setup ctx_get_setup(ctx* context);
+99: func log_state* ctx_get_log_state(ctx* context);
+102: func arena* ctx_get_perm_arena(ctx* context);
+103: func arena* ctx_get_temp_arena(ctx* context);
+104: func heap* ctx_get_perm_heap(ctx* context);
+105: func heap* ctx_get_temp_heap(ctx* context);
+109: func void* ctx_get_user_data(ctx* context, ctx_user_data_idx idx);
+112: func b32 ctx_set_user_data(ctx* context, ctx_user_data_idx idx, void* user_data);
+115: func void ctx_clear_temp(ctx* context);
 
 === include\context\global_ctx.h ===
-16: func b32 global_ctx_init(ctx_setup setup);
-19: func b32 global_ctx_quit(void);
-22: func b32 global_ctx_is_init(void);
-25: func ctx* global_ctx_get(void);
-28: func void global_ctx_lock(void);
-29: func void global_ctx_unlock(void);
-32: func allocator global_get_allocator(void);
-33: func ctx_setup global_get_setup(void);
-34: func allocator global_get_main_allocator(void);
-35: func log_state* global_get_log_state(void);
-36: func arena* global_get_perm_arena(void);
-37: func arena* global_get_temp_arena(void);
-38: func heap* global_get_perm_heap(void);
-39: func heap* global_get_temp_heap(void);
-44: func b32 global_has_user_data_access(ctx_user_data_idx idx);
-45: func void* global_get_user_data(ctx_user_data_idx idx);
-46: func b32 global_set_user_data(ctx_user_data_idx idx, void* user_data);
-49: func b32 global_set_user_data_access(ctx_user_data_idx idx, b8 has_access);
-50: func void global_set_user_data_access_all(b8 has_access);
-53: func void global_clear_temp(void);
-56: func void global_log_set_level(log_level level);
-59: func void global_log_begin_frame(void);
-60: func log_frame* global_log_end_frame(u32 severity_mask);
-63: #define global_log_fatal(...)   _log(global_get_log_state(), LOG_LEVEL_FATAL, CALLSITE_HERE, __VA_ARGS__)
-64: #define global_log_error(...)   _log(global_get_log_state(), LOG_LEVEL_ERROR, CALLSITE_HERE, __VA_ARGS__)
-65: #define global_log_warn(...)    _log(global_get_log_state(), LOG_LEVEL_WARN, CALLSITE_HERE, __VA_ARGS__)
-66: #define global_log_info(...)    _log(global_get_log_state(), LOG_LEVEL_INFO, CALLSITE_HERE, __VA_ARGS__)
-67: #define global_log_debug(...)   _log(global_get_log_state(), LOG_LEVEL_DEBUG, CALLSITE_HERE, __VA_ARGS__)
-68: #define global_log_verbose(...) _log(global_get_log_state(), LOG_LEVEL_VERBOSE, CALLSITE_HERE, __VA_ARGS__)
-69: #define global_log_trace(...)   _log(global_get_log_state(), LOG_LEVEL_TRACE, CALLSITE_HERE, __VA_ARGS__)
+6: #include "ctx.h"
+14: func b32 global_ctx_init(ctx_setup setup);
+17: func b32 global_ctx_quit(void);
+20: func b32 global_ctx_is_init(void);
+23: func ctx* global_ctx_get(void);
+26: func void global_ctx_lock(void);
+27: func void global_ctx_unlock(void);
+30: func allocator global_get_allocator(void);
+31: func ctx_setup global_get_setup(void);
+32: func allocator global_get_main_allocator(void);
+33: func log_state* global_get_log_state(void);
+34: func arena* global_get_perm_arena(void);
+35: func arena* global_get_temp_arena(void);
+36: func heap* global_get_perm_heap(void);
+37: func heap* global_get_temp_heap(void);
+42: func b32 global_has_user_data_access(ctx_user_data_idx idx);
+43: func void* global_get_user_data(ctx_user_data_idx idx);
+44: func b32 global_set_user_data(ctx_user_data_idx idx, void* user_data);
+47: func b32 global_set_user_data_access(ctx_user_data_idx idx, b8 has_access);
+48: func void global_set_user_data_access_all(b8 has_access);
+51: func void global_clear_temp(void);
+54: func void global_log_set_level(log_level level);
+57: func void global_log_begin_frame(void);
+58: func log_frame* global_log_end_frame(u32 severity_mask);
+61: #define global_log_fatal(...)   _log(global_get_log_state(), LOG_LEVEL_FATAL, CALLSITE_HERE, __VA_ARGS__)
+62: #define global_log_error(...)   _log(global_get_log_state(), LOG_LEVEL_ERROR, CALLSITE_HERE, __VA_ARGS__)
+63: #define global_log_warn(...)    _log(global_get_log_state(), LOG_LEVEL_WARN, CALLSITE_HERE, __VA_ARGS__)
+64: #define global_log_info(...)    _log(global_get_log_state(), LOG_LEVEL_INFO, CALLSITE_HERE, __VA_ARGS__)
+65: #define global_log_debug(...)   _log(global_get_log_state(), LOG_LEVEL_DEBUG, CALLSITE_HERE, __VA_ARGS__)
+66: #define global_log_verbose(...) _log(global_get_log_state(), LOG_LEVEL_VERBOSE, CALLSITE_HERE, __VA_ARGS__)
+67: #define global_log_trace(...)   _log(global_get_log_state(), LOG_LEVEL_TRACE, CALLSITE_HERE, __VA_ARGS__)
 
 === include\context\thread_ctx.h ===
-9: #define THREAD_CTX_USER_DATA_COUNT CTX_USER_DATA_COUNT
-12: func ctx* thread_ctx_get(void);
-15: func b32 thread_ctx_is_init(void);
+6: #include "ctx.h"
+13: #define THREAD_CTX_USER_DATA_COUNT CTX_USER_DATA_COUNT
+16: func ctx* thread_ctx_get(void);
+19: func b32 thread_ctx_is_init(void);
 23: func b32 thread_ctx_init(ctx_setup setup);
-22: func void thread_ctx_quit(void);
-26: func allocator thread_get_allocator(void);
+26: func b32 thread_ctx_quit(void);
+30: func allocator thread_get_allocator(void);
 34: func ctx_setup thread_get_setup(void);
 38: func log_state* thread_get_log_state(void);
 41: func arena* thread_get_perm_arena(void);
@@ -313,67 +581,79 @@
 62: func b32 thread_log_sync(void);
 65: func void thread_log_begin_frame(void);
 66: func log_frame* thread_log_end_frame(u32 severity_mask);
-59: #define thread_log_fatal(...)   _log(thread_get_log_state(), LOG_LEVEL_FATAL, CALLSITE_HERE, __VA_ARGS__)
-60: #define thread_log_error(...)   _log(thread_get_log_state(), LOG_LEVEL_ERROR, CALLSITE_HERE, __VA_ARGS__)
-61: #define thread_log_warn(...)    _log(thread_get_log_state(), LOG_LEVEL_WARN, CALLSITE_HERE, __VA_ARGS__)
-62: #define thread_log_info(...)    _log(thread_get_log_state(), LOG_LEVEL_INFO, CALLSITE_HERE, __VA_ARGS__)
-63: #define thread_log_debug(...)   _log(thread_get_log_state(), LOG_LEVEL_DEBUG, CALLSITE_HERE, __VA_ARGS__)
-64: #define thread_log_verbose(...) _log(thread_get_log_state(), LOG_LEVEL_VERBOSE, CALLSITE_HERE, __VA_ARGS__)
-65: #define thread_log_trace(...)   _log(thread_get_log_state(), LOG_LEVEL_TRACE, CALLSITE_HERE, __VA_ARGS__)
+69: #define thread_log_fatal(...)   _log(thread_get_log_state(), LOG_LEVEL_FATAL, CALLSITE_HERE, __VA_ARGS__)
+70: #define thread_log_error(...)   _log(thread_get_log_state(), LOG_LEVEL_ERROR, CALLSITE_HERE, __VA_ARGS__)
+71: #define thread_log_warn(...)    _log(thread_get_log_state(), LOG_LEVEL_WARN, CALLSITE_HERE, __VA_ARGS__)
+72: #define thread_log_info(...)    _log(thread_get_log_state(), LOG_LEVEL_INFO, CALLSITE_HERE, __VA_ARGS__)
+73: #define thread_log_debug(...)   _log(thread_get_log_state(), LOG_LEVEL_DEBUG, CALLSITE_HERE, __VA_ARGS__)
+74: #define thread_log_verbose(...) _log(thread_get_log_state(), LOG_LEVEL_VERBOSE, CALLSITE_HERE, __VA_ARGS__)
+75: #define thread_log_trace(...)   _log(thread_get_log_state(), LOG_LEVEL_TRACE, CALLSITE_HERE, __VA_ARGS__)
 
 === include\filesystem\archive.h ===
-10: typedef struct archive_entry {
-18: typedef struct archive {
-25: typedef struct archive_entry_info {
+6: #include "../basic/codespace.h"
+7: #include "../memory/allocator.h"
+8: #include "../memory/buffer.h"
+9: #include "path.h"
+15: typedef struct archive_entry {
+23: typedef struct archive {
+29: typedef struct archive_entry_info {
+36: typedef b32 archive_iterate_callback(const archive_entry_info* info, void* user_data);
 39: func archive _archive_create(callsite site);
-43: func void _archive_destroy(archive* arc, callsite site);
-45: #define archive_create() \
-47: #define archive_destroy(arc) \
-51: func void archive_clear(archive* arc);
-54: func sz archive_count(const archive* arc);
-57: func b32 archive_exists(const archive* arc, const path* src);
-60: func b32 archive_load_file(archive* arc, const path* src);
-63: func b32 archive_save_file(const archive* arc, const path* dst);
-66: func b32 archive_write_all(archive* arc, const path* src, buffer data);
-69: func b32 archive_remove(archive* arc, const path* src);
-73: func b32 archive_read_all(const archive* arc, const path* src, allocator* alloc, buffer* out_data);
-76: func b32 archive_add_file(archive* arc, const path* archive_path, const path* disk_path);
-79: func b32 archive_iterate(const archive* arc, archive_iterate_callback* callback, void* user_data);
-82: func b32 archive_get_entry_info(const archive* arc, const path* src, archive_entry_info* out_info);
-85: func b32 archive_get_entry_data(const archive* arc, const path* src, buffer* out_data);
+42: func void _archive_destroy(archive* arc, callsite site);
+44: #define archive_create() \
+46: #define archive_destroy(arc) \
+50: func void archive_clear(archive* arc);
+53: func sz archive_count(const archive* arc);
+56: func b32 archive_exists(const archive* arc, const path* src);
+59: func b32 archive_load_file(archive* arc, const path* src);
+62: func b32 archive_save_file(const archive* arc, const path* dst);
+65: func b32 archive_write_all(archive* arc, const path* src, buffer data);
+68: func b32 archive_remove(archive* arc, const path* src);
+72: func b32 archive_read_all(const archive* arc, const path* src, allocator* alloc, buffer* out_data);
+75: func b32 archive_add_file(archive* arc, const path* archive_path, const path* disk_path);
+78: func b32 archive_iterate(const archive* arc, archive_iterate_callback* callback, void* user_data);
+81: func b32 archive_get_entry_info(const archive* arc, const path* src, archive_entry_info* out_info);
+84: func b32 archive_get_entry_data(const archive* arc, const path* src, buffer* out_data);
 
 === include\filesystem\directory.h ===
-8: typedef struct dir_entry {
-14: typedef enum dir_system_path {
-33: func path dir_get_base(void);
-36: func path dir_get_pref(cstr8 org_name, cstr8 app_name);
-39: func path dir_get_system(dir_system_path location);
-42: func b32 dir_create(const path* src);
-45: func b32 dir_remove(const path* src);
-48: func b32 dir_rename(const path* old_src, const path* new_src);
-51: func b32 dir_cpy_recursive(const path* src, const path* dst, b32 overwrite_existing);
-54: func b32 dir_exists(const path* src);
-57: func b32 dir_create_recursive(const path* src);
-60: func b32 dir_remove_recursive(const path* src);
-63: func b32 dir_iterate(const path* src, dir_iterate_callback* callback, void* user_data);
-66: func b32 dir_iterate_recursive(
+6: #include "path.h"
+12: typedef struct dir_entry {
+18: typedef enum dir_system_path {
+34: typedef b32 dir_iterate_callback(const dir_entry* entry, void* user_data);
+37: func path dir_get_base(void);
+40: func path dir_get_pref(cstr8 org_name, cstr8 app_name);
+43: func path dir_get_system(dir_system_path location);
+46: func b32 dir_create(const path* src);
+49: func b32 dir_remove(const path* src);
+52: func b32 dir_rename(const path* old_src, const path* new_src);
+55: func b32 dir_cpy_recursive(const path* src, const path* dst, b32 overwrite_existing);
+58: func b32 dir_exists(const path* src);
+61: func b32 dir_create_recursive(const path* src);
+64: func b32 dir_remove_recursive(const path* src);
+67: func b32 dir_iterate(const path* src, dir_iterate_callback* callback, void* user_data);
+70: func b32 dir_iterate_recursive(
 
 === include\filesystem\file.h ===
-11: func b32 file_create(const path* src);
-14: func b32 file_delete(const path* src);
-17: func b32 file_rename(const path* old_src, const path* new_src);
-20: func b32 file_cpy(const path* src, const path* dst, b32 overwrite_existing);
-23: func b32 file_exists(const path* src);
-26: func b32 file_get_size(const path* src, sz* out_size);
-30: func b32 file_read_all(const path* src, allocator* alloc, buffer* out_data);
-33: func b32 file_write_all(const path* src, buffer data);
-36: func b32 file_append_all(const path* src, buffer data);
-39: func b32 file_write_all_atomic(const path* src, buffer data);
+6: #include "../memory/allocator.h"
+7: #include "../memory/buffer.h"
+8: #include "path.h"
+15: func b32 file_create(const path* src);
+18: func b32 file_delete(const path* src);
+21: func b32 file_rename(const path* old_src, const path* new_src);
+24: func b32 file_cpy(const path* src, const path* dst, b32 overwrite_existing);
+27: func b32 file_exists(const path* src);
+30: func b32 file_get_size(const path* src, sz* out_size);
+34: func b32 file_read_all(const path* src, allocator* alloc, buffer* out_data);
+37: func b32 file_write_all(const path* src, buffer data);
+40: func b32 file_append_all(const path* src, buffer data);
+43: func b32 file_write_all_atomic(const path* src, buffer data);
 
 === include\filesystem\filemap.h ===
-8: typedef enum filemap_access {
-14: typedef enum filemap_error {
-22: typedef struct filemap {
+6: #include "../basic/codespace.h"
+7: #include "path.h"
+13: typedef enum filemap_access {
+19: typedef enum filemap_error {
+27: typedef struct filemap {
 39: func filemap _filemap_open(const path* src, filemap_access access, callsite site);
 42: func b32 filemap_is_open(const filemap* map);
 45: func b32 filemap_flush(filemap* map);
@@ -385,11 +665,14 @@
 60: func filemap_error filemap_get_last_error(void);
 
 === include\filesystem\filestream.h ===
-9: typedef struct archive archive;
-11: typedef enum filestream_kind {
-17: typedef enum filestream_seek_basis {
-23: typedef enum filestream_error {
-41: typedef struct filestream {
+6: #include "../basic/codespace.h"
+7: #include "../basic/utility_defines.h"
+8: #include "path.h"
+14: typedef struct archive archive;
+16: typedef enum filestream_kind {
+22: typedef enum filestream_seek_basis {
+28: typedef enum filestream_error {
+46: typedef struct filestream {
 61: func filestream _filestream_open(const path* src, u32 mode_flags, callsite site);
 64: func filestream _filestream_open_archive(archive* arc, const path* src, u32 mode_flags, callsite site);
 67: func void _filestream_close(filestream* stm, callsite site);
@@ -406,57 +689,69 @@
 98: func sz filestream_tell(const filestream* stm);
 101: func sz filestream_size(const filestream* stm);
 104: func b32 filestream_eof(const filestream* stm);
-95: func filestream_error filestream_get_error(const filestream* stm);
+107: func filestream_error filestream_get_error(const filestream* stm);
 
 === include\filesystem\module.h ===
-12: typedef struct mod {
-22: func mod mod_open(const path* src);
-25: func b32 mod_is_open(const mod* mod_ptr);
-28: func void* mod_get_func(const mod* mod_ptr, cstr8 name);
-31: func cstr8 mod_get_extension(void);
-34: func void mod_close(mod* mod_ptr);
+6: #include "path.h"
+13: typedef b32 mod_init_func(void);
+14: typedef void mod_quit_func(void);
+16: typedef struct mod {
+26: func mod mod_open(const path* src);
+29: func b32 mod_is_open(const mod* mod_ptr);
+32: func void* mod_get_func(const mod* mod_ptr, cstr8 name);
+35: func cstr8 mod_get_extension(void);
+38: func void mod_close(mod* mod_ptr);
 
 === include\filesystem\path.h ===
-10: typedef struct path {
-15: func path path_from_cstr(cstr8 src);
-18: func path path_from_str8(str8 src);
-22: func path path_join(const path* lhs, const path* rhs);
-25: func path path_join_cstr(const path* lhs, cstr8 rhs);
-28: func sz path_append(path* dst, const path* src);
-31: func sz path_append_cstr(path* dst, cstr8 src);
-34: func void path_norm(path* src);
-37: func path path_norm_trimmed_cpy(const path* src);
-40: func b32 path_cmd_normd(const path* lhs, const path* rhs);
-43: func b32 path_ends_with(const path* src, cstr8 suffix);
-46: func b32 path_is_absolute(const path* src);
-49: func b32 path_is_relative(const path* src);
-52: func void path_remove_extension(path* src);
-55: func void path_remove_name(path* src);
-58: func void path_remove_directory(path* src);
-61: func void path_remove_trailing_slash(path* src);
-64: func path path_get_extension(const path* src);
-67: func path path_get_name(const path* src);
-70: func path path_get_basename(const path* src);
-73: func path path_get_directory(const path* src);
-76: func path path_get_common(const path* src_list, sz path_count);
-79: func path path_get_current(void);
-82: func b32 path_set_current(const path* src);
-85: func path path_resolve(const path* src);
-88: func path path_make_relative(const path* src, const path* root);
-91: func b32 path_exists(const path* src);
-94: func b32 path_remove(const path* src);
-97: func b32 path_rename(const path* old_src, const path* new_src);
-94: func timestamp path_get_last_write_time(const path* src);
+6: #include "../strings/cstrings.h"
+7: #include "../strings/strings.h"
+8: #include "../utils/timestamp.h"
+14: typedef struct path {
+19: func path path_from_cstr(cstr8 src);
+22: func path path_from_str8(str8 src);
+26: func path path_join(const path* lhs, const path* rhs);
+29: func path path_join_cstr(const path* lhs, cstr8 rhs);
+32: func sz path_append(path* dst, const path* src);
+35: func sz path_append_cstr(path* dst, cstr8 src);
+38: func void path_norm(path* src);
+41: func path path_norm_trimmed_cpy(const path* src);
+44: func b32 path_cmd_normd(const path* lhs, const path* rhs);
+47: func b32 path_ends_with(const path* src, cstr8 suffix);
+50: func b32 path_is_absolute(const path* src);
+53: func b32 path_is_relative(const path* src);
+56: func void path_remove_extension(path* src);
+59: func void path_remove_name(path* src);
+62: func void path_remove_directory(path* src);
+65: func void path_remove_trailing_slash(path* src);
+68: func path path_get_extension(const path* src);
+71: func path path_get_name(const path* src);
+74: func path path_get_basename(const path* src);
+77: func path path_get_directory(const path* src);
+80: func path path_get_common(const path* src_list, sz path_count);
+83: func path path_get_current(void);
+86: func b32 path_set_current(const path* src);
+89: func path path_resolve(const path* src);
+92: func path path_make_relative(const path* src, const path* root);
+95: func b32 path_exists(const path* src);
+98: func b32 path_remove(const path* src);
+101: func b32 path_rename(const path* old_src, const path* new_src);
+104: func timestamp path_get_last_write_time(const path* src);
 
 === include\filesystem\pathinfo.h ===
-9: typedef enum pathinfo_type {
-17: typedef struct pathinfo {
-29: func b32 pathinfo_get(const path* src, pathinfo* out_info);
+6: #include "../utils/timestamp.h"
+7: #include "path.h"
+13: typedef enum pathinfo_type {
+21: typedef struct pathinfo {
+33: func b32 pathinfo_get(const path* src, pathinfo* out_info);
 
 === include\filesystem\pathwatch.h ===
-11: typedef enum pathwatch_action {
-18: typedef struct pathwatch_event {
-27: typedef struct pathwatch {
+6: #include "../basic/codespace.h"
+7: #include "path.h"
+13: typedef i64 pathwatch_id;
+14: typedef i64 pathwatch_watch_id;
+16: typedef enum pathwatch_action {
+23: typedef struct pathwatch_event {
+32: typedef struct pathwatch {
 39: func pathwatch _pathwatch_create(b32 use_generic_mode, callsite site);
 42: func void _pathwatch_destroy(pathwatch* watcher, callsite site);
 44: #define pathwatch_create(use_generic_mode) \
@@ -474,6 +769,8 @@
 75: func cstr8 pathwatch_get_last_error(void);
 
 === include\input\audio_device.h ===
+6: #include "devices.h"
+8: typedef void* audio_device;
 14: typedef enum audio_device_type {
 21: func b32 audio_device_is_valid(audio_device src);
 24: func audio_device audio_device_from_device(device src);
@@ -485,6 +782,11 @@
 42: func cstr8 audio_device_get_name(audio_device aud_id);
 
 === include\input\camera.h ===
+6: #include "../basic/primitive_types.h"
+7: #include "../memory/buffer.h"
+8: #include "../strings/cstrings.h"
+9: #include "devices.h"
+11: typedef void* camera;
 17: typedef enum camera_pos {
 24: func b32 camera_is_valid(camera src);
 27: func camera camera_from_device(device src);
@@ -499,15 +801,20 @@
 46: func b32 camera_read(camera cam_id, buffer* out_frame);
 
 === include\input\clipboard.h ===
-13: func b32 clipboard_has_text(void);
-16: func b32 clipboard_has_data(cstr8 mime_type);
-19: func b32 clipboard_set_text(cstr8 src);
-22: func b32 clipboard_set_data(cstr8 mime_type, buffer src_data);
-26: func b32 clipboard_get_text(c8* out_text, sz out_capacity);
-31: func b32 clipboard_get_data(cstr8 mime_type, buffer out_data, sz* out_size);
-34: func b32 clipboard_clear(void);
+6: #include "../basic/primitive_types.h"
+7: #include "../memory/buffer.h"
+14: func b32 clipboard_has_text(void);
+17: func b32 clipboard_has_data(cstr8 mime_type);
+20: func b32 clipboard_set_text(cstr8 src);
+23: func b32 clipboard_set_data(cstr8 mime_type, buffer src_data);
+27: func b32 clipboard_get_text(c8* out_text, sz out_capacity);
+32: func b32 clipboard_get_data(cstr8 mime_type, buffer out_data, sz* out_size);
+35: func b32 clipboard_clear(void);
 
 === include\input\devices.h ===
+6: #include "../basic/primitive_types.h"
+7: #include "../strings/cstrings.h"
+9: typedef void* device;
 20: typedef enum device_type {
 35: typedef struct device_info {
 46: func b32 device_is_valid(device src);
@@ -519,14 +826,18 @@
 64: func b32 devices_get_info(device dev_id, device_info* out_info);
 
 === include\input\gamepads.h ===
-17: typedef enum gamepad_button {
-49: typedef enum gamepad_axis {
-63: typedef enum gamepad_sensor_kind {
-75: func sz gamepads_get_count(void);
-78: func b32 gamepads_is_connected(sz slot_idx);
+6: #include "devices.h"
+17: #define GAMEPADS_MAX_COUNT 4
+20: typedef enum gamepad_button {
+52: typedef enum gamepad_axis {
+63: typedef i32 gamepad_touchpad_idx;
+64: typedef i32 gamepad_finger_idx;
+66: typedef enum gamepad_sensor_kind {
+78: func sz gamepads_get_count(void);
+81: func b32 gamepads_is_connected(sz slot_idx);
 84: func device gamepads_get_device(sz slot_idx);
-84: func cstr8 gamepads_get_name(sz slot_idx);
-87: func b32 gamepads_has_button(sz slot_idx, gamepad_button button);
+87: func cstr8 gamepads_get_name(sz slot_idx);
+90: func b32 gamepads_has_button(sz slot_idx, gamepad_button button);
 93: func b32 gamepads_get_button(sz slot_idx, gamepad_button button);
 96: func b32 gamepads_has_axis(sz slot_idx, gamepad_axis axis);
 99: func i16 gamepads_get_axis(sz slot_idx, gamepad_axis axis);
@@ -536,6 +847,8 @@
 105: func i16 gamepads_get_axis_deadzone(sz slot_idx, gamepad_axis axis);
 
 === include\input\joystick.h ===
+6: #include "devices.h"
+8: typedef void* joystick;
 14: typedef enum battery_state {
 23: typedef enum joystick_hat_state {
 36: func b32 joystick_is_valid(joystick src);
@@ -555,224 +868,209 @@
 66: func battery_state joystick_get_battery(joystick joy_id, i32* out_percent);
 
 === include\input\keyboard.h ===
-14: typedef enum keymod {
-44: func b32 keyboard_vkey_is_valid(vkey key);
-47: func b32 keyboard_is_available(void);
-50: func device keyboard_get_primary_device(void);
-53: func b32 keyboard_is_key_down(vkey key);
-59: func keymod keyboard_get_mods(void);
-62: func b32 keyboard_has_mods(keymod required_mods);
-65: func b32 keyboard_has_mods_exact(keymod required_mods, keymod forbidden_mods);
-68: func b32 keyboard_is_key_down_mod(vkey key, keymod required_mods, keymod forbidden_mods);
-71: func cstr8 keyboard_get_key_name(vkey key);
-74: func cstr8 keyboard_get_key_display_name(vkey key, keymod modifiers, b32 key_event);
-
-=== include\input\vkeys.h ===
-142: typedef enum vkey {
+6: #include "devices.h"
+7: #include "vkeys.h"
+18: func b32 keyboard_is_available(void);
+21: func device keyboard_get_primary_device(void);
+24: func b32 keyboard_is_key_down(vkey key);
+27: func keymod keyboard_get_mods(void);
+30: func b32 keyboard_has_mods(keymod required_mods);
+33: func b32 keyboard_has_mods_exact(keymod required_mods, keymod forbidden_mods);
+36: func b32 keyboard_is_key_down_mod(vkey key, keymod required_mods, keymod forbidden_mods);
+39: func cstr8 keyboard_get_key_name(vkey key);
+42: func cstr8 keyboard_get_key_display_name(vkey key, keymod modifiers, b32 key_event);
 
 === include\input\mouse.h ===
-14: typedef enum mouse_button {
-22: typedef enum mouse_wheel_direction {
-30: typedef u32 mouse_state;
+6: #include "devices.h"
+17: typedef enum mouse_button {
+26: typedef enum mouse_wheel_direction {
+32: typedef u32 mouse_state;
 35: func b32 mouse_is_available(void);
 38: func device mouse_get_primary_device(void);
 41: func mouse_state mouse_get_state(void);
 44: func b32 mouse_is_button_down(mouse_button button);
 
-=== include\interface\cursor.h ===
-13: typedef struct cursor_pos {
-19: func b32 cursor_set_icon(icon icon_id);
-22: func b32 cursor_reset_icon(void);
-25: func b32 cursor_set_visible(b32 visible);
-28: func b32 cursor_is_visible(void);
-32: func b32 cursor_set_capture(window opt_window, b32 enabled);
-35: func b32 cursor_is_captured(window opt_window);
-39: func b32 cursor_set_relative_mode(window opt_window, b32 enabled);
-42: func b32 cursor_is_relative_mode(window opt_window);
-45: func cursor_pos cursor_get_pos(void);
-48: func cursor_pos cursor_get_global_pos(void);
-51: func cursor_pos cursor_get_relative_pos(void);
-55: func b32 cursor_warp(window opt_window, f32 xpos, f32 ypos);
-
-=== include\interface\text_input.h ===
-13: func b32 text_input_start(window opt_window);
-14: func b32 text_input_stop(window opt_window);
-15: func b32 text_input_is_active(window opt_window);
-16: func b32 text_input_set_area(window opt_window, i32 xpos, i32 ypos, i32 width, i32 height);
-
-=== include\interface\dpi.h ===
-13: typedef struct dpi_metrics {
-19: func dpi_metrics dpi_metrics_make_default(void);
-20: func b32 dpi_get_monitor_metrics(monitor monitor_id, dpi_metrics* out_metrics);
-21: func b32 dpi_get_window_metrics(window window_id, dpi_metrics* out_metrics);
-23: func f32 dpi_scale_f32(f32 value, f32 scale);
-24: func i32 dpi_scale_i32(i32 value, f32 scale);
-
-=== include\interface\icon.h ===
-12: typedef void* icon;
-14: typedef enum icon_system {
-37: func b32 icon_id_is_valid(icon src);
-38: func icon icon_create_rgba(i32 width, i32 height, const u8* rgba_pixels, i32 hot_xpos, i32 hot_ypos);
-39: func icon icon_create_system(icon_system system_icon);
-40: func b32 icon_destroy(icon icon_id);
-42: func b32 icon_get_size(icon icon_id, i32* out_width, i32* out_height);
-43: func b32 icon_get_hotspot(icon icon_id, i32* out_xpos, i32* out_ypos);
-44: func b32 icon_get_system(icon icon_id, icon_system* out_system_icon);
-45: func b32 icon_is_rgba(icon icon_id);
-46: func b32 icon_is_system(icon icon_id);
-
 === include\input\msg.h ===
+6: #include "../basic/codespace.h"
+7: #include "../basic/utility_defines.h"
 26: typedef enum msg_category {
+37: #define MSG_DATA_SIZE kb(2)
 40: typedef struct msg {
+48: typedef b32 (*msg_handler_fn)(msg* src, void* user_data);
+49: typedef b32 (*msg_filter_fn)(const msg* src, void* user_data);
 51: typedef struct msg_handler_desc {
-65: func b32 msg_poll(msg* out_msg);
-69: func b32 _msg_post_native(const void* native_event, msg* out_msg, callsite site);
-70: #define msg_post_native(native_event, out_msg) _msg_post_native((native_event), (out_msg), CALLSITE_HERE)
-74: func b32 _msg_post(const msg* src, callsite site);
-75: #define msg_post(src) _msg_post((src), CALLSITE_HERE)
-79: func u64 msg_add_handler(const msg_handler_desc* desc);
-82: func b32 msg_remove_handler(u64 handler_id);
-85: func void msg_clear_handlers(void);
-88: func void msg_set_filter(msg_filter_fn filter_fn, void* user_data);
+67: func b32 msg_poll(msg* out_msg);
+71: func b32 _msg_post(const msg* src, callsite site);
+72: #define msg_post(src) _msg_post((src), CALLSITE_HERE)
+76: func u64 msg_add_handler(const msg_handler_desc* desc);
+79: func b32 msg_remove_handler(u64 handler_id);
+82: func void msg_clear_handlers(void);
+85: func void msg_set_filter(msg_filter_fn filter_fn, void* user_data);
 
 === include\input\msg_core.h ===
-27: typedef enum msg_core_type {
-147: typedef enum msg_core_object_event_kind {
-152: typedef enum msg_core_object_type {
-173: typedef enum msg_core_thread_ctx_event_kind {
-178: typedef enum msg_core_pathwatch_event_kind {
-183: typedef enum msg_core_global_ctx_event_kind {
-188: #define MSG_LOG_TEXT_CAP    512
-189: #define MSG_ASSERT_TEXT_CAP 512
-192: typedef struct msg_core_monitor_data {
-199: typedef struct msg_core_window_data {
-206: typedef struct msg_core_keyboard_device_data {
-211: typedef struct msg_core_keyboard_data {
-223: typedef struct msg_core_text_editing_data {
-231: typedef struct msg_core_text_editing_candidates_data {
-240: typedef struct msg_core_text_input_data {
-246: typedef struct msg_core_mouse_device_data {
-251: typedef struct msg_core_mouse_motion_data {
-262: typedef struct msg_core_mouse_button_data {
-273: typedef struct msg_core_mouse_wheel_data {
-284: typedef struct msg_core_joystick_device_data {
-289: typedef struct msg_core_joystick_axis_data {
-296: typedef struct msg_core_joystick_ball_data {
-304: typedef struct msg_core_joystick_hat_data {
-311: typedef struct msg_core_joystick_button_data {
-318: typedef struct msg_core_joystick_battery_data {
-325: typedef struct msg_core_gamepad_device_data {
-330: typedef struct msg_core_gamepad_axis_data {
-337: typedef struct msg_core_gamepad_button_data {
-344: typedef struct msg_core_gamepad_touchpad_data {
-354: typedef struct msg_core_gamepad_sensor_data {
-362: typedef struct msg_core_audio_device_data {
-367: typedef struct msg_core_camera_device_data {
-372: typedef struct msg_core_render_data {
-377: typedef struct msg_core_touch_device_data {
-382: typedef struct msg_core_tablet_device_data {
-387: typedef struct msg_core_touch_data {
-399: typedef struct msg_core_pen_proximity_data {
-406: typedef struct msg_core_pen_motion_data {
-416: typedef struct msg_core_pen_touch_data {
-428: typedef struct msg_core_pen_button_data {
-440: typedef struct msg_core_pen_axis_data {
-452: typedef struct msg_core_drop_data {
-461: typedef struct msg_core_clipboard_data {
-468: typedef struct msg_core_sensor_data {
-474: typedef struct msg_core_object_lifecycle_data {
-480: typedef struct msg_core_thread_ctx_data {
-486: typedef struct msg_core_pathwatch_data {
-493: typedef struct msg_core_log_data {
-500: typedef struct msg_core_global_ctx_data {
-505: typedef struct msg_core_assert_data {
-511: typedef union msg_core_data {
-556: func void msg_core_fill_monitor(msg* src, const msg_core_monitor_data* core_data);
-557: func void msg_core_fill_window(msg* src, const msg_core_window_data* core_data);
-558: func void msg_core_fill_keyboard_device(msg* src, const msg_core_keyboard_device_data* core_data);
-559: func void msg_core_fill_keyboard(msg* src, const msg_core_keyboard_data* core_data);
-560: func void msg_core_fill_text_editing(msg* src, const msg_core_text_editing_data* core_data);
-561: func void msg_core_fill_text_editing_candidates(msg* src, const msg_core_text_editing_candidates_data* core_data);
-562: func void msg_core_fill_text_input(msg* src, const msg_core_text_input_data* core_data);
-563: func void msg_core_fill_mouse_device(msg* src, const msg_core_mouse_device_data* core_data);
-564: func void msg_core_fill_mouse_motion(msg* src, const msg_core_mouse_motion_data* core_data);
-565: func void msg_core_fill_mouse_button(msg* src, const msg_core_mouse_button_data* core_data);
-566: func void msg_core_fill_mouse_wheel(msg* src, const msg_core_mouse_wheel_data* core_data);
-567: func void msg_core_fill_joystick_device(msg* src, const msg_core_joystick_device_data* core_data);
-568: func void msg_core_fill_joystick_axis(msg* src, const msg_core_joystick_axis_data* core_data);
-569: func void msg_core_fill_joystick_ball(msg* src, const msg_core_joystick_ball_data* core_data);
-570: func void msg_core_fill_joystick_hat(msg* src, const msg_core_joystick_hat_data* core_data);
-571: func void msg_core_fill_joystick_button(msg* src, const msg_core_joystick_button_data* core_data);
-572: func void msg_core_fill_joystick_battery(msg* src, const msg_core_joystick_battery_data* core_data);
-573: func void msg_core_fill_gamepad_device(msg* src, const msg_core_gamepad_device_data* core_data);
-574: func void msg_core_fill_gamepad_axis(msg* src, const msg_core_gamepad_axis_data* core_data);
-575: func void msg_core_fill_gamepad_button(msg* src, const msg_core_gamepad_button_data* core_data);
-576: func void msg_core_fill_gamepad_touchpad(msg* src, const msg_core_gamepad_touchpad_data* core_data);
-577: func void msg_core_fill_gamepad_sensor(msg* src, const msg_core_gamepad_sensor_data* core_data);
-578: func void msg_core_fill_audio_device(msg* src, const msg_core_audio_device_data* core_data);
-579: func void msg_core_fill_camera_device(msg* src, const msg_core_camera_device_data* core_data);
-580: func void msg_core_fill_render(msg* src, const msg_core_render_data* core_data);
-581: func void msg_core_fill_touch_device(msg* src, const msg_core_touch_device_data* core_data);
-582: func void msg_core_fill_touch(msg* src, const msg_core_touch_data* core_data);
-583: func void msg_core_fill_tablet_device(msg* src, const msg_core_tablet_device_data* core_data);
-584: func void msg_core_fill_pen_proximity(msg* src, const msg_core_pen_proximity_data* core_data);
-585: func void msg_core_fill_pen_motion(msg* src, const msg_core_pen_motion_data* core_data);
-586: func void msg_core_fill_pen_touch(msg* src, const msg_core_pen_touch_data* core_data);
-587: func void msg_core_fill_pen_button(msg* src, const msg_core_pen_button_data* core_data);
-588: func void msg_core_fill_pen_axis(msg* src, const msg_core_pen_axis_data* core_data);
-589: func void msg_core_fill_drop(msg* src, const msg_core_drop_data* core_data);
-590: func void msg_core_fill_clipboard(msg* src, const msg_core_clipboard_data* core_data);
-591: func void msg_core_fill_sensor(msg* src, const msg_core_sensor_data* core_data);
-592: func void msg_core_fill_object_lifecycle(msg* src, const msg_core_object_lifecycle_data* core_data);
-593: func void msg_core_fill_thread_ctx(msg* src, const msg_core_thread_ctx_data* core_data);
-594: func void msg_core_fill_pathwatch(msg* src, const msg_core_pathwatch_data* core_data);
-595: func void msg_core_fill_log(msg* src, const msg_core_log_data* core_data);
-596: func void msg_core_fill_assert(msg* src, const msg_core_assert_data* core_data);
-597: func void msg_core_fill_global_ctx(msg* src, const msg_core_global_ctx_data* core_data);
-599: func msg_core_monitor_data* msg_core_get_monitor(msg* src);
-600: func msg_core_window_data* msg_core_get_window(msg* src);
-601: func msg_core_keyboard_device_data* msg_core_get_keyboard_device(msg* src);
-602: func msg_core_keyboard_data* msg_core_get_keyboard(msg* src);
-603: func msg_core_text_editing_data* msg_core_get_text_editing(msg* src);
-604: func msg_core_text_editing_candidates_data* msg_core_get_text_editing_candidates(msg* src);
-605: func msg_core_text_input_data* msg_core_get_text_input(msg* src);
-606: func msg_core_mouse_device_data* msg_core_get_mouse_device(msg* src);
-607: func msg_core_mouse_motion_data* msg_core_get_mouse_motion(msg* src);
-608: func msg_core_mouse_button_data* msg_core_get_mouse_button(msg* src);
-609: func msg_core_mouse_wheel_data* msg_core_get_mouse_wheel(msg* src);
-610: func msg_core_joystick_device_data* msg_core_get_joystick_device(msg* src);
-611: func msg_core_joystick_axis_data* msg_core_get_joystick_axis(msg* src);
-612: func msg_core_joystick_ball_data* msg_core_get_joystick_ball(msg* src);
-613: func msg_core_joystick_hat_data* msg_core_get_joystick_hat(msg* src);
-614: func msg_core_joystick_button_data* msg_core_get_joystick_button(msg* src);
-615: func msg_core_joystick_battery_data* msg_core_get_joystick_battery(msg* src);
-616: func msg_core_gamepad_device_data* msg_core_get_gamepad_device(msg* src);
-617: func msg_core_gamepad_axis_data* msg_core_get_gamepad_axis(msg* src);
-618: func msg_core_gamepad_button_data* msg_core_get_gamepad_button(msg* src);
-619: func msg_core_gamepad_touchpad_data* msg_core_get_gamepad_touchpad(msg* src);
-620: func msg_core_gamepad_sensor_data* msg_core_get_gamepad_sensor(msg* src);
-621: func msg_core_audio_device_data* msg_core_get_audio_device(msg* src);
-622: func msg_core_camera_device_data* msg_core_get_camera_device(msg* src);
-623: func msg_core_render_data* msg_core_get_render(msg* src);
-624: func msg_core_touch_device_data* msg_core_get_touch_device(msg* src);
-625: func msg_core_touch_data* msg_core_get_touch(msg* src);
-626: func msg_core_tablet_device_data* msg_core_get_tablet_device(msg* src);
-627: func msg_core_pen_proximity_data* msg_core_get_pen_proximity(msg* src);
-628: func msg_core_pen_motion_data* msg_core_get_pen_motion(msg* src);
-629: func msg_core_pen_touch_data* msg_core_get_pen_touch(msg* src);
-630: func msg_core_pen_button_data* msg_core_get_pen_button(msg* src);
-631: func msg_core_pen_axis_data* msg_core_get_pen_axis(msg* src);
-632: func msg_core_drop_data* msg_core_get_drop(msg* src);
-633: func msg_core_clipboard_data* msg_core_get_clipboard(msg* src);
-634: func msg_core_sensor_data* msg_core_get_sensor(msg* src);
-635: func msg_core_object_lifecycle_data* msg_core_get_object_lifecycle(msg* src);
-636: func msg_core_thread_ctx_data* msg_core_get_thread_ctx(msg* src);
-637: func msg_core_pathwatch_data* msg_core_get_pathwatch(msg* src);
-638: func msg_core_log_data* msg_core_get_log(msg* src);
-639: func msg_core_assert_data* msg_core_get_assert(msg* src);
-640: func msg_core_global_ctx_data* msg_core_get_global_ctx(msg* src);
+6: #include "../basic/assert.h"
+7: #include "../basic/codespace.h"
+8: #include "../basic/primitive_types.h"
+9: #include "../context/global_ctx.h"
+10: #include "../context/thread_ctx.h"
+11: #include "../filesystem/pathwatch.h"
+12: #include "../interface/monitor.h"
+13: #include "../interface/window.h"
+14: #include "../strings/cstrings.h"
+15: #include "../utils/log_state.h"
+16: #include "audio_device.h"
+17: #include "camera.h"
+18: #include "devices.h"
+19: #include "gamepads.h"
+20: #include "joystick.h"
+21: #include "keyboard.h"
+22: #include "mouse.h"
+23: #include "msg.h"
+24: #include "sensor.h"
+25: #include "tablet.h"
+26: #include "touch.h"
+33: typedef enum msg_core_type {
+153: typedef enum msg_core_object_event_kind {
+158: typedef enum msg_core_object_type {
+179: typedef enum msg_core_thread_ctx_event_kind {
+184: typedef enum msg_core_pathwatch_event_kind {
+189: typedef enum msg_core_global_ctx_event_kind {
+194: #define MSG_LOG_TEXT_CAP    512
+195: #define MSG_ASSERT_TEXT_CAP 512
+198: typedef struct msg_core_monitor_data {
+205: typedef struct msg_core_window_data {
+212: typedef struct msg_core_keyboard_device_data {
+217: typedef struct msg_core_keyboard_data {
+227: typedef struct msg_core_text_editing_data {
+235: typedef struct msg_core_text_editing_candidates_data {
+244: typedef struct msg_core_text_input_data {
+250: typedef struct msg_core_mouse_device_data {
+255: typedef struct msg_core_mouse_motion_data {
+266: typedef struct msg_core_mouse_button_data {
+277: typedef struct msg_core_mouse_wheel_data {
+288: typedef struct msg_core_joystick_device_data {
+293: typedef struct msg_core_joystick_axis_data {
+300: typedef struct msg_core_joystick_ball_data {
+308: typedef struct msg_core_joystick_hat_data {
+315: typedef struct msg_core_joystick_button_data {
+322: typedef struct msg_core_joystick_battery_data {
+329: typedef struct msg_core_gamepad_device_data {
+334: typedef struct msg_core_gamepad_axis_data {
+341: typedef struct msg_core_gamepad_button_data {
+348: typedef struct msg_core_gamepad_touchpad_data {
+358: typedef struct msg_core_gamepad_sensor_data {
+366: typedef struct msg_core_audio_device_data {
+371: typedef struct msg_core_camera_device_data {
+376: typedef struct msg_core_render_data {
+381: typedef struct msg_core_touch_device_data {
+386: typedef struct msg_core_tablet_device_data {
+391: typedef struct msg_core_touch_data {
+403: typedef struct msg_core_pen_proximity_data {
+410: typedef struct msg_core_pen_motion_data {
+420: typedef struct msg_core_pen_touch_data {
+432: typedef struct msg_core_pen_button_data {
+444: typedef struct msg_core_pen_axis_data {
+456: typedef struct msg_core_drop_data {
+465: typedef struct msg_core_clipboard_data {
+472: typedef struct msg_core_sensor_data {
+478: typedef struct msg_core_object_lifecycle_data {
+485: typedef struct msg_core_thread_ctx_data {
+491: typedef struct msg_core_pathwatch_data {
+498: typedef struct msg_core_log_data {
+505: typedef struct msg_core_global_ctx_data {
+510: typedef struct msg_core_assert_data {
+516: typedef union msg_core_data {
+562: func void msg_core_fill_monitor(msg* src, const msg_core_monitor_data* core_data);
+563: func void msg_core_fill_window(msg* src, const msg_core_window_data* core_data);
+564: func void msg_core_fill_keyboard_device(msg* src, const msg_core_keyboard_device_data* core_data);
+565: func void msg_core_fill_keyboard(msg* src, const msg_core_keyboard_data* core_data);
+566: func void msg_core_fill_text_editing(msg* src, const msg_core_text_editing_data* core_data);
+567: func void msg_core_fill_text_editing_candidates(msg* src, const msg_core_text_editing_candidates_data* core_data);
+568: func void msg_core_fill_text_input(msg* src, const msg_core_text_input_data* core_data);
+569: func void msg_core_fill_mouse_device(msg* src, const msg_core_mouse_device_data* core_data);
+570: func void msg_core_fill_mouse_motion(msg* src, const msg_core_mouse_motion_data* core_data);
+571: func void msg_core_fill_mouse_button(msg* src, const msg_core_mouse_button_data* core_data);
+572: func void msg_core_fill_mouse_wheel(msg* src, const msg_core_mouse_wheel_data* core_data);
+573: func void msg_core_fill_joystick_device(msg* src, const msg_core_joystick_device_data* core_data);
+574: func void msg_core_fill_joystick_axis(msg* src, const msg_core_joystick_axis_data* core_data);
+575: func void msg_core_fill_joystick_ball(msg* src, const msg_core_joystick_ball_data* core_data);
+576: func void msg_core_fill_joystick_hat(msg* src, const msg_core_joystick_hat_data* core_data);
+577: func void msg_core_fill_joystick_button(msg* src, const msg_core_joystick_button_data* core_data);
+578: func void msg_core_fill_joystick_battery(msg* src, const msg_core_joystick_battery_data* core_data);
+579: func void msg_core_fill_gamepad_device(msg* src, const msg_core_gamepad_device_data* core_data);
+580: func void msg_core_fill_gamepad_axis(msg* src, const msg_core_gamepad_axis_data* core_data);
+581: func void msg_core_fill_gamepad_button(msg* src, const msg_core_gamepad_button_data* core_data);
+582: func void msg_core_fill_gamepad_touchpad(msg* src, const msg_core_gamepad_touchpad_data* core_data);
+583: func void msg_core_fill_gamepad_sensor(msg* src, const msg_core_gamepad_sensor_data* core_data);
+584: func void msg_core_fill_audio_device(msg* src, const msg_core_audio_device_data* core_data);
+585: func void msg_core_fill_camera_device(msg* src, const msg_core_camera_device_data* core_data);
+586: func void msg_core_fill_render(msg* src, const msg_core_render_data* core_data);
+587: func void msg_core_fill_touch_device(msg* src, const msg_core_touch_device_data* core_data);
+588: func void msg_core_fill_touch(msg* src, const msg_core_touch_data* core_data);
+589: func void msg_core_fill_tablet_device(msg* src, const msg_core_tablet_device_data* core_data);
+590: func void msg_core_fill_pen_proximity(msg* src, const msg_core_pen_proximity_data* core_data);
+591: func void msg_core_fill_pen_motion(msg* src, const msg_core_pen_motion_data* core_data);
+592: func void msg_core_fill_pen_touch(msg* src, const msg_core_pen_touch_data* core_data);
+593: func void msg_core_fill_pen_button(msg* src, const msg_core_pen_button_data* core_data);
+594: func void msg_core_fill_pen_axis(msg* src, const msg_core_pen_axis_data* core_data);
+595: func void msg_core_fill_drop(msg* src, const msg_core_drop_data* core_data);
+596: func void msg_core_fill_clipboard(msg* src, const msg_core_clipboard_data* core_data);
+597: func void msg_core_fill_sensor(msg* src, const msg_core_sensor_data* core_data);
+598: func void msg_core_fill_object_lifecycle(msg* src, const msg_core_object_lifecycle_data* core_data);
+599: func void msg_core_fill_thread_ctx(msg* src, const msg_core_thread_ctx_data* core_data);
+600: func void msg_core_fill_pathwatch(msg* src, const msg_core_pathwatch_data* core_data);
+601: func void msg_core_fill_log(msg* src, const msg_core_log_data* core_data);
+602: func void msg_core_fill_assert(msg* src, const msg_core_assert_data* core_data);
+603: func void msg_core_fill_global_ctx(msg* src, const msg_core_global_ctx_data* core_data);
+606: func msg_core_monitor_data* msg_core_get_monitor(msg* src);
+607: func msg_core_window_data* msg_core_get_window(msg* src);
+608: func msg_core_keyboard_device_data* msg_core_get_keyboard_device(msg* src);
+609: func msg_core_keyboard_data* msg_core_get_keyboard(msg* src);
+610: func msg_core_text_editing_data* msg_core_get_text_editing(msg* src);
+611: func msg_core_text_editing_candidates_data* msg_core_get_text_editing_candidates(msg* src);
+612: func msg_core_text_input_data* msg_core_get_text_input(msg* src);
+613: func msg_core_mouse_device_data* msg_core_get_mouse_device(msg* src);
+614: func msg_core_mouse_motion_data* msg_core_get_mouse_motion(msg* src);
+615: func msg_core_mouse_button_data* msg_core_get_mouse_button(msg* src);
+616: func msg_core_mouse_wheel_data* msg_core_get_mouse_wheel(msg* src);
+617: func msg_core_joystick_device_data* msg_core_get_joystick_device(msg* src);
+618: func msg_core_joystick_axis_data* msg_core_get_joystick_axis(msg* src);
+619: func msg_core_joystick_ball_data* msg_core_get_joystick_ball(msg* src);
+620: func msg_core_joystick_hat_data* msg_core_get_joystick_hat(msg* src);
+621: func msg_core_joystick_button_data* msg_core_get_joystick_button(msg* src);
+622: func msg_core_joystick_battery_data* msg_core_get_joystick_battery(msg* src);
+623: func msg_core_gamepad_device_data* msg_core_get_gamepad_device(msg* src);
+624: func msg_core_gamepad_axis_data* msg_core_get_gamepad_axis(msg* src);
+625: func msg_core_gamepad_button_data* msg_core_get_gamepad_button(msg* src);
+626: func msg_core_gamepad_touchpad_data* msg_core_get_gamepad_touchpad(msg* src);
+627: func msg_core_gamepad_sensor_data* msg_core_get_gamepad_sensor(msg* src);
+628: func msg_core_audio_device_data* msg_core_get_audio_device(msg* src);
+629: func msg_core_camera_device_data* msg_core_get_camera_device(msg* src);
+630: func msg_core_render_data* msg_core_get_render(msg* src);
+631: func msg_core_touch_device_data* msg_core_get_touch_device(msg* src);
+632: func msg_core_touch_data* msg_core_get_touch(msg* src);
+633: func msg_core_tablet_device_data* msg_core_get_tablet_device(msg* src);
+634: func msg_core_pen_proximity_data* msg_core_get_pen_proximity(msg* src);
+635: func msg_core_pen_motion_data* msg_core_get_pen_motion(msg* src);
+636: func msg_core_pen_touch_data* msg_core_get_pen_touch(msg* src);
+637: func msg_core_pen_button_data* msg_core_get_pen_button(msg* src);
+638: func msg_core_pen_axis_data* msg_core_get_pen_axis(msg* src);
+639: func msg_core_drop_data* msg_core_get_drop(msg* src);
+640: func msg_core_clipboard_data* msg_core_get_clipboard(msg* src);
+641: func msg_core_sensor_data* msg_core_get_sensor(msg* src);
+642: func msg_core_object_lifecycle_data* msg_core_get_object_lifecycle(msg* src);
+643: func msg_core_thread_ctx_data* msg_core_get_thread_ctx(msg* src);
+644: func msg_core_pathwatch_data* msg_core_get_pathwatch(msg* src);
+645: func msg_core_log_data* msg_core_get_log(msg* src);
+646: func msg_core_assert_data* msg_core_get_assert(msg* src);
+647: func msg_core_global_ctx_data* msg_core_get_global_ctx(msg* src);
 
 === include\input\sensor.h ===
+6: #include "../basic/primitive_types.h"
+7: #include "../memory/buffer.h"
+8: #include "../strings/cstrings.h"
+9: #include "devices.h"
+11: typedef void* sensor;
 17: typedef enum sensor_kind {
 29: func b32 sensor_is_valid(sensor src);
 32: func sensor sensor_from_device(device src);
@@ -787,40 +1085,193 @@
 51: func b32 sensor_read(sensor sen_id, buffer* out_samples);
 
 === include\input\tablet.h ===
-16: typedef enum tablet_axis {
-27: typedef enum tablet_input_flag {
-37: typedef enum tablet_button {
-44: typedef struct tablet_pen_state {
-58: func b32 tablet_is_available(void);
-61: func sz tablet_get_total_count(void);
+6: #include "../interface/window.h"
+7: #include "devices.h"
+13: typedef u32 pen_id;
+20: typedef enum tablet_axis {
+31: typedef enum tablet_input_flag {
+39: typedef u32 tablet_input_flags;
+41: typedef enum tablet_button {
+48: typedef struct tablet_pen_state {
+62: func b32 tablet_is_available(void);
+65: func sz tablet_get_total_count(void);
 68: func device tablet_get_device(sz idx);
-67: func b32 tablet_get_last_pen_state(tablet_pen_state* out_state);
+71: func b32 tablet_get_last_pen_state(tablet_pen_state* out_state);
 74: func b32 tablet_read_hid_report(device dev_id, void* dst, sz capacity, sz* out_size, i32 timeout_ms);
 
 === include\input\touch.h ===
-15: typedef enum touch_device_kind {
-23: typedef struct touch_finger_state {
-31: func b32 touch_is_available(void);
-34: func sz touch_get_total_count(void);
+6: #include "devices.h"
+12: typedef u64 finger_id;
+19: typedef enum touch_device_kind {
+27: typedef struct touch_finger_state {
+35: func b32 touch_is_available(void);
+38: func sz touch_get_total_count(void);
 41: func device touch_get_device(sz idx);
 44: func touch_device_kind touch_get_device_kind(device dev_id);
 47: func sz touch_get_finger_count(device dev_id);
 50: func b32 touch_get_finger(device dev_id, sz idx, touch_finger_state* out_finger);
 
+=== include\input\vkeys.h ===
+6: #include "../basic/primitive_types.h"
+15: #define BASED_VKEY_LIST(X)            \
+264: typedef enum vkey {
+265: #define BASED_VKEY_ENUM(name, value) name = (value),
+270: func force_inline b32 vkey_is_valid(vkey key) {
+272: #define BASED_VKEY_CASE(name, value) case name:
+282: typedef enum keymod {
+
+=== include\interface\cursor.h ===
+6: #include "icon.h"
+7: #include "window.h"
+13: typedef struct cursor_pos {
+20: func b32 cursor_set_icon(icon icon_id);
+23: func b32 cursor_reset_icon(void);
+26: func b32 cursor_set_visible(b32 visible);
+29: func b32 cursor_is_visible(void);
+33: func b32 cursor_set_capture(window opt_window, b32 enabled);
+36: func b32 cursor_is_captured(window opt_window);
+40: func b32 cursor_set_relative_mode(window opt_window, b32 enabled);
+43: func b32 cursor_is_relative_mode(window opt_window);
+46: func cursor_pos cursor_get_pos(void);
+49: func cursor_pos cursor_get_global_pos(void);
+52: func cursor_pos cursor_get_relative_pos(void);
+56: func b32 cursor_warp(window opt_window, f32 xpos, f32 ypos);
+
+=== include\interface\dialog.h ===
+6: #include "window.h"
+12: typedef enum dialog_message_kind {
+18: typedef enum dialog_message_box_flag {
+26: typedef enum dialog_message_box_button_flag {
+31: typedef struct dialog_message_box_button {
+37: typedef struct dialog_message_box_color {
+43: typedef struct dialog_message_box_color_scheme {
+51: typedef struct dialog_message_box {
+60: typedef struct dialog_file_filter {
+65: typedef void dialog_file_callback(
+73: func b32 dialog_show_message(
+80: func b32 dialog_show_message_box(window owner, const dialog_message_box* message_box, i32* out_button_id);
+83: func b32 dialog_open_file(
+93: func b32 dialog_save_file(
+102: func b32 dialog_open_folder(
+
+=== include\interface\dpi.h ===
+6: #include "monitor.h"
+7: #include "window.h"
+13: typedef struct dpi_metrics {
+19: func dpi_metrics dpi_metrics_make_default(void);
+22: func b32 dpi_get_monitor_metrics(monitor monitor_id, dpi_metrics* out_metrics);
+25: func b32 dpi_get_window_metrics(window window_id, dpi_metrics* out_metrics);
+28: func f32 dpi_scale_f32(f32 value, f32 scale);
+31: func i32 dpi_scale_i32(i32 value, f32 scale);
+
+=== include\interface\icon.h ===
+6: #include "../basic/primitive_types.h"
+12: typedef void* icon;
+14: typedef enum icon_system {
+37: func b32 icon_id_is_valid(icon src);
+40: func icon icon_create_rgba(i32 width, i32 height, const u8* rgba_pixels, i32 hot_xpos, i32 hot_ypos);
+43: func icon icon_create_system(icon_system system_icon);
+46: func b32 icon_destroy(icon icon_id);
+49: func b32 icon_get_size(icon icon_id, i32* out_width, i32* out_height);
+52: func b32 icon_get_hotspot(icon icon_id, i32* out_xpos, i32* out_ypos);
+55: func b32 icon_get_system(icon icon_id, icon_system* out_system_icon);
+58: func b32 icon_is_rgba(icon icon_id);
+61: func b32 icon_is_system(icon icon_id);
+
+=== include\interface\monitor.h ===
+6: #include "../basic/primitive_types.h"
+7: #include "../basic/third_party.h"
+8: #include "../input/devices.h"
+9: #include "../strings/cstrings.h"
+11: typedef void* monitor;
+17: typedef struct monitor_mode {
+24: typedef enum monitor_orientation {
+33: func b32 monitor_id_is_valid(monitor src);
+36: func monitor monitor_from_device(device src);
+39: func sz monitor_get_total_count(void);
+40: func monitor monitor_get_from_idx(sz idx);
+43: func monitor monitor_get_primary_id(void);
+46: func r2_i32 monitor_get_bounds(monitor mon_id);
+47: func r2_i32 monitor_get_usable_bounds(monitor mon_id);
+50: func sz monitor_get_mode_count(monitor mon_id);
+51: func b32 monitor_get_mode(monitor mon_id, sz idx, monitor_mode* out_mode);
+52: func b32 monitor_get_current_mode(monitor mon_id, monitor_mode* out_mode);
+53: func b32 monitor_get_desktop_mode(monitor mon_id, monitor_mode* out_mode);
+56: func cstr8 monitor_get_name(monitor mon_id);
+57: func f32 monitor_get_refresh_rate(monitor mon_id);
+58: func f32 monitor_get_content_scale(monitor mon_id);
+59: func monitor_orientation monitor_get_orientation(monitor mon_id);
+
+=== include\interface\text_input.h ===
+6: #include "window.h"
+13: func b32 text_input_start(window opt_window);
+14: func b32 text_input_stop(window opt_window);
+15: func b32 text_input_is_active(window opt_window);
+16: func b32 text_input_set_area(window opt_window, i32 xpos, i32 ypos, i32 width, i32 height);
+
+=== include\interface\window.h ===
+6: #include "../basic/primitive_types.h"
+7: #include "../strings/cstrings.h"
+8: #include "icon.h"
+9: #include "monitor.h"
+15: typedef void* window;
+17: typedef enum window_mode {
+24: typedef enum window_center_axis {
+33: func b32 window_id_is_valid(window src);
+37: func sz window_get_total_count(void);
+38: func window window_get_from_idx(sz idx);
+41: func b32 window_is_valid(window window_id);
+45: func window window_create(cstr8 title, i32 width, i32 height, window_mode mode, u64 flags);
+48: func b32 window_destroy(window window_id);
+52: func b32 window_is_hidden(window window_id);
+55: func b32 window_show(window window_id);
+58: func b32 window_hide(window window_id);
+62: func b32 window_set_pos(window window_id, i32 xpos, i32 ypos);
+65: func b32 window_get_pos(window window_id, i32* out_xpos, i32* out_ypos);
+69: func b32 window_set_size(window window_id, i32 width, i32 height);
+72: func b32 window_get_size(window window_id, i32* out_width, i32* out_height);
+76: func b32 window_set_mode(window window_id, window_mode mode);
+79: func window_mode window_get_mode(window window_id);
+83: func b32 window_is_minimized(window window_id);
+86: func b32 window_is_maximized(window window_id);
+89: func b32 window_has_input_focus(window window_id);
+92: func b32 window_has_mouse_focus(window window_id);
+95: func b32 window_is_topmost(window window_id);
+98: func b32 window_minimize(window window_id);
+101: func b32 window_maximize(window window_id);
+104: func b32 window_restore(window window_id);
+107: func b32 window_focus(window window_id);
+110: func b32 window_set_topmost(window window_id, b32 enabled);
+114: func cstr8 window_get_title(window window_id);
+117: func b32 window_set_title(window window_id, cstr8 title);
+120: func b32 window_set_icon(window window_id, icon icon_id);
+123: func b32 window_get_monitor(window window_id, monitor* out_monitor_id);
+126: func b32 window_get_creation_monitor(window window_id, monitor* out_monitor_id);
+130: func b32 window_center_in_monitor(
+136: func window window_get_keyboard_focus();
+137: func window window_get_cursor_focus();
+
 === include\memory\allocator.h ===
-24: typedef struct allocator {
-36: func void* _allocator_alloc(allocator alloc, sz size, callsite site);
-39: func void* _allocator_calloc(allocator alloc, sz count, sz size, callsite site);
-42: func void _allocator_dealloc(allocator alloc, void* ptr, callsite site);
-45: func void* _allocator_realloc(allocator alloc, void* ptr, sz new_size, callsite site);
-48: #define allocator_alloc(alloc, size) \
-50: #define allocator_dealloc(alloc, ptr) \
-52: #define allocator_calloc(alloc, count, size) \
-54: #define allocator_realloc(alloc, ptr, new_size) \
+6: #include "../basic/codespace.h"
+13: typedef void* allocator_callback_realloc(
+18: typedef void* allocator_callback_alloc(
+22: typedef void allocator_callback_free(
+27: typedef struct allocator {
+38: func void* _allocator_alloc(allocator alloc, sz size, callsite site);
+41: func void* _allocator_calloc(allocator alloc, sz count, sz size, callsite site);
+44: func void _allocator_dealloc(allocator alloc, void* ptr, callsite site);
+47: func void* _allocator_realloc(allocator alloc, void* ptr, sz new_size, callsite site);
+50: #define allocator_alloc(alloc, size) \
+52: #define allocator_dealloc(alloc, ptr) \
+54: #define allocator_calloc(alloc, count, size) \
+56: #define allocator_realloc(alloc, ptr, new_size) \
 
 === include\memory\arena.h ===
-17: typedef struct arena_block {
-34: typedef struct arena {
+6: #include "../basic/codespace.h"
+7: #include "../threads/mutex.h"
+8: #include "allocator.h"
+21: typedef struct arena_block {
+38: typedef struct arena {
 52: func arena _arena_create(
 62: func arena _arena_create_mutexed(allocator parent_alloc, sz default_block_sz, callsite site);
 68: func void _arena_destroy(arena* arn, callsite site);
@@ -828,43 +1279,48 @@
 72: #define arena_create_mutexed(parent_alloc, default_block_sz) \
 74: #define arena_destroy(arn) \
 80: func allocator arena_get_allocator(arena* arn);
-75: func void arena_add_block(arena* arn, void* ptr, sz size);
-80: func b32 arena_remove_block(arena* arn, void* ptr);
-90: func void* _arena_alloc(arena* arn, sz size, sz align, callsite site);
-97: func void* _arena_realloc(
-106: #define arena_alloc(arn, size, align) \
-108: #define arena_realloc(arn, ptr, old_size, new_size, align) \
-115: #define arena_alloc_type(arn, type) \
-117: #define arena_alloc_array(arn, type, count) \
-119: #define arena_realloc_array(arn, ptr, old_count, new_count, type) \
-128: func void arena_clear(arena* arn);
-130: func sz arena_block_count(arena* arn);
-131: func sz arena_total_size(arena* arn);
-132: func sz arena_total_used(arena* arn);
-133: func sz arena_total_free(arena* arn);
+90: func void arena_add_block(arena* arn, void* ptr, sz size);
+95: func b32 arena_remove_block(arena* arn, void* ptr);
+105: func void* _arena_alloc(arena* arn, sz size, sz align, callsite site);
+112: func void* _arena_realloc(
+121: #define arena_alloc(arn, size, align) \
+123: #define arena_realloc(arn, ptr, old_size, new_size, align) \
+130: #define arena_alloc_type(arn, type) \
+132: #define arena_alloc_array(arn, type, count) \
+134: #define arena_realloc_array(arn, ptr, old_count, new_count, type) \
+143: func void arena_clear(arena* arn);
+146: func sz arena_block_count(arena* arn);
+147: func sz arena_total_size(arena* arn);
+148: func sz arena_total_used(arena* arn);
+149: func sz arena_total_free(arena* arn);
 
 === include\memory\buffer.h ===
-8: typedef struct buffer {
-14: func buffer buffer_from(void* ptr, sz size);
-17: func buffer buffer_sub_from(buffer buff, sz offset);
-20: func buffer buffer_sub_from_sized(buffer buff, sz offset, sz size);
-23: func buffer buffer_slice(buffer buff, sz start, sz end);
-26: func buffer buffer_split_offset(buffer* buff, sz offset);
-30: func buffer buffer_split_size(buffer* buff, sz size);
-33: func b32 buffer_cmp(buffer a, buffer b);
-37: func b32 buffer_cmp_common(buffer a, buffer b);
-40: func void* buffer_get_ptr(buffer buff, sz offset);
-44: func void* buffer_get_data(buffer buff, sz offset, sz read_size);
-48: func void buffer_set8(buffer buff, u8 value);
-49: func void buffer_set16(buffer buff, u16 value);
-50: func void buffer_set32(buffer buff, u32 value);
-51: func void buffer_set64(buffer buff, u64 value);
-52: func void buffer_zero(buffer buff);
+6: #include "../basic/primitive_types.h"
+7: #include "memops.h"
+13: typedef struct buffer {
+19: func buffer buffer_from(void* ptr, sz size);
+22: func buffer buffer_sub_from(buffer buff, sz offset);
+25: func buffer buffer_sub_from_sized(buffer buff, sz offset, sz size);
+28: func buffer buffer_slice(buffer buff, sz start, sz end);
+31: func buffer buffer_split_offset(buffer* buff, sz offset);
+35: func buffer buffer_split_size(buffer* buff, sz size);
+38: func b32 buffer_cmp(buffer a, buffer b);
+42: func b32 buffer_cmp_common(buffer a, buffer b);
+45: func void* buffer_get_ptr(buffer buff, sz offset);
+49: func void* buffer_get_data(buffer buff, sz offset, sz read_size);
+53: func void buffer_set8(buffer buff, u8 value);
+54: func void buffer_set16(buffer buff, u16 value);
+55: func void buffer_set32(buffer buff, u32 value);
+56: func void buffer_set64(buffer buff, u64 value);
+58: func void buffer_zero(buffer buff);
 
 === include\memory\heap.h ===
-18: typedef struct heap_chunk {
-32: typedef struct heap_block {
-48: typedef struct heap {
+6: #include "../basic/codespace.h"
+7: #include "../threads/mutex.h"
+8: #include "allocator.h"
+22: typedef struct heap_chunk {
+36: typedef struct heap_block {
+52: typedef struct heap {
 67: func heap _heap_create(allocator parent_alloc, mutex opt_mutex, sz default_block_sz, callsite site);
 73: func heap _heap_create_mutexed(allocator parent_alloc, sz default_block_sz, callsite site);
 79: func void _heap_destroy(heap* hep, callsite site);
@@ -872,49 +1328,55 @@
 83: #define heap_create_mutexed(parent_alloc, default_block_sz) \
 85: #define heap_destroy(hep) \
 90: func allocator heap_get_allocator(heap* hep);
-89: func void heap_add_block(heap* hep, void* ptr, sz size);
-94: func b32 heap_remove_block(heap* hep, void* ptr);
-104: func void* _heap_alloc(heap* hep, sz size, sz align, callsite site);
-109: func void _heap_dealloc(heap* hep, void* ptr, callsite site);
-115: func void* _heap_realloc(
-123: #define heap_alloc(hp, size, align) \
-125: #define heap_dealloc(hp, ptr) \
-127: #define heap_realloc(hp, ptr, old_size, new_size, align) \
-134: #define heap_alloc_type(hp, type) \
-136: #define heap_alloc_array(hp, type, count) \
-138: #define heap_realloc_array(hp, ptr, old_count, new_count, type) \
-147: func void heap_clear(heap* hep);
-149: func sz heap_block_count(heap* hep);
-150: func sz heap_total_size(heap* hep);
-151: func sz heap_total_free(heap* hep);
+100: func void heap_add_block(heap* hep, void* ptr, sz size);
+105: func b32 heap_remove_block(heap* hep, void* ptr);
+115: func void* _heap_alloc(heap* hep, sz size, sz align, callsite site);
+120: func void _heap_dealloc(heap* hep, void* ptr, callsite site);
+126: func void* _heap_realloc(
+134: #define heap_alloc(hp, size, align) \
+136: #define heap_dealloc(hp, ptr) \
+138: #define heap_realloc(hp, ptr, old_size, new_size, align) \
+145: #define heap_alloc_type(hp, type) \
+147: #define heap_alloc_array(hp, type, count) \
+149: #define heap_realloc_array(hp, ptr, old_count, new_count, type) \
+158: func void heap_clear(heap* hep);
+161: func sz heap_block_count(heap* hep);
+162: func sz heap_total_size(heap* hep);
+163: func sz heap_total_free(heap* hep);
 
 === include\memory\memops.h ===
-13: func void mem_set8(void* ptr, u8 value, sz size);
-14: func void mem_set16(void* ptr, u16 value, sz count);
-15: func void mem_set32(void* ptr, u32 value, sz count);
-16: func void mem_set64(void* ptr, u64 value, sz count);
-18: func void mem_zero(void* ptr, sz size);
-20: func void* mem_cpy(void* dst, const void* src, sz size);
-21: func void* mem_mv(void* dst, const void* src, sz size);
-22: func b32 mem_cmp(const void* lhs, const void* rhs, sz size);
-23: func void* mem_align_forward(void* ptr, sz align);
-24: func void* mem_align_backward(void* ptr, sz align);
-26: #define mem_set8_type(ptr, value, type) \
-28: #define mem_set8_array(ptr, value, count, type) \
-31: #define mem_set16_type(ptr, value) \
-33: #define mem_set16_array(ptr, value, count) \
-36: #define mem_set32_type(ptr, value) \
-38: #define mem_set32_array(ptr, value, count) \
-41: #define mem_set64_type(ptr, value) \
-43: #define mem_set64_array(ptr, value, count) \
-46: #define mem_zero_type(ptr, type) \
-48: #define mem_zero_array(ptr, type, count) \
-52: func force_inline up mem_align_forward_up(up ptr, sz align) {
-56: func force_inline up mem_align_backward_up(up ptr, sz align) {
+6: #include "../basic/primitive_types.h"
+7: #include "../basic/utility_defines.h"
+14: func void mem_set8(void* ptr, u8 value, sz size);
+18: func void mem_set16(void* ptr, u16 value, sz count);
+19: func void mem_set32(void* ptr, u32 value, sz count);
+20: func void mem_set64(void* ptr, u64 value, sz count);
+23: func void mem_zero(void* ptr, sz size);
+26: func void* mem_cpy(void* dst, const void* src, sz size);
+27: func void* mem_mv(void* dst, const void* src, sz size);
+28: func b32 mem_cmp(const void* lhs, const void* rhs, sz size);
+32: func void* mem_align_forward(void* ptr, sz align);
+33: func void* mem_align_backward(void* ptr, sz align);
+37: func up mem_align_forward_up(up ptr, sz align);
+38: func up mem_align_backward_up(up ptr, sz align);
+41: #define mem_set8_type(ptr, value, type) \
+43: #define mem_set8_array(ptr, value, count, type) \
+45: #define mem_set16_type(ptr, value) \
+47: #define mem_set16_array(ptr, value, count) \
+49: #define mem_set32_type(ptr, value) \
+51: #define mem_set32_array(ptr, value, count) \
+53: #define mem_set64_type(ptr, value) \
+55: #define mem_set64_array(ptr, value, count) \
+57: #define mem_zero_value(ptr) \
+59: #define mem_zero_type(ptr, type) \
+61: #define mem_zero_array(ptr, type, count) \
 
 === include\memory\pool.h ===
-16: typedef struct pool_block {
-33: typedef struct pool {
+6: #include "../basic/codespace.h"
+7: #include "../threads/mutex.h"
+8: #include "allocator.h"
+20: typedef struct pool_block {
+37: typedef struct pool {
 56: func pool _pool_create(
 70: func pool _pool_create_mutexed(
 81: func void _pool_destroy(pool* pol, callsite site);
@@ -922,21 +1384,24 @@
 85: #define pool_create_mutexed(parent_alloc, default_block_sz, object_size, object_align) \
 87: #define pool_destroy(pol) \
 94: func allocator pool_get_allocator(pool* pol);
-90: func void pool_add_block(pool* pol, void* ptr, sz size);
-95: func b32 pool_remove_block(pool* pol, void* ptr);
-104: func void* _pool_alloc(pool* pol, callsite site);
-108: func void _pool_dealloc(pool* pol, void* ptr, callsite site);
-111: #define pool_alloc(pol) \
-113: #define pool_dealloc(pol, ptr) \
-119: #define pool_alloc_type(pol, type) \
-121: #define pool_dealloc_type(pol, ptr) \
-130: func void pool_clear(pool* pol);
-132: func sz pool_block_count(pool* pol);
-133: func sz pool_slot_size(pool* pol);
-134: func sz pool_free_count(pool* pol);
+103: func void pool_add_block(pool* pol, void* ptr, sz size);
+108: func b32 pool_remove_block(pool* pol, void* ptr);
+117: func void* _pool_alloc(pool* pol, callsite site);
+121: func void _pool_dealloc(pool* pol, void* ptr, callsite site);
+124: #define pool_alloc(pol) \
+126: #define pool_dealloc(pol, ptr) \
+132: #define pool_alloc_type(pol, type) \
+134: #define pool_dealloc_type(pol, ptr) \
+143: func void pool_clear(pool* pol);
+146: func sz pool_block_count(pool* pol);
+147: func sz pool_slot_size(pool* pol);
+148: func sz pool_free_count(pool* pol);
 
 === include\memory\ring.h ===
-22: typedef struct ring {
+6: #include "../basic/codespace.h"
+7: #include "../threads/mutex.h"
+8: #include "allocator.h"
+27: typedef struct ring {
 43: func ring _ring_create(void* ptr, sz capacity, mutex opt_mutex, callsite site);
 47: func ring _ring_create_mutexed(void* ptr, sz capacity, callsite site);
 52: func ring _ring_create_alloc(allocator parent_alloc, sz capacity, mutex opt_mutex, callsite site);
@@ -948,60 +1413,49 @@
 68: #define ring_create_alloc_mutexed(parent_alloc, capacity) \
 70: #define ring_destroy(rng) \
 78: func sz ring_size(ring* rng);
-65: func sz ring_space(ring* rng);
-66: func sz ring_capacity(ring* rng);
-75: func sz ring_write(ring* rng, void* data, sz size);
-80: func sz ring_read(ring* rng, void* out, sz size);
-85: func sz ring_peek(ring* rng, void* out, sz size);
-89: func sz ring_skip(ring* rng, sz size);
-92: func void* ring_reserve_write(ring* rng, sz* out_size);
-93: func b32 ring_commit_write(ring* rng, sz size);
-96: func const void* ring_reserve_read(ring* rng, sz* out_size);
-97: func b32 ring_commit_read(ring* rng, sz size);
-105: func void ring_clear(ring* rng);
+81: func sz ring_space(ring* rng);
+83: func sz ring_capacity(ring* rng);
+92: func sz ring_write(ring* rng, void* data, sz size);
+97: func sz ring_read(ring* rng, void* out, sz size);
+102: func sz ring_peek(ring* rng, void* out, sz size);
+106: func sz ring_skip(ring* rng, sz size);
+109: func void* ring_reserve_write(ring* rng, sz* out_size);
+111: func b32 ring_commit_write(ring* rng, sz size);
+114: func const void* ring_reserve_read(ring* rng, sz* out_size);
+116: func b32 ring_commit_read(ring* rng, sz size);
+124: func void ring_clear(ring* rng);
 
 === include\memory\scratch.h ===
-28: typedef struct scratch {
-36: func scratch scratch_begin(arena* arn);
-41: func void scratch_end(scratch* scr);
+6: #include "arena.h"
+32: typedef struct scratch {
+40: func scratch scratch_begin(arena* arn);
+45: func void scratch_end(scratch* scr);
 
 === include\memory\vmem.h ===
-22: typedef struct vmem_stats {
-48: func sz vmem_page_size(void);
-54: func void* vmem_reserve(sz size);
-59: func b32 vmem_commit(void* ptr, sz size);
-65: func b32 vmem_decommit(void* ptr, sz size);
-71: func b32 vmem_release(void* ptr, sz size);
-77: func void* vmem_alloc(sz size);
-82: func void* vmem_calloc(sz count, sz size);
-89: func void* vmem_realloc(void* ptr, sz old_size, sz new_size);
-93: func b32 vmem_free(void* ptr, sz size);
-98: func allocator vmem_get_allocator(void);
-102: func vmem_stats vmem_get_stats(void);
-
-=== include\processes\process_pipe.h ===
-22: func process_pipe _process_pipe_stdin(process prc, callsite site);
-26: func process_pipe _process_pipe_stdout(process prc, callsite site);
-30: func process_pipe _process_pipe_stderr(process prc, callsite site);
-33: func b32 process_pipe_is_valid(process_pipe pip);
-37: func sz process_pipe_read(process_pipe pip, void* ptr, sz size);
-41: func sz process_pipe_write(process_pipe pip, const void* ptr, sz size);
-43: func sz process_pipe_read_nonblocking(process_pipe pip, void* ptr, sz size);
-44: func sz process_pipe_write_nonblocking(process_pipe pip, const void* ptr, sz size);
-45: func b32 process_pipe_poll_readable(process_pipe pip, i32 timeout_ms);
-48: func b32 process_pipe_flush(process_pipe pip);
-52: func void _process_pipe_close(process_pipe pip, callsite site);
-54: #define process_pipe_stdin(prc) \
-56: #define process_pipe_stdout(prc) \
-58: #define process_pipe_stderr(prc) \
-60: #define process_pipe_close(pip) \
+6: #include "../basic/primitive_types.h"
+7: #include "allocator.h"
+26: typedef struct vmem_stats {
+52: func sz vmem_page_size(void);
+58: func void* vmem_reserve(sz size);
+63: func b32 vmem_commit(void* ptr, sz size);
+69: func b32 vmem_decommit(void* ptr, sz size);
+75: func b32 vmem_release(void* ptr, sz size);
+81: func void* vmem_alloc(sz size);
+86: func void* vmem_calloc(sz count, sz size);
+93: func void* vmem_realloc(void* ptr, sz old_size, sz new_size);
+97: func b32 vmem_free(void* ptr, sz size);
+102: func allocator vmem_get_allocator(void);
+106: func vmem_stats vmem_get_stats(void);
 
 === include\processes\common_processes.h ===
-9: func b32 process_open_weblink(cstr8 url);
-12: func b32 process_open_file_window(cstr8 location);
-15: func b32 process_open_terminal(cstr8 location);
+6: #include "process.h"
+13: func b32 process_open_weblink(cstr8 url);
+16: func b32 process_open_file_window(cstr8 location);
+19: func b32 process_open_terminal(cstr8 location);
 
 === include\processes\process.h ===
+6: #include "../basic/codespace.h"
+17: typedef void* process;
 19: #define PROCESS_NAME_CAP 260
 22: typedef struct process_snapshot_entry {
 28: typedef struct process_options {
@@ -1024,66 +1478,90 @@
 95: #define process_destroy(prc) \
 
 === include\processes\process_current.h ===
-14: typedef enum process_priority {
-22: func u64 process_id(void);
-25: func process_priority process_get_priority(void);
-29: func b32 process_set_priority(process_priority priority);
-32: func b32 process_is_unique(void);
-36: func b32 process_restart(void);
-33: func no_return void process_exit(i32 exit_code);
-37: func no_return void process_abort(void);
+6: #include "../basic/primitive_types.h"
+18: typedef enum process_priority {
+26: func u64 process_id(void);
+29: func process_priority process_get_priority(void);
+33: func b32 process_set_priority(process_priority priority);
+36: func b32 process_is_unique(void);
+40: func b32 process_restart(void);
+44: func no_return void process_exit(i32 exit_code);
+48: func no_return void process_abort(void);
+
+=== include\processes\process_pipe.h ===
+6: #include "../basic/codespace.h"
+7: #include "process.h"
+18: typedef void* process_pipe;
+22: func process_pipe _process_pipe_stdin(process prc, callsite site);
+26: func process_pipe _process_pipe_stdout(process prc, callsite site);
+30: func process_pipe _process_pipe_stderr(process prc, callsite site);
+33: func b32 process_pipe_is_valid(process_pipe pip);
+37: func sz process_pipe_read(process_pipe pip, void* ptr, sz size);
+41: func sz process_pipe_write(process_pipe pip, const void* ptr, sz size);
+43: func sz process_pipe_read_nonblocking(process_pipe pip, void* ptr, sz size);
+44: func sz process_pipe_write_nonblocking(process_pipe pip, const void* ptr, sz size);
+45: func b32 process_pipe_poll_readable(process_pipe pip, i32 timeout_ms);
+48: func b32 process_pipe_flush(process_pipe pip);
+52: func void _process_pipe_close(process_pipe pip, callsite site);
+54: #define process_pipe_stdin(prc) \
+56: #define process_pipe_stdout(prc) \
+58: #define process_pipe_stderr(prc) \
+60: #define process_pipe_close(pip) \
 
 === include\strings\char.h ===
-12: func b32 c8_is_alnum(c8 chr);
-13: func b32 c8_is_alpha(c8 chr);
-14: func b32 c8_is_blank(c8 chr);
-15: func b32 c8_is_cntrl(c8 chr);
-16: func b32 c8_is_digit(c8 chr);
-17: func b32 c8_is_graph(c8 chr);
-18: func b32 c8_is_lower(c8 chr);
-19: func b32 c8_is_print(c8 chr);
-20: func b32 c8_is_punct(c8 chr);
-21: func b32 c8_is_space(c8 chr);
-22: func b32 c8_is_upper(c8 chr);
-23: func b32 c8_is_xdigit(c8 chr);
-24: func c8 c8_to_lower(c8 chr);
-25: func c8 c8_to_upper(c8 chr);
-26: func i32 c8_hex_to_nibble(c8 chr);
-27: func c8 c8_nibble_to_hex(u8 nibble);
-33: func b32 c16_is_alnum(c16 chr);
-34: func b32 c16_is_alpha(c16 chr);
-35: func b32 c16_is_blank(c16 chr);
-36: func b32 c16_is_cntrl(c16 chr);
-37: func b32 c16_is_digit(c16 chr);
-38: func b32 c16_is_graph(c16 chr);
-39: func b32 c16_is_lower(c16 chr);
-40: func b32 c16_is_print(c16 chr);
-41: func b32 c16_is_punct(c16 chr);
-42: func b32 c16_is_space(c16 chr);
-43: func b32 c16_is_upper(c16 chr);
-44: func b32 c16_is_xdigit(c16 chr);
-45: func c16 c16_to_lower(c16 chr);
-46: func c16 c16_to_upper(c16 chr);
-47: func i32 c16_hex_to_nibble(c16 chr);
-48: func c16 c16_nibble_to_hex(u8 nibble);
-54: func b32 c32_is_alnum(c32 chr);
-55: func b32 c32_is_alpha(c32 chr);
-56: func b32 c32_is_blank(c32 chr);
-57: func b32 c32_is_cntrl(c32 chr);
-58: func b32 c32_is_digit(c32 chr);
-59: func b32 c32_is_graph(c32 chr);
-60: func b32 c32_is_lower(c32 chr);
-61: func b32 c32_is_print(c32 chr);
-62: func b32 c32_is_punct(c32 chr);
-63: func b32 c32_is_space(c32 chr);
-64: func b32 c32_is_upper(c32 chr);
-65: func b32 c32_is_xdigit(c32 chr);
-66: func c32 c32_to_lower(c32 chr);
-67: func c32 c32_to_upper(c32 chr);
-68: func i32 c32_hex_to_nibble(c32 chr);
-69: func c32 c32_nibble_to_hex(u8 nibble);
+6: #include "../basic/primitive_types.h"
+17: func b32 c8_is_alnum(c8 chr);
+18: func b32 c8_is_alpha(c8 chr);
+19: func b32 c8_is_blank(c8 chr);
+20: func b32 c8_is_cntrl(c8 chr);
+21: func b32 c8_is_digit(c8 chr);
+22: func b32 c8_is_graph(c8 chr);
+23: func b32 c8_is_lower(c8 chr);
+24: func b32 c8_is_print(c8 chr);
+25: func b32 c8_is_punct(c8 chr);
+26: func b32 c8_is_space(c8 chr);
+27: func b32 c8_is_upper(c8 chr);
+28: func b32 c8_is_xdigit(c8 chr);
+31: func c8 c8_to_lower(c8 chr);
+32: func c8 c8_to_upper(c8 chr);
+35: func i32 c8_hex_to_nibble(c8 chr);
+36: func c8 c8_nibble_to_hex(u8 nibble);
+43: func b32 c16_is_alnum(c16 chr);
+44: func b32 c16_is_alpha(c16 chr);
+45: func b32 c16_is_blank(c16 chr);
+46: func b32 c16_is_cntrl(c16 chr);
+47: func b32 c16_is_digit(c16 chr);
+48: func b32 c16_is_graph(c16 chr);
+49: func b32 c16_is_lower(c16 chr);
+50: func b32 c16_is_print(c16 chr);
+51: func b32 c16_is_punct(c16 chr);
+52: func b32 c16_is_space(c16 chr);
+53: func b32 c16_is_upper(c16 chr);
+54: func b32 c16_is_xdigit(c16 chr);
+57: func c16 c16_to_lower(c16 chr);
+58: func c16 c16_to_upper(c16 chr);
+61: func i32 c16_hex_to_nibble(c16 chr);
+62: func c16 c16_nibble_to_hex(u8 nibble);
+69: func b32 c32_is_alnum(c32 chr);
+70: func b32 c32_is_alpha(c32 chr);
+71: func b32 c32_is_blank(c32 chr);
+72: func b32 c32_is_cntrl(c32 chr);
+73: func b32 c32_is_digit(c32 chr);
+74: func b32 c32_is_graph(c32 chr);
+75: func b32 c32_is_lower(c32 chr);
+76: func b32 c32_is_print(c32 chr);
+77: func b32 c32_is_punct(c32 chr);
+78: func b32 c32_is_space(c32 chr);
+79: func b32 c32_is_upper(c32 chr);
+80: func b32 c32_is_xdigit(c32 chr);
+83: func c32 c32_to_lower(c32 chr);
+84: func c32 c32_to_upper(c32 chr);
+87: func i32 c32_hex_to_nibble(c32 chr);
+88: func c32 c32_nibble_to_hex(u8 nibble);
 
 === include\strings\cstrings.h ===
+6: #include "../basic/primitive_types.h"
+8: #include <stdarg.h>
 19: func sz cstr8_len(cstr8 str);
 22: func b32 cstr8_is_empty(cstr8 str);
 25: func void cstr8_clear(c8* str);
@@ -1195,8 +1673,30 @@
 370: func sz cstr16_to_cstr32(cstr16 src, c32* buf, sz buf_cap);
 371: func sz cstr32_to_cstr8(cstr32 src, c8* buf, sz buf_cap);
 372: func sz cstr32_to_cstr16(cstr32 src, c16* buf, sz buf_cap);
+380: #define STR_CAP_TINY   16
+381: #define STR_CAP_SHORT  64
+382: #define STR_CAP_MEDIUM 512
+383: #define STR_CAP_LONG   1024
+384: #define STR_CAP_LARGE  2048
+393: typedef c8 str8_tiny[STR_CAP_TINY];
+394: typedef c8 str8_short[STR_CAP_SHORT];
+395: typedef c8 str8_medium[STR_CAP_MEDIUM];
+396: typedef c8 str8_long[STR_CAP_LONG];
+397: typedef c8 str8_large[STR_CAP_LARGE];
+403: typedef c16 str16_tiny[STR_CAP_TINY];
+404: typedef c16 str16_short[STR_CAP_SHORT];
+405: typedef c16 str16_medium[STR_CAP_MEDIUM];
+406: typedef c16 str16_long[STR_CAP_LONG];
+407: typedef c16 str16_large[STR_CAP_LARGE];
+413: typedef c32 str32_tiny[STR_CAP_TINY];
+414: typedef c32 str32_short[STR_CAP_SHORT];
+415: typedef c32 str32_medium[STR_CAP_MEDIUM];
+416: typedef c32 str32_long[STR_CAP_LONG];
+417: typedef c32 str32_large[STR_CAP_LARGE];
 
 === include\strings\strings.h ===
+6: #include "cstrings.h"
+8: #include <stdarg.h>
 21: typedef struct str8 {
 28: func str8 str8_make(c8* ptr, sz cap);
 31: func str8 str8_empty(c8* ptr, sz cap);
@@ -1309,250 +1809,287 @@
 380: func sz str32_to_str16(str32 src, str16* dst);
 
 === include\strings\unicode.h ===
-21: func b32 unicode_is_valid(c32 codepoint);
-29: func sz utf8_encode_size(c32 codepoint);
-33: func sz utf8_byte_count(c8 first_byte);
-37: func c32 utf8_decode(cstr8 ptr, sz* consumed);
-41: func sz utf8_encode(c32 codepoint, c8* out);
-44: func sz utf8_codepoint_count(cstr8 src, sz src_size);
-52: func sz utf16_encode_size(c32 codepoint);
-56: func c32 utf16_decode(cstr16 ptr, sz* consumed);
-60: func sz utf16_encode(c32 codepoint, c16* out);
-64: func sz utf16_codepoint_count(cstr16 src, sz src_size);
-74: func sz utf8_to_utf16(cstr8 src, sz src_size, c16* dst, sz dst_cap);
-80: func sz utf8_to_utf32(cstr8 src, sz src_size, c32* dst, sz dst_cap);
-87: func sz utf16_to_utf8(cstr16 src, sz src_size, c8* dst, sz dst_cap);
-94: func sz utf16_to_utf32(cstr16 src, sz src_size, c32* dst, sz dst_cap);
-101: func sz utf32_to_utf8(cstr32 src, sz src_size, c8* dst, sz dst_cap);
-108: func sz utf32_to_utf16(cstr32 src, sz src_size, c16* dst, sz dst_cap);
+6: #include "../basic/primitive_types.h"
+25: func b32 unicode_is_valid(c32 codepoint);
+33: func sz utf8_encode_size(c32 codepoint);
+37: func sz utf8_byte_count(c8 first_byte);
+41: func c32 utf8_decode(cstr8 ptr, sz* consumed);
+45: func sz utf8_encode(c32 codepoint, c8* out);
+48: func sz utf8_codepoint_count(cstr8 src, sz src_size);
+56: func sz utf16_encode_size(c32 codepoint);
+60: func c32 utf16_decode(cstr16 ptr, sz* consumed);
+64: func sz utf16_encode(c32 codepoint, c16* out);
+68: func sz utf16_codepoint_count(cstr16 src, sz src_size);
+78: func sz utf8_to_utf16(cstr8 src, sz src_size, c16* dst, sz dst_cap);
+84: func sz utf8_to_utf32(cstr8 src, sz src_size, c32* dst, sz dst_cap);
+91: func sz utf16_to_utf8(cstr16 src, sz src_size, c8* dst, sz dst_cap);
+98: func sz utf16_to_utf32(cstr16 src, sz src_size, c32* dst, sz dst_cap);
+105: func sz utf32_to_utf8(cstr32 src, sz src_size, c8* dst, sz dst_cap);
+112: func sz utf32_to_utf16(cstr32 src, sz src_size, c16* dst, sz dst_cap);
 
 === include\system\cpu_info.h ===
-9: typedef struct cpu_instruction_set_info {
-29: typedef struct cpu_info {
-39: func b32 cpu_info_query(cpu_info* out_info);
+6: #include "../basic/primitive_types.h"
+7: #include "../strings/cstrings.h"
+13: typedef struct cpu_instruction_set_info {
+40: typedef struct cpu_info {
+59: func b32 cpu_info_query(cpu_info* out_info);
 
 === include\system\hardware_info.h ===
+6: #include "../strings/cstrings.h"
+7: #include "cpu_info.h"
+8: #include "system_runtime.h"
 14: typedef struct hardware_info {
 47: func b32 hardware_info_query(hardware_info* out_info);
 
 === include\system\language.h ===
+6: #include "../basic/primitive_types.h"
+7: #include "../strings/cstrings.h"
 13: typedef struct language_info {
 25: func b32 language_query(language_info* out_info);
 
 === include\system\system_info.h ===
-9: typedef struct system_info {
-21: func b32 system_info_query(system_info* out_info);
+6: #include "../basic/primitive_types.h"
+7: #include "../strings/cstrings.h"
+13: typedef struct system_info {
+41: func b32 system_info_query(system_info* out_info);
 
 === include\system\system_runtime.h ===
-8: typedef struct system_runtime_info {
-19: func b32 system_runtime_query(system_runtime_info* out_info);
+6: #include "../basic/primitive_types.h"
+12: typedef struct system_runtime_info {
+35: func b32 system_runtime_query(system_runtime_info* out_info);
 
 === include\threads\atomics.h ===
-15: typedef struct atomic_i32 {
-19: typedef struct atomic_u32 {
-23: typedef struct atomic_i64 {
-27: typedef struct atomic_u64 {
-32: typedef struct atomic_ptr {
-36: typedef enum atomic_memory_order {
-50: func i32 atomic_i32_get(atomic_i32* atom);
-51: func i32 atomic_i32_get_explicit(atomic_i32* atom, atomic_memory_order order);
-54: func i32 atomic_i32_set(atomic_i32* atom, i32 val);
-55: func i32 atomic_i32_set_explicit(atomic_i32* atom, i32 val, atomic_memory_order order);
-60: func b32 atomic_i32_cmpex(atomic_i32* atom, i32* expected, i32 desired);
-63: func i32 atomic_i32_add(atomic_i32* atom, i32 delta);
-64: func i32 atomic_i32_and(atomic_i32* atom, i32 mask);
-65: func i32 atomic_i32_or(atomic_i32* atom, i32 mask);
-66: func i32 atomic_i32_xor(atomic_i32* atom, i32 mask);
-69: func i32 atomic_i32_sub(atomic_i32* atom, i32 delta);
-72: func b32 atomic_i32_eq(atomic_i32* atom, i32 val);
-73: func b32 atomic_i32_neq(atomic_i32* atom, i32 val);
-74: func b32 atomic_i32_lt(atomic_i32* atom, i32 val);
-75: func b32 atomic_i32_gt(atomic_i32* atom, i32 val);
-76: func b32 atomic_i32_lte(atomic_i32* atom, i32 val);
-77: func b32 atomic_i32_gte(atomic_i32* atom, i32 val);
-84: func u32 atomic_u32_get(atomic_u32* atom);
-85: func u32 atomic_u32_get_explicit(atomic_u32* atom, atomic_memory_order order);
-88: func u32 atomic_u32_set(atomic_u32* atom, u32 val);
-89: func u32 atomic_u32_set_explicit(atomic_u32* atom, u32 val, atomic_memory_order order);
-94: func b32 atomic_u32_cmpex(atomic_u32* atom, u32* expected, u32 desired);
-97: func u32 atomic_u32_add(atomic_u32* atom, u32 delta);
-98: func u32 atomic_u32_and(atomic_u32* atom, u32 mask);
-99: func u32 atomic_u32_or(atomic_u32* atom, u32 mask);
-100: func u32 atomic_u32_xor(atomic_u32* atom, u32 mask);
-103: func u32 atomic_u32_sub(atomic_u32* atom, u32 delta);
-106: func b32 atomic_u32_eq(atomic_u32* atom, u32 val);
-107: func b32 atomic_u32_neq(atomic_u32* atom, u32 val);
-108: func b32 atomic_u32_lt(atomic_u32* atom, u32 val);
-109: func b32 atomic_u32_gt(atomic_u32* atom, u32 val);
-110: func b32 atomic_u32_lte(atomic_u32* atom, u32 val);
-111: func b32 atomic_u32_gte(atomic_u32* atom, u32 val);
-118: func i64 atomic_i64_get(atomic_i64* atom);
-119: func i64 atomic_i64_get_explicit(atomic_i64* atom, atomic_memory_order order);
-122: func i64 atomic_i64_set(atomic_i64* atom, i64 val);
-123: func i64 atomic_i64_set_explicit(atomic_i64* atom, i64 val, atomic_memory_order order);
-127: func b32 atomic_i64_cmpex(atomic_i64* atom, i64* expected, i64 desired);
-130: func i64 atomic_i64_add(atomic_i64* atom, i64 delta);
-131: func i64 atomic_i64_and(atomic_i64* atom, i64 mask);
-132: func i64 atomic_i64_or(atomic_i64* atom, i64 mask);
-133: func i64 atomic_i64_xor(atomic_i64* atom, i64 mask);
-136: func i64 atomic_i64_sub(atomic_i64* atom, i64 delta);
-139: func b32 atomic_i64_eq(atomic_i64* atom, i64 val);
-140: func b32 atomic_i64_neq(atomic_i64* atom, i64 val);
-141: func b32 atomic_i64_lt(atomic_i64* atom, i64 val);
-142: func b32 atomic_i64_gt(atomic_i64* atom, i64 val);
-143: func b32 atomic_i64_lte(atomic_i64* atom, i64 val);
-144: func b32 atomic_i64_gte(atomic_i64* atom, i64 val);
-151: func u64 atomic_u64_get(atomic_u64* atom);
-152: func u64 atomic_u64_get_explicit(atomic_u64* atom, atomic_memory_order order);
-155: func u64 atomic_u64_set(atomic_u64* atom, u64 val);
-156: func u64 atomic_u64_set_explicit(atomic_u64* atom, u64 val, atomic_memory_order order);
-160: func b32 atomic_u64_cmpex(atomic_u64* atom, u64* expected, u64 desired);
-163: func u64 atomic_u64_add(atomic_u64* atom, u64 delta);
-164: func u64 atomic_u64_and(atomic_u64* atom, u64 mask);
-165: func u64 atomic_u64_or(atomic_u64* atom, u64 mask);
-166: func u64 atomic_u64_xor(atomic_u64* atom, u64 mask);
-169: func u64 atomic_u64_sub(atomic_u64* atom, u64 delta);
-172: func b32 atomic_u64_eq(atomic_u64* atom, u64 val);
-173: func b32 atomic_u64_neq(atomic_u64* atom, u64 val);
-174: func b32 atomic_u64_lt(atomic_u64* atom, u64 val);
-175: func b32 atomic_u64_gt(atomic_u64* atom, u64 val);
-176: func b32 atomic_u64_lte(atomic_u64* atom, u64 val);
-177: func b32 atomic_u64_gte(atomic_u64* atom, u64 val);
-184: func void* atomic_ptr_get(atomic_ptr* atom);
-187: func void* atomic_ptr_set(atomic_ptr* atom, void* val);
-192: func b32 atomic_ptr_cmpex(atomic_ptr* atom, void** expected, void* desired);
-195: func b32 atomic_ptr_eq(atomic_ptr* atom, void* val);
-196: func b32 atomic_ptr_neq(atomic_ptr* atom, void* val);
-203: func void atomic_fence_acquire(void);
-206: func void atomic_fence_release(void);
-209: func void atomic_fence(void);
-213: func void atomic_pause(void);
+6: #include "../basic/primitive_types.h"
+19: typedef struct atomic_i32 {
+23: typedef struct atomic_u32 {
+27: typedef struct atomic_i64 {
+31: typedef struct atomic_u64 {
+36: typedef struct atomic_ptr {
+40: typedef enum atomic_memory_order {
+54: func i32 atomic_i32_get(atomic_i32* atom);
+55: func i32 atomic_i32_get_explicit(atomic_i32* atom, atomic_memory_order order);
+58: func i32 atomic_i32_set(atomic_i32* atom, i32 val);
+59: func i32 atomic_i32_set_explicit(atomic_i32* atom, i32 val, atomic_memory_order order);
+64: func b32 atomic_i32_cmpex(atomic_i32* atom, i32* expected, i32 desired);
+67: func i32 atomic_i32_add(atomic_i32* atom, i32 delta);
+68: func i32 atomic_i32_and(atomic_i32* atom, i32 mask);
+69: func i32 atomic_i32_or(atomic_i32* atom, i32 mask);
+70: func i32 atomic_i32_xor(atomic_i32* atom, i32 mask);
+73: func i32 atomic_i32_sub(atomic_i32* atom, i32 delta);
+76: func b32 atomic_i32_eq(atomic_i32* atom, i32 val);
+77: func b32 atomic_i32_neq(atomic_i32* atom, i32 val);
+78: func b32 atomic_i32_lt(atomic_i32* atom, i32 val);
+79: func b32 atomic_i32_gt(atomic_i32* atom, i32 val);
+80: func b32 atomic_i32_lte(atomic_i32* atom, i32 val);
+81: func b32 atomic_i32_gte(atomic_i32* atom, i32 val);
+88: func u32 atomic_u32_get(atomic_u32* atom);
+89: func u32 atomic_u32_get_explicit(atomic_u32* atom, atomic_memory_order order);
+92: func u32 atomic_u32_set(atomic_u32* atom, u32 val);
+93: func u32 atomic_u32_set_explicit(atomic_u32* atom, u32 val, atomic_memory_order order);
+98: func b32 atomic_u32_cmpex(atomic_u32* atom, u32* expected, u32 desired);
+101: func u32 atomic_u32_add(atomic_u32* atom, u32 delta);
+102: func u32 atomic_u32_and(atomic_u32* atom, u32 mask);
+103: func u32 atomic_u32_or(atomic_u32* atom, u32 mask);
+104: func u32 atomic_u32_xor(atomic_u32* atom, u32 mask);
+107: func u32 atomic_u32_sub(atomic_u32* atom, u32 delta);
+110: func b32 atomic_u32_eq(atomic_u32* atom, u32 val);
+111: func b32 atomic_u32_neq(atomic_u32* atom, u32 val);
+112: func b32 atomic_u32_lt(atomic_u32* atom, u32 val);
+113: func b32 atomic_u32_gt(atomic_u32* atom, u32 val);
+114: func b32 atomic_u32_lte(atomic_u32* atom, u32 val);
+115: func b32 atomic_u32_gte(atomic_u32* atom, u32 val);
+122: func i64 atomic_i64_get(atomic_i64* atom);
+123: func i64 atomic_i64_get_explicit(atomic_i64* atom, atomic_memory_order order);
+126: func i64 atomic_i64_set(atomic_i64* atom, i64 val);
+127: func i64 atomic_i64_set_explicit(atomic_i64* atom, i64 val, atomic_memory_order order);
+131: func b32 atomic_i64_cmpex(atomic_i64* atom, i64* expected, i64 desired);
+134: func i64 atomic_i64_add(atomic_i64* atom, i64 delta);
+135: func i64 atomic_i64_and(atomic_i64* atom, i64 mask);
+136: func i64 atomic_i64_or(atomic_i64* atom, i64 mask);
+137: func i64 atomic_i64_xor(atomic_i64* atom, i64 mask);
+140: func i64 atomic_i64_sub(atomic_i64* atom, i64 delta);
+143: func b32 atomic_i64_eq(atomic_i64* atom, i64 val);
+144: func b32 atomic_i64_neq(atomic_i64* atom, i64 val);
+145: func b32 atomic_i64_lt(atomic_i64* atom, i64 val);
+146: func b32 atomic_i64_gt(atomic_i64* atom, i64 val);
+147: func b32 atomic_i64_lte(atomic_i64* atom, i64 val);
+148: func b32 atomic_i64_gte(atomic_i64* atom, i64 val);
+155: func u64 atomic_u64_get(atomic_u64* atom);
+156: func u64 atomic_u64_get_explicit(atomic_u64* atom, atomic_memory_order order);
+159: func u64 atomic_u64_set(atomic_u64* atom, u64 val);
+160: func u64 atomic_u64_set_explicit(atomic_u64* atom, u64 val, atomic_memory_order order);
+164: func b32 atomic_u64_cmpex(atomic_u64* atom, u64* expected, u64 desired);
+167: func u64 atomic_u64_add(atomic_u64* atom, u64 delta);
+168: func u64 atomic_u64_and(atomic_u64* atom, u64 mask);
+169: func u64 atomic_u64_or(atomic_u64* atom, u64 mask);
+170: func u64 atomic_u64_xor(atomic_u64* atom, u64 mask);
+173: func u64 atomic_u64_sub(atomic_u64* atom, u64 delta);
+176: func b32 atomic_u64_eq(atomic_u64* atom, u64 val);
+177: func b32 atomic_u64_neq(atomic_u64* atom, u64 val);
+178: func b32 atomic_u64_lt(atomic_u64* atom, u64 val);
+179: func b32 atomic_u64_gt(atomic_u64* atom, u64 val);
+180: func b32 atomic_u64_lte(atomic_u64* atom, u64 val);
+181: func b32 atomic_u64_gte(atomic_u64* atom, u64 val);
+188: func void* atomic_ptr_get(atomic_ptr* atom);
+191: func void* atomic_ptr_set(atomic_ptr* atom, void* val);
+196: func b32 atomic_ptr_cmpex(atomic_ptr* atom, void** expected, void* desired);
+199: func b32 atomic_ptr_eq(atomic_ptr* atom, void* val);
+200: func b32 atomic_ptr_neq(atomic_ptr* atom, void* val);
+207: func void atomic_fence_acquire(void);
+210: func void atomic_fence_release(void);
+213: func void atomic_fence(void);
+217: func void atomic_pause(void);
 
 === include\threads\condvar.h ===
-13: func condvar _condvar_create(callsite site);
-16: func b32 _condvar_destroy(condvar cond, callsite site);
-19: #define condvar_create()      _condvar_create(CALLSITE_HERE)
-20: #define condvar_destroy(cond) _condvar_destroy(cond, CALLSITE_HERE)
-23: func b32 condvar_is_valid(condvar cond);
-27: func void condvar_wait(condvar cond, mutex mtx);
-30: func b32 condvar_wait_timeout(condvar cond, mutex mtx, u32 millis);
-33: func void condvar_signal(condvar cond);
-36: func void condvar_broadcast(condvar cond);
+6: #include "../basic/codespace.h"
+7: #include "mutex.h"
+14: typedef void* condvar;
+17: func condvar _condvar_create(callsite site);
+20: func b32 _condvar_destroy(condvar cond, callsite site);
+23: #define condvar_create()      _condvar_create(CALLSITE_HERE)
+24: #define condvar_destroy(cond) _condvar_destroy(cond, CALLSITE_HERE)
+27: func b32 condvar_is_valid(condvar cond);
+31: func void condvar_wait(condvar cond, mutex mtx);
+34: func b32 condvar_wait_timeout(condvar cond, mutex mtx, u32 millis);
+37: func void condvar_signal(condvar cond);
+40: func void condvar_broadcast(condvar cond);
 
 === include\threads\mutex.h ===
-12: func mutex _mutex_create(callsite site);
-15: func b32 _mutex_destroy(mutex mtx, callsite site);
-18: #define mutex_create()     _mutex_create(CALLSITE_HERE)
-19: #define mutex_destroy(mtx) _mutex_destroy(mtx, CALLSITE_HERE)
-22: func b32 mutex_is_valid(mutex mtx);
-27: func void mutex_lock(mutex mtx);
-31: func b32 mutex_trylock(mutex mtx);
-34: func b32 mutex_timed_lock(mutex mtx, i32 timeout_ms);
-38: func void mutex_unlock(mutex mtx);
+6: #include "../basic/codespace.h"
+13: typedef void* mutex;
+16: func mutex _mutex_create(callsite site);
+19: func b32 _mutex_destroy(mutex mtx, callsite site);
+22: #define mutex_create()     _mutex_create(CALLSITE_HERE)
+23: #define mutex_destroy(mtx) _mutex_destroy(mtx, CALLSITE_HERE)
+26: func b32 mutex_is_valid(mutex mtx);
+31: func void mutex_lock(mutex mtx);
+35: func b32 mutex_trylock(mutex mtx);
+38: func b32 mutex_timed_lock(mutex mtx, i32 timeout_ms);
+42: func void mutex_unlock(mutex mtx);
 
 === include\threads\rwlock.h ===
-13: func rwlock _rwlock_create(callsite site);
-16: func b32 _rwlock_destroy(rwlock rw, callsite site);
-19: #define rwlock_create()    _rwlock_create(CALLSITE_HERE)
-20: #define rwlock_destroy(rw) _rwlock_destroy(rw, CALLSITE_HERE)
-23: func b32 rwlock_is_valid(rwlock rw);
-28: func void rwlock_read_lock(rwlock rw);
-31: func void rwlock_read_unlock(rwlock rw);
-36: func void rwlock_write_lock(rwlock rw);
-39: func void rwlock_write_unlock(rwlock rw);
-43: func b32 rwlock_try_read_lock(rwlock rw);
-47: func b32 rwlock_try_write_lock(rwlock rw);
-50: func b32 rwlock_timed_read_lock(rwlock rw, i32 timeout_ms);
-53: func b32 rwlock_timed_write_lock(rwlock rw, i32 timeout_ms);
+6: #include "../basic/codespace.h"
+13: typedef void* rwlock;
+17: func rwlock _rwlock_create(callsite site);
+20: func b32 _rwlock_destroy(rwlock rw, callsite site);
+23: #define rwlock_create()    _rwlock_create(CALLSITE_HERE)
+24: #define rwlock_destroy(rw) _rwlock_destroy(rw, CALLSITE_HERE)
+27: func b32 rwlock_is_valid(rwlock rw);
+32: func void rwlock_read_lock(rwlock rw);
+35: func void rwlock_read_unlock(rwlock rw);
+40: func void rwlock_write_lock(rwlock rw);
+43: func void rwlock_write_unlock(rwlock rw);
+47: func b32 rwlock_try_read_lock(rwlock rw);
+51: func b32 rwlock_try_write_lock(rwlock rw);
+54: func b32 rwlock_timed_read_lock(rwlock rw, i32 timeout_ms);
+57: func b32 rwlock_timed_write_lock(rwlock rw, i32 timeout_ms);
 
 === include\threads\semaphore.h ===
-12: func semaphore _semaphore_create(u32 initial_count, callsite site);
-15: func b32 _semaphore_destroy(semaphore sem, callsite site);
-18: #define semaphore_create(initial_count) _semaphore_create(initial_count, CALLSITE_HERE)
-19: #define semaphore_destroy(sem)          _semaphore_destroy(sem, CALLSITE_HERE)
-22: func b32 semaphore_is_valid(semaphore sem);
-27: func void semaphore_acquire(semaphore sem);
-31: func b32 semaphore_try_acquire(semaphore sem);
-35: func b32 semaphore_acquire_timeout(semaphore sem, u32 millis);
-38: func void semaphore_release(semaphore sem);
+6: #include "../basic/codespace.h"
+13: typedef void* semaphore;
+16: func semaphore _semaphore_create(u32 initial_count, callsite site);
+19: func b32 _semaphore_destroy(semaphore sem, callsite site);
+22: #define semaphore_create(initial_count) _semaphore_create(initial_count, CALLSITE_HERE)
+23: #define semaphore_destroy(sem)          _semaphore_destroy(sem, CALLSITE_HERE)
+26: func b32 semaphore_is_valid(semaphore sem);
+31: func void semaphore_acquire(semaphore sem);
+35: func b32 semaphore_try_acquire(semaphore sem);
+39: func b32 semaphore_acquire_timeout(semaphore sem, u32 millis);
+42: func void semaphore_release(semaphore sem);
 
 === include\threads\spinlock.h ===
-15: func spinlock _spinlock_create(callsite site);
-18: func void _spinlock_destroy(spinlock sl, callsite site);
-21: #define spinlock_create()    _spinlock_create(CALLSITE_HERE)
-22: #define spinlock_destroy(sl) _spinlock_destroy(sl, CALLSITE_HERE)
-25: func b32 spinlock_is_valid(spinlock sl);
-28: func void spinlock_lock(spinlock sl);
-31: func void spinlock_unlock(spinlock sl);
-35: func b32 spinlock_try_lock(spinlock sl);
+6: #include "../basic/codespace.h"
+16: typedef void* spinlock;
+19: func spinlock _spinlock_create(callsite site);
+22: func b32 _spinlock_destroy(spinlock sl, callsite site);
+25: #define spinlock_create()    _spinlock_create(CALLSITE_HERE)
+26: #define spinlock_destroy(sl) _spinlock_destroy(sl, CALLSITE_HERE)
+29: func b32 spinlock_is_valid(spinlock sl);
+32: func void spinlock_lock(spinlock sl);
+35: func void spinlock_unlock(spinlock sl);
+39: func b32 spinlock_try_lock(spinlock sl);
 
 === include\threads\thread.h ===
+6: #include "../basic/codespace.h"
+7: #include "../context/ctx.h"
+8: #include "../memory/allocator.h"
+19: typedef void* thread;
+22: typedef i32 (*thread_func)(void* arg);
 27: func thread _thread_create(thread_func entry, void* arg, ctx_setup setup, callsite site);
 32: func thread _thread_create_named(
+41: func b32 _thread_detach(thread thd, callsite site);
+45: func b32 _thread_join(thread thd, i32* out_exit_code, callsite site);
 48: #define thread_create(entry, arg, setup) \
 50: #define thread_create_named(entry, arg, name, setup) \
-41: func b32 thread_is_valid(thread thd);
-45: func b32 thread_join(thread thd, i32* out_exit_code);
-49: func void thread_detach(thread thd);
-52: func u64 thread_get_id(thread thd);
-55: func cstr8 thread_get_name(thread thd);
+52: #define thread_detach(thd) \
+54: #define thread_join(thd, out_exit_code) \
+58: func b32 thread_is_valid(thread thd);
+61: func u64 thread_get_id(thread thd);
+64: func cstr8 thread_get_name(thread thd);
 
 === include\threads\thread_current.h ===
-9: typedef enum thread_priority {
-17: func u64 thread_id(void);
-21: func thread_priority thread_get_priority(void);
-24: func b32 thread_set_priority(thread_priority priority);
-27: func void thread_sleep(u32 millis);
-30: func void thread_yield(void);
-33: func void thread_sleep_ns(u64 nanos);
-38: func void thread_sleep_precise(u64 nanos);
+6: #include "thread.h"
+13: typedef enum thread_priority {
+21: func u64 thread_id(void);
+25: func thread_priority thread_get_priority(void);
+28: func b32 thread_set_priority(thread_priority priority);
+31: func void thread_sleep(u32 millis);
+34: func void thread_yield(void);
+37: func void thread_sleep_ns(u64 nanos);
+42: func void thread_sleep_precise(u64 nanos);
 
 === include\threads\thread_group.h ===
+6: #include "../basic/codespace.h"
+7: #include "thread.h"
 20: typedef i32 (*thread_group_func)(u32 idx, void* arg);
 23: typedef void* thread_group;
 29: func thread_group _thread_group_create(
-37: func thread_group _thread_group_create_named(
-47: func b32 _thread_group_destroy(thread_group group, callsite site);
+38: func thread_group _thread_group_create_named(
+48: func b32 _thread_group_destroy(thread_group group, callsite site);
 51: #define thread_group_create(count, entry, arg, setup) \
 53: #define thread_group_create_named(count, entry, arg, setup, base_name) \
-54: #define thread_group_destroy(group) _thread_group_destroy(group, CALLSITE_HERE)
-57: func b32 thread_group_is_valid(thread_group group);
-60: func u32 thread_group_get_count(thread_group group);
-63: func thread thread_group_get(thread_group group, u32 idx);
-69: func b32 thread_group_join_all(thread_group group, i32* out_exit_codes);
-73: func b32 thread_group_detach_all(thread_group group);
+55: #define thread_group_destroy(group) _thread_group_destroy(group, CALLSITE_HERE)
+58: func b32 thread_group_is_valid(thread_group group);
+61: func u32 thread_group_get_count(thread_group group);
+64: func thread thread_group_get(thread_group group, u32 idx);
+70: func b32 thread_group_join_all(thread_group group, i32* out_exit_codes);
+74: func b32 thread_group_detach_all(thread_group group);
 
 === include\utils\cmdline.h ===
-9: typedef struct cmdline {
-15: func cmdline cmdline_build(sz count, c8** args);
-18: func sz cmdline_get_count(cmdline cmdl);
-21: func b32 cmdline_is_empty(cmdline cmdl);
-24: func cstr8 cmdline_get_arg(cmdline cmdl, sz idx);
-27: func cstr8 cmdline_get_program(cmdline cmdl);
-30: func b32 cmdline_find(cmdline cmdl, cstr8 arg, sz* out_idx);
-33: func b32 cmdline_has(cmdline cmdl, cstr8 arg);
-37: func cstr8 cmdline_get_option(cmdline cmdl, cstr8 name);
-40: func b32 cmdline_get_option_i64(cmdline cmdl, cstr8 name, i64* out);
-43: func b32 cmdline_get_option_f64(cmdline cmdl, cstr8 name, f64* out);
+6: #include "../basic/primitive_types.h"
+13: typedef struct cmdline {
+19: func cmdline cmdline_build(sz count, c8** args);
+22: func sz cmdline_get_count(cmdline cmdl);
+25: func b32 cmdline_is_empty(cmdline cmdl);
+28: func cstr8 cmdline_get_arg(cmdline cmdl, sz idx);
+31: func cstr8 cmdline_get_program(cmdline cmdl);
+34: func b32 cmdline_find(cmdline cmdl, cstr8 arg, sz* out_idx);
+37: func b32 cmdline_has(cmdline cmdl, cstr8 arg);
+41: func cstr8 cmdline_get_option(cmdline cmdl, cstr8 name);
+44: func b32 cmdline_get_option_i64(cmdline cmdl, cstr8 name, i64* out);
+47: func b32 cmdline_get_option_f64(cmdline cmdl, cstr8 name, f64* out);
 
 === include\utils\compress.h ===
+6: #include "../memory/allocator.h"
+7: #include "../memory/buffer.h"
 13: typedef enum compress_error {
 21: func cstr8 compress_error_to_cstr(compress_error error);
 25: func compress_error compress_encode(buffer src, allocator alloc, buffer* out_compressed);
 29: func compress_error compress_decode(buffer src, allocator alloc, buffer* out_decompressed);
-32: func void compress_free(allocator alloc, buffer* src);
 
 === include\utils\crc.h ===
-9: func u32 crc32_init(void);
-10: func u32 crc32_update(u32 crc, const void* data, sz size);
-11: func u32 crc32_finalize(u32 crc);
-12: func u32 crc32(const void* data, sz size);
-15: func u64 crc64_init(void);
-16: func u64 crc64_update(u64 crc, const void* data, sz size);
-17: func u64 crc64_finalize(u64 crc);
-18: func u64 crc64(const void* data, sz size);
+6: #include "../basic/primitive_types.h"
+14: func u32 crc32_init(void);
+16: func u32 crc32_update(u32 crc, const void* data, sz size);
+18: func u32 crc32_finalize(u32 crc);
+20: func u32 crc32(const void* data, sz size);
+24: func u64 crc64_init(void);
+26: func u64 crc64_update(u64 crc, const void* data, sz size);
+28: func u64 crc64_finalize(u64 crc);
+30: func u64 crc64(const void* data, sz size);
 
 === include\utils\digits.h ===
+6: #include "../basic/primitive_types.h"
 13: func sz u8_digits(u8 value);
 14: func sz u16_digits(u16 value);
 15: func sz u32_digits(u32 value);
@@ -1575,22 +2112,24 @@
 40: func sz dp_digits(dp value);
 
 === include\utils\endian.h ===
-9: func b32 endian_is_little(void);
-12: func b32 endian_is_big(void);
-15: func u16 endian_le16_to_native(u16 value);
-16: func u32 endian_le32_to_native(u32 value);
-17: func u64 endian_le64_to_native(u64 value);
-20: func u16 endian_be16_to_native(u16 value);
-21: func u32 endian_be32_to_native(u32 value);
-22: func u64 endian_be64_to_native(u64 value);
-25: func u16 endian_native_to_le16(u16 value);
-26: func u32 endian_native_to_le32(u32 value);
-27: func u64 endian_native_to_le64(u64 value);
-30: func u16 endian_native_to_be16(u16 value);
-31: func u32 endian_native_to_be32(u32 value);
-32: func u64 endian_native_to_be64(u64 value);
+6: #include "../basic/primitive_types.h"
+13: func b32 endian_is_little(void);
+16: func b32 endian_is_big(void);
+19: func u16 endian_le16_to_native(u16 value);
+20: func u32 endian_le32_to_native(u32 value);
+21: func u64 endian_le64_to_native(u64 value);
+24: func u16 endian_be16_to_native(u16 value);
+25: func u32 endian_be32_to_native(u32 value);
+26: func u64 endian_be64_to_native(u64 value);
+29: func u16 endian_native_to_le16(u16 value);
+30: func u32 endian_native_to_le32(u32 value);
+31: func u64 endian_native_to_le64(u64 value);
+34: func u16 endian_native_to_be16(u16 value);
+35: func u32 endian_native_to_be32(u32 value);
+36: func u64 endian_native_to_be64(u64 value);
 
 === include\utils\huffman.h ===
+6: #include "../memory/buffer.h"
 8: #define HUFFMAN_SYMBOL_CAP    256
 9: #define HUFFMAN_CODE_WORD_CAP 4
 10: #define HUFFMAN_NODE_CAP      ((HUFFMAN_SYMBOL_CAP * 2) - 1)
@@ -1607,56 +2146,66 @@
 65: func b32 huffman_tree_decode_symbol(
 
 === include\utils\id.h ===
-13: typedef struct id8 {
-20: func id8 id8_zero(void);
-23: func id8 id8_make(u8 value);
-26: func u8 id8_get(id8 ident);
-29: func b32 id8_is_zero(id8 ident);
-32: func b32 id8_is_valid(id8 ident);
-35: func id8 id8_next(id8 ident);
-38: func i32 id8_cmp(id8 lhs, id8 rhs);
-41: func sz id8_string_length(id8 ident);
-44: func b32 id8_parse_cstr8(cstr8 src, id8* out);
-47: func b32 id8_to_cstr8(id8 ident, c8* dst, sz cap);
-50: func b32 id8_to_str8(id8 ident, str8* dst);
-56: typedef struct id16 {
-63: func id16 id16_zero(void);
-66: func id16 id16_make(u16 value);
-69: func u16 id16_get(id16 ident);
-72: func b32 id16_is_zero(id16 ident);
-75: func b32 id16_is_valid(id16 ident);
-78: func id16 id16_next(id16 ident);
-81: func i32 id16_cmp(id16 lhs, id16 rhs);
-84: func sz id16_string_length(id16 ident);
-87: func b32 id16_parse_cstr8(cstr8 src, id16* out);
-90: func b32 id16_to_cstr8(id16 ident, c8* dst, sz cap);
-93: func b32 id16_to_str8(id16 ident, str8* dst);
-99: typedef struct id32 {
-106: func id32 id32_zero(void);
-109: func id32 id32_make(u32 value);
-112: func u32 id32_get(id32 ident);
-115: func b32 id32_is_zero(id32 ident);
-118: func b32 id32_is_valid(id32 ident);
-121: func id32 id32_next(id32 ident);
-124: func i32 id32_cmp(id32 lhs, id32 rhs);
-127: func sz id32_string_length(id32 ident);
-130: func b32 id32_parse_cstr8(cstr8 src, id32* out);
-133: func b32 id32_to_cstr8(id32 ident, c8* dst, sz cap);
-136: func b32 id32_to_str8(id32 ident, str8* dst);
-142: typedef struct id64 {
-149: func id64 id64_zero(void);
-152: func id64 id64_make(u64 value);
-155: func u64 id64_get(id64 ident);
-158: func b32 id64_is_zero(id64 ident);
-161: func b32 id64_is_valid(id64 ident);
-164: func id64 id64_next(id64 ident);
-167: func i32 id64_cmp(id64 lhs, id64 rhs);
-170: func sz id64_string_length(id64 ident);
-173: func b32 id64_parse_cstr8(cstr8 src, id64* out);
-176: func b32 id64_to_cstr8(id64 ident, c8* dst, sz cap);
-179: func b32 id64_to_str8(id64 ident, str8* dst);
+6: #include "../basic/primitive_types.h"
+7: #include "../strings/strings.h"
+17: typedef struct id8 {
+24: func id8 id8_zero(void);
+27: func id8 id8_make(u8 value);
+30: func u8 id8_get(id8 ident);
+33: func b32 id8_is_zero(id8 ident);
+36: func b32 id8_is_valid(id8 ident);
+39: func id8 id8_next(id8 ident);
+42: func i32 id8_cmp(id8 lhs, id8 rhs);
+45: func sz id8_string_length(id8 ident);
+48: func b32 id8_parse_cstr8(cstr8 src, id8* out);
+51: func b32 id8_to_cstr8(id8 ident, c8* dst, sz cap);
+54: func b32 id8_to_str8(id8 ident, str8* dst);
+60: typedef struct id16 {
+67: func id16 id16_zero(void);
+70: func id16 id16_make(u16 value);
+73: func u16 id16_get(id16 ident);
+76: func b32 id16_is_zero(id16 ident);
+79: func b32 id16_is_valid(id16 ident);
+82: func id16 id16_next(id16 ident);
+85: func i32 id16_cmp(id16 lhs, id16 rhs);
+88: func sz id16_string_length(id16 ident);
+91: func b32 id16_parse_cstr8(cstr8 src, id16* out);
+94: func b32 id16_to_cstr8(id16 ident, c8* dst, sz cap);
+97: func b32 id16_to_str8(id16 ident, str8* dst);
+103: typedef struct id32 {
+110: func id32 id32_zero(void);
+113: func id32 id32_make(u32 value);
+116: func u32 id32_get(id32 ident);
+119: func b32 id32_is_zero(id32 ident);
+122: func b32 id32_is_valid(id32 ident);
+125: func id32 id32_next(id32 ident);
+128: func i32 id32_cmp(id32 lhs, id32 rhs);
+131: func sz id32_string_length(id32 ident);
+134: func b32 id32_parse_cstr8(cstr8 src, id32* out);
+137: func b32 id32_to_cstr8(id32 ident, c8* dst, sz cap);
+140: func b32 id32_to_str8(id32 ident, str8* dst);
+146: typedef struct id64 {
+153: func id64 id64_zero(void);
+156: func id64 id64_make(u64 value);
+159: func u64 id64_get(id64 ident);
+162: func b32 id64_is_zero(id64 ident);
+165: func b32 id64_is_valid(id64 ident);
+168: func id64 id64_next(id64 ident);
+171: func i32 id64_cmp(id64 lhs, id64 rhs);
+174: func sz id64_string_length(id64 ident);
+177: func b32 id64_parse_cstr8(cstr8 src, id64* out);
+180: func b32 id64_to_cstr8(id64 ident, c8* dst, sz cap);
+183: func b32 id64_to_str8(id64 ident, str8* dst);
 
 === include\utils\log_state.h ===
+6: #include "../basic/codespace.h"
+7: #include "../basic/primitive_types.h"
+8: #include "../basic/utility_defines.h"
+9: #include "../memory/arena.h"
+10: #include "../threads/mutex.h"
+16: typedef struct log_state log_state;
+25: #    define LOG_LEVEL_DEFAULT LOG_LEVEL_DEBUG
+27: #    define LOG_LEVEL_DEFAULT LOG_LEVEL_INFO
 33: typedef enum log_level {
 45: func cstr8 log_level_to_str(log_level level);
 48: func void log_state_set_level(log_state* state, log_level level);
@@ -1675,168 +2224,136 @@
 110: func void _log_state_quit(log_state* state, callsite site);
 112: #define log_state_init(state, mutex_handle, alloc) \
 114: #define log_state_quit(state) \
-113: func b32 log_state_is_init(log_state* state);
-117: func b32 log_state_clear(log_state* state);
-121: func void log_state_sync(log_state* dst, log_state* src);
-129: func void log_state_begin_frame(log_state* state);
-136: func log_frame* log_state_end_frame(log_state* state, u32 severity_mask);
-143: func void _log(log_state* state, log_level level, callsite site, const char* msg, ...);
-146: #define log_state_fatal(state, ...)   _log((state), LOG_LEVEL_FATAL, CALLSITE_HERE, __VA_ARGS__)
-147: #define log_state_error(state, ...)   _log((state), LOG_LEVEL_ERROR, CALLSITE_HERE, __VA_ARGS__)
-148: #define log_state_warn(state, ...)    _log((state), LOG_LEVEL_WARN, CALLSITE_HERE, __VA_ARGS__)
-149: #define log_state_info(state, ...)    _log((state), LOG_LEVEL_INFO, CALLSITE_HERE, __VA_ARGS__)
-150: #define log_state_debug(state, ...)   _log((state), LOG_LEVEL_DEBUG, CALLSITE_HERE, __VA_ARGS__)
-151: #define log_state_verbose(state, ...) _log((state), LOG_LEVEL_VERBOSE, CALLSITE_HERE, __VA_ARGS__)
-152: #define log_state_trace(state, ...)   _log((state), LOG_LEVEL_TRACE, CALLSITE_HERE, __VA_ARGS__)
+118: func b32 log_state_is_init(log_state* state);
+122: func b32 log_state_clear(log_state* state);
+126: func void log_state_sync(log_state* dst, log_state* src);
+134: func void log_state_begin_frame(log_state* state);
+141: func log_frame* log_state_end_frame(log_state* state, u32 severity_mask);
+148: func void _log(log_state* state, log_level level, callsite site, const char* msg, ...);
+151: #define log_state_fatal(state, ...)   _log((state), LOG_LEVEL_FATAL, CALLSITE_HERE, __VA_ARGS__)
+152: #define log_state_error(state, ...)   _log((state), LOG_LEVEL_ERROR, CALLSITE_HERE, __VA_ARGS__)
+153: #define log_state_warn(state, ...)    _log((state), LOG_LEVEL_WARN, CALLSITE_HERE, __VA_ARGS__)
+154: #define log_state_info(state, ...)    _log((state), LOG_LEVEL_INFO, CALLSITE_HERE, __VA_ARGS__)
+155: #define log_state_debug(state, ...)   _log((state), LOG_LEVEL_DEBUG, CALLSITE_HERE, __VA_ARGS__)
+156: #define log_state_verbose(state, ...) _log((state), LOG_LEVEL_VERBOSE, CALLSITE_HERE, __VA_ARGS__)
+157: #define log_state_trace(state, ...)   _log((state), LOG_LEVEL_TRACE, CALLSITE_HERE, __VA_ARGS__)
 
 === include\utils\random_series.h ===
+6: #include "../basic/primitive_types.h"
+12: typedef struct random_series {
+18: func void random_series_seed(random_series* series, u32 seed);
+21: func void random_series_reset(random_series* series);
+25: func b32 random_series_chance_f64(random_series* series, f64 chance);
+26: func b32 random_series_chance_f32(random_series* series, f32 chance);
+32: func b32 random_series_chance(random_series* series, u32x chance);
+35: func u8 random_series_u8(random_series* series);
+36: func u16 random_series_u16(random_series* series);
+37: func u32 random_series_u32(random_series* series);
+38: func u64 random_series_u64(random_series* series);
+39: func i8 random_series_i8(random_series* series);
+40: func i16 random_series_i16(random_series* series);
+41: func i32 random_series_i32(random_series* series);
+42: func i64 random_series_i64(random_series* series);
+43: func f32 random_series_f32(random_series* series);
+44: func f64 random_series_f64(random_series* series);
+47: func u8 random_series_rng_u8(random_series* series, u8 min_value, u8 max_value);
+48: func u16 random_series_rng_u16(random_series* series, u16 min_value, u16 max_value);
+49: func u32 random_series_rng_u32(random_series* series, u32 min_value, u32 max_value);
+50: func u64 random_series_rng_u64(random_series* series, u64 min_value, u64 max_value);
+51: func i8 random_series_rng_i8(random_series* series, i8 min_value, i8 max_value);
+52: func i16 random_series_rng_i16(random_series* series, i16 min_value, i16 max_value);
+53: func i32 random_series_rng_i32(random_series* series, i32 min_value, i32 max_value);
+54: func i64 random_series_rng_i64(random_series* series, i64 min_value, i64 max_value);
+55: func f32 random_series_rng_f32(random_series* series, f32 min_value, f32 max_value);
+56: func f64 random_series_rng_f64(random_series* series, f64 min_value, f64 max_value);
+60: func f32 random_series_u_f32(random_series* series);
+61: func f64 random_series_u_f64(random_series* series);
+65: func f32 random_series_b_f32(random_series* series);
+66: func f64 random_series_b_f64(random_series* series);
 
 === include\utils\stacktrace.h ===
-10: #define STACKTRACE_CAPTURE_CAP 64
-24: func sz stacktrace_capture(stacktrace_frame* out_frames, sz out_capacity, sz skip_frames);
+6: #include "../basic/primitive_types.h"
+7: #include "../strings/cstrings.h"
+15: #  define STACKTRACE_CAPTURE_CAP 64
+18: typedef struct stacktrace_frame {
+28: func sz stacktrace_capture(stacktrace_frame* out_frames, sz out_capacity, sz skip_frames);
 
 === include\utils\timer.h ===
-13: func void timer_clear(f32* timer);
-16: func void timer_bump(f32* timer);
-19: func void timer_increment(f32* timer, f32 dt, f32 scale);
-22: func b32 timer_consume(f32* timer, f32 rate);
-25: func b32 timer_consume_once(f32* timer, f32 rate);
+6: #include "../basic/primitive_types.h"
+17: func void timer_clear(f32* timer);
+20: func void timer_bump(f32* timer);
+23: func void timer_increment(f32* timer, f32 dt, f32 scale);
+26: func b32 timer_consume(f32* timer, f32 rate);
+29: func b32 timer_consume_once(f32* timer, f32 rate);
 
 === include\utils\timestamp.h ===
-9: typedef struct timestamp {
-16: func timestamp timestamp_zero(void);
-19: func timestamp timestamp_now(void);
-22: func timestamp timestamp_from_microseconds(i64 microseconds);
-25: func timestamp timestamp_from_milliseconds(i64 milliseconds);
-28: func timestamp timestamp_from_seconds(f64 seconds);
-31: func timestamp timestamp_from_minutes(f64 minutes);
-34: func timestamp timestamp_from_hours(f64 hours);
-37: func i64 timestamp_as_microseconds(timestamp value);
-40: func f64 timestamp_as_milliseconds(timestamp value);
-43: func f64 timestamp_as_seconds(timestamp value);
-46: func f64 timestamp_as_minutes(timestamp value);
-49: func f64 timestamp_as_hours(timestamp value);
-52: func b32 timestamp_is_zero(timestamp value);
-55: func timestamp timestamp_add(timestamp lhs, timestamp rhs);
-58: func timestamp timestamp_sub(timestamp lhs, timestamp rhs);
-61: func timestamp timestamp_scale(timestamp value, f64 factor);
-64: func timestamp timestamp_abs(timestamp value);
-67: func timestamp timestamp_clamp(timestamp value, timestamp min_value, timestamp max_value);
-70: func i32 timestamp_cmp(timestamp lhs, timestamp rhs);
+6: #include "../basic/primitive_types.h"
+13: typedef struct timestamp {
+20: func timestamp timestamp_zero(void);
+23: func timestamp timestamp_now(void);
+26: func timestamp timestamp_from_microseconds(i64 microseconds);
+29: func timestamp timestamp_from_milliseconds(i64 milliseconds);
+32: func timestamp timestamp_from_seconds(f64 seconds);
+35: func timestamp timestamp_from_minutes(f64 minutes);
+38: func timestamp timestamp_from_hours(f64 hours);
+41: func i64 timestamp_as_microseconds(timestamp value);
+44: func f64 timestamp_as_milliseconds(timestamp value);
+47: func f64 timestamp_as_seconds(timestamp value);
+50: func f64 timestamp_as_minutes(timestamp value);
+53: func f64 timestamp_as_hours(timestamp value);
+56: func b32 timestamp_is_zero(timestamp value);
+59: func timestamp timestamp_add(timestamp lhs, timestamp rhs);
+62: func timestamp timestamp_sub(timestamp lhs, timestamp rhs);
+65: func timestamp timestamp_scale(timestamp value, f64 factor);
+68: func timestamp timestamp_abs(timestamp value);
+71: func timestamp timestamp_clamp(timestamp value, timestamp min_value, timestamp max_value);
+74: func i32 timestamp_cmp(timestamp lhs, timestamp rhs);
 
 === include\utils\uuid.h ===
-9: typedef struct uuid {
-16: func uuid uuid_zero(void);
-19: func uuid uuid_from_bytes(const u8* bytes);
-22: func uuid uuid_from_u64(u64 upper, u64 lower);
-25: func void uuid_get_bytes(uuid value, u8* dst);
-28: func u64 uuid_get_upper(uuid value);
-31: func u64 uuid_get_lower(uuid value);
-34: func b32 uuid_is_zero(uuid value);
-37: func b32 uuid_equal(uuid lhs, uuid rhs);
-40: func i32 uuid_cmp(uuid lhs, uuid rhs);
-43: func u8 uuid_get_version(uuid value);
-46: func u8 uuid_get_variant(uuid value);
-50: func sz uuid_string_length(void);
-53: func b32 uuid_parse_cstr8(cstr8 src, uuid* out);
-56: func b32 uuid_to_cstr8(uuid value, c8* dst, sz cap);
-59: func b32 uuid_to_cstr16(uuid value, c16* dst, sz cap);
-62: func b32 uuid_to_cstr32(uuid value, c32* dst, sz cap);
-65: func b32 uuid_to_str8(uuid value, str8* dst);
-68: func b32 uuid_to_str16(uuid value, str16* dst);
-71: func b32 uuid_to_str32(uuid value, str32* dst);
-74: func uuid uuid_generate_v4(void);
+6: #include "../basic/primitive_types.h"
+7: #include "../basic/third_party.h"
+8: #include "../strings/strings.h"
+9: #include "random_series.h"
+15: typedef struct uuid {
+22: func uuid uuid_zero(void);
+25: func uuid uuid_from_bytes(const u8* bytes);
+28: func uuid uuid_from_u64(u64 upper, u64 lower);
+31: func void uuid_get_bytes(uuid value, u8* dst);
+34: func u64 uuid_get_upper(uuid value);
+37: func u64 uuid_get_lower(uuid value);
+40: func b32 uuid_is_zero(uuid value);
+43: func b32 uuid_equal(uuid lhs, uuid rhs);
+46: func i32 uuid_cmp(uuid lhs, uuid rhs);
+49: func u8 uuid_get_version(uuid value);
+52: func u8 uuid_get_variant(uuid value);
+56: func sz uuid_string_length(void);
+59: func b32 uuid_parse_cstr8(cstr8 src, uuid* out);
+62: func b32 uuid_to_cstr8(uuid value, c8* dst, sz cap);
+65: func b32 uuid_to_cstr16(uuid value, c16* dst, sz cap);
+68: func b32 uuid_to_cstr32(uuid value, c32* dst, sz cap);
+71: func b32 uuid_to_str8(uuid value, str8* dst);
+74: func b32 uuid_to_str16(uuid value, str16* dst);
+77: func b32 uuid_to_str32(uuid value, str32* dst);
+80: func uuid uuid_generate_v4(random_series* series);
 
 === include\utils\version.h ===
-9: typedef union version {
-21: func version version_zero(void);
-24: func version version_from_packed(u32 packed);
-27: func version version_make(u8 major, u8 minor, u16 patch);
-30: func u32 version_get_packed(version ver);
-33: func u8 version_get_major(version ver);
-36: func u8 version_get_minor(version ver);
-39: func u16 version_get_patch(version ver);
-42: func b32 version_is_zero(version ver);
-46: func sz version_string_length(version ver);
-49: func i32 version_cmp(version lhs, version rhs);
-52: func b32 version_to_cstr8(version ver, c8* dst, sz cap);
-55: func b32 version_to_cstr16(version ver, c16* dst, sz cap);
-58: func b32 version_to_cstr32(version ver, c32* dst, sz cap);
-61: func b32 version_to_str8(version ver, str8* dst);
-64: func b32 version_to_str16(version ver, str16* dst);
-67: func b32 version_to_str32(version ver, str32* dst);
-70: func b32 version_parse_cstr8(cstr8 src, version* out_ver);
-
-=== include\interface\dialog.h ===
-8: typedef enum dialog_message_kind {
-14: typedef enum dialog_message_box_flag {
-22: typedef enum dialog_message_box_button_flag {
-27: typedef struct dialog_message_box_button {
-33: typedef struct dialog_message_box_color {
-39: typedef struct dialog_message_box_color_scheme {
-47: typedef struct dialog_message_box {
-56: typedef struct dialog_file_filter {
-61: typedef void dialog_file_callback(
-68: func b32 dialog_show_message(window owner, dialog_message_kind message_kind, cstr8 title, cstr8 message);
-74: func b32 dialog_show_message_box(window owner, const dialog_message_box* message_box, i32* out_button_id);
-76: func b32 dialog_open_file(window owner, const dialog_file_filter* filters, sz filter_count, cstr8 default_location, b32 allow_many, dialog_file_callback* callback, void* user_data);
-85: func b32 dialog_save_file(window owner, const dialog_file_filter* filters, sz filter_count, cstr8 default_location, dialog_file_callback* callback, void* user_data);
-93: func b32 dialog_open_folder(window owner, cstr8 default_location, b32 allow_many, dialog_file_callback* callback, void* user_data);
-
-=== include\interface\monitor.h ===
-17: typedef struct monitor_mode {
-24: typedef enum monitor_orientation {
-33: func b32 monitor_id_is_valid(monitor src);
-36: func monitor monitor_from_device(device src);
-39: func sz monitor_get_total_count(void);
-40: func monitor monitor_get_from_idx(sz idx);
-43: func monitor monitor_get_primary_id(void);
-46: func r2_i32 monitor_get_bounds(monitor mon_id);
-47: func r2_i32 monitor_get_usable_bounds(monitor mon_id);
-50: func sz monitor_get_mode_count(monitor mon_id);
-51: func b32 monitor_get_mode(monitor mon_id, sz idx, monitor_mode* out_mode);
-52: func b32 monitor_get_current_mode(monitor mon_id, monitor_mode* out_mode);
-53: func b32 monitor_get_desktop_mode(monitor mon_id, monitor_mode* out_mode);
-56: func cstr8 monitor_get_name(monitor mon_id);
-57: func f32 monitor_get_refresh_rate(monitor mon_id);
-58: func f32 monitor_get_content_scale(monitor mon_id);
-59: func monitor_orientation monitor_get_orientation(monitor mon_id);
-
-=== include\interface\window.h ===
-15: typedef void* window;
-17: typedef enum window_mode {
-24: typedef enum window_center_axis {
-32: func b32 window_id_is_valid(window src);
-35: func sz window_get_total_count(void);
-36: func window window_get_from_idx(sz idx);
-37: func b32 window_is_valid(window window_id);
-40: func window window_create(cstr8 title, i32 width, i32 height, window_mode mode, u64 flags);
-41: func b32 window_destroy(window window_id);
-44: func b32 window_is_hidden(window window_id);
-47: func b32 window_show(window window_id);
-50: func b32 window_hide(window window_id);
-54: func b32 window_set_pos(window window_id, i32 xpos, i32 ypos);
-57: func b32 window_get_pos(window window_id, i32* out_xpos, i32* out_ypos);
-61: func b32 window_set_size(window window_id, i32 width, i32 height);
-64: func b32 window_get_size(window window_id, i32* out_width, i32* out_height);
-68: func b32 window_set_mode(window window_id, window_mode mode);
-71: func window_mode window_get_mode(window window_id);
-75: func b32 window_is_minimized(window window_id);
-78: func b32 window_is_maximized(window window_id);
-81: func b32 window_has_input_focus(window window_id);
-84: func b32 window_has_mouse_focus(window window_id);
-87: func b32 window_is_topmost(window window_id);
-90: func b32 window_minimize(window window_id);
-93: func b32 window_maximize(window window_id);
-96: func b32 window_restore(window window_id);
-99: func b32 window_focus(window window_id);
-102: func b32 window_set_topmost(window window_id, b32 enabled);
-106: func cstr8 window_get_title(window window_id);
-109: func b32 window_set_title(window window_id, cstr8 title);
-112: func b32 window_set_icon(window window_id, icon icon_id);
-115: func b32 window_get_monitor(window window_id, monitor* out_monitor_id);
-118: func b32 window_get_creation_monitor(window window_id, monitor* out_monitor_id);
-122: func b32 window_center_in_monitor(window window_id, monitor monitor_id, window_center_axis axis_mask);
-136: func window window_get_keyboard_focus();
-137: func window window_get_cursor_focus();
-
+6: #include "../basic/primitive_types.h"
+7: #include "../strings/strings.h"
+13: typedef union version {
+23: func version version_zero(void);
+26: func version version_from_packed(u32 packed);
+29: func version version_make(u8 major, u8 minor, u16 patch);
+32: func u32 version_get_packed(version ver);
+35: func u8 version_get_major(version ver);
+38: func u8 version_get_minor(version ver);
+41: func u16 version_get_patch(version ver);
+44: func b32 version_is_zero(version ver);
+48: func sz version_string_length(version ver);
+51: func i32 version_cmp(version lhs, version rhs);
+54: func b32 version_to_cstr8(version ver, c8* dst, sz cap);
+57: func b32 version_to_cstr16(version ver, c16* dst, sz cap);
+60: func b32 version_to_cstr32(version ver, c32* dst, sz cap);
+63: func b32 version_to_str8(version ver, str8* dst);
+66: func b32 version_to_str16(version ver, str16* dst);
+69: func b32 version_to_str32(version ver, str32* dst);
+72: func b32 version_parse_cstr8(cstr8 src, version* out_ver);

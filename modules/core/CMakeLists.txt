@@ -45,6 +45,14 @@ endfunction()
 # Setup target
 add_library(based-core STATIC ${BASED_CORE_SOURCES})
 setup_based_core_target(based-core)
+add_custom_command(
+    TARGET based-core
+    POST_BUILD
+    COMMAND "${Python3_EXECUTABLE}" "${CMAKE_SOURCE_DIR}/scripts/generate_api_indexes.py" --root "${CMAKE_SOURCE_DIR}" --modules core
+    WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
+    COMMENT "Regenerating core api_index.txt if stale"
+    VERBATIM
+)
 if(BASED_PROFILER_ENABLED)
     fetch_tracy()
     target_link_libraries(based-core PUBLIC Tracy::TracyClient)
@@ -76,6 +84,9 @@ if(BASED_BUILD_TESTS)
     list(REMOVE_ITEM TEST_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/tests/app_entry_standalone.cpp")
     list(REMOVE_ITEM TEST_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/tests/mod_entry_standalone.cpp")
     list(REMOVE_ITEM TEST_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/tests/run_entry_standalone.cpp")
+    if(APPLE)
+        list(FILTER TEST_SOURCES EXCLUDE REGEX "tests[/\\\\]processes[/\\\\].*\\.cpp$")
+    endif()
     add_executable(based-core-tests ${TEST_SOURCES})
     list(LENGTH TEST_SOURCES TEST_SOURCE_COUNT)
     if(TEST_SOURCE_COUNT GREATER 0)

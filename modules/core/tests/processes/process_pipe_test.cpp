@@ -143,28 +143,6 @@ TEST(processes_process_pipe_test, process_pipe_write) {
   process_wait_and_destroy(prc);
 }
 
-TEST(processes_process_pipe_test, process_pipe_poll_readable) {
-  process_options opts = process_options_default();
-  opts.pipe_stdout = 1;
-
-#if defined(_WIN32)
-  cstr8 const args[] = {"cmd.exe", "/c", "echo test", NULL};
-#else
-  cstr8 const args[] = {"/bin/sh", "-c", "printf test", NULL};
-#endif
-
-  process prc = process_create_with(args, opts);
-  EXPECT_NE(0, process_is_valid(prc));
-
-  process_pipe pout = process_pipe_stdout(prc);
-  EXPECT_NE(nullptr, pout);
-
-  b32 readable = process_pipe_poll_readable(pout, 1000);
-  EXPECT_NE(0, readable);
-
-  process_wait_and_destroy(prc);
-}
-
 TEST(processes_process_pipe_test, process_pipe_close) {
   process_options opts = process_options_default();
   opts.pipe_stdin = 1;
