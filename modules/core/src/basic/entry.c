@@ -2,6 +2,7 @@
 // Copyright (c) 2026 Christian Luppi
 
 #include "basic/entry.h"
+#include "basic/crash.h"
 #include "context/global_ctx.h"
 #include "context/thread_ctx.h"
 #include "../internal.h"
@@ -192,6 +193,19 @@ func b32 entry_init(cmdline cmdline) {
                    (u32)global_ctx_is_init(),
                    (u32)thread_ctx_is_init());
 
+  global_log_verbose("Installing crash handler");
+  if (!crash_install()) {
+    global_log_error("Crash handler installation failed");
+    thread_log_verbose("Rolling back thread context after crash handler install failure");
+    if (!thread_ctx_quit()) {
+      global_log_error("Failed rolling back thread context after crash handler install failure");
+    }
+    global_log_verbose("Rolling back global context after crash handler install failure");
+    global_ctx_quit();
+    profile_func_end;
+    return false;
+  }
+
   // Set memory hooks for olib.
   global_log_verbose("Configuring olib memory hooks");
   olib_set_memory_fns(
@@ -208,6 +222,8 @@ func b32 entry_init(cmdline cmdline) {
           entry_pipeline_realloc,
           entry_pipeline_free)) {
     global_log_error("SDL_SetMemoryFunctions failed error=%s", SDL_GetError());
+    global_log_verbose("Uninstalling crash handler after SDL memory hook failure");
+    crash_uninstall();
     thread_log_verbose("Rolling back thread context after SDL memory hook failure");
     if (!thread_ctx_quit()) {
       global_log_error("Failed rolling back thread context after SDL memory hook failure");
@@ -221,6 +237,8 @@ func b32 entry_init(cmdline cmdline) {
   global_log_verbose("Initializing SDL required flags=0x%08X", (unsigned int)SDL_INIT_REQUIRED_FLAGS);
   if (!SDL_Init(SDL_INIT_REQUIRED_FLAGS)) {
     global_log_error("SDL_Init failed error=%s", SDL_GetError());
+    global_log_verbose("Uninstalling crash handler after SDL init failure");
+    crash_uninstall();
     thread_log_verbose("Rolling back thread context after SDL init failure");
     if (!thread_ctx_quit()) {
       global_log_error("Failed rolling back thread context after SDL init failure");
@@ -292,6 +310,11 @@ func void entry_quit(void) {
     entry_start_setup = (ctx_setup) {0};
     profile_func_end;
     return;
+  }
+
+  if (crash_is_installed()) {
+    global_log_verbose("Uninstalling crash handler");
+    crash_uninstall();
   }
 
   if (has_thread_ctx) {

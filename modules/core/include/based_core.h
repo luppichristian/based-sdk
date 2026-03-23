@@ -6,6 +6,7 @@
 // Include basic module.
 #include "basic/assert.h"
 #include "basic/codespace.h"
+#include "basic/crash.h"
 #include "basic/entry.h"
 #include "basic/entry_impl.h"
 #include "basic/env_defines.h"

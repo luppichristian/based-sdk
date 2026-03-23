@@ -21,7 +21,7 @@ This guide is organized by API area and then by header so you can quickly jump t
 
 ## basic
 
-Compiler/platform layer, primitive types, assertions, intrinsics and foundational macros.
+Compiler/platform layer, primitive types, assertions, crash routing, intrinsics and foundational macros.
 
 ### `basic/assert.h`
 
@@ -53,6 +53,27 @@ Compiler/platform layer, primitive types, assertions, intrinsics and foundationa
     - `mode` (`assert_mode`): Configuration value controlling behavior
 - `assert_get_mode() -> assert_mode`
   - What it does: Gets assert get mode
+  - Parameters: none
+
+### `basic/crash.h`
+
+- Types: **0**
+- Functions: **3**
+
+#### Types
+
+- None
+
+#### Functions
+
+- `crash_install() -> b32`
+  - What it does: Installs platform crash handlers that route unhandled faults through the assert system
+  - Parameters: none
+- `crash_uninstall() -> void`
+  - What it does: Restores the previous platform crash handlers
+  - Parameters: none
+- `crash_is_installed() -> b32`
+  - What it does: Reports whether the crash handler is currently installed
   - Parameters: none
 
 ### `basic/codespace.h`

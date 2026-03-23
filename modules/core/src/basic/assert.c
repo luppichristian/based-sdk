@@ -12,6 +12,7 @@
 #include "basic/utility_defines.h"
 #include "basic/profiler.h"
 #include "processes/process_current.h"
+#include "strings/cstrings.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include "basic/safe.h"
@@ -76,7 +77,7 @@ func assert_action assert_dialog(cstr8 msg, callsite site) {
   stacktrace_frame frames[ASSERT_STACKTRACE_DEPTH] = {0};
   sz captured_count = stacktrace_capture(frames, ASSERT_STACKTRACE_DEPTH, 2);
 
-  i32 text_len = cstr8_format(
+  (void)cstr8_format(
       buf,
       size_of(buf),
       "Assertion failed\n"
@@ -91,29 +92,16 @@ func assert_action assert_dialog(cstr8 msg, callsite site) {
       site.filename,
       site.line);
 
-  if (text_len < 0) {
-    text_len = 0;
-  }
-
-  sz write_offset = (sz)text_len;
-  if (write_offset >= size_of(buf)) {
-    write_offset = size_of(buf) - 1;
-  }
+  sz write_offset = cstr8_len(buf);
 
   if (captured_count == 0) {
-    cstr8_format(buf + write_offset, size_of(buf) - write_offset, "  <unavailable>\n");
+    (void)cstr8_append_format(buf, size_of(buf), "  <unavailable>\n");
   } else {
     safe_for (sz frame_idx = 0; frame_idx < captured_count; ++frame_idx) {
-      i32 line_len = cstr8_format(
-          buf + write_offset,
-          size_of(buf) - write_offset,
-          "  #%02u %s\n",
-          (u32)frame_idx,
-          frames[frame_idx].symbol);
-      if (line_len < 0) {
+      if (!cstr8_append_format(buf, size_of(buf), "  #%02u %s\n", (u32)frame_idx, frames[frame_idx].symbol)) {
         break;
       }
-      write_offset += (sz)line_len;
+      write_offset = cstr8_len(buf);
       if (write_offset >= size_of(buf) - 1) {
         break;
       }
