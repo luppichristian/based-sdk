@@ -236,6 +236,7 @@ func void _pool_destroy(pool* pol, callsite site) {
 func allocator pool_get_allocator(pool* pol) {
   allocator alloc;
   alloc.user_data = pol;
+  alloc.tracker = NULL;
   alloc.alloc_fn = pool_alloc_callback;
   alloc.dealloc_fn = pool_dealloc_callback;
   alloc.realloc_fn = pool_realloc_callback;

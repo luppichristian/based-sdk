@@ -229,7 +229,6 @@ func LONG WINAPI crash_windows_exception_handler(EXCEPTION_POINTERS* exception_p
 #elif defined(PLATFORM_UNIX)
 func void crash_format_unix_message(c8* dst, sz dst_cap, i32 signal_number, siginfo_t* signal_info) {
   if (dst == NULL || dst_cap == 0) {
-    profile_func_end;
     return;
   }
 

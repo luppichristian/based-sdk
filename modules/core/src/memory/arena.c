@@ -214,6 +214,7 @@ func void _arena_destroy(arena* arn, callsite site) {
 func allocator arena_get_allocator(arena* arn) {
   allocator alloc;
   alloc.user_data = arn;
+  alloc.tracker = NULL;
   alloc.alloc_fn = arena_alloc_callback;
   alloc.dealloc_fn = arena_dealloc_callback;
   alloc.realloc_fn = arena_realloc_callback;

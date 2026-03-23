@@ -30,6 +30,7 @@
 #include "containers/tree.h"
 
 // Include memory modules.
+#include "memory/alloc_tracker.h"
 #include "memory/allocator.h"
 #include "memory/arena.h"
 #include "memory/buffer.h"

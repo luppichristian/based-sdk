@@ -2,6 +2,7 @@
 // Copyright (c) 2026 Christian Luppi
 
 #include "memory/vmem.h"
+#include "memory/alloc_tracker.h"
 #include "basic/assert.h"
 #include "basic/env_defines.h"
 #include "basic/utility_defines.h"
@@ -10,38 +11,9 @@
 #include "platform_includes.h"
 #include <string.h>
 
-typedef struct vmem_stats_state {
-  u64 reserve_calls;
-  u64 commit_calls;
-  u64 decommit_calls;
-  u64 release_calls;
-
-  sz reserved_bytes;
-  sz committed_bytes;
-  sz decommitted_bytes;
-  sz released_bytes;
-
-  u64 alloc_calls;
-  u64 calloc_calls;
-  u64 realloc_calls;
-  u64 free_calls;
-
-  u64 live_allocations;
-  sz live_allocated_bytes;
-  sz peak_live_allocated_bytes;
-  sz total_allocated_bytes;
-  sz total_freed_bytes;
-} vmem_stats_state;
-
-global_var vmem_stats_state g_vmem_stats;
-
-func void vmem_update_peak_allocated_bytes(void) {
-  profile_func_begin;
-  if (g_vmem_stats.live_allocated_bytes > g_vmem_stats.peak_live_allocated_bytes) {
-    g_vmem_stats.peak_live_allocated_bytes = g_vmem_stats.live_allocated_bytes;
-  }
-  profile_func_end;
-}
+global_var alloc_tracker g_vmem_reserved_tracker;
+global_var alloc_tracker g_vmem_committed_tracker;
+global_var alloc_tracker g_vmem_full_tracker;
 
 // =========================================================================
 // Platform Implementations
@@ -58,10 +30,10 @@ func sz vmem_page_size(void) {
 
 func void* vmem_reserve(sz size) {
   profile_func_begin;
-  g_vmem_stats.reserve_calls += 1;
+  alloc_tracker_on_alloc_call(&g_vmem_reserved_tracker);
   void* ptr = VirtualAlloc(NULL, size, MEM_RESERVE, PAGE_NOACCESS);
   if (ptr != NULL) {
-    g_vmem_stats.reserved_bytes += size;
+    alloc_tracker_on_alloc_success(&g_vmem_reserved_tracker, (callsite) {0}, ptr, size);
     TracyCAlloc(ptr, size);
   }
   profile_func_end;
@@ -70,10 +42,10 @@ func void* vmem_reserve(sz size) {
 
 func b32 vmem_commit(void* ptr, sz size) {
   profile_func_begin;
-  g_vmem_stats.commit_calls += 1;
+  alloc_tracker_on_alloc_call(&g_vmem_committed_tracker);
   b32 success = VirtualAlloc(ptr, size, MEM_COMMIT, PAGE_READWRITE) != NULL ? true : false;
   if (success) {
-    g_vmem_stats.committed_bytes += size;
+    alloc_tracker_on_alloc_success(&g_vmem_committed_tracker, (callsite) {0}, ptr, size);
   }
   profile_func_end;
   return success;
@@ -81,10 +53,10 @@ func b32 vmem_commit(void* ptr, sz size) {
 
 func b32 vmem_decommit(void* ptr, sz size) {
   profile_func_begin;
-  g_vmem_stats.decommit_calls += 1;
+  alloc_tracker_on_free_call(&g_vmem_committed_tracker);
   b32 success = VirtualFree(ptr, size, MEM_DECOMMIT) != 0 ? true : false;
   if (success) {
-    g_vmem_stats.decommitted_bytes += size;
+    alloc_tracker_on_free_success(&g_vmem_committed_tracker, (callsite) {0}, ptr, size);
   }
   profile_func_end;
   return success;
@@ -92,10 +64,10 @@ func b32 vmem_decommit(void* ptr, sz size) {
 
 func b32 vmem_release(void* ptr, sz size) {
   profile_func_begin;
-  g_vmem_stats.release_calls += 1;
+  alloc_tracker_on_free_call(&g_vmem_reserved_tracker);
   b32 success = VirtualFree(ptr, 0, MEM_RELEASE) != 0 ? true : false;
   if (success) {
-    g_vmem_stats.released_bytes += size;
+    alloc_tracker_on_free_success(&g_vmem_reserved_tracker, (callsite) {0}, ptr, size);
     TracyCFree(ptr);
   }
   profile_func_end;
@@ -133,13 +105,13 @@ func sz vmem_page_size(void) {
 
 func void* vmem_reserve(sz size) {
   profile_func_begin;
-  g_vmem_stats.reserve_calls += 1;
+  alloc_tracker_on_alloc_call(&g_vmem_reserved_tracker);
   void* ptr = mmap(NULL, size, PROT_NONE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
   if (ptr == MAP_FAILED) {
     profile_func_end;
     return NULL;
   }
-  g_vmem_stats.reserved_bytes += size;
+  alloc_tracker_on_alloc_success(&g_vmem_reserved_tracker, (callsite) {0}, ptr, size);
   TracyCAlloc(ptr, size);
   profile_func_end;
   return ptr;
@@ -147,10 +119,10 @@ func void* vmem_reserve(sz size) {
 
 func b32 vmem_commit(void* ptr, sz size) {
   profile_func_begin;
-  g_vmem_stats.commit_calls += 1;
+  alloc_tracker_on_alloc_call(&g_vmem_committed_tracker);
   b32 success = mprotect(ptr, size, PROT_READ | PROT_WRITE) == 0 ? true : false;
   if (success) {
-    g_vmem_stats.committed_bytes += size;
+    alloc_tracker_on_alloc_success(&g_vmem_committed_tracker, (callsite) {0}, ptr, size);
   }
   profile_func_end;
   return success;
@@ -158,24 +130,24 @@ func b32 vmem_commit(void* ptr, sz size) {
 
 func b32 vmem_decommit(void* ptr, sz size) {
   profile_func_begin;
-  g_vmem_stats.decommit_calls += 1;
+  alloc_tracker_on_free_call(&g_vmem_committed_tracker);
   if (mprotect(ptr, size, PROT_NONE) != 0) {
     profile_func_end;
     return false;
   }
   // Hint to the OS to release the physical pages; best-effort, not checked.
   (void)madvise(ptr, size, MADV_DONTNEED);
-  g_vmem_stats.decommitted_bytes += size;
+  alloc_tracker_on_free_success(&g_vmem_committed_tracker, (callsite) {0}, ptr, size);
   profile_func_end;
   return true;
 }
 
 func b32 vmem_release(void* ptr, sz size) {
   profile_func_begin;
-  g_vmem_stats.release_calls += 1;
+  alloc_tracker_on_free_call(&g_vmem_reserved_tracker);
   b32 success = munmap(ptr, size) == 0 ? true : false;
   if (success) {
-    g_vmem_stats.released_bytes += size;
+    alloc_tracker_on_free_success(&g_vmem_reserved_tracker, (callsite) {0}, ptr, size);
     TracyCFree(ptr);
   }
   profile_func_end;
@@ -307,7 +279,7 @@ func sz vmem_get_alloc_align(void) {
 
 func void* vmem_alloc(sz size) {
   profile_func_begin;
-  g_vmem_stats.alloc_calls += 1;
+  alloc_tracker_on_alloc_call(&g_vmem_full_tracker);
   if (size == 0) {
     profile_func_end;
     return NULL;
@@ -334,17 +306,14 @@ func void* vmem_alloc(sz size) {
   header->info.mapping_size = total_size;
   header->info.prefix_size = prefix_size;
   header->info.user_size = size;
-  g_vmem_stats.live_allocations += 1;
-  g_vmem_stats.live_allocated_bytes += size;
-  g_vmem_stats.total_allocated_bytes += size;
-  vmem_update_peak_allocated_bytes();
+  alloc_tracker_on_alloc_success(&g_vmem_full_tracker, (callsite) {0}, user_ptr, size);
   profile_func_end;
   return user_ptr;
 }
 
 func void* vmem_calloc(sz count, sz size) {
   profile_func_begin;
-  g_vmem_stats.calloc_calls += 1;
+  alloc_tracker_on_calloc_call(&g_vmem_full_tracker);
   if (count == 0 || size == 0) {
     profile_func_end;
     return NULL;
@@ -366,7 +335,7 @@ func void* vmem_calloc(sz count, sz size) {
 
 func void* vmem_realloc(void* ptr, sz old_size, sz new_size) {
   profile_func_begin;
-  g_vmem_stats.realloc_calls += 1;
+  alloc_tracker_on_realloc_call(&g_vmem_full_tracker);
   (void)old_size;
   if (!ptr) {
     profile_func_end;
@@ -401,7 +370,7 @@ func void* vmem_realloc(void* ptr, sz old_size, sz new_size) {
 
 func b32 vmem_free(void* ptr, sz size) {
   profile_func_begin;
-  g_vmem_stats.free_calls += 1;
+  alloc_tracker_on_free_call(&g_vmem_full_tracker);
   (void)size;
   if (!ptr) {
     profile_func_end;
@@ -414,16 +383,7 @@ func b32 vmem_free(void* ptr, sz size) {
   void* base_ptr = vmem_get_alloc_base(ptr);
   b32 success = vmem_platform_free(base_ptr, mapping_size);
   if (success) {
-    if (g_vmem_stats.live_allocations > 0) {
-      g_vmem_stats.live_allocations -= 1;
-    }
-
-    if (g_vmem_stats.live_allocated_bytes >= user_size) {
-      g_vmem_stats.live_allocated_bytes -= user_size;
-    } else {
-      g_vmem_stats.live_allocated_bytes = 0;
-    }
-    g_vmem_stats.total_freed_bytes += user_size;
+    alloc_tracker_on_free_success(&g_vmem_full_tracker, (callsite) {0}, ptr, user_size);
   }
   profile_func_end;
   return success;
@@ -465,6 +425,7 @@ func allocator vmem_get_allocator(void) {
   profile_func_begin;
   allocator alloc;
   alloc.user_data = NULL;
+  alloc.tracker = NULL;
   alloc.alloc_fn = vmem_alloc_callback;
   alloc.dealloc_fn = vmem_dealloc_callback;
   alloc.realloc_fn = vmem_realloc_callback;
@@ -475,28 +436,31 @@ func allocator vmem_get_allocator(void) {
 func vmem_stats vmem_get_stats(void) {
   profile_func_begin;
   vmem_stats stats;
+  alloc_tracker_stats reserved_stats = alloc_tracker_get_stats(&g_vmem_reserved_tracker);
+  alloc_tracker_stats committed_stats = alloc_tracker_get_stats(&g_vmem_committed_tracker);
+  alloc_tracker_stats full_stats = alloc_tracker_get_stats(&g_vmem_full_tracker);
   stats.page_size = vmem_page_size();
 
-  stats.reserve_calls = g_vmem_stats.reserve_calls;
-  stats.commit_calls = g_vmem_stats.commit_calls;
-  stats.decommit_calls = g_vmem_stats.decommit_calls;
-  stats.release_calls = g_vmem_stats.release_calls;
+  stats.reserve_calls = reserved_stats.alloc_calls;
+  stats.commit_calls = committed_stats.alloc_calls;
+  stats.decommit_calls = committed_stats.free_calls;
+  stats.release_calls = reserved_stats.free_calls;
 
-  stats.reserved_bytes = g_vmem_stats.reserved_bytes;
-  stats.committed_bytes = g_vmem_stats.committed_bytes;
-  stats.decommitted_bytes = g_vmem_stats.decommitted_bytes;
-  stats.released_bytes = g_vmem_stats.released_bytes;
+  stats.reserved_bytes = (sz)reserved_stats.total_allocated_bytes;
+  stats.committed_bytes = (sz)committed_stats.total_allocated_bytes;
+  stats.decommitted_bytes = (sz)committed_stats.total_freed_bytes;
+  stats.released_bytes = (sz)reserved_stats.total_freed_bytes;
 
-  stats.alloc_calls = g_vmem_stats.alloc_calls;
-  stats.calloc_calls = g_vmem_stats.calloc_calls;
-  stats.realloc_calls = g_vmem_stats.realloc_calls;
-  stats.free_calls = g_vmem_stats.free_calls;
+  stats.alloc_calls = full_stats.alloc_calls;
+  stats.calloc_calls = full_stats.calloc_calls;
+  stats.realloc_calls = full_stats.realloc_calls;
+  stats.free_calls = full_stats.free_calls;
 
-  stats.live_allocations = g_vmem_stats.live_allocations;
-  stats.live_allocated_bytes = g_vmem_stats.live_allocated_bytes;
-  stats.peak_live_allocated_bytes = g_vmem_stats.peak_live_allocated_bytes;
-  stats.total_allocated_bytes = g_vmem_stats.total_allocated_bytes;
-  stats.total_freed_bytes = g_vmem_stats.total_freed_bytes;
+  stats.live_allocations = full_stats.live_allocations;
+  stats.live_allocated_bytes = (sz)full_stats.live_allocated_bytes;
+  stats.peak_live_allocated_bytes = (sz)full_stats.peak_live_allocated_bytes;
+  stats.total_allocated_bytes = (sz)full_stats.total_allocated_bytes;
+  stats.total_freed_bytes = (sz)full_stats.total_freed_bytes;
   profile_func_end;
   return stats;
 }

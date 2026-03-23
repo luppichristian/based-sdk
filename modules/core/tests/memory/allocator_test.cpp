@@ -27,6 +27,7 @@ namespace {
 TEST(memory_allocator_test, create_default) {
   allocator alloc = {0};
   EXPECT_EQ(nullptr, alloc.user_data);
+  EXPECT_EQ(nullptr, alloc.tracker);
   EXPECT_EQ(nullptr, alloc.alloc_fn);
   EXPECT_EQ(nullptr, alloc.dealloc_fn);
   EXPECT_EQ(nullptr, alloc.realloc_fn);
@@ -61,4 +62,26 @@ TEST(memory_allocator_test, dealloc) {
   void* ptr = allocator_alloc(alloc, 100);
   allocator_dealloc(alloc, ptr);
   EXPECT_EQ(1U, test_deallocated_size);
+}
+
+TEST(memory_allocator_test, user_data_get_set) {
+  allocator alloc = {0};
+  i32 value = 42;
+
+  EXPECT_EQ(nullptr, allocator_get_user_data(&alloc));
+
+  allocator_set_user_data(&alloc, &value);
+
+  EXPECT_EQ(&value, allocator_get_user_data(&alloc));
+}
+
+TEST(memory_allocator_test, tracker_get_set) {
+  allocator alloc = {0};
+  alloc_tracker tracker = alloc_tracker_create();
+
+  EXPECT_EQ(nullptr, allocator_get_tracker(&alloc));
+
+  allocator_set_tracker(&alloc, &tracker);
+
+  EXPECT_EQ(&tracker, allocator_get_tracker(&alloc));
 }

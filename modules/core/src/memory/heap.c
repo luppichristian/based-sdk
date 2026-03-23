@@ -296,6 +296,7 @@ func void _heap_destroy(heap* hep, callsite site) {
 func allocator heap_get_allocator(heap* hep) {
   allocator alloc;
   alloc.user_data = hep;
+  alloc.tracker = NULL;
   alloc.alloc_fn = heap_alloc_callback;
   alloc.dealloc_fn = heap_dealloc_callback;
   alloc.realloc_fn = heap_realloc_callback;

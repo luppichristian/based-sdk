@@ -4,35 +4,46 @@
 #pragma once
 
 #include "../basic/codespace.h"
+#include "alloc_tracker.h"
 
 // =========================================================================
 c_begin;
 // =========================================================================
 
-// A flexible memory allocator interface that allows users to provide custom allocation strategies.
-typedef void* allocator_callback_realloc(
-    void* user_data,
-    callsite site,
-    void* ptr,
-    sz new_size);
-typedef void* allocator_callback_alloc(
-    void* user_data,
-    callsite site,
-    sz size);
-typedef void allocator_callback_free(
-    void* user_data,
-    callsite site,
-    void* ptr);
+// Reallocates an existing allocation to a new size.
+typedef void* allocator_callback_realloc(void* user_data, callsite site, void* ptr, sz new_size);
 
+// Allocates a new memory block of the requested size.
+typedef void* allocator_callback_alloc(void* user_data, callsite site, sz size);
+
+// Releases a previously allocated memory block.
+typedef void allocator_callback_free(void* user_data, callsite site, void* ptr);
+
+// Describes a generic allocator callback interface with optional tracking state.
 typedef struct allocator {
   // Custom user data passed to the callback functions.
   void* user_data;
+
+  // Optional allocation tracker used to collect allocator-local statistics.
+  alloc_tracker* tracker;
 
   // Callback functions for allocation, deallocation, and reallocation.
   allocator_callback_alloc* alloc_fn;
   allocator_callback_free* dealloc_fn;
   allocator_callback_realloc* realloc_fn;
 } allocator;
+
+// Returns the allocator user-data pointer, or NULL when alloc is NULL.
+func void* allocator_get_user_data(allocator* alloc);
+
+// Replaces the allocator user-data pointer when alloc is valid.
+func void allocator_set_user_data(allocator* alloc, void* user_data);
+
+// Returns the attached allocation tracker, or NULL when none is set.
+func alloc_tracker* allocator_get_tracker(allocator* alloc);
+
+// Attaches or clears the allocation tracker when alloc is valid.
+func void allocator_set_tracker(allocator* alloc, alloc_tracker* tracker);
 
 // Allocates a block of memory of the given size using the provided allocator.
 func void* _allocator_alloc(allocator alloc, sz size, callsite site);

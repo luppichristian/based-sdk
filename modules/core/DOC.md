@@ -4110,7 +4110,7 @@ Allocators, arenas, buffers and memory utility APIs.
 ### `memory/allocator.h`
 
 - Types: **4**
-- Functions: **4**
+- Functions: **8**
 
 #### Types
 
@@ -4127,12 +4127,31 @@ Allocators, arenas, buffers and memory utility APIs.
   - What it represents: Represents `allocator` data grouped in a struct
   - Members:
     - `user_data`: `void*`
+    - `tracker`: `alloc_tracker*`
     - `alloc_fn`: `allocator_callback_alloc*`
     - `dealloc_fn`: `allocator_callback_free*`
     - `realloc_fn`: `allocator_callback_realloc*`
 
 #### Functions
 
+- `allocator_get_user_data(allocator* alloc) -> void*`
+  - What it does: Gets allocator user data
+  - Parameters:
+    - `alloc` (`allocator*`): Allocator/context used for memory management
+- `allocator_set_user_data(allocator* alloc, void* user_data) -> void`
+  - What it does: Sets allocator user data
+  - Parameters:
+    - `alloc` (`allocator*`): Allocator/context used for memory management
+    - `user_data` (`void*`): Input data used by the operation
+- `allocator_get_tracker(allocator* alloc) -> alloc_tracker*`
+  - What it does: Gets allocator tracker
+  - Parameters:
+    - `alloc` (`allocator*`): Allocator/context used for memory management
+- `allocator_set_tracker(allocator* alloc, alloc_tracker* tracker) -> void`
+  - What it does: Sets allocator tracker
+  - Parameters:
+    - `alloc` (`allocator*`): Allocator/context used for memory management
+    - `tracker` (`alloc_tracker*`): Input parameter
 - `_allocator_alloc(allocator alloc, sz size, callsite site) -> void*`
   - What it does: Performs  allocator alloc
   - Parameters:
@@ -4159,6 +4178,113 @@ Allocators, arenas, buffers and memory utility APIs.
     - `ptr` (`void*`): Input data used by the operation
     - `new_size` (`sz`): Size or capacity value used by the operation
     - `site` (`callsite`): Input parameter
+
+### `memory/alloc_tracker.h`
+
+- Types: **5**
+- Functions: **12**
+
+#### Types
+
+- `alloc_tracker_stats` (struct)
+  - What it represents: Snapshot of allocator-tracker counters
+  - Members:
+    - `alloc_calls`: `u64`
+    - `calloc_calls`: `u64`
+    - `realloc_calls`: `u64`
+    - `free_calls`: `u64`
+    - `live_allocations`: `u64`
+    - `live_allocated_bytes`: `u64`
+    - `peak_live_allocated_bytes`: `u64`
+    - `total_allocated_bytes`: `u64`
+    - `total_freed_bytes`: `u64`
+- `alloc_tracker_callback_alloc` (alias)
+  - What it represents: Type alias used for allocation event callbacks
+  - Members: none (alias/function type)
+- `alloc_tracker_callback_free` (alias)
+  - What it represents: Type alias used for deallocation event callbacks
+  - Members: none (alias/function type)
+- `alloc_tracker_callback_realloc` (alias)
+  - What it represents: Type alias used for reallocation event callbacks
+  - Members: none (alias/function type)
+- `alloc_tracker` (struct)
+  - What it represents: Atomic allocator-tracker state that can be attached to an `allocator`
+  - Members:
+    - `user_data`: `void*`
+    - `alloc_fn`: `alloc_tracker_callback_alloc*`
+    - `dealloc_fn`: `alloc_tracker_callback_free*`
+    - `realloc_fn`: `alloc_tracker_callback_realloc*`
+    - `alloc_calls`: `atomic_u64`
+    - `calloc_calls`: `atomic_u64`
+    - `realloc_calls`: `atomic_u64`
+    - `free_calls`: `atomic_u64`
+    - `live_allocations`: `atomic_u64`
+    - `live_allocated_bytes`: `atomic_u64`
+    - `peak_live_allocated_bytes`: `atomic_u64`
+    - `total_allocated_bytes`: `atomic_u64`
+    - `total_freed_bytes`: `atomic_u64`
+
+#### Functions
+
+- `alloc_tracker_create() -> alloc_tracker`
+  - What it does: Creates a zeroed allocator tracker
+  - Parameters: none
+- `alloc_tracker_get_user_data(alloc_tracker* tracker) -> void*`
+  - What it does: Gets alloc-tracker user data
+  - Parameters:
+    - `tracker` (`alloc_tracker*`): Input parameter
+- `alloc_tracker_set_user_data(alloc_tracker* tracker, void* user_data) -> void`
+  - What it does: Sets alloc-tracker user data
+  - Parameters:
+    - `tracker` (`alloc_tracker*`): Input parameter
+    - `user_data` (`void*`): Input data used by the operation
+- `alloc_tracker_reset(alloc_tracker* tracker) -> void`
+  - What it does: Resets allocator-tracker counters
+  - Parameters:
+    - `tracker` (`alloc_tracker*`): Input parameter
+- `alloc_tracker_get_stats(alloc_tracker* tracker) -> alloc_tracker_stats`
+  - What it does: Reads allocator-tracker counters into a snapshot
+  - Parameters:
+    - `tracker` (`alloc_tracker*`): Input parameter
+- `alloc_tracker_on_alloc_call(alloc_tracker* tracker) -> void`
+  - What it does: Records an allocator alloc call
+  - Parameters:
+    - `tracker` (`alloc_tracker*`): Input parameter
+- `alloc_tracker_on_calloc_call(alloc_tracker* tracker) -> void`
+  - What it does: Records an allocator calloc call
+  - Parameters:
+    - `tracker` (`alloc_tracker*`): Input parameter
+- `alloc_tracker_on_realloc_call(alloc_tracker* tracker) -> void`
+  - What it does: Records an allocator realloc call
+  - Parameters:
+    - `tracker` (`alloc_tracker*`): Input parameter
+- `alloc_tracker_on_free_call(alloc_tracker* tracker) -> void`
+  - What it does: Records an allocator free call
+  - Parameters:
+    - `tracker` (`alloc_tracker*`): Input parameter
+- `alloc_tracker_on_alloc_success(alloc_tracker* tracker, callsite site, void* ptr, sz size) -> void`
+  - What it does: Records a successful allocation
+  - Parameters:
+    - `tracker` (`alloc_tracker*`): Input parameter
+    - `site` (`callsite`): Input parameter
+    - `ptr` (`void*`): Input data used by the operation
+    - `size` (`sz`): Size or capacity value used by the operation
+- `alloc_tracker_on_free_success(alloc_tracker* tracker, callsite site, void* ptr, sz size) -> void`
+  - What it does: Records a successful free
+  - Parameters:
+    - `tracker` (`alloc_tracker*`): Input parameter
+    - `site` (`callsite`): Input parameter
+    - `ptr` (`void*`): Input data used by the operation
+    - `size` (`sz`): Size or capacity value used by the operation
+- `alloc_tracker_on_realloc_success(alloc_tracker* tracker, callsite site, void* old_ptr, void* new_ptr, sz old_size, sz new_size) -> void`
+  - What it does: Records a successful realloc size transition
+  - Parameters:
+    - `tracker` (`alloc_tracker*`): Input parameter
+    - `site` (`callsite`): Input parameter
+    - `old_ptr` (`void*`): Input data used by the operation
+    - `new_ptr` (`void*`): Input data used by the operation
+    - `old_size` (`sz`): Size or capacity value used by the operation
+    - `new_size` (`sz`): Size or capacity value used by the operation
 
 ### `memory/arena.h`
 

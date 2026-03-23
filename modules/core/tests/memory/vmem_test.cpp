@@ -161,6 +161,27 @@ TEST(memory_vmem_test, get_stats_after_operations) {
   vmem_free(ptr, page_sz);
 }
 
+TEST(memory_vmem_test, get_stats_after_virtual_memory_operations) {
+  vmem_stats stats_before = vmem_get_stats();
+  sz page_sz = vmem_page_size();
+
+  void* ptr = vmem_reserve(page_sz * 2);
+  ASSERT_NE(nullptr, ptr);
+  EXPECT_NE(0, vmem_commit(ptr, page_sz));
+  EXPECT_NE(0, vmem_decommit(ptr, page_sz));
+  EXPECT_NE(0, vmem_release(ptr, page_sz * 2));
+
+  vmem_stats stats_after = vmem_get_stats();
+  EXPECT_GT(stats_after.reserve_calls, stats_before.reserve_calls);
+  EXPECT_GT(stats_after.commit_calls, stats_before.commit_calls);
+  EXPECT_GT(stats_after.decommit_calls, stats_before.decommit_calls);
+  EXPECT_GT(stats_after.release_calls, stats_before.release_calls);
+  EXPECT_GE(stats_after.reserved_bytes, stats_before.reserved_bytes + page_sz * 2);
+  EXPECT_GE(stats_after.committed_bytes, stats_before.committed_bytes + page_sz);
+  EXPECT_GE(stats_after.decommitted_bytes, stats_before.decommitted_bytes + page_sz);
+  EXPECT_GE(stats_after.released_bytes, stats_before.released_bytes + page_sz * 2);
+}
+
 TEST(memory_vmem_test, alloc_larger_than_page) {
   sz large_size = vmem_page_size() * 10;
   void* ptr = vmem_alloc(large_size);

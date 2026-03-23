@@ -1260,18 +1260,45 @@
 
 === include\memory\allocator.h ===
 6: #include "../basic/codespace.h"
-13: typedef void* allocator_callback_realloc(
-18: typedef void* allocator_callback_alloc(
-22: typedef void allocator_callback_free(
-27: typedef struct allocator {
-38: func void* _allocator_alloc(allocator alloc, sz size, callsite site);
-41: func void* _allocator_calloc(allocator alloc, sz count, sz size, callsite site);
-44: func void _allocator_dealloc(allocator alloc, void* ptr, callsite site);
-47: func void* _allocator_realloc(allocator alloc, void* ptr, sz new_size, callsite site);
-50: #define allocator_alloc(alloc, size) \
-52: #define allocator_dealloc(alloc, ptr) \
-54: #define allocator_calloc(alloc, count, size) \
-56: #define allocator_realloc(alloc, ptr, new_size) \
+13: typedef struct alloc_tracker alloc_tracker;
+15: typedef void* allocator_callback_realloc(
+20: typedef void* allocator_callback_alloc(
+24: typedef void allocator_callback_free(
+29: typedef struct allocator {
+30: func void* allocator_get_user_data(allocator* alloc);
+31: func void allocator_set_user_data(allocator* alloc, void* user_data);
+33: func alloc_tracker* allocator_get_tracker(allocator* alloc);
+34: func void allocator_set_tracker(allocator* alloc, alloc_tracker* tracker);
+37: func void* _allocator_alloc(allocator alloc, sz size, callsite site);
+40: func void* _allocator_calloc(allocator alloc, sz count, sz size, callsite site);
+43: func void _allocator_dealloc(allocator alloc, void* ptr, callsite site);
+46: func void* _allocator_realloc(allocator alloc, void* ptr, sz new_size, callsite site);
+49: #define allocator_alloc(alloc, size) \
+51: #define allocator_dealloc(alloc, ptr) \
+53: #define allocator_calloc(alloc, count, size) \
+55: #define allocator_realloc(alloc, ptr, new_size) \
+
+=== include\memory\alloc_tracker.h ===
+6: #include "../basic/codespace.h"
+7: #include "../threads/atomics.h"
+13: typedef struct alloc_tracker_stats {
+26: typedef struct allocator allocator;
+28: typedef void alloc_tracker_callback_alloc(
+35: typedef void alloc_tracker_callback_free(
+42: typedef void alloc_tracker_callback_realloc(
+52: typedef struct alloc_tracker {
+70: func alloc_tracker alloc_tracker_create(void);
+72: func void* alloc_tracker_get_user_data(alloc_tracker* tracker);
+73: func void alloc_tracker_set_user_data(alloc_tracker* tracker, void* user_data);
+76: func void alloc_tracker_reset(alloc_tracker* tracker);
+79: func alloc_tracker_stats alloc_tracker_get_stats(alloc_tracker* tracker);
+82: func void alloc_tracker_on_alloc_call(alloc_tracker* tracker);
+83: func void alloc_tracker_on_calloc_call(alloc_tracker* tracker);
+84: func void alloc_tracker_on_realloc_call(alloc_tracker* tracker);
+85: func void alloc_tracker_on_free_call(alloc_tracker* tracker);
+88: func void alloc_tracker_on_alloc_success(alloc_tracker* tracker, callsite site, void* ptr, sz size);
+89: func void alloc_tracker_on_free_success(alloc_tracker* tracker, callsite site, void* ptr, sz size);
+90: func void alloc_tracker_on_realloc_success(
 
 === include\memory\arena.h ===
 6: #include "../basic/codespace.h"
