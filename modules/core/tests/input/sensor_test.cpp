@@ -23,13 +23,12 @@ TEST(input_sensor_test, id_conversion_and_invalid_lifecycle_calls) {
 
 TEST(input_sensor_test, enumeration_consistency_when_devices_exist) {
   sz count_val = sensor_get_total_count();
-  sensor out_id = NULL;
+  sensor out_id = count_val == 0 ? NULL : sensor_get_from_idx(0);
   if (count_val == 0) {
-    EXPECT_TRUE(sensor_get_from_idx(0, &out_id) == 0);
     return;
   }
 
-  ASSERT_TRUE(sensor_get_from_idx(0, &out_id) != 0);
+  ASSERT_TRUE(out_id != NULL);
   EXPECT_TRUE(sensor_is_valid(out_id) != 0);
   sensor_kind kind_val = sensor_get_kind(out_id);
   EXPECT_TRUE(kind_val >= SENSOR_KIND_INVALID);

@@ -78,9 +78,6 @@ func u64 msg_add_handler(const msg_handler_desc* desc);
 // Removes a previously registered message handler.
 func b32 msg_remove_handler(u64 handler_id);
 
-// Removes all registered message handlers.
-func void msg_clear_handlers(void);
-
 // Installs or clears a process-global event filter callback.
 func void msg_set_filter(msg_filter_fn filter_fn, void* user_data);
 

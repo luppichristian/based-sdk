@@ -1775,7 +1775,7 @@ Device input APIs and message/event distribution.
 ### `input/audio_device.h`
 
 - Types: **2**
-- Functions: **8**
+- Functions: **11**
 
 #### Types
 
@@ -1792,44 +1792,55 @@ Device input APIs and message/event distribution.
 #### Functions
 
 - `audio_device_is_valid(audio_device src) -> b32`
-  - What it does: Performs audio device is valid
+  - What it does: Validates an audio device handle
   - Parameters:
     - `src` (`audio_device`): Input data used by the operation
-- `audio_device_from_device(device src) -> audio_device`
-  - What it does: Performs audio device from device
+- `device_get_audio_device(device src) -> audio_device`
+  - What it does: Converts a generic device handle into an audio device handle
   - Parameters:
     - `src` (`device`): Input data used by the operation
+- `audio_device_to_device(audio_device src) -> device`
+  - What it does: Converts an audio device handle into a generic device handle
+  - Parameters:
+    - `src` (`audio_device`): Input data used by the operation
 - `audio_device_type_is_valid(audio_device_type src) -> b32`
-  - What it does: Performs audio device type is valid
+  - What it does: Validates an audio-device direction
   - Parameters:
     - `src` (`audio_device_type`): Input data used by the operation
 - `audio_device_get_type_name(audio_device_type audio_type) -> cstr8`
-  - What it does: Gets audio device get type name
+  - What it does: Returns the display name for an audio-device direction
   - Parameters:
     - `audio_type` (`audio_device_type`): Input parameter
 - `audio_device_get_total_count(audio_device_type audio_type) -> sz`
-  - What it does: Gets audio device get total count
+  - What it does: Returns the number of currently known audio devices for the requested direction
   - Parameters:
     - `audio_type` (`audio_device_type`): Input parameter
-- `audio_device_get_id(audio_device_type audio_type, sz idx, audio_device* out_id) -> b32`
-  - What it does: Gets audio device get id
+- `audio_device_get_from_idx(audio_device_type audio_type, sz idx) -> audio_device`
+  - What it does: Returns the audio device handle at the requested index for the requested direction
   - Parameters:
     - `audio_type` (`audio_device_type`): Input parameter
     - `idx` (`sz`): Zero-based index used to select an item
-    - `out_id` (`audio_device*`): Output value written by the function
+- `audio_device_get_primary(audio_device_type audio_type) -> audio_device`
+  - What it does: Returns the primary audio device handle for the requested direction
+  - Parameters:
+    - `audio_type` (`audio_device_type`): Input parameter
+- `audio_device_get_focused(audio_device_type audio_type) -> audio_device`
+  - What it does: Returns the focused audio device handle for the requested direction, or the primary device when none is focused
+  - Parameters:
+    - `audio_type` (`audio_device_type`): Input parameter
 - `audio_device_get_type(audio_device aud_id) -> audio_device_type`
-  - What it does: Gets audio device get type
+  - What it does: Returns the direction encoded by an audio device handle
   - Parameters:
     - `aud_id` (`audio_device`): Input parameter
 - `audio_device_get_name(audio_device aud_id) -> cstr8`
-  - What it does: Gets audio device get name
+  - What it does: Returns the backend-defined name for an audio device handle
   - Parameters:
     - `aud_id` (`audio_device`): Input parameter
 
 ### `input/camera.h`
 
 - Types: **2**
-- Functions: **11**
+- Functions: **14**
 
 #### Types
 
@@ -1846,47 +1857,56 @@ Device input APIs and message/event distribution.
 #### Functions
 
 - `camera_is_valid(camera src) -> b32`
-  - What it does: Performs camera is valid
+  - What it does: Validates a camera handle
   - Parameters:
     - `src` (`camera`): Input data used by the operation
-- `camera_from_device(device src) -> camera`
-  - What it does: Performs camera from device
+- `device_get_camera(device src) -> camera`
+  - What it does: Converts a generic device handle into a camera handle
   - Parameters:
     - `src` (`device`): Input data used by the operation
+- `camera_to_device(camera src) -> device`
+  - What it does: Converts a camera handle into a generic device handle
+  - Parameters:
+    - `src` (`camera`): Input data used by the operation
 - `camera_get_total_count() -> sz`
-  - What it does: Gets camera get total count
+  - What it does: Returns the number of currently known cameras
   - Parameters: none
-- `camera_get_id(sz idx, camera* out_id) -> b32`
-  - What it does: Gets camera get id
+- `camera_get_from_idx(sz idx) -> camera`
+  - What it does: Returns the camera handle at the requested index
   - Parameters:
     - `idx` (`sz`): Zero-based index used to select an item
-    - `out_id` (`camera*`): Output value written by the function
+- `camera_get_primary() -> camera`
+  - What it does: Returns the primary camera handle
+  - Parameters: none
+- `camera_get_focused() -> camera`
+  - What it does: Returns the focused camera handle, or the primary camera when none is focused
+  - Parameters: none
 - `camera_get_name(camera cam_id) -> cstr8`
-  - What it does: Gets camera get name
+  - What it does: Returns the backend-defined name for a camera handle
   - Parameters:
     - `cam_id` (`camera`): Input parameter
 - `camera_get_pos(camera cam_id) -> camera_pos`
-  - What it does: Gets camera get pos
+  - What it does: Returns the reported physical position of a camera
   - Parameters:
     - `cam_id` (`camera`): Input parameter
 - `camera_open(camera cam_id) -> b32`
-  - What it does: Opens camera open
+  - What it does: Opens a camera for lifecycle tracking
   - Parameters:
     - `cam_id` (`camera`): Input parameter
 - `camera_close(camera cam_id) -> b32`
-  - What it does: Closes camera close
+  - What it does: Closes a camera tracked by the module
   - Parameters:
     - `cam_id` (`camera`): Input parameter
 - `camera_start(camera cam_id) -> b32`
-  - What it does: Performs camera start
+  - What it does: Marks a camera as started
   - Parameters:
     - `cam_id` (`camera`): Input parameter
 - `camera_stop(camera cam_id) -> b32`
-  - What it does: Performs camera stop
+  - What it does: Marks a camera as stopped
   - Parameters:
     - `cam_id` (`camera`): Input parameter
 - `camera_read(camera cam_id, buffer* out_frame) -> b32`
-  - What it does: Reads data for camera read
+  - What it does: Reads a frame into the supplied output buffer metadata
   - Parameters:
     - `cam_id` (`camera`): Input parameter
     - `out_frame` (`buffer*`): Output value written by the function
@@ -1935,14 +1955,23 @@ Device input APIs and message/event distribution.
 
 ### `input/devices.h`
 
-- Types: **3**
-- Functions: **7**
+- Types: **4**
+- Functions: **10**
 
 #### Types
 
 - `device` (alias)
   - What it represents: Type alias used for `device`
   - Members: none (alias/function type)
+- `battery_state` (enum)
+  - What it represents: Represents device battery and power states shared by device-bound input APIs
+  - Members:
+    - `BATTERY_STATE_UNKNOWN`: `enum value`
+    - `BATTERY_STATE_ERROR`: `enum value`
+    - `BATTERY_STATE_ON_BATTERY`: `enum value`
+    - `BATTERY_STATE_NO_BATTERY`: `enum value`
+    - `BATTERY_STATE_CHARGING`: `enum value`
+    - `BATTERY_STATE_CHARGED`: `enum value`
 - `device_type` (enum)
   - What it represents: Represents a set of named constants for `device type`
   - Members:
@@ -1962,6 +1991,9 @@ Device input APIs and message/event distribution.
   - Members:
     - `id`: `device`
     - `connected`: `b32`
+    - `device_state`: `u64`
+    - `battery_state`: `battery_state`
+    - `handle`: `void*`
     - `name`: `str8_short`
     - `vendor_id`: `u16`
     - `product_id`: `u16`
@@ -1971,43 +2003,58 @@ Device input APIs and message/event distribution.
 #### Functions
 
 - `device_is_valid(device src) -> b32`
-  - What it does: Performs device is valid
+  - What it does: Validates a generic device handle
   - Parameters:
     - `src` (`device`): Input data used by the operation
 - `devices_get_type(device src) -> device_type`
-  - What it does: Gets devices get type
+  - What it does: Returns the encoded device category for a handle
+  - Parameters:
+    - `src` (`device`): Input data used by the operation
+- `device_get_handle(device src) -> void*`
+  - What it does: Returns the backend or native handle currently associated with a device
+  - Parameters:
+    - `src` (`device`): Input data used by the operation
+- `device_get_state(device src) -> u64`
+  - What it does: Returns the lifecycle state counter for a device
   - Parameters:
     - `src` (`device`): Input data used by the operation
 - `devices_get_type_name(device_type type) -> cstr8`
-  - What it does: Gets devices get type name
+  - What it does: Returns the display name for a device category
   - Parameters:
     - `type` (`device_type`): Input parameter
 - `devices_get_count(device_type type) -> sz`
-  - What it does: Gets devices get count
+  - What it does: Returns the number of currently known devices of the requested type
+  - Parameters:
+    - `type` (`device_type`): Input parameter
+- `devices_get_type_count(device_type type) -> u32`
+  - What it does: Returns the number of currently known devices of the requested type as a 32-bit count
   - Parameters:
     - `type` (`device_type`): Input parameter
 - `devices_get_device(device_type type, sz idx) -> device`
-  - What it does: Gets devices get device
+  - What it does: Returns the generic device handle at the requested index for a device category
   - Parameters:
     - `type` (`device_type`): Input parameter
     - `idx` (`sz`): Zero-based index used to select an item
 - `devices_is_connected(device dev_id) -> b32`
-  - What it does: Performs devices is connected
+  - What it does: Reports whether a generic device handle is currently connected
   - Parameters:
     - `dev_id` (`device`): Input parameter
 - `devices_get_info(device dev_id, device_info* out_info) -> b32`
-  - What it does: Gets devices get info
+  - What it does: Fills the current metadata snapshot for a generic device handle
   - Parameters:
     - `dev_id` (`device`): Input parameter
     - `out_info` (`device_info*`): Output value written by the function
 
 ### `input/gamepads.h`
 
-- Types: **5**
-- Functions: **12**
+- Types: **6**
+- Functions: **15**
 
 #### Types
 
+- `gamepad` (alias)
+  - What it represents: Type alias used for `gamepad`
+  - Members: none (alias/function type)
 - `gamepad_button` (enum)
   - What it represents: Represents a set of named constants for `gamepad button`
   - Members:
@@ -2070,86 +2117,95 @@ Device input APIs and message/event distribution.
 
 #### Functions
 
-- `gamepads_get_count() -> sz`
-  - What it does: Gets gamepads get count
+- `gamepad_is_valid(gamepad src) -> b32`
+  - What it does: Validates a gamepad handle
+  - Parameters:
+    - `src` (`gamepad`): Input data used by the operation
+- `device_get_gamepad(device src) -> gamepad`
+  - What it does: Converts a generic device handle into a gamepad handle
+  - Parameters:
+    - `src` (`device`): Input data used by the operation
+- `gamepad_to_device(gamepad src) -> device`
+  - What it does: Converts a gamepad handle into a generic device handle
+  - Parameters:
+    - `src` (`gamepad`): Input data used by the operation
+- `gamepad_get_total_count() -> sz`
+  - What it does: Returns the number of currently known gamepads
   - Parameters: none
-- `gamepads_is_connected(sz slot_idx) -> b32`
-  - What it does: Performs gamepads is connected
+- `gamepad_get_from_idx(sz idx) -> gamepad`
+  - What it does: Returns the gamepad handle at the requested index
   - Parameters:
-    - `slot_idx` (`sz`): Zero-based index used to select an item
-- `gamepads_get_device(sz slot_idx) -> device`
-  - What it does: Gets gamepads get device
+    - `idx` (`sz`): Zero-based index used to select an item
+- `gamepad_get_primary() -> gamepad`
+  - What it does: Returns the primary gamepad handle
+  - Parameters: none
+- `gamepad_get_focused() -> gamepad`
+  - What it does: Returns the focused gamepad handle, or the primary gamepad when none is focused
+  - Parameters: none
+- `gamepad_is_connected(gamepad src) -> b32`
+  - What it does: Reports whether the supplied gamepad is connected
   - Parameters:
-    - `slot_idx` (`sz`): Zero-based index used to select an item
-- `gamepads_get_name(sz slot_idx) -> cstr8`
-  - What it does: Gets gamepads get name
+    - `src` (`gamepad`): Input data used by the operation
+- `gamepad_get_name(gamepad src) -> cstr8`
+  - What it does: Returns the backend-defined name for a gamepad handle
   - Parameters:
-    - `slot_idx` (`sz`): Zero-based index used to select an item
-- `gamepads_has_button(sz slot_idx, gamepad_button button) -> b32`
-  - What it does: Performs gamepads has button
+    - `src` (`gamepad`): Input parameter
+- `gamepad_has_button(gamepad src, gamepad_button button) -> b32`
+  - What it does: Reports whether the gamepad exposes the requested button
   - Parameters:
-    - `slot_idx` (`sz`): Zero-based index used to select an item
+    - `src` (`gamepad`): Input parameter
     - `button` (`gamepad_button`): Input parameter
-- `gamepads_get_button(sz slot_idx, gamepad_button button) -> b32`
-  - What it does: Gets gamepads get button
+- `gamepad_get_button(gamepad src, gamepad_button button) -> b32`
+  - What it does: Returns the cached state of a gamepad button
   - Parameters:
-    - `slot_idx` (`sz`): Zero-based index used to select an item
+    - `src` (`gamepad`): Input parameter
     - `button` (`gamepad_button`): Input parameter
-- `gamepads_has_axis(sz slot_idx, gamepad_axis axis) -> b32`
-  - What it does: Performs gamepads has axis
+- `gamepad_has_axis(gamepad src, gamepad_axis axis) -> b32`
+  - What it does: Reports whether the gamepad exposes the requested axis
   - Parameters:
-    - `slot_idx` (`sz`): Zero-based index used to select an item
+    - `src` (`gamepad`): Input parameter
     - `axis` (`gamepad_axis`): Input parameter
-- `gamepads_get_axis(sz slot_idx, gamepad_axis axis) -> i16`
-  - What it does: Gets gamepads get axis
+- `gamepad_get_axis(gamepad src, gamepad_axis axis) -> i16`
+  - What it does: Returns the cached signed value of a gamepad axis
   - Parameters:
-    - `slot_idx` (`sz`): Zero-based index used to select an item
+    - `src` (`gamepad`): Input parameter
     - `axis` (`gamepad_axis`): Input parameter
-- `gamepads_set_rumble(sz slot_idx, u16 low_freq, u16 high_freq, u32 duration_ms) -> b32`
-  - What it does: Sets gamepads set rumble
+- `gamepad_set_rumble(gamepad src, u16 low_freq, u16 high_freq, u32 duration_ms) -> b32`
+  - What it does: Starts gamepad rumble on a specific device
   - Parameters:
-    - `slot_idx` (`sz`): Zero-based index used to select an item
+    - `src` (`gamepad`): Input parameter
     - `low_freq` (`u16`): Input parameter
     - `high_freq` (`u16`): Input parameter
     - `duration_ms` (`u32`): Input parameter
-- `gamepads_set_led(sz slot_idx, u8 red, u8 green, u8 blue) -> b32`
-  - What it does: Sets gamepads set led
+- `gamepad_set_led(gamepad src, u8 red, u8 green, u8 blue) -> b32`
+  - What it does: Sets the LED color on a specific gamepad
   - Parameters:
-    - `slot_idx` (`sz`): Zero-based index used to select an item
+    - `src` (`gamepad`): Input parameter
     - `red` (`u8`): Input parameter
     - `green` (`u8`): Input parameter
     - `blue` (`u8`): Input parameter
-- `gamepads_set_axis_deadzone(sz slot_idx, gamepad_axis axis, i16 deadzone) -> b32`
-  - What it does: Sets gamepads set axis deadzone
+- `gamepad_set_axis_deadzone(gamepad src, gamepad_axis axis, i16 deadzone) -> b32`
+  - What it does: Sets the deadzone used for a specific gamepad axis
   - Parameters:
-    - `slot_idx` (`sz`): Zero-based index used to select an item
+    - `src` (`gamepad`): Input parameter
     - `axis` (`gamepad_axis`): Input parameter
     - `deadzone` (`i16`): Input parameter
-- `gamepads_get_axis_deadzone(sz slot_idx, gamepad_axis axis) -> i16`
-  - What it does: Gets gamepads get axis deadzone
+- `gamepad_get_axis_deadzone(gamepad src, gamepad_axis axis) -> i16`
+  - What it does: Returns the current deadzone for a specific gamepad axis
   - Parameters:
-    - `slot_idx` (`sz`): Zero-based index used to select an item
+    - `src` (`gamepad`): Input parameter
     - `axis` (`gamepad_axis`): Input parameter
 
 ### `input/joystick.h`
 
-- Types: **3**
-- Functions: **15**
+- Types: **2**
+- Functions: **18**
 
 #### Types
 
 - `joystick` (alias)
   - What it represents: Type alias used for `joystick`
   - Members: none (alias/function type)
-- `battery_state` (enum)
-  - What it represents: Represents a set of named constants for `battery state`
-  - Members:
-    - `BATTERY_STATE_UNKNOWN`: `enum value`
-    - `BATTERY_STATE_ERROR`: `enum value`
-    - `BATTERY_STATE_ON_BATTERY`: `enum value`
-    - `BATTERY_STATE_NO_BATTERY`: `enum value`
-    - `BATTERY_STATE_CHARGING`: `enum value`
-    - `BATTERY_STATE_CHARGED`: `enum value`
 - `joystick_hat_state` (enum)
   - What it represents: Represents a set of named constants for `joystick hat state`
   - Members:
@@ -2166,130 +2222,166 @@ Device input APIs and message/event distribution.
 #### Functions
 
 - `joystick_is_valid(joystick src) -> b32`
-  - What it does: Performs joystick is valid
+  - What it does: Validates a joystick handle
   - Parameters:
     - `src` (`joystick`): Input data used by the operation
-- `joystick_from_device(device src) -> joystick`
-  - What it does: Performs joystick from device
+- `device_get_joystick(device src) -> joystick`
+  - What it does: Converts a generic device handle into a joystick handle
   - Parameters:
     - `src` (`device`): Input data used by the operation
+- `joystick_to_device(joystick src) -> device`
+  - What it does: Converts a joystick handle into a generic device handle
+  - Parameters:
+    - `src` (`joystick`): Input data used by the operation
 - `joystick_get_total_count() -> sz`
-  - What it does: Gets joystick get total count
+  - What it does: Returns the number of currently known joysticks
   - Parameters: none
-- `joystick_get_id(sz idx, joystick* out_id) -> b32`
-  - What it does: Gets joystick get id
+- `joystick_get_from_idx(sz idx) -> joystick`
+  - What it does: Returns the joystick handle at the requested index
   - Parameters:
     - `idx` (`sz`): Zero-based index used to select an item
-    - `out_id` (`joystick*`): Output value written by the function
+- `joystick_get_primary() -> joystick`
+  - What it does: Returns the primary joystick handle
+  - Parameters: none
+- `joystick_get_focused() -> joystick`
+  - What it does: Returns the focused joystick handle, or the primary joystick when none is focused
+  - Parameters: none
 - `joystick_get_name(joystick joy_id) -> cstr8`
-  - What it does: Gets joystick get name
+  - What it does: Returns the backend-defined name for a joystick handle
   - Parameters:
     - `joy_id` (`joystick`): Input parameter
 - `joystick_is_connected(joystick joy_id) -> b32`
-  - What it does: Performs joystick is connected
+  - What it does: Reports whether a joystick handle is connected
   - Parameters:
     - `joy_id` (`joystick`): Input parameter
 - `joystick_get_axis_count(joystick joy_id) -> sz`
-  - What it does: Gets joystick get axis count
+  - What it does: Returns the number of joystick axes
   - Parameters:
     - `joy_id` (`joystick`): Input parameter
 - `joystick_get_ball_count(joystick joy_id) -> sz`
-  - What it does: Gets joystick get ball count
+  - What it does: Returns the number of joystick trackballs
   - Parameters:
     - `joy_id` (`joystick`): Input parameter
 - `joystick_get_hat_count(joystick joy_id) -> sz`
-  - What it does: Gets joystick get hat count
+  - What it does: Returns the number of joystick hats
   - Parameters:
     - `joy_id` (`joystick`): Input parameter
 - `joystick_get_button_count(joystick joy_id) -> sz`
-  - What it does: Gets joystick get button count
+  - What it does: Returns the number of joystick buttons
   - Parameters:
     - `joy_id` (`joystick`): Input parameter
 - `joystick_get_axis(joystick joy_id, sz axis_idx) -> i16`
-  - What it does: Gets joystick get axis
+  - What it does: Returns the current value for a joystick axis
   - Parameters:
     - `joy_id` (`joystick`): Input parameter
     - `axis_idx` (`sz`): Zero-based index used to select an item
 - `joystick_get_ball(joystick joy_id, sz ball_idx, i32* out_xrel, i32* out_yrel) -> b32`
-  - What it does: Gets joystick get ball
+  - What it does: Returns relative trackball motion for a joystick ball control
   - Parameters:
     - `joy_id` (`joystick`): Input parameter
     - `ball_idx` (`sz`): Zero-based index used to select an item
     - `out_xrel` (`i32*`): Output value written by the function
     - `out_yrel` (`i32*`): Output value written by the function
 - `joystick_get_hat(joystick joy_id, sz hat_idx) -> joystick_hat_state`
-  - What it does: Gets joystick get hat
+  - What it does: Returns the current hat state for a joystick hat control
   - Parameters:
     - `joy_id` (`joystick`): Input parameter
     - `hat_idx` (`sz`): Zero-based index used to select an item
 - `joystick_get_button(joystick joy_id, sz button_idx) -> b32`
-  - What it does: Gets joystick get button
+  - What it does: Returns the current state for a joystick button control
   - Parameters:
     - `joy_id` (`joystick`): Input parameter
     - `button_idx` (`sz`): Zero-based index used to select an item
 - `joystick_get_battery(joystick joy_id, i32* out_percent) -> battery_state`
-  - What it does: Gets joystick get battery
+  - What it does: Returns the current battery state and optional percentage for a joystick
   - Parameters:
     - `joy_id` (`joystick`): Input parameter
     - `out_percent` (`i32*`): Output value written by the function
 
 ### `input/keyboard.h`
 
-- Types: **0**
-- Functions: **9**
+- Types: **1**
+- Functions: **12**
 
 #### Types
 
-- None
+- `keyboard` (alias)
+  - What it represents: Type alias used for `keyboard`
+  - Members: none (alias/function type)
 
 #### Functions
 
+- `keyboard_is_valid(keyboard src) -> b32`
+  - What it does: Validates a keyboard handle
+  - Parameters:
+    - `src` (`keyboard`): Input data used by the operation
+- `device_get_keyboard(device src) -> keyboard`
+  - What it does: Converts a generic device handle into a keyboard handle
+  - Parameters:
+    - `src` (`device`): Input data used by the operation
+- `keyboard_to_device(keyboard src) -> device`
+  - What it does: Converts a keyboard handle into a generic device handle
+  - Parameters:
+    - `src` (`keyboard`): Input data used by the operation
 - `keyboard_is_available() -> b32`
-  - What it does: Performs keyboard is available
+  - What it does: Reports whether any keyboard backend is available
   - Parameters: none
-- `keyboard_get_primary_device() -> device`
-  - What it does: Gets keyboard get primary device
+- `keyboard_get_primary() -> keyboard`
+  - What it does: Returns the primary keyboard handle
   - Parameters: none
-- `keyboard_is_key_down(vkey key) -> b32`
-  - What it does: Performs keyboard is key down
+- `keyboard_get_focused() -> keyboard`
+  - What it does: Returns the focused keyboard handle, or the primary keyboard when none is focused
+  - Parameters: none
+- `keyboard_is_key_down(keyboard src, vkey key) -> b32`
+  - What it does: Reports whether a key is down on a specific keyboard
   - Parameters:
+    - `src` (`keyboard`): Input parameter
     - `key` (`vkey`): Input parameter
-- `keyboard_get_mods() -> keymod`
-  - What it does: Gets keyboard get mods
-  - Parameters: none
-- `keyboard_has_mods(keymod required_mods) -> b32`
-  - What it does: Performs keyboard has mods
+- `keyboard_get_mods(keyboard src) -> keymod`
+  - What it does: Returns the cached modifier state for a specific keyboard
   - Parameters:
+    - `src` (`keyboard`): Input parameter
+- `keyboard_has_mods(keyboard src, keymod required_mods) -> b32`
+  - What it does: Reports whether a keyboard satisfies the requested modifier mask
+  - Parameters:
+    - `src` (`keyboard`): Input parameter
     - `required_mods` (`keymod`): Input parameter
-- `keyboard_has_mods_exact(keymod required_mods, keymod forbidden_mods) -> b32`
-  - What it does: Performs keyboard has mods exact
+- `keyboard_has_mods_exact(keyboard src, keymod required_mods, keymod forbidden_mods) -> b32`
+  - What it does: Reports whether a keyboard satisfies required and forbidden modifier masks
   - Parameters:
+    - `src` (`keyboard`): Input parameter
     - `required_mods` (`keymod`): Input parameter
     - `forbidden_mods` (`keymod`): Input parameter
-- `keyboard_is_key_down_mod(vkey key, keymod required_mods, keymod forbidden_mods) -> b32`
-  - What it does: Performs keyboard is key down mod
+- `keyboard_is_key_down_mod(keyboard src, vkey key, keymod required_mods, keymod forbidden_mods) -> b32`
+  - What it does: Reports whether a key is down and a specific keyboard satisfies the modifier requirements
   - Parameters:
+    - `src` (`keyboard`): Input parameter
     - `key` (`vkey`): Input parameter
     - `required_mods` (`keymod`): Input parameter
     - `forbidden_mods` (`keymod`): Input parameter
-- `keyboard_get_key_name(vkey key) -> cstr8`
-  - What it does: Gets keyboard get key name
+- `keyboard_get_key_name(keyboard src, vkey key) -> cstr8`
+  - What it does: Returns the readable physical-key name for a key query on a specific keyboard
   - Parameters:
+    - `src` (`keyboard`): Input parameter
     - `key` (`vkey`): Input parameter
-- `keyboard_get_key_display_name(vkey key, keymod modifiers, b32 key_event) -> cstr8`
-  - What it does: Gets keyboard get key display name
+- `keyboard_get_key_display_name(keyboard src, vkey key, keymod modifiers, b32 key_event) -> cstr8`
+  - What it does: Returns the translated key-display name for a key query on a specific keyboard
   - Parameters:
+    - `src` (`keyboard`): Input parameter
     - `key` (`vkey`): Input parameter
     - `modifiers` (`keymod`): Input parameter
     - `key_event` (`b32`): Input parameter
 
 ### `input/mouse.h`
 
-- Types: **3**
-- Functions: **4**
+- Types: **4**
+- Functions: **7**
 
 #### Types
 
+- `mouse` (alias)
+  - What it represents: Type alias used for `mouse`
+  - Members: none (alias/function type)
 - `mouse_button` (enum)
   - What it represents: Represents a set of named constants for `mouse button`
   - Members:
@@ -2310,18 +2402,35 @@ Device input APIs and message/event distribution.
 
 #### Functions
 
-- `mouse_is_available() -> b32`
-  - What it does: Performs mouse is available
-  - Parameters: none
-- `mouse_get_primary_device() -> device`
-  - What it does: Gets mouse get primary device
-  - Parameters: none
-- `mouse_get_state() -> mouse_state`
-  - What it does: Gets mouse get state
-  - Parameters: none
-- `mouse_is_button_down(mouse_button button) -> b32`
-  - What it does: Performs mouse is button down
+- `mouse_is_valid(mouse src) -> b32`
+  - What it does: Validates a mouse handle
   - Parameters:
+    - `src` (`mouse`): Input data used by the operation
+- `device_get_mouse(device src) -> mouse`
+  - What it does: Converts a generic device handle into a mouse handle
+  - Parameters:
+    - `src` (`device`): Input data used by the operation
+- `mouse_to_device(mouse src) -> device`
+  - What it does: Converts a mouse handle into a generic device handle
+  - Parameters:
+    - `src` (`mouse`): Input data used by the operation
+- `mouse_is_available() -> b32`
+  - What it does: Reports whether any mouse backend is available
+  - Parameters: none
+- `mouse_get_primary() -> mouse`
+  - What it does: Returns the primary mouse handle
+  - Parameters: none
+- `mouse_get_focused() -> mouse`
+  - What it does: Returns the focused mouse handle, or the primary mouse when none is focused
+  - Parameters: none
+- `mouse_get_state(mouse src) -> mouse_state`
+  - What it does: Returns the cached button state for a specific mouse
+  - Parameters:
+    - `src` (`mouse`): Input parameter
+- `mouse_is_button_down(mouse src, mouse_button button) -> b32`
+  - What it does: Reports whether a button is down on a specific mouse
+  - Parameters:
+    - `src` (`mouse`): Input parameter
     - `button` (`mouse_button`): Input parameter
 
 ### `input/msg.h`
@@ -2384,9 +2493,6 @@ Device input APIs and message/event distribution.
   - What it does: Removes msg remove handler
   - Parameters:
     - `handler_id` (`u64`): Input parameter
-- `msg_clear_handlers() -> void`
-  - What it does: Performs msg clear handlers
-  - Parameters: none
 - `msg_set_filter(msg_filter_fn filter_fn, void* user_data) -> void`
   - What it does: Sets msg set filter
   - Parameters:
@@ -3274,7 +3380,7 @@ Device input APIs and message/event distribution.
 ### `input/sensor.h`
 
 - Types: **2**
-- Functions: **11**
+- Functions: **14**
 
 #### Types
 
@@ -3299,18 +3405,27 @@ Device input APIs and message/event distribution.
   - What it does: Performs sensor is valid
   - Parameters:
     - `src` (`sensor`): Input data used by the operation
-- `sensor_from_device(device src) -> sensor`
-  - What it does: Performs sensor from device
+- `device_get_sensor(device src) -> sensor`
+  - What it does: Converts a generic device handle into a sensor handle
   - Parameters:
     - `src` (`device`): Input data used by the operation
+- `sensor_to_device(sensor src) -> device`
+  - What it does: Converts a sensor handle into a generic device handle
+  - Parameters:
+    - `src` (`sensor`): Input data used by the operation
 - `sensor_get_total_count() -> sz`
   - What it does: Gets sensor get total count
   - Parameters: none
-- `sensor_get_from_idx(sz idx, sensor* out_id) -> b32`
-  - What it does: Gets sensor get from idx
+- `sensor_get_from_idx(sz idx) -> sensor`
+  - What it does: Returns the sensor handle at the requested index
   - Parameters:
     - `idx` (`sz`): Zero-based index used to select an item
-    - `out_id` (`sensor*`): Output value written by the function
+- `sensor_get_primary() -> sensor`
+  - What it does: Returns the primary sensor handle
+  - Parameters: none
+- `sensor_get_focused() -> sensor`
+  - What it does: Returns the focused sensor handle, or the primary sensor when none is focused
+  - Parameters: none
 - `sensor_get_name(sensor sen_id) -> cstr8`
   - What it does: Gets sensor get name
   - Parameters:
@@ -3343,11 +3458,14 @@ Device input APIs and message/event distribution.
 
 ### `input/tablet.h`
 
-- Types: **6**
-- Functions: **5**
+- Types: **7**
+- Functions: **8**
 
 #### Types
 
+- `tablet` (alias)
+  - What it represents: Type alias used for `tablet`
+  - Members: none (alias/function type)
 - `pen_id` (alias)
   - What it represents: Type alias used for `pen id`
   - Members: none (alias/function type)
@@ -3396,24 +3514,43 @@ Device input APIs and message/event distribution.
 
 #### Functions
 
+- `tablet_is_valid(tablet src) -> b32`
+  - What it does: Validates a tablet handle
+  - Parameters:
+    - `src` (`tablet`): Input data used by the operation
+- `device_get_tablet(device src) -> tablet`
+  - What it does: Converts a generic device handle into a tablet handle
+  - Parameters:
+    - `src` (`device`): Input data used by the operation
+- `tablet_to_device(tablet src) -> device`
+  - What it does: Converts a tablet handle into a generic device handle
+  - Parameters:
+    - `src` (`tablet`): Input data used by the operation
 - `tablet_is_available() -> b32`
   - What it does: Performs tablet is available
   - Parameters: none
 - `tablet_get_total_count() -> sz`
   - What it does: Gets tablet get total count
   - Parameters: none
-- `tablet_get_device(sz idx) -> device`
-  - What it does: Gets tablet get device
+- `tablet_get_from_idx(sz idx) -> tablet`
+  - What it does: Returns the tablet handle at the requested index
   - Parameters:
     - `idx` (`sz`): Zero-based index used to select an item
-- `tablet_get_last_pen_state(tablet_pen_state* out_state) -> b32`
-  - What it does: Gets tablet get last pen state
+- `tablet_get_primary() -> tablet`
+  - What it does: Returns the primary tablet handle
+  - Parameters: none
+- `tablet_get_focused() -> tablet`
+  - What it does: Returns the focused tablet handle, or the primary tablet when none is focused
+  - Parameters: none
+- `tablet_get_last_pen_state(tablet src, tablet_pen_state* out_state) -> b32`
+  - What it does: Returns the last cached pen state for a specific tablet
   - Parameters:
+    - `src` (`tablet`): Input parameter
     - `out_state` (`tablet_pen_state*`): Output value written by the function
-- `tablet_read_hid_report(device dev_id, void* dst, sz capacity, sz* out_size, i32 timeout_ms) -> b32`
+- `tablet_read_hid_report(tablet src, void* dst, sz capacity, sz* out_size, i32 timeout_ms) -> b32`
   - What it does: Reads data for tablet read hid report
   - Parameters:
-    - `dev_id` (`device`): Input parameter
+    - `src` (`tablet`): Input parameter
     - `dst` (`void*`): Destination storage for output data
     - `capacity` (`sz`): Size or capacity value used by the operation
     - `out_size` (`sz*`): Output value written by the function
@@ -3421,11 +3558,14 @@ Device input APIs and message/event distribution.
 
 ### `input/touch.h`
 
-- Types: **3**
-- Functions: **6**
+- Types: **4**
+- Functions: **9**
 
 #### Types
 
+- `touch` (alias)
+  - What it represents: Type alias used for `touch`
+  - Members: none (alias/function type)
 - `finger_id` (alias)
   - What it represents: Type alias used for `finger id`
   - Members: none (alias/function type)
@@ -3446,28 +3586,46 @@ Device input APIs and message/event distribution.
 
 #### Functions
 
+- `touch_is_valid(touch src) -> b32`
+  - What it does: Validates a touch-device handle
+  - Parameters:
+    - `src` (`touch`): Input data used by the operation
+- `device_get_touch(device src) -> touch`
+  - What it does: Converts a generic device handle into a touch-device handle
+  - Parameters:
+    - `src` (`device`): Input data used by the operation
+- `touch_to_device(touch src) -> device`
+  - What it does: Converts a touch-device handle into a generic device handle
+  - Parameters:
+    - `src` (`touch`): Input data used by the operation
 - `touch_is_available() -> b32`
   - What it does: Performs touch is available
   - Parameters: none
 - `touch_get_total_count() -> sz`
   - What it does: Gets touch get total count
   - Parameters: none
-- `touch_get_device(sz idx) -> device`
-  - What it does: Gets touch get device
+- `touch_get_from_idx(sz idx) -> touch`
+  - What it does: Returns the touch-device handle at the requested index
   - Parameters:
     - `idx` (`sz`): Zero-based index used to select an item
-- `touch_get_device_kind(device dev_id) -> touch_device_kind`
+- `touch_get_primary() -> touch`
+  - What it does: Returns the primary touch-device handle
+  - Parameters: none
+- `touch_get_focused() -> touch`
+  - What it does: Returns the focused touch-device handle, or the primary touch device when none is focused
+  - Parameters: none
+- `touch_get_device_kind(touch src) -> touch_device_kind`
   - What it does: Gets touch get device kind
   - Parameters:
-    - `dev_id` (`device`): Input parameter
-- `touch_get_finger_count(device dev_id) -> sz`
+    - `src` (`touch`): Input parameter
+- `touch_get_finger_count(touch src) -> sz`
   - What it does: Gets touch get finger count
   - Parameters:
-    - `dev_id` (`device`): Input parameter
-- `touch_get_finger(device dev_id, sz idx, touch_finger_state* out_finger) -> b32`
+    - `src` (`touch`): Input parameter
+- `touch_get_finger(touch src, sz idx, touch_finger_state* out_finger) -> b32`
   - What it does: Gets touch get finger
   - Parameters:
-    - `dev_id` (`device`): Input parameter
+    - `src` (`touch`): Input parameter
     - `idx` (`sz`): Zero-based index used to select an item
     - `out_finger` (`touch_finger_state*`): Output value written by the function
 

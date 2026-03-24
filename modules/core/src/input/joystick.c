@@ -60,23 +60,33 @@ func i32 joystick_battery_state_to_native(battery_state state) {
 }
 
 func b32 joystick_is_valid(joystick src) {
-  return src != NULL;
+  return src != NULL && devices_get_type((device)src) == DEVICE_TYPE_JOYSTICK;
 }
 
-func joystick joystick_from_device(device src) {
+func joystick device_get_joystick(device src) {
   if (devices_get_type(src) != DEVICE_TYPE_JOYSTICK) {
+    invalid_code_path;
     return NULL;
   }
 
-  return (joystick)(up)devices_get_instance(src);
+  return (joystick)src;
 }
 
 func joystick joystick_from_native_id(up native_id) {
-  return (joystick)(up)native_id;
+  return device_get_joystick(devices_make_id(DEVICE_TYPE_JOYSTICK, (u64)native_id));
 }
 
 func up joystick_to_native_id(joystick src) {
-  return (up)src;
+  return (up)devices_get_instance(joystick_to_device(src));
+}
+
+func device joystick_to_device(joystick src) {
+  if (!joystick_is_valid(src)) {
+    invalid_code_path;
+    return NULL;
+  }
+
+  return (device)src;
 }
 
 func sz joystick_get_total_count(void) {
@@ -96,15 +106,12 @@ func sz joystick_get_total_count(void) {
   return count > 0 ? (sz)count : 0;
 }
 
-func b32 joystick_get_id(sz idx, joystick* out_id) {
+func joystick joystick_get_from_idx(sz idx) {
   profile_func_begin;
   int count = 0;
   SDL_JoystickID* ids = SDL_GetJoysticks(&count);
   b32 found = ids != NULL && idx < (sz)count;
-
-  if (out_id) {
-    *out_id = NULL;
-  }
+  joystick out_id = NULL;
 
   if (ids == NULL && count != 0) {
     thread_log_error("Failed to enumerate joysticks for id lookup idx=%zu error=%s", (size_t)idx, SDL_GetError());
@@ -112,8 +119,9 @@ func b32 joystick_get_id(sz idx, joystick* out_id) {
     thread_log_warn("Joystick id lookup missed idx=%zu count=%d", (size_t)idx, count);
   }
 
-  if (found && out_id) {
-    *out_id = joystick_from_native_id((up)ids[idx]);
+  if (found) {
+    out_id = joystick_from_native_id((up)ids[idx]);
+    devices_update_runtime(joystick_to_device(out_id), 1, (void*)(up)ids[idx]);
   }
 
   if (ids) {
@@ -121,7 +129,16 @@ func b32 joystick_get_id(sz idx, joystick* out_id) {
   }
 
   profile_func_end;
-  return found;
+  return out_id;
+}
+
+func joystick joystick_get_primary(void) {
+  return joystick_get_from_idx(0);
+}
+
+func joystick joystick_get_focused(void) {
+  device src = devices_get_focused_device(DEVICE_TYPE_JOYSTICK);
+  return device_is_valid(src) ? device_get_joystick(src) : NULL;
 }
 
 func cstr8 joystick_get_name(joystick joy_id) {
@@ -320,6 +337,8 @@ func battery_state joystick_get_battery(joystick joy_id, i32* out_percent) {
 
   int native_percent = -1;
   battery_state result = joystick_battery_state_from_native((i32)SDL_GetJoystickPowerInfo(handle, &native_percent));
+  devices_set_battery(joystick_to_device(joy_id), result);
+  devices_update_runtime(joystick_to_device(joy_id), 1, (void*)handle);
   if (out_percent) {
     *out_percent = native_percent;
   }
@@ -327,4 +346,33 @@ func battery_state joystick_get_battery(joystick joy_id, i32* out_percent) {
   SDL_CloseJoystick(handle);
   profile_func_end;
   return result;
+}
+
+func b32 joystick_internal_on_msg(msg* src, void* user_data) {
+  profile_func_begin;
+  (void)user_data;
+  if (src == NULL) {
+    profile_func_end;
+    return true;
+  }
+
+  if (src->type == MSG_CORE_TYPE_JOYSTICK_ADDED || src->type == MSG_CORE_TYPE_JOYSTICK_REMOVED ||
+      src->type == MSG_CORE_TYPE_JOYSTICK_UPDATE_COMPLETE) {
+    joystick joy_id = msg_core_get_joystick_device(src)->joystick;
+    b32 connected = src->type != MSG_CORE_TYPE_JOYSTICK_REMOVED;
+    devices_update_runtime(joystick_to_device(joy_id), connected, connected ? (void*)(up)joystick_to_native_id(joy_id) : NULL);
+  } else if (src->type == MSG_CORE_TYPE_JOYSTICK_AXIS_MOTION) {
+    devices_set_focus(joystick_to_device(msg_core_get_joystick_axis(src)->joystick));
+  } else if (src->type == MSG_CORE_TYPE_JOYSTICK_BALL_MOTION) {
+    devices_set_focus(joystick_to_device(msg_core_get_joystick_ball(src)->joystick));
+  } else if (src->type == MSG_CORE_TYPE_JOYSTICK_HAT_MOTION) {
+    devices_set_focus(joystick_to_device(msg_core_get_joystick_hat(src)->joystick));
+  } else if (src->type == MSG_CORE_TYPE_JOYSTICK_BUTTON_DOWN || src->type == MSG_CORE_TYPE_JOYSTICK_BUTTON_UP) {
+    devices_set_focus(joystick_to_device(msg_core_get_joystick_button(src)->joystick));
+  } else if (src->type == MSG_CORE_TYPE_JOYSTICK_BATTERY_UPDATED) {
+    devices_set_battery(joystick_to_device(msg_core_get_joystick_battery(src)->joystick), msg_core_get_joystick_battery(src)->state);
+    devices_set_focus(joystick_to_device(msg_core_get_joystick_battery(src)->joystick));
+  }
+  profile_func_end;
+  return true;
 }

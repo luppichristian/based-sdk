@@ -11,15 +11,6 @@ typedef void* joystick;
 c_begin;
 // =========================================================================
 
-typedef enum battery_state {
-  BATTERY_STATE_UNKNOWN = 0,
-  BATTERY_STATE_ERROR = 1,
-  BATTERY_STATE_ON_BATTERY = 2,
-  BATTERY_STATE_NO_BATTERY = 3,
-  BATTERY_STATE_CHARGING = 4,
-  BATTERY_STATE_CHARGED = 5,
-} battery_state;
-
 typedef enum joystick_hat_state {
   JOYSTICK_HAT_STATE_CENTERED = 0x00,
   JOYSTICK_HAT_STATE_UP = 0x01,
@@ -36,13 +27,22 @@ typedef enum joystick_hat_state {
 func b32 joystick_is_valid(joystick src);
 
 // Converts src into a joystick handle when it refers to a joystick device.
-func joystick joystick_from_device(device src);
+func joystick device_get_joystick(device src);
+
+// Converts src into a generic device handle.
+func device joystick_to_device(joystick src);
 
 // Returns the number of currently known joystick devices.
 func sz joystick_get_total_count(void);
 
-// Writes the joystick id at idx into out_id. Returns 1 on success, 0 otherwise.
-func b32 joystick_get_id(sz idx, joystick* out_id);
+// Returns the joystick handle at idx, or NULL when unavailable.
+func joystick joystick_get_from_idx(sz idx);
+
+// Returns the primary joystick handle, or NULL when unavailable.
+func joystick joystick_get_primary(void);
+
+// Returns the focused joystick handle, or the primary joystick when unavailable.
+func joystick joystick_get_focused(void);
 
 // Returns a backend-defined joystick name for id, or NULL when unavailable.
 func cstr8 joystick_get_name(joystick joy_id);

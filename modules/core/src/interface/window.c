@@ -305,6 +305,8 @@ func window window_create(cstr8 title, i32 width, i32 height, window_mode mode, 
     return NULL;
   }
 
+  input_native_backend_on_window_created(result);
+
   thread_log_info("Created window id=%llu title=%s width=%d height=%d mode=%u",
                   (unsigned long long)window_to_native_id(result),
                   title != NULL ? title : "",
@@ -324,6 +326,7 @@ func b32 window_destroy(window window_id) {
     return false;
   }
 
+  input_native_backend_on_window_destroyed(window_id);
   window_forget_creation_monitor(window_id);
   SDL_DestroyWindow(window_ptr);
   thread_log_info("Destroyed window id=%llu", (unsigned long long)window_to_native_id(window_id));

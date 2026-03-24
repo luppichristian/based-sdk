@@ -21,7 +21,10 @@ typedef enum audio_device_type {
 func b32 audio_device_is_valid(audio_device src);
 
 // Converts src into an audio device handle when it refers to an audio device.
-func audio_device audio_device_from_device(device src);
+func audio_device device_get_audio_device(device src);
+
+// Converts src into a generic device handle.
+func device audio_device_to_device(audio_device src);
 
 // Returns 1 when src is a valid audio device direction, 0 otherwise.
 func b32 audio_device_type_is_valid(audio_device_type src);
@@ -33,7 +36,13 @@ func cstr8 audio_device_get_type_name(audio_device_type audio_type);
 func sz audio_device_get_total_count(audio_device_type audio_type);
 
 // Writes the audio device id at idx into out_id. Returns 1 on success, 0 otherwise.
-func b32 audio_device_get_id(audio_device_type audio_type, sz idx, audio_device* out_id);
+func audio_device audio_device_get_from_idx(audio_device_type audio_type, sz idx);
+
+// Returns the primary audio device for audio_type, or NULL when unavailable.
+func audio_device audio_device_get_primary(audio_device_type audio_type);
+
+// Returns the focused audio device for audio_type, or the primary device when unavailable.
+func audio_device audio_device_get_focused(audio_device_type audio_type);
 
 // Returns the encoded audio device direction for id.
 func audio_device_type audio_device_get_type(audio_device aud_id);

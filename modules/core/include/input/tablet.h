@@ -6,11 +6,22 @@
 #include "../interface/window.h"
 #include "devices.h"
 
+typedef void* tablet;
+
 // =========================================================================
 c_begin;
 // =========================================================================
 
 typedef u32 pen_id;
+
+// Returns 1 if src refers to a concrete tablet handle, 0 otherwise.
+func b32 tablet_is_valid(tablet src);
+
+// Converts src into a tablet handle when it refers to a tablet device.
+func tablet device_get_tablet(device src);
+
+// Converts src into a generic device handle.
+func device tablet_to_device(tablet src);
 
 // =========================================================================
 // Tablet
@@ -64,14 +75,20 @@ func b32 tablet_is_available(void);
 // Returns the number of currently known tablet devices.
 func sz tablet_get_total_count(void);
 
-// Returns the tablet device at idx, or NULL when idx is unavailable.
-func device tablet_get_device(sz idx);
+// Returns the tablet handle at idx, or NULL when idx is unavailable.
+func tablet tablet_get_from_idx(sz idx);
+
+// Returns the primary tablet handle, or NULL when unavailable.
+func tablet tablet_get_primary(void);
+
+// Returns the focused tablet handle, or the primary tablet when unavailable.
+func tablet tablet_get_focused(void);
 
 // Writes the latest cached pen state into out_state. Returns 1 on success, 0 otherwise.
-func b32 tablet_get_last_pen_state(tablet_pen_state* out_state);
+func b32 tablet_get_last_pen_state(tablet src, tablet_pen_state* out_state);
 
 // Reads a raw HID report from id into dst. Returns 1 on success, 0 otherwise.
-func b32 tablet_read_hid_report(device dev_id, void* dst, sz capacity, sz* out_size, i32 timeout_ms);
+func b32 tablet_read_hid_report(tablet src, void* dst, sz capacity, sz* out_size, i32 timeout_ms);
 
 // =========================================================================
 c_end;

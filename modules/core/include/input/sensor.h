@@ -29,13 +29,22 @@ typedef enum sensor_kind {
 func b32 sensor_is_valid(sensor src);
 
 // Converts src into a sensor handle when it refers to a sensor device.
-func sensor sensor_from_device(device src);
+func sensor device_get_sensor(device src);
+
+// Converts src into a generic device handle.
+func device sensor_to_device(sensor src);
 
 // Returns the number of currently known sensor devices.
 func sz sensor_get_total_count(void);
 
-// Writes the sensor id at idx into out_id. Returns 1 on success, 0 otherwise.
-func b32 sensor_get_from_idx(sz idx, sensor* out_id);
+// Returns the sensor handle at idx, or NULL when unavailable.
+func sensor sensor_get_from_idx(sz idx);
+
+// Returns the primary sensor handle, or NULL when unavailable.
+func sensor sensor_get_primary(void);
+
+// Returns the focused sensor handle, or the primary sensor when unavailable.
+func sensor sensor_get_focused(void);
 
 // Returns a backend-defined sensor name for id, or NULL when unavailable.
 func cstr8 sensor_get_name(sensor sen_id);

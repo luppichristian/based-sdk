@@ -33,19 +33,16 @@ TEST(input_joystick_test, id_conversion_and_generic_conversion_roundtrip) {
 
   device dev_id = devices_make_id(DEVICE_TYPE_JOYSTICK, 123);
   ASSERT_TRUE(device_is_valid(dev_id) != 0);
-  joystick from_dev = joystick_from_device(dev_id);
+  joystick from_dev = device_get_joystick(dev_id);
   EXPECT_TRUE(joystick_is_valid(from_dev) != 0);
   EXPECT_EQ((up)123, joystick_to_native_id(from_dev));
 }
 
 TEST(input_joystick_test, enumeration_consistency_when_devices_exist) {
   sz count_val = joystick_get_total_count();
-  joystick out_id = NULL;
-  if (count_val == 0) {
-    EXPECT_TRUE(joystick_get_id(0, &out_id) == 0);
-    return;
+  joystick out_id = count_val == 0 ? NULL : joystick_get_from_idx(0);
+  if (count_val > 0) {
+    ASSERT_TRUE(out_id != NULL);
+    EXPECT_TRUE(joystick_is_valid(out_id) != 0);
   }
-
-  ASSERT_TRUE(joystick_get_id(0, &out_id) != 0);
-  EXPECT_TRUE(joystick_is_valid(out_id) != 0);
 }

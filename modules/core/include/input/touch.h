@@ -5,11 +5,22 @@
 
 #include "devices.h"
 
+typedef void* touch;
+
 // =========================================================================
 c_begin;
 // =========================================================================
 
 typedef u64 finger_id;
+
+// Returns 1 if src refers to a concrete touch handle, 0 otherwise.
+func b32 touch_is_valid(touch src);
+
+// Converts src into a touch handle when it refers to a touch device.
+func touch device_get_touch(device src);
+
+// Converts src into a generic device handle.
+func device touch_to_device(touch src);
 
 // =========================================================================
 // Touch
@@ -37,17 +48,23 @@ func b32 touch_is_available(void);
 // Returns the number of currently known touch devices.
 func sz touch_get_total_count(void);
 
-// Returns the touch device at idx, or NULL when idx is unavailable.
-func device touch_get_device(sz idx);
+// Returns the touch handle at idx, or NULL when idx is unavailable.
+func touch touch_get_from_idx(sz idx);
+
+// Returns the primary touch handle, or NULL when unavailable.
+func touch touch_get_primary(void);
+
+// Returns the focused touch handle, or the primary touch when unavailable.
+func touch touch_get_focused(void);
 
 // Returns the backend-reported kind for id.
-func touch_device_kind touch_get_device_kind(device dev_id);
+func touch_device_kind touch_get_device_kind(touch src);
 
 // Returns the number of active fingers currently tracked for id.
-func sz touch_get_finger_count(device dev_id);
+func sz touch_get_finger_count(touch src);
 
 // Writes the finger state at idx into out_finger. Returns 1 on success, 0 otherwise.
-func b32 touch_get_finger(device dev_id, sz idx, touch_finger_state* out_finger);
+func b32 touch_get_finger(touch src, sz idx, touch_finger_state* out_finger);
 
 // =========================================================================
 c_end;

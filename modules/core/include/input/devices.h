@@ -8,6 +8,17 @@
 
 typedef void* device;
 
+typedef enum battery_state {
+  BATTERY_STATE_UNKNOWN = 0,
+  BATTERY_STATE_ERROR = 1,
+  BATTERY_STATE_ON_BATTERY = 2,
+  BATTERY_STATE_NO_BATTERY = 3,
+  BATTERY_STATE_CHARGING = 4,
+  BATTERY_STATE_CHARGED = 5,
+} battery_state;
+
+#define DEVICES_HANDLE_CAP ((sz)1024)
+
 // =========================================================================
 c_begin;
 // =========================================================================
@@ -35,6 +46,9 @@ typedef enum device_type {
 typedef struct device_info {
   device id;
   b32 connected;
+  u64 device_state;
+  battery_state battery_state;
+  void* handle;
   str8_short name;
   u16 vendor_id;
   u16 product_id;
@@ -48,11 +62,20 @@ func b32 device_is_valid(device src);
 // Returns the stable device category encoded by src.
 func device_type devices_get_type(device src);
 
+// Returns the backend/native handle currently associated with src.
+func void* device_get_handle(device src);
+
+// Returns the lifecycle state value for src.
+func u64 device_get_state(device src);
+
 // Returns a stable display name for type.
 func cstr8 devices_get_type_name(device_type type);
 
 // Returns the number of devices of type currently known to the backend.
 func sz devices_get_count(device_type type);
+
+// Returns the number of devices of type currently known to the backend.
+func u32 devices_get_type_count(device_type type);
 
 // Returns the device at idx, or NULL when idx is unavailable.
 func device devices_get_device(device_type type, sz idx);

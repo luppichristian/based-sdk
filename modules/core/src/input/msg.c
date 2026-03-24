@@ -12,8 +12,6 @@
 #include <SDL3/SDL_hidapi.h>
 #include "basic/safe.h"
 
-func void tablet_internal_on_msg(msg* src);
-
 func mouse_button mouse_button_from_sdl(Uint8 button) {
   switch (button) {
     case SDL_BUTTON_LEFT:
@@ -48,11 +46,31 @@ func Uint8 mouse_button_to_sdl(mouse_button button) {
   }
 }
 
-func void msg_notify_internal_listeners(const msg* src) {
+func b32 msg_handle_runtime_internal(msg* src, void* user_data) {
   profile_func_begin;
-  msg* src_mut = (msg*)src;
-  tablet_internal_on_msg(src_mut);
+  (void)user_data;
+
+  if (src->type == MSG_CORE_TYPE_TOUCH_ADDED || src->type == MSG_CORE_TYPE_TOUCH_REMOVED) {
+    device dev_id = msg_core_get_touch_device(src)->device;
+    devices_update_runtime(dev_id, src->type == MSG_CORE_TYPE_TOUCH_ADDED, (void*)(up)devices_get_instance(dev_id));
+  } else if (src->type >= MSG_CORE_TYPE_FINGER_DOWN && src->type <= MSG_CORE_TYPE_FINGER_CANCELED) {
+    devices_set_focus(msg_core_get_touch(src)->device);
+    devices_update_runtime(msg_core_get_touch(src)->device, 1, (void*)(up)devices_get_instance(msg_core_get_touch(src)->device));
+  } else if (src->type >= MSG_CORE_TYPE_AUDIO_DEVICE_ADDED && src->type <= MSG_CORE_TYPE_AUDIO_DEVICE_FORMAT_CHANGED) {
+    device dev_id = audio_device_to_device(msg_core_get_audio_device(src)->audio);
+    devices_update_runtime(dev_id, src->type != MSG_CORE_TYPE_AUDIO_DEVICE_REMOVED, (void*)(up)devices_get_instance(dev_id));
+    devices_set_focus(dev_id);
+  } else if (src->type >= MSG_CORE_TYPE_CAMERA_DEVICE_ADDED && src->type <= MSG_CORE_TYPE_CAMERA_DEVICE_DENIED) {
+    device dev_id = camera_to_device(msg_core_get_camera_device(src)->camera);
+    devices_update_runtime(dev_id, src->type != MSG_CORE_TYPE_CAMERA_DEVICE_REMOVED, (void*)(up)devices_get_instance(dev_id));
+    devices_set_focus(dev_id);
+  } else if (src->type == MSG_CORE_TYPE_SENSOR_UPDATE) {
+    device dev_id = sensor_to_device(msg_core_get_sensor(src)->sensor);
+    devices_update_runtime(dev_id, 1, (void*)(up)devices_get_instance(dev_id));
+    devices_set_focus(dev_id);
+  }
   profile_func_end;
+  return true;
 }
 
 #define MSG_DEVICE_TRACK_CAP ((sz)128)
@@ -442,7 +460,9 @@ func b32 msg_from_sdl(const SDL_Event* src, msg* out_msg) {
           out_msg,
           &(msg_core_keyboard_data) {
               .window = window_from_native_id((up)src->key.windowID),
-              .device = devices_make_id(DEVICE_TYPE_KEYBOARD, (u64)src->key.which),
+              .device = input_native_backend_resolve_keyboard_device(
+                  src,
+                  devices_make_id(DEVICE_TYPE_KEYBOARD, (u64)src->key.which)),
               .key = keyboard_internal_vkey_from_scancode((u32)src->key.scancode),
               .modifiers = (keymod)src->key.mod,
               .down = src->key.down ? true : false,
@@ -501,7 +521,9 @@ func b32 msg_from_sdl(const SDL_Event* src, msg* out_msg) {
           out_msg,
           &(msg_core_mouse_motion_data) {
               .window = window_from_native_id((up)src->motion.windowID),
-              .device = devices_make_id(DEVICE_TYPE_MOUSE, (u64)src->motion.which),
+              .device = input_native_backend_resolve_mouse_motion_device(
+                  src,
+                  devices_make_id(DEVICE_TYPE_MOUSE, (u64)src->motion.which)),
               .button_mask = (u32)src->motion.state,
               .x = src->motion.x,
               .y = src->motion.y,
@@ -517,7 +539,9 @@ func b32 msg_from_sdl(const SDL_Event* src, msg* out_msg) {
           out_msg,
           &(msg_core_mouse_button_data) {
               .window = window_from_native_id((up)src->button.windowID),
-              .device = devices_make_id(DEVICE_TYPE_MOUSE, (u64)src->button.which),
+              .device = input_native_backend_resolve_mouse_button_device(
+                  src,
+                  devices_make_id(DEVICE_TYPE_MOUSE, (u64)src->button.which)),
               .button = mouse_button_from_sdl((Uint8)src->button.button),
               .down = src->button.down ? true : false,
               .clicks = (u8)src->button.clicks,
@@ -532,7 +556,9 @@ func b32 msg_from_sdl(const SDL_Event* src, msg* out_msg) {
           out_msg,
           &(msg_core_mouse_wheel_data) {
               .window = window_from_native_id((up)src->wheel.windowID),
-              .device = devices_make_id(DEVICE_TYPE_MOUSE, (u64)src->wheel.which),
+              .device = input_native_backend_resolve_mouse_wheel_device(
+                  src,
+                  devices_make_id(DEVICE_TYPE_MOUSE, (u64)src->wheel.which)),
               .x = src->wheel.x,
               .y = src->wheel.y,
               .direction = (mouse_wheel_direction)src->wheel.direction,
@@ -722,7 +748,9 @@ func b32 msg_from_sdl(const SDL_Event* src, msg* out_msg) {
       msg_core_fill_touch(
           out_msg,
           &(msg_core_touch_data) {
-              .device = devices_make_id(DEVICE_TYPE_TOUCH, (u64)src->tfinger.touchID),
+              .device = input_native_backend_resolve_touch_device(
+                  src,
+                  devices_make_id(DEVICE_TYPE_TOUCH, (u64)src->tfinger.touchID)),
               .finger_id = (finger_id)src->tfinger.fingerID,
               .x = src->tfinger.x,
               .y = src->tfinger.y,
@@ -740,7 +768,9 @@ func b32 msg_from_sdl(const SDL_Event* src, msg* out_msg) {
           out_msg,
           &(msg_core_pen_proximity_data) {
               .window = window_from_native_id((up)src->pproximity.windowID),
-              .device = devices_make_id(DEVICE_TYPE_TABLET, (u64)src->pproximity.which),
+              .device = input_native_backend_resolve_pen_device(
+                  src,
+                  devices_make_id(DEVICE_TYPE_TABLET, (u64)src->pproximity.which)),
               .pen_id = (pen_id)src->pproximity.which,
           });
       profile_func_end;
@@ -751,7 +781,9 @@ func b32 msg_from_sdl(const SDL_Event* src, msg* out_msg) {
           out_msg,
           &(msg_core_pen_motion_data) {
               .window = window_from_native_id((up)src->pmotion.windowID),
-              .device = devices_make_id(DEVICE_TYPE_TABLET, (u64)src->pmotion.which),
+              .device = input_native_backend_resolve_pen_device(
+                  src,
+                  devices_make_id(DEVICE_TYPE_TABLET, (u64)src->pmotion.which)),
               .pen_id = (pen_id)src->pmotion.which,
               .pen_state = (tablet_input_flags)src->pmotion.pen_state,
               .x = src->pmotion.x,
@@ -766,7 +798,9 @@ func b32 msg_from_sdl(const SDL_Event* src, msg* out_msg) {
           out_msg,
           &(msg_core_pen_touch_data) {
               .window = window_from_native_id((up)src->ptouch.windowID),
-              .device = devices_make_id(DEVICE_TYPE_TABLET, (u64)src->ptouch.which),
+              .device = input_native_backend_resolve_pen_device(
+                  src,
+                  devices_make_id(DEVICE_TYPE_TABLET, (u64)src->ptouch.which)),
               .pen_id = (pen_id)src->ptouch.which,
               .pen_state = (tablet_input_flags)src->ptouch.pen_state,
               .x = src->ptouch.x,
@@ -783,7 +817,9 @@ func b32 msg_from_sdl(const SDL_Event* src, msg* out_msg) {
           out_msg,
           &(msg_core_pen_button_data) {
               .window = window_from_native_id((up)src->pbutton.windowID),
-              .device = devices_make_id(DEVICE_TYPE_TABLET, (u64)src->pbutton.which),
+              .device = input_native_backend_resolve_pen_device(
+                  src,
+                  devices_make_id(DEVICE_TYPE_TABLET, (u64)src->pbutton.which)),
               .pen_id = (pen_id)src->pbutton.which,
               .pen_state = (tablet_input_flags)src->pbutton.pen_state,
               .x = src->pbutton.x,
@@ -799,7 +835,9 @@ func b32 msg_from_sdl(const SDL_Event* src, msg* out_msg) {
           out_msg,
           &(msg_core_pen_axis_data) {
               .window = window_from_native_id((up)src->paxis.windowID),
-              .device = devices_make_id(DEVICE_TYPE_TABLET, (u64)src->paxis.which),
+              .device = input_native_backend_resolve_pen_device(
+                  src,
+                  devices_make_id(DEVICE_TYPE_TABLET, (u64)src->paxis.which)),
               .pen_id = (pen_id)src->paxis.which,
               .pen_state = (tablet_input_flags)src->paxis.pen_state,
               .x = src->paxis.x,
@@ -1386,8 +1424,6 @@ func b32 _msg_post(const msg* src, callsite site) {
     return false;
   }
 
-  msg_notify_internal_listeners(&posted_msg);
-
   if (!msg_dispatch_handlers(&posted_msg)) {
     profile_func_end;
     return false;
@@ -1460,18 +1496,6 @@ func b32 msg_remove_handler(u64 handler_id) {
   thread_log_warn("Message handler removal missed id=%llu", (unsigned long long)handler_id);
   profile_func_end;
   return false;
-}
-
-func void msg_clear_handlers(void) {
-  profile_func_begin;
-  safe_for (u32 idx = 0; idx < msg_handler_count; idx += 1) {
-    msg_handler_entries[idx] = (msg_handler_entry) {0};
-  }
-
-  msg_handler_count = 0;
-  msg_handler_next_id = 1;
-  thread_log_trace("msg_clear_handlers");
-  profile_func_end;
 }
 
 func void msg_set_filter(msg_filter_fn filter_fn, void* user_data) {

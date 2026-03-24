@@ -14,6 +14,7 @@
 #  include <dbghelp.h>
 #  include <direct.h>
 #  include <psapi.h>
+#  include <hidsdi.h>
 #elif defined(PLATFORM_LINUX)
 #  include <dlfcn.h>
 #  include <execinfo.h>
@@ -27,6 +28,10 @@
 #  include <sys/types.h>
 #  include <sys/utsname.h>
 #  include <unistd.h>
+#  include <libinput.h>
+#  include <libudev.h>
+#  include <poll.h>
+#  include <fcntl.h>
 #elif defined(PLATFORM_MACOS)
 #  include <dlfcn.h>
 #  include <execinfo.h>
@@ -42,4 +47,8 @@
 #  include <sys/types.h>
 #  include <sys/utsname.h>
 #  include <unistd.h>
+#  include <CoreFoundation/CoreFoundation.h>
+#  include <IOKit/hid/IOHIDManager.h>
+#  include <IOKit/hid/IOHIDKeys.h>
+#  include <IOKit/hidsystem/IOHIDUsageTables.h>
 #endif

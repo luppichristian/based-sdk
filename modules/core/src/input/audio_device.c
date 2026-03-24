@@ -2,6 +2,7 @@
 // Copyright (c) 2026 Christian Luppi
 
 #include "input/audio_device.h"
+#include "basic/assert.h"
 #include "../internal.h"
 #include "context/thread_ctx.h"
 #include "../sdl3_include.h"
@@ -24,19 +25,20 @@ func u64 audio_device_decode_native_id(u64 instance) {
 }
 
 func u64 audio_device_get_instance(audio_device src) {
-  return (u64)(up)src;
+  return devices_get_instance(audio_device_to_device(src));
 }
 
 func b32 audio_device_is_valid(audio_device src) {
-  return src != NULL;
+  return src != NULL && devices_get_type((device)src) == DEVICE_TYPE_AUDIO;
 }
 
-func audio_device audio_device_from_device(device src) {
+func audio_device device_get_audio_device(device src) {
   if (devices_get_type(src) != DEVICE_TYPE_AUDIO) {
+    invalid_code_path;
     return NULL;
   }
 
-  return (audio_device)(up)devices_get_instance(src);
+  return (audio_device)src;
 }
 
 func audio_device audio_device_from_native_id(up native_id, audio_device_type audio_type) {
@@ -47,7 +49,7 @@ func audio_device audio_device_from_native_id(up native_id, audio_device_type au
   }
 
   profile_func_end;
-  return (audio_device)(up)audio_device_encode_instance((u64)native_id, audio_type);
+  return device_get_audio_device(devices_make_audio_device((u64)native_id, audio_type));
 }
 
 func up audio_device_to_native_id(audio_device src) {
@@ -56,6 +58,15 @@ func up audio_device_to_native_id(audio_device src) {
   }
 
   return (up)audio_device_decode_native_id(audio_device_get_instance(src));
+}
+
+func device audio_device_to_device(audio_device src) {
+  if (!audio_device_is_valid(src)) {
+    invalid_code_path;
+    return NULL;
+  }
+
+  return (device)src;
 }
 
 func b32 audio_device_type_is_valid(audio_device_type src) {
@@ -104,15 +115,12 @@ func sz audio_device_get_total_count(audio_device_type audio_type) {
   return 0;
 }
 
-func b32 audio_device_get_id(audio_device_type audio_type, sz idx, audio_device* out_id) {
+func audio_device audio_device_get_from_idx(audio_device_type audio_type, sz idx) {
   profile_func_begin;
   int count = 0;
   SDL_AudioDeviceID* ids = NULL;
   b32 found = false;
-
-  if (out_id) {
-    *out_id = NULL;
-  }
+  audio_device out_id = NULL;
 
   if (audio_type == AUDIO_DEVICE_TYPE_PLAYBACK) {
     ids = SDL_GetAudioPlaybackDevices(&count);
@@ -120,7 +128,7 @@ func b32 audio_device_get_id(audio_device_type audio_type, sz idx, audio_device*
     ids = SDL_GetAudioRecordingDevices(&count);
   } else {
     profile_func_end;
-    return false;
+    return NULL;
   }
 
   found = ids != NULL && idx < (sz)count;
@@ -136,8 +144,9 @@ func b32 audio_device_get_id(audio_device_type audio_type, sz idx, audio_device*
                     count);
   }
 
-  if (found && out_id) {
-    *out_id = audio_device_from_native_id((up)ids[idx], audio_type);
+  if (found) {
+    out_id = audio_device_from_native_id((up)ids[idx], audio_type);
+    devices_update_runtime(audio_device_to_device(out_id), 1, (void*)(up)ids[idx]);
   }
 
   if (ids) {
@@ -145,7 +154,21 @@ func b32 audio_device_get_id(audio_device_type audio_type, sz idx, audio_device*
   }
 
   profile_func_end;
-  return found;
+  return out_id;
+}
+
+func audio_device audio_device_get_primary(audio_device_type audio_type) {
+  return audio_device_get_from_idx(audio_type, 0);
+}
+
+func audio_device audio_device_get_focused(audio_device_type audio_type) {
+  device src = devices_get_focused_device(DEVICE_TYPE_AUDIO);
+  if (!device_is_valid(src)) {
+    return audio_device_get_primary(audio_type);
+  }
+
+  audio_device result = device_get_audio_device(src);
+  return audio_device_get_type(result) == audio_type ? result : audio_device_get_primary(audio_type);
 }
 
 func audio_device_type audio_device_get_type(audio_device aud_id) {

@@ -5,6 +5,8 @@
 
 #include "devices.h"
 
+typedef void* mouse;
+
 // =========================================================================
 c_begin;
 // =========================================================================
@@ -31,17 +33,29 @@ typedef enum mouse_wheel_direction {
 // Bitmask of currently pressed buttons. Use bit(MOUSE_BUTTON_*) to test buttons.
 typedef u32 mouse_state;
 
+// Returns 1 if src refers to a concrete mouse handle, 0 otherwise.
+func b32 mouse_is_valid(mouse src);
+
+// Converts src into a mouse handle when it refers to a mouse device.
+func mouse device_get_mouse(device src);
+
+// Converts src into a generic device handle.
+func device mouse_to_device(mouse src);
+
 // Returns 1 if a mouse backend is available, 0 otherwise.
 func b32 mouse_is_available(void);
 
-// Returns the primary mouse device, or NULL when unavailable.
-func device mouse_get_primary_device(void);
+// Returns the primary mouse handle, or NULL when unavailable.
+func mouse mouse_get_primary(void);
+
+// Returns the focused mouse handle, or the primary mouse when unavailable.
+func mouse mouse_get_focused(void);
 
 // Returns the current mouse button state as a bitmask.
-func mouse_state mouse_get_state(void);
+func mouse_state mouse_get_state(mouse src);
 
 // Returns 1 if button is currently pressed, 0 otherwise.
-func b32 mouse_is_button_down(mouse_button button);
+func b32 mouse_is_button_down(mouse src, mouse_button button);
 
 // =========================================================================
 c_end;

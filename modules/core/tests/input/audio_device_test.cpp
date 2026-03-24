@@ -15,7 +15,7 @@ TEST(input_audio_device_test, id_conversion_type_and_generic_conversion_roundtri
 
   device dev_id = devices_make_audio_device(77, AUDIO_DEVICE_TYPE_RECORDING);
   ASSERT_TRUE(device_is_valid(dev_id) != 0);
-  audio_device from_dev = audio_device_from_device(dev_id);
+  audio_device from_dev = device_get_audio_device(dev_id);
   EXPECT_TRUE(audio_device_is_valid(from_dev) != 0);
   EXPECT_EQ((up)77, audio_device_to_native_id(from_dev));
   EXPECT_EQ(AUDIO_DEVICE_TYPE_RECORDING, audio_device_get_type(from_dev));
@@ -24,20 +24,18 @@ TEST(input_audio_device_test, id_conversion_type_and_generic_conversion_roundtri
 TEST(input_audio_device_test, enumeration_consistency_when_devices_exist) {
   audio_device out_id = NULL;
   sz playback_count = audio_device_get_total_count(AUDIO_DEVICE_TYPE_PLAYBACK);
-  if (playback_count == 0) {
-    EXPECT_TRUE(audio_device_get_id(AUDIO_DEVICE_TYPE_PLAYBACK, 0, &out_id) == 0);
-  } else {
-    ASSERT_TRUE(audio_device_get_id(AUDIO_DEVICE_TYPE_PLAYBACK, 0, &out_id) != 0);
+  if (playback_count > 0) {
+    out_id = audio_device_get_from_idx(AUDIO_DEVICE_TYPE_PLAYBACK, 0);
+    ASSERT_TRUE(out_id != NULL);
     EXPECT_TRUE(audio_device_is_valid(out_id) != 0);
     EXPECT_EQ(AUDIO_DEVICE_TYPE_PLAYBACK, audio_device_get_type(out_id));
   }
 
   out_id = NULL;
   sz recording_count = audio_device_get_total_count(AUDIO_DEVICE_TYPE_RECORDING);
-  if (recording_count == 0) {
-    EXPECT_TRUE(audio_device_get_id(AUDIO_DEVICE_TYPE_RECORDING, 0, &out_id) == 0);
-  } else {
-    ASSERT_TRUE(audio_device_get_id(AUDIO_DEVICE_TYPE_RECORDING, 0, &out_id) != 0);
+  if (recording_count > 0) {
+    out_id = audio_device_get_from_idx(AUDIO_DEVICE_TYPE_RECORDING, 0);
+    ASSERT_TRUE(out_id != NULL);
     EXPECT_TRUE(audio_device_is_valid(out_id) != 0);
     EXPECT_EQ(AUDIO_DEVICE_TYPE_RECORDING, audio_device_get_type(out_id));
   }

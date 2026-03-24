@@ -21,84 +21,85 @@
 28: #include "containers/sort.h"
 29: #include "containers/stack_list.h"
 30: #include "containers/tree.h"
-33: #include "memory/allocator.h"
-34: #include "memory/arena.h"
-35: #include "memory/buffer.h"
-36: #include "memory/heap.h"
-37: #include "memory/memops.h"
-38: #include "memory/pool.h"
-39: #include "memory/ring.h"
-40: #include "memory/scratch.h"
-41: #include "memory/vmem.h"
-44: #include "filesystem/archive.h"
-45: #include "filesystem/directory.h"
-46: #include "filesystem/file.h"
-47: #include "filesystem/filemap.h"
-48: #include "filesystem/filestream.h"
-49: #include "filesystem/module.h"
-50: #include "filesystem/path.h"
-51: #include "filesystem/pathinfo.h"
-52: #include "filesystem/pathwatch.h"
-55: #include "input/audio_device.h"
-56: #include "input/camera.h"
-57: #include "input/clipboard.h"
-58: #include "input/devices.h"
-59: #include "input/gamepads.h"
-60: #include "input/joystick.h"
-61: #include "input/keyboard.h"
-62: #include "input/mouse.h"
-63: #include "input/msg.h"
-64: #include "input/msg_core.h"
-65: #include "input/sensor.h"
-66: #include "input/tablet.h"
-67: #include "input/touch.h"
-68: #include "input/vkeys.h"
-71: #include "interface/cursor.h"
-72: #include "interface/dialog.h"
-73: #include "interface/dpi.h"
-74: #include "interface/icon.h"
-75: #include "interface/monitor.h"
-76: #include "interface/text_input.h"
-77: #include "interface/window.h"
-80: #include "processes/common_processes.h"
-81: #include "processes/process.h"
-82: #include "processes/process_current.h"
-83: #include "processes/process_pipe.h"
-86: #include "system/cpu_info.h"
-87: #include "system/hardware_info.h"
-88: #include "system/language.h"
-89: #include "system/system_info.h"
-90: #include "system/system_runtime.h"
-93: #include "strings/char.h"
-94: #include "strings/cstrings.h"
-95: #include "strings/strings.h"
-96: #include "strings/unicode.h"
-99: #include "utils/cmdline.h"
-100: #include "utils/compress.h"
-101: #include "utils/crc.h"
-102: #include "utils/digits.h"
-103: #include "utils/endian.h"
-104: #include "utils/huffman.h"
-105: #include "utils/id.h"
-106: #include "utils/log_state.h"
-107: #include "utils/random_series.h"
-108: #include "utils/stacktrace.h"
-109: #include "utils/timer.h"
-110: #include "utils/timestamp.h"
-111: #include "utils/uuid.h"
-112: #include "utils/version.h"
-115: #include "context/ctx.h"
-116: #include "context/global_ctx.h"
-117: #include "context/thread_ctx.h"
-120: #include "threads/atomics.h"
-121: #include "threads/condvar.h"
-122: #include "threads/mutex.h"
-123: #include "threads/rwlock.h"
-124: #include "threads/semaphore.h"
-125: #include "threads/spinlock.h"
-126: #include "threads/thread.h"
-127: #include "threads/thread_current.h"
-128: #include "threads/thread_group.h"
+33: #include "memory/alloc_tracker.h"
+34: #include "memory/allocator.h"
+35: #include "memory/arena.h"
+36: #include "memory/buffer.h"
+37: #include "memory/heap.h"
+38: #include "memory/memops.h"
+39: #include "memory/pool.h"
+40: #include "memory/ring.h"
+41: #include "memory/scratch.h"
+42: #include "memory/vmem.h"
+45: #include "filesystem/archive.h"
+46: #include "filesystem/directory.h"
+47: #include "filesystem/file.h"
+48: #include "filesystem/filemap.h"
+49: #include "filesystem/filestream.h"
+50: #include "filesystem/module.h"
+51: #include "filesystem/path.h"
+52: #include "filesystem/pathinfo.h"
+53: #include "filesystem/pathwatch.h"
+56: #include "input/audio_device.h"
+57: #include "input/camera.h"
+58: #include "input/clipboard.h"
+59: #include "input/devices.h"
+60: #include "input/gamepads.h"
+61: #include "input/joystick.h"
+62: #include "input/keyboard.h"
+63: #include "input/mouse.h"
+64: #include "input/msg.h"
+65: #include "input/msg_core.h"
+66: #include "input/sensor.h"
+67: #include "input/tablet.h"
+68: #include "input/touch.h"
+69: #include "input/vkeys.h"
+72: #include "interface/cursor.h"
+73: #include "interface/dialog.h"
+74: #include "interface/dpi.h"
+75: #include "interface/icon.h"
+76: #include "interface/monitor.h"
+77: #include "interface/text_input.h"
+78: #include "interface/window.h"
+81: #include "processes/common_processes.h"
+82: #include "processes/process.h"
+83: #include "processes/process_current.h"
+84: #include "processes/process_pipe.h"
+87: #include "system/cpu_info.h"
+88: #include "system/hardware_info.h"
+89: #include "system/language.h"
+90: #include "system/system_info.h"
+91: #include "system/system_runtime.h"
+94: #include "strings/char.h"
+95: #include "strings/cstrings.h"
+96: #include "strings/strings.h"
+97: #include "strings/unicode.h"
+100: #include "utils/cmdline.h"
+101: #include "utils/compress.h"
+102: #include "utils/crc.h"
+103: #include "utils/digits.h"
+104: #include "utils/endian.h"
+105: #include "utils/huffman.h"
+106: #include "utils/id.h"
+107: #include "utils/log_state.h"
+108: #include "utils/random_series.h"
+109: #include "utils/stacktrace.h"
+110: #include "utils/timer.h"
+111: #include "utils/timestamp.h"
+112: #include "utils/uuid.h"
+113: #include "utils/version.h"
+116: #include "context/ctx.h"
+117: #include "context/global_ctx.h"
+118: #include "context/thread_ctx.h"
+121: #include "threads/atomics.h"
+122: #include "threads/condvar.h"
+123: #include "threads/mutex.h"
+124: #include "threads/rwlock.h"
+125: #include "threads/semaphore.h"
+126: #include "threads/spinlock.h"
+127: #include "threads/thread.h"
+128: #include "threads/thread_current.h"
+129: #include "threads/thread_group.h"
 
 === include\basic\assert.h ===
 6: #include "codespace.h"
@@ -780,13 +781,16 @@
 8: typedef void* audio_device;
 14: typedef enum audio_device_type {
 21: func b32 audio_device_is_valid(audio_device src);
-24: func audio_device audio_device_from_device(device src);
-27: func b32 audio_device_type_is_valid(audio_device_type src);
-30: func cstr8 audio_device_get_type_name(audio_device_type audio_type);
-33: func sz audio_device_get_total_count(audio_device_type audio_type);
-36: func b32 audio_device_get_id(audio_device_type audio_type, sz idx, audio_device* out_id);
-39: func audio_device_type audio_device_get_type(audio_device aud_id);
-42: func cstr8 audio_device_get_name(audio_device aud_id);
+24: func audio_device device_get_audio_device(device src);
+27: func device audio_device_to_device(audio_device src);
+30: func b32 audio_device_type_is_valid(audio_device_type src);
+33: func cstr8 audio_device_get_type_name(audio_device_type audio_type);
+36: func sz audio_device_get_total_count(audio_device_type audio_type);
+39: func audio_device audio_device_get_from_idx(audio_device_type audio_type, sz idx);
+42: func audio_device audio_device_get_primary(audio_device_type audio_type);
+45: func audio_device audio_device_get_focused(audio_device_type audio_type);
+48: func audio_device_type audio_device_get_type(audio_device aud_id);
+51: func cstr8 audio_device_get_name(audio_device aud_id);
 
 === include\input\camera.h ===
 6: #include "../basic/primitive_types.h"
@@ -796,16 +800,19 @@
 11: typedef void* camera;
 17: typedef enum camera_pos {
 24: func b32 camera_is_valid(camera src);
-27: func camera camera_from_device(device src);
-30: func sz camera_get_total_count(void);
-33: func b32 camera_get_id(sz idx, camera* out_id);
-36: func cstr8 camera_get_name(camera cam_id);
-39: func camera_pos camera_get_pos(camera cam_id);
-42: func b32 camera_open(camera cam_id);
-43: func b32 camera_close(camera cam_id);
-44: func b32 camera_start(camera cam_id);
-45: func b32 camera_stop(camera cam_id);
-46: func b32 camera_read(camera cam_id, buffer* out_frame);
+27: func camera device_get_camera(device src);
+30: func device camera_to_device(camera src);
+33: func sz camera_get_total_count(void);
+36: func camera camera_get_from_idx(sz idx);
+39: func camera camera_get_primary(void);
+42: func camera camera_get_focused(void);
+45: func cstr8 camera_get_name(camera cam_id);
+48: func camera_pos camera_get_pos(camera cam_id);
+51: func b32 camera_open(camera cam_id);
+52: func b32 camera_close(camera cam_id);
+53: func b32 camera_start(camera cam_id);
+54: func b32 camera_stop(camera cam_id);
+55: func b32 camera_read(camera cam_id, buffer* out_frame);
 
 === include\input\clipboard.h ===
 6: #include "../basic/primitive_types.h"
@@ -822,46 +829,58 @@
 6: #include "../basic/primitive_types.h"
 7: #include "../strings/cstrings.h"
 9: typedef void* device;
-20: typedef enum device_type {
-35: typedef struct device_info {
-46: func b32 device_is_valid(device src);
-49: func device_type devices_get_type(device src);
-52: func cstr8 devices_get_type_name(device_type type);
-55: func sz devices_get_count(device_type type);
-58: func device devices_get_device(device_type type, sz idx);
-61: func b32 devices_is_connected(device dev_id);
-64: func b32 devices_get_info(device dev_id, device_info* out_info);
+11: typedef enum battery_state {
+29: typedef enum device_type {
+44: typedef struct device_info {
+58: func b32 device_is_valid(device src);
+61: func device_type devices_get_type(device src);
+64: func void* device_get_handle(device src);
+67: func u64 device_get_state(device src);
+70: func cstr8 devices_get_type_name(device_type type);
+73: func sz devices_get_count(device_type type);
+76: func u32 devices_get_type_count(device_type type);
+79: func device devices_get_device(device_type type, sz idx);
+82: func b32 devices_is_connected(device dev_id);
+85: func b32 devices_get_info(device dev_id, device_info* out_info);
 
 === include\input\gamepads.h ===
 6: #include "devices.h"
-17: #define GAMEPADS_MAX_COUNT 4
-20: typedef enum gamepad_button {
-52: typedef enum gamepad_axis {
-63: typedef i32 gamepad_touchpad_idx;
-64: typedef i32 gamepad_finger_idx;
-66: typedef enum gamepad_sensor_kind {
-78: func sz gamepads_get_count(void);
-81: func b32 gamepads_is_connected(sz slot_idx);
-84: func device gamepads_get_device(sz slot_idx);
-87: func cstr8 gamepads_get_name(sz slot_idx);
-90: func b32 gamepads_has_button(sz slot_idx, gamepad_button button);
-93: func b32 gamepads_get_button(sz slot_idx, gamepad_button button);
-96: func b32 gamepads_has_axis(sz slot_idx, gamepad_axis axis);
-99: func i16 gamepads_get_axis(sz slot_idx, gamepad_axis axis);
-102: func b32 gamepads_set_rumble(sz slot_idx, u16 low_freq, u16 high_freq, u32 duration_ms);
-103: func b32 gamepads_set_led(sz slot_idx, u8 red, u8 green, u8 blue);
-104: func b32 gamepads_set_axis_deadzone(sz slot_idx, gamepad_axis axis, i16 deadzone);
-105: func i16 gamepads_get_axis_deadzone(sz slot_idx, gamepad_axis axis);
+8: typedef void* gamepad;
+19: #define GAMEPADS_MAX_COUNT 4
+22: typedef enum gamepad_button {
+54: typedef enum gamepad_axis {
+65: typedef i32 gamepad_touchpad_idx;
+66: typedef i32 gamepad_finger_idx;
+68: typedef enum gamepad_sensor_kind {
+80: func b32 gamepad_is_valid(gamepad src);
+83: func gamepad device_get_gamepad(device src);
+86: func device gamepad_to_device(gamepad src);
+89: func sz gamepad_get_total_count(void);
+90: func gamepad gamepad_get_from_idx(sz idx);
+91: func gamepad gamepad_get_primary(void);
+92: func gamepad gamepad_get_focused(void);
+95: func b32 gamepad_is_connected(gamepad src);
+98: func cstr8 gamepad_get_name(gamepad src);
+101: func b32 gamepad_has_button(gamepad src, gamepad_button button);
+104: func b32 gamepad_get_button(gamepad src, gamepad_button button);
+107: func b32 gamepad_has_axis(gamepad src, gamepad_axis axis);
+110: func i16 gamepad_get_axis(gamepad src, gamepad_axis axis);
+113: func b32 gamepad_set_rumble(gamepad src, u16 low_freq, u16 high_freq, u32 duration_ms);
+114: func b32 gamepad_set_led(gamepad src, u8 red, u8 green, u8 blue);
+115: func b32 gamepad_set_axis_deadzone(gamepad src, gamepad_axis axis, i16 deadzone);
+116: func i16 gamepad_get_axis_deadzone(gamepad src, gamepad_axis axis);
 
 === include\input\joystick.h ===
 6: #include "devices.h"
 8: typedef void* joystick;
-14: typedef enum battery_state {
-23: typedef enum joystick_hat_state {
-36: func b32 joystick_is_valid(joystick src);
-39: func joystick joystick_from_device(device src);
-42: func sz joystick_get_total_count(void);
-45: func b32 joystick_get_id(sz idx, joystick* out_id);
+14: typedef enum joystick_hat_state {
+27: func b32 joystick_is_valid(joystick src);
+30: func joystick device_get_joystick(device src);
+33: func device joystick_to_device(joystick src);
+36: func sz joystick_get_total_count(void);
+39: func joystick joystick_get_from_idx(sz idx);
+42: func joystick joystick_get_primary(void);
+45: func joystick joystick_get_focused(void);
 48: func cstr8 joystick_get_name(joystick joy_id);
 51: func b32 joystick_is_connected(joystick joy_id);
 54: func sz joystick_get_axis_count(joystick joy_id);
@@ -877,25 +896,35 @@
 === include\input\keyboard.h ===
 6: #include "devices.h"
 7: #include "vkeys.h"
-18: func b32 keyboard_is_available(void);
-21: func device keyboard_get_primary_device(void);
-24: func b32 keyboard_is_key_down(vkey key);
-27: func keymod keyboard_get_mods(void);
-30: func b32 keyboard_has_mods(keymod required_mods);
-33: func b32 keyboard_has_mods_exact(keymod required_mods, keymod forbidden_mods);
-36: func b32 keyboard_is_key_down_mod(vkey key, keymod required_mods, keymod forbidden_mods);
-39: func cstr8 keyboard_get_key_name(vkey key);
-42: func cstr8 keyboard_get_key_display_name(vkey key, keymod modifiers, b32 key_event);
+9: typedef void* keyboard;
+20: func b32 keyboard_is_valid(keyboard src);
+23: func keyboard device_get_keyboard(device src);
+26: func device keyboard_to_device(keyboard src);
+29: func b32 keyboard_is_available(void);
+32: func keyboard keyboard_get_primary(void);
+35: func keyboard keyboard_get_focused(void);
+38: func b32 keyboard_is_key_down(keyboard src, vkey key);
+41: func keymod keyboard_get_mods(keyboard src);
+44: func b32 keyboard_has_mods(keyboard src, keymod required_mods);
+47: func b32 keyboard_has_mods_exact(keyboard src, keymod required_mods, keymod forbidden_mods);
+50: func b32 keyboard_is_key_down_mod(keyboard src, vkey key, keymod required_mods, keymod forbidden_mods);
+53: func cstr8 keyboard_get_key_name(keyboard src, vkey key);
+56: func cstr8 keyboard_get_key_display_name(keyboard src, vkey key, keymod modifiers, b32 key_event);
 
 === include\input\mouse.h ===
 6: #include "devices.h"
-17: typedef enum mouse_button {
-26: typedef enum mouse_wheel_direction {
-32: typedef u32 mouse_state;
-35: func b32 mouse_is_available(void);
-38: func device mouse_get_primary_device(void);
-41: func mouse_state mouse_get_state(void);
-44: func b32 mouse_is_button_down(mouse_button button);
+8: typedef void* mouse;
+19: typedef enum mouse_button {
+28: typedef enum mouse_wheel_direction {
+34: typedef u32 mouse_state;
+37: func b32 mouse_is_valid(mouse src);
+40: func mouse device_get_mouse(device src);
+43: func device mouse_to_device(mouse src);
+46: func b32 mouse_is_available(void);
+49: func mouse mouse_get_primary(void);
+52: func mouse mouse_get_focused(void);
+55: func mouse_state mouse_get_state(mouse src);
+58: func b32 mouse_is_button_down(mouse src, mouse_button button);
 
 === include\input\msg.h ===
 6: #include "../basic/codespace.h"
@@ -1080,43 +1109,58 @@
 11: typedef void* sensor;
 17: typedef enum sensor_kind {
 29: func b32 sensor_is_valid(sensor src);
-32: func sensor sensor_from_device(device src);
-35: func sz sensor_get_total_count(void);
-38: func b32 sensor_get_from_idx(sz idx, sensor* out_id);
-41: func cstr8 sensor_get_name(sensor sen_id);
-44: func sensor_kind sensor_get_kind(sensor sen_id);
-47: func b32 sensor_open(sensor sen_id);
-48: func b32 sensor_close(sensor sen_id);
-49: func b32 sensor_start(sensor sen_id);
-50: func b32 sensor_stop(sensor sen_id);
-51: func b32 sensor_read(sensor sen_id, buffer* out_samples);
+32: func sensor device_get_sensor(device src);
+35: func device sensor_to_device(sensor src);
+38: func sz sensor_get_total_count(void);
+41: func sensor sensor_get_from_idx(sz idx);
+44: func sensor sensor_get_primary(void);
+47: func sensor sensor_get_focused(void);
+50: func cstr8 sensor_get_name(sensor sen_id);
+53: func sensor_kind sensor_get_kind(sensor sen_id);
+56: func b32 sensor_open(sensor sen_id);
+57: func b32 sensor_close(sensor sen_id);
+58: func b32 sensor_start(sensor sen_id);
+59: func b32 sensor_stop(sensor sen_id);
+60: func b32 sensor_read(sensor sen_id, buffer* out_samples);
 
 === include\input\tablet.h ===
 6: #include "../interface/window.h"
 7: #include "devices.h"
-13: typedef u32 pen_id;
-20: typedef enum tablet_axis {
-31: typedef enum tablet_input_flag {
-39: typedef u32 tablet_input_flags;
-41: typedef enum tablet_button {
-48: typedef struct tablet_pen_state {
-62: func b32 tablet_is_available(void);
-65: func sz tablet_get_total_count(void);
-68: func device tablet_get_device(sz idx);
-71: func b32 tablet_get_last_pen_state(tablet_pen_state* out_state);
-74: func b32 tablet_read_hid_report(device dev_id, void* dst, sz capacity, sz* out_size, i32 timeout_ms);
+9: typedef void* tablet;
+15: typedef u32 pen_id;
+18: func b32 tablet_is_valid(tablet src);
+21: func tablet device_get_tablet(device src);
+24: func device tablet_to_device(tablet src);
+31: typedef enum tablet_axis {
+42: typedef enum tablet_input_flag {
+50: typedef u32 tablet_input_flags;
+52: typedef enum tablet_button {
+59: typedef struct tablet_pen_state {
+73: func b32 tablet_is_available(void);
+76: func sz tablet_get_total_count(void);
+79: func tablet tablet_get_from_idx(sz idx);
+82: func tablet tablet_get_primary(void);
+85: func tablet tablet_get_focused(void);
+88: func b32 tablet_get_last_pen_state(tablet src, tablet_pen_state* out_state);
+91: func b32 tablet_read_hid_report(tablet src, void* dst, sz capacity, sz* out_size, i32 timeout_ms);
 
 === include\input\touch.h ===
 6: #include "devices.h"
-12: typedef u64 finger_id;
-19: typedef enum touch_device_kind {
-27: typedef struct touch_finger_state {
-35: func b32 touch_is_available(void);
-38: func sz touch_get_total_count(void);
-41: func device touch_get_device(sz idx);
-44: func touch_device_kind touch_get_device_kind(device dev_id);
-47: func sz touch_get_finger_count(device dev_id);
-50: func b32 touch_get_finger(device dev_id, sz idx, touch_finger_state* out_finger);
+8: typedef void* touch;
+14: typedef u64 finger_id;
+17: func b32 touch_is_valid(touch src);
+20: func touch device_get_touch(device src);
+23: func device touch_to_device(touch src);
+30: typedef enum touch_device_kind {
+38: typedef struct touch_finger_state {
+46: func b32 touch_is_available(void);
+49: func sz touch_get_total_count(void);
+52: func touch touch_get_from_idx(sz idx);
+55: func touch touch_get_primary(void);
+58: func touch touch_get_focused(void);
+61: func touch_device_kind touch_get_device_kind(touch src);
+64: func sz touch_get_finger_count(touch src);
+67: func b32 touch_get_finger(touch src, sz idx, touch_finger_state* out_finger);
 
 === include\input\vkeys.h ===
 6: #include "../basic/primitive_types.h"
@@ -1258,47 +1302,46 @@
 136: func window window_get_keyboard_focus();
 137: func window window_get_cursor_focus();
 
-=== include\memory\allocator.h ===
-6: #include "../basic/codespace.h"
-13: typedef struct alloc_tracker alloc_tracker;
-15: typedef void* allocator_callback_realloc(
-20: typedef void* allocator_callback_alloc(
-24: typedef void allocator_callback_free(
-29: typedef struct allocator {
-30: func void* allocator_get_user_data(allocator* alloc);
-31: func void allocator_set_user_data(allocator* alloc, void* user_data);
-33: func alloc_tracker* allocator_get_tracker(allocator* alloc);
-34: func void allocator_set_tracker(allocator* alloc, alloc_tracker* tracker);
-37: func void* _allocator_alloc(allocator alloc, sz size, callsite site);
-40: func void* _allocator_calloc(allocator alloc, sz count, sz size, callsite site);
-43: func void _allocator_dealloc(allocator alloc, void* ptr, callsite site);
-46: func void* _allocator_realloc(allocator alloc, void* ptr, sz new_size, callsite site);
-49: #define allocator_alloc(alloc, size) \
-51: #define allocator_dealloc(alloc, ptr) \
-53: #define allocator_calloc(alloc, count, size) \
-55: #define allocator_realloc(alloc, ptr, new_size) \
-
 === include\memory\alloc_tracker.h ===
 6: #include "../basic/codespace.h"
 7: #include "../threads/atomics.h"
-13: typedef struct alloc_tracker_stats {
-26: typedef struct allocator allocator;
-28: typedef void alloc_tracker_callback_alloc(
-35: typedef void alloc_tracker_callback_free(
-42: typedef void alloc_tracker_callback_realloc(
-52: typedef struct alloc_tracker {
-70: func alloc_tracker alloc_tracker_create(void);
-72: func void* alloc_tracker_get_user_data(alloc_tracker* tracker);
-73: func void alloc_tracker_set_user_data(alloc_tracker* tracker, void* user_data);
-76: func void alloc_tracker_reset(alloc_tracker* tracker);
-79: func alloc_tracker_stats alloc_tracker_get_stats(alloc_tracker* tracker);
-82: func void alloc_tracker_on_alloc_call(alloc_tracker* tracker);
-83: func void alloc_tracker_on_calloc_call(alloc_tracker* tracker);
-84: func void alloc_tracker_on_realloc_call(alloc_tracker* tracker);
-85: func void alloc_tracker_on_free_call(alloc_tracker* tracker);
-88: func void alloc_tracker_on_alloc_success(alloc_tracker* tracker, callsite site, void* ptr, sz size);
-89: func void alloc_tracker_on_free_success(alloc_tracker* tracker, callsite site, void* ptr, sz size);
-90: func void alloc_tracker_on_realloc_success(
+14: typedef struct alloc_tracker_stats {
+27: typedef void alloc_tracker_callback_alloc(void* user_data, callsite site, void* ptr, sz size);
+30: typedef void alloc_tracker_callback_free(void* user_data, callsite site, void* ptr, sz size);
+33: typedef void alloc_tracker_callback_realloc(void* user_data, callsite site, void* old_ptr, void* new_ptr, sz old_size, sz new_size);
+36: typedef struct alloc_tracker {
+60: func alloc_tracker alloc_tracker_create(void);
+63: func void* alloc_tracker_get_user_data(alloc_tracker* tracker);
+66: func void alloc_tracker_set_user_data(alloc_tracker* tracker, void* user_data);
+69: func void alloc_tracker_reset(alloc_tracker* tracker);
+72: func alloc_tracker_stats alloc_tracker_get_stats(alloc_tracker* tracker);
+75: func void alloc_tracker_on_alloc_call(alloc_tracker* tracker);
+76: func void alloc_tracker_on_calloc_call(alloc_tracker* tracker);
+77: func void alloc_tracker_on_realloc_call(alloc_tracker* tracker);
+78: func void alloc_tracker_on_free_call(alloc_tracker* tracker);
+81: func void alloc_tracker_on_alloc_success(alloc_tracker* tracker, callsite site, void* ptr, sz size);
+82: func void alloc_tracker_on_free_success(alloc_tracker* tracker, callsite site, void* ptr, sz size);
+83: func void alloc_tracker_on_realloc_success(
+
+=== include\memory\allocator.h ===
+6: #include "../basic/codespace.h"
+7: #include "alloc_tracker.h"
+14: typedef void* allocator_callback_realloc(void* user_data, callsite site, void* ptr, sz new_size);
+17: typedef void* allocator_callback_alloc(void* user_data, callsite site, sz size);
+20: typedef void allocator_callback_free(void* user_data, callsite site, void* ptr);
+23: typedef struct allocator {
+37: func void* allocator_get_user_data(allocator* alloc);
+40: func void allocator_set_user_data(allocator* alloc, void* user_data);
+43: func alloc_tracker* allocator_get_tracker(allocator* alloc);
+46: func void allocator_set_tracker(allocator* alloc, alloc_tracker* tracker);
+49: func void* _allocator_alloc(allocator alloc, sz size, callsite site);
+52: func void* _allocator_calloc(allocator alloc, sz count, sz size, callsite site);
+55: func void _allocator_dealloc(allocator alloc, void* ptr, callsite site);
+58: func void* _allocator_realloc(allocator alloc, void* ptr, sz new_size, callsite site);
+61: #define allocator_alloc(alloc, size) \
+63: #define allocator_dealloc(alloc, ptr) \
+65: #define allocator_calloc(alloc, count, size) \
+67: #define allocator_realloc(alloc, ptr, new_size) \
 
 === include\memory\arena.h ===
 6: #include "../basic/codespace.h"

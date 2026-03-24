@@ -5,6 +5,8 @@
 
 #include "devices.h"
 
+typedef void* gamepad;
+
 // =========================================================================
 c_begin;
 // =========================================================================
@@ -74,35 +76,44 @@ typedef enum gamepad_sensor_kind {
   GAMEPAD_SENSOR_KIND_GYRO_R = 6,
 } gamepad_sensor_kind;
 
-// Returns the number of active gamepad slots.
-func sz gamepads_get_count(void);
+// Returns 1 if src refers to a concrete gamepad handle, 0 otherwise.
+func b32 gamepad_is_valid(gamepad src);
 
-// Returns 1 if slot_idx currently holds a connected gamepad, 0 otherwise.
-func b32 gamepads_is_connected(sz slot_idx);
+// Converts src into a gamepad handle when it refers to a gamepad device.
+func gamepad device_get_gamepad(device src);
 
-// Returns the device for slot_idx, or NULL when the slot is disconnected.
-func device gamepads_get_device(sz slot_idx);
+// Converts src into a generic device handle.
+func device gamepad_to_device(gamepad src);
 
-// Returns the cached gamepad name for slot_idx, or NULL when unavailable.
-func cstr8 gamepads_get_name(sz slot_idx);
+// Enumeration helpers.
+func sz gamepad_get_total_count(void);
+func gamepad gamepad_get_from_idx(sz idx);
+func gamepad gamepad_get_primary(void);
+func gamepad gamepad_get_focused(void);
+
+// Returns 1 if src is currently connected, 0 otherwise.
+func b32 gamepad_is_connected(gamepad src);
+
+// Returns the cached gamepad name for src, or NULL when unavailable.
+func cstr8 gamepad_get_name(gamepad src);
 
 // Returns 1 if the connected gamepad exposes button, 0 otherwise.
-func b32 gamepads_has_button(sz slot_idx, gamepad_button button);
+func b32 gamepad_has_button(gamepad src, gamepad_button button);
 
 // Returns the cached pressed state for button.
-func b32 gamepads_get_button(sz slot_idx, gamepad_button button);
+func b32 gamepad_get_button(gamepad src, gamepad_button button);
 
 // Returns 1 if the connected gamepad exposes axis, 0 otherwise.
-func b32 gamepads_has_axis(sz slot_idx, gamepad_axis axis);
+func b32 gamepad_has_axis(gamepad src, gamepad_axis axis);
 
 // Returns the cached signed axis value for axis.
-func i16 gamepads_get_axis(sz slot_idx, gamepad_axis axis);
+func i16 gamepad_get_axis(gamepad src, gamepad_axis axis);
 
 // Runtime output/control helpers for supported devices.
-func b32 gamepads_set_rumble(sz slot_idx, u16 low_freq, u16 high_freq, u32 duration_ms);
-func b32 gamepads_set_led(sz slot_idx, u8 red, u8 green, u8 blue);
-func b32 gamepads_set_axis_deadzone(sz slot_idx, gamepad_axis axis, i16 deadzone);
-func i16 gamepads_get_axis_deadzone(sz slot_idx, gamepad_axis axis);
+func b32 gamepad_set_rumble(gamepad src, u16 low_freq, u16 high_freq, u32 duration_ms);
+func b32 gamepad_set_led(gamepad src, u8 red, u8 green, u8 blue);
+func b32 gamepad_set_axis_deadzone(gamepad src, gamepad_axis axis, i16 deadzone);
+func i16 gamepad_get_axis_deadzone(gamepad src, gamepad_axis axis);
 
 // =========================================================================
 c_end;

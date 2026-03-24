@@ -31,7 +31,6 @@ namespace {
 }  // namespace
 
 TEST(input_msg_test, add_remove_handler_and_dispatch) {
-  msg_clear_handlers();
   msg_set_filter(NULL, NULL);
 
   msg_test_handler_state state_val = {};
@@ -56,7 +55,6 @@ TEST(input_msg_test, add_remove_handler_and_dispatch) {
 }
 
 TEST(input_msg_test, handler_filter_matches_category_and_type) {
-  msg_clear_handlers();
   msg_set_filter(NULL, NULL);
 
   msg_test_handler_state state_val = {};
@@ -88,8 +86,6 @@ TEST(input_msg_test, handler_filter_matches_category_and_type) {
 }
 
 TEST(input_msg_test, filter_blocks_post_immediately) {
-  msg_clear_handlers();
-
   u32 blocked_type = MSG_CORE_TYPE_USER + 77;
   msg_set_filter(msg_test_filter_reject_type, &blocked_type);
 
@@ -103,7 +99,6 @@ TEST(input_msg_test, filter_blocks_post_immediately) {
 }
 
 TEST(input_msg_test, handler_can_cancel_post_immediately) {
-  msg_clear_handlers();
   msg_set_filter(NULL, NULL);
 
   msg_test_handler_state state_val = {};

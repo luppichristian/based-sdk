@@ -20,6 +20,58 @@
 global_var cmdline entry_cmdline_current = {0};
 global_var ctx_setup entry_start_setup = {0};
 global_var u32 entry_init_depth = 0;
+global_var u64 entry_internal_msg_handler_ids[6] = {0};
+
+func void entry_register_internal_msg_handlers(void) {
+  profile_func_begin;
+  if (entry_internal_msg_handler_ids[0] != 0) {
+    profile_func_end;
+    return;
+  }
+
+  entry_internal_msg_handler_ids[0] = msg_add_handler(&(msg_handler_desc) {
+      .handler_fn = keyboard_internal_on_msg,
+      .priority = I32_MAX,
+      .category = MSG_CATEGORY_CORE,
+  });
+  entry_internal_msg_handler_ids[1] = msg_add_handler(&(msg_handler_desc) {
+      .handler_fn = mouse_internal_on_msg,
+      .priority = I32_MAX,
+      .category = MSG_CATEGORY_CORE,
+  });
+  entry_internal_msg_handler_ids[2] = msg_add_handler(&(msg_handler_desc) {
+      .handler_fn = gamepad_internal_on_msg,
+      .priority = I32_MAX,
+      .category = MSG_CATEGORY_CORE,
+  });
+  entry_internal_msg_handler_ids[3] = msg_add_handler(&(msg_handler_desc) {
+      .handler_fn = joystick_internal_on_msg,
+      .priority = I32_MAX,
+      .category = MSG_CATEGORY_CORE,
+  });
+  entry_internal_msg_handler_ids[4] = msg_add_handler(&(msg_handler_desc) {
+      .handler_fn = tablet_internal_on_msg,
+      .priority = I32_MAX,
+      .category = MSG_CATEGORY_CORE,
+  });
+  entry_internal_msg_handler_ids[5] = msg_add_handler(&(msg_handler_desc) {
+      .handler_fn = msg_handle_runtime_internal,
+      .priority = I32_MAX,
+      .category = MSG_CATEGORY_CORE,
+  });
+  profile_func_end;
+}
+
+func void entry_unregister_internal_msg_handlers(void) {
+  profile_func_begin;
+  safe_for (sz item_idx = 0; item_idx < count_of(entry_internal_msg_handler_ids); item_idx += 1) {
+    if (entry_internal_msg_handler_ids[item_idx] != 0) {
+      (void)msg_remove_handler(entry_internal_msg_handler_ids[item_idx]);
+      entry_internal_msg_handler_ids[item_idx] = 0;
+    }
+  }
+  profile_func_end;
+}
 
 func void* entry_pipeline_malloc(sz size) {
   profile_func_begin;
@@ -255,6 +307,8 @@ func b32 entry_init(cmdline cmdline) {
 
   global_log_info("SDL initialized");
 
+  entry_register_internal_msg_handlers();
+
   if (cmdline_is_empty(entry_cmdline_current)) {
     entry_cmdline_current = cmdline;
     global_log_trace("Captured entry command line count=%zu", (size_t)entry_cmdline_current.count);
@@ -330,6 +384,7 @@ func void entry_quit(void) {
   }
 
   if (has_sdl) {
+    entry_unregister_internal_msg_handlers();
     global_log_verbose("Shutting down SDL");
     SDL_Quit();
   }

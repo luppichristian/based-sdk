@@ -2,6 +2,7 @@
 // Copyright (c) 2026 Christian Luppi
 
 #include "input/camera.h"
+#include "basic/assert.h"
 #include "../internal.h"
 #include "context/thread_ctx.h"
 #include "../sdl3_include.h"
@@ -14,12 +15,11 @@ typedef struct camera_state_entry {
   b32 is_started;
 } camera_state_entry;
 
-#define CAMERA_STATE_CAP ((sz)64)
-global_var camera_state_entry camera_states[CAMERA_STATE_CAP] = {0};
+global_var camera_state_entry camera_states[DEVICES_HANDLE_CAP] = {0};
 
 func camera_state_entry* camera_find_state(SDL_CameraID camera_id, b32 create_if_missing) {
   profile_func_begin;
-  safe_for (sz item_idx = 0; item_idx < CAMERA_STATE_CAP; item_idx += 1) {
+  safe_for (sz item_idx = 0; item_idx < DEVICES_HANDLE_CAP; item_idx += 1) {
     if (camera_states[item_idx].camera_id == camera_id) {
       profile_func_end;
       return &camera_states[item_idx];
@@ -29,7 +29,7 @@ func camera_state_entry* camera_find_state(SDL_CameraID camera_id, b32 create_if
     profile_func_end;
     return NULL;
   }
-  safe_for (sz item_idx = 0; item_idx < CAMERA_STATE_CAP; item_idx += 1) {
+  safe_for (sz item_idx = 0; item_idx < DEVICES_HANDLE_CAP; item_idx += 1) {
     if (camera_states[item_idx].camera_id == 0) {
       camera_states[item_idx].camera_id = camera_id;
       profile_func_end;
@@ -44,23 +44,37 @@ func camera_state_entry* camera_find_state(SDL_CameraID camera_id, b32 create_if
 }
 
 func b32 camera_is_valid(camera src) {
-  return src != NULL;
+  return src != NULL && devices_get_type((device)src) == DEVICE_TYPE_CAMERA;
 }
 
-func camera camera_from_device(device src) {
+func camera device_get_camera(device src) {
   if (devices_get_type(src) != DEVICE_TYPE_CAMERA) {
+    invalid_code_path;
     return NULL;
   }
 
-  return (camera)(up)devices_get_instance(src);
+  return (camera)src;
 }
 
 func camera camera_from_native_id(up native_id) {
-  return (camera)(up)native_id;
+  return device_get_camera(devices_make_id(DEVICE_TYPE_CAMERA, (u64)native_id));
 }
 
 func up camera_to_native_id(camera src) {
-  return (up)src;
+  if (!camera_is_valid(src)) {
+    return 0;
+  }
+
+  return (up)devices_get_instance(camera_to_device(src));
+}
+
+func device camera_to_device(camera src) {
+  if (!camera_is_valid(src)) {
+    invalid_code_path;
+    return NULL;
+  }
+
+  return (device)src;
 }
 
 func sz camera_get_total_count(void) {
@@ -81,15 +95,12 @@ func sz camera_get_total_count(void) {
   return result;
 }
 
-func b32 camera_get_id(sz idx, camera* out_id) {
+func camera camera_get_from_idx(sz idx) {
   profile_func_begin;
   int count = 0;
   SDL_CameraID* ids = SDL_GetCameras(&count);
   b32 found = ids != NULL && idx < (sz)count;
-
-  if (out_id) {
-    *out_id = NULL;
-  }
+  camera out_id = NULL;
 
   if (ids == NULL && count != 0) {
     thread_log_error("Failed to enumerate cameras for id lookup idx=%zu error=%s", (size_t)idx, SDL_GetError());
@@ -97,8 +108,9 @@ func b32 camera_get_id(sz idx, camera* out_id) {
     thread_log_warn("Camera id lookup missed idx=%zu count=%d", (size_t)idx, count);
   }
 
-  if (found && out_id) {
-    *out_id = camera_from_native_id((up)ids[idx]);
+  if (found) {
+    out_id = camera_from_native_id((up)ids[idx]);
+    devices_update_runtime(camera_to_device(out_id), 1, (void*)(up)ids[idx]);
   }
 
   if (ids) {
@@ -106,7 +118,16 @@ func b32 camera_get_id(sz idx, camera* out_id) {
   }
 
   profile_func_end;
-  return found;
+  return out_id;
+}
+
+func camera camera_get_primary(void) {
+  return camera_get_from_idx(0);
+}
+
+func camera camera_get_focused(void) {
+  device src = devices_get_focused_device(DEVICE_TYPE_CAMERA);
+  return device_is_valid(src) ? device_get_camera(src) : NULL;
 }
 
 func cstr8 camera_get_name(camera id) {

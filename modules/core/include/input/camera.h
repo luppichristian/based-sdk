@@ -24,13 +24,22 @@ typedef enum camera_pos {
 func b32 camera_is_valid(camera src);
 
 // Converts src into a camera handle when it refers to a camera device.
-func camera camera_from_device(device src);
+func camera device_get_camera(device src);
+
+// Converts src into a generic device handle.
+func device camera_to_device(camera src);
 
 // Returns the number of currently known camera devices.
 func sz camera_get_total_count(void);
 
-// Writes the camera id at idx into out_id. Returns 1 on success, 0 otherwise.
-func b32 camera_get_id(sz idx, camera* out_id);
+// Returns the camera handle at idx, or NULL when unavailable.
+func camera camera_get_from_idx(sz idx);
+
+// Returns the primary camera handle, or NULL when unavailable.
+func camera camera_get_primary(void);
+
+// Returns the focused camera handle, or the primary camera when unavailable.
+func camera camera_get_focused(void);
 
 // Returns a backend-defined camera name for id, or NULL when unavailable.
 func cstr8 camera_get_name(camera cam_id);

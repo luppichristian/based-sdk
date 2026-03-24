@@ -13,12 +13,15 @@
 typedef struct device_handle_entry {
   device_type type;
   u64 instance;
+  void* handle;
+  u64 device_state;
+  b32 connected;
+  battery_state battery_state;
 } device_handle_entry;
 
 static const u64 DEVICES_AUDIO_RECORDING_BIT = 1ULL << 63;
-#define DEVICES_HANDLE_CAP ((sz)1024)
-
 global_var device_handle_entry device_handles[DEVICES_HANDLE_CAP] = {0};
+global_var device focused_devices[DEVICE_TYPE_MONITOR + 1] = {0};
 
 func void devices_clear_name(c8* dst, sz capacity) {
   profile_func_begin;
@@ -95,6 +98,25 @@ func device_handle_entry* devices_lookup_entry(device src) {
   return NULL;
 }
 
+func void devices_assign_default_handle(device_handle_entry* entry) {
+  if (entry == NULL) {
+    return;
+  }
+
+  entry->handle = (void*)(up)entry->instance;
+}
+
+func void devices_set_connected_entry(device_handle_entry* entry, b32 connected) {
+  if (entry == NULL) {
+    return;
+  }
+
+  if (entry->connected != connected) {
+    entry->connected = connected;
+    entry->device_state += 1;
+  }
+}
+
 func device devices_make_id(device_type type, u64 instance) {
   profile_func_begin;
   if (type <= DEVICE_TYPE_UNKNOWN || type > DEVICE_TYPE_MONITOR || instance == 0) {
@@ -104,6 +126,9 @@ func device devices_make_id(device_type type, u64 instance) {
 
   safe_for (sz item_idx = 0; item_idx < DEVICES_HANDLE_CAP; item_idx += 1) {
     if (device_handles[item_idx].type == type && device_handles[item_idx].instance == instance) {
+      if (device_handles[item_idx].handle == NULL) {
+        devices_assign_default_handle(&device_handles[item_idx]);
+      }
       profile_func_end;
       return (device)&device_handles[item_idx];
     }
@@ -113,6 +138,10 @@ func device devices_make_id(device_type type, u64 instance) {
     if (device_handles[item_idx].type == DEVICE_TYPE_UNKNOWN && device_handles[item_idx].instance == 0) {
       device_handles[item_idx].type = type;
       device_handles[item_idx].instance = instance;
+      device_handles[item_idx].device_state = 0;
+      device_handles[item_idx].connected = 0;
+      device_handles[item_idx].battery_state = BATTERY_STATE_UNKNOWN;
+      devices_assign_default_handle(&device_handles[item_idx]);
       profile_func_end;
       return (device)&device_handles[item_idx];
     }
@@ -151,6 +180,71 @@ func b32 device_is_valid(device src) {
 func device_type devices_get_type(device src) {
   device_handle_entry* handle = devices_lookup_entry(src);
   return handle ? handle->type : DEVICE_TYPE_UNKNOWN;
+}
+
+func void* device_get_handle(device src) {
+  device_handle_entry* handle = devices_lookup_entry(src);
+  return handle ? handle->handle : NULL;
+}
+
+func u64 device_get_state(device src) {
+  device_handle_entry* handle = devices_lookup_entry(src);
+  return handle ? handle->device_state : 0;
+}
+
+func void devices_update_runtime(device src, b32 connected, void* handle) {
+  device_handle_entry* entry = devices_lookup_entry(src);
+  if (entry == NULL) {
+    return;
+  }
+
+  if (handle != NULL && entry->handle != handle) {
+    entry->handle = handle;
+    entry->device_state += 1;
+  } else if (entry->handle == NULL) {
+    devices_assign_default_handle(entry);
+  }
+
+  devices_set_connected_entry(entry, connected);
+}
+
+func void devices_touch_state(device src) {
+  device_handle_entry* entry = devices_lookup_entry(src);
+  if (entry == NULL) {
+    return;
+  }
+
+  entry->device_state += 1;
+}
+
+func void devices_set_focus(device src) {
+  device_type type = devices_get_type(src);
+  if (type <= DEVICE_TYPE_UNKNOWN || type > DEVICE_TYPE_MONITOR) {
+    return;
+  }
+
+  focused_devices[type] = src;
+}
+
+func device devices_get_focused_device(device_type type) {
+  if (type <= DEVICE_TYPE_UNKNOWN || type > DEVICE_TYPE_MONITOR) {
+    return NULL;
+  }
+
+  if (device_is_valid(focused_devices[type]) && devices_is_connected(focused_devices[type])) {
+    return focused_devices[type];
+  }
+
+  return devices_get_device(type, 0);
+}
+
+func void devices_set_battery(device src, battery_state state) {
+  device_handle_entry* entry = devices_lookup_entry(src);
+  if (entry == NULL) {
+    return;
+  }
+
+  entry->battery_state = state;
 }
 
 func device devices_make_audio_device(u64 native_id, audio_device_type audio_type) {
@@ -346,6 +440,11 @@ func cstr8 devices_get_type_name(device_type type) {
 }
 
 func sz devices_get_count(device_type type) {
+  sz native_total = input_native_backend_get_device_count(type);
+  if (native_total > 0) {
+    return native_total;
+  }
+
   int count = 0;
 
   switch (type) {
@@ -432,14 +531,28 @@ func sz devices_get_count(device_type type) {
   }
 }
 
+func u32 devices_get_type_count(device_type type) {
+  sz total = devices_get_count(type);
+  return total > (sz)U32_MAX ? U32_MAX : (u32)total;
+}
+
 func device devices_get_device(device_type type, sz idx) {
   profile_func_begin;
+  device native_device = input_native_backend_get_device(type, idx);
+  if (native_device != NULL) {
+    profile_func_end;
+    return native_device;
+  }
+
   int count = 0;
 
   switch (type) {
     case DEVICE_TYPE_KEYBOARD: {
       SDL_KeyboardID* ids = SDL_GetKeyboards(&count);
       device result = ids && idx < (sz)count ? devices_make_id(DEVICE_TYPE_KEYBOARD, (u64)ids[idx]) : NULL;
+      if (result != NULL) {
+        devices_update_runtime(result, 1, (void*)(up)ids[idx]);
+      }
       if (ids) {
         SDL_free(ids);
       }
@@ -449,6 +562,9 @@ func device devices_get_device(device_type type, sz idx) {
     case DEVICE_TYPE_MOUSE: {
       SDL_MouseID* ids = SDL_GetMice(&count);
       device result = ids && idx < (sz)count ? devices_make_id(DEVICE_TYPE_MOUSE, (u64)ids[idx]) : NULL;
+      if (result != NULL) {
+        devices_update_runtime(result, 1, (void*)(up)ids[idx]);
+      }
       if (ids) {
         SDL_free(ids);
       }
@@ -458,6 +574,9 @@ func device devices_get_device(device_type type, sz idx) {
     case DEVICE_TYPE_GAMEPAD: {
       SDL_JoystickID* ids = SDL_GetGamepads(&count);
       device result = ids && idx < (sz)count ? devices_make_id(DEVICE_TYPE_GAMEPAD, (u64)ids[idx]) : NULL;
+      if (result != NULL) {
+        devices_update_runtime(result, 1, (void*)(up)ids[idx]);
+      }
       if (ids) {
         SDL_free(ids);
       }
@@ -467,6 +586,9 @@ func device devices_get_device(device_type type, sz idx) {
     case DEVICE_TYPE_JOYSTICK: {
       SDL_JoystickID* ids = SDL_GetJoysticks(&count);
       device result = ids && idx < (sz)count ? devices_make_id(DEVICE_TYPE_JOYSTICK, (u64)ids[idx]) : NULL;
+      if (result != NULL) {
+        devices_update_runtime(result, 1, (void*)(up)ids[idx]);
+      }
       if (ids) {
         SDL_free(ids);
       }
@@ -476,6 +598,9 @@ func device devices_get_device(device_type type, sz idx) {
     case DEVICE_TYPE_TOUCH: {
       SDL_TouchID* ids = SDL_GetTouchDevices(&count);
       device result = ids && idx < (sz)count ? devices_make_id(DEVICE_TYPE_TOUCH, (u64)ids[idx]) : NULL;
+      if (result != NULL) {
+        devices_update_runtime(result, 1, (void*)(up)ids[idx]);
+      }
       if (ids) {
         SDL_free(ids);
       }
@@ -494,6 +619,9 @@ func device devices_get_device(device_type type, sz idx) {
     case DEVICE_TYPE_CAMERA: {
       SDL_CameraID* ids = SDL_GetCameras(&count);
       device result = ids && idx < (sz)count ? devices_make_id(DEVICE_TYPE_CAMERA, (u64)ids[idx]) : NULL;
+      if (result != NULL) {
+        devices_update_runtime(result, 1, (void*)(up)ids[idx]);
+      }
       if (ids) {
         SDL_free(ids);
       }
@@ -503,6 +631,9 @@ func device devices_get_device(device_type type, sz idx) {
     case DEVICE_TYPE_SENSOR: {
       SDL_SensorID* ids = SDL_GetSensors(&count);
       device result = ids && idx < (sz)count ? devices_make_id(DEVICE_TYPE_SENSOR, (u64)ids[idx]) : NULL;
+      if (result != NULL) {
+        devices_update_runtime(result, 1, (void*)(up)ids[idx]);
+      }
       if (ids) {
         SDL_free(ids);
       }
@@ -512,6 +643,9 @@ func device devices_get_device(device_type type, sz idx) {
     case DEVICE_TYPE_MONITOR: {
       SDL_DisplayID* ids = SDL_GetDisplays(&count);
       device result = ids && idx < (sz)count ? devices_make_id(DEVICE_TYPE_MONITOR, (u64)ids[idx]) : NULL;
+      if (result != NULL) {
+        devices_update_runtime(result, 1, (void*)(up)ids[idx]);
+      }
       if (ids) {
         SDL_free(ids);
       }
@@ -543,6 +677,14 @@ func b32 devices_get_info(device dev_id, device_info* out_info) {
   if (out_info) {
     *out_info = (device_info) {0};
     out_info->id = dev_id;
+    out_info->device_state = device_get_state(dev_id);
+    out_info->battery_state = BATTERY_STATE_UNKNOWN;
+    out_info->handle = device_get_handle(dev_id);
+  }
+
+  if (input_native_backend_get_info(dev_id, out_info)) {
+    profile_func_end;
+    return true;
   }
 
   switch (type) {
@@ -556,7 +698,9 @@ func b32 devices_get_info(device dev_id, device_info* out_info) {
           if (out_info) {
             out_info->connected = 1;
             devices_cpy_cstring(out_info->name, size_of(out_info->name), SDL_GetKeyboardNameForID(ids[idx]));
+            out_info->handle = (void*)(up)ids[idx];
           }
+          devices_update_runtime(dev_id, 1, (void*)(up)ids[idx]);
           break;
         }
       }
@@ -565,6 +709,13 @@ func b32 devices_get_info(device dev_id, device_info* out_info) {
         SDL_free(ids);
       }
 
+      if (!found) {
+        devices_update_runtime(dev_id, 0, NULL);
+      }
+      if (out_info) {
+        out_info->device_state = device_get_state(dev_id);
+        out_info->battery_state = devices_lookup_entry(dev_id) ? devices_lookup_entry(dev_id)->battery_state : BATTERY_STATE_UNKNOWN;
+      }
       profile_func_end;
       return found;
     }
@@ -578,7 +729,9 @@ func b32 devices_get_info(device dev_id, device_info* out_info) {
           if (out_info) {
             out_info->connected = 1;
             devices_cpy_cstring(out_info->name, size_of(out_info->name), SDL_GetMouseNameForID(ids[idx]));
+            out_info->handle = (void*)(up)ids[idx];
           }
+          devices_update_runtime(dev_id, 1, (void*)(up)ids[idx]);
           break;
         }
       }
@@ -587,6 +740,13 @@ func b32 devices_get_info(device dev_id, device_info* out_info) {
         SDL_free(ids);
       }
 
+      if (!found) {
+        devices_update_runtime(dev_id, 0, NULL);
+      }
+      if (out_info) {
+        out_info->device_state = device_get_state(dev_id);
+        out_info->battery_state = devices_lookup_entry(dev_id) ? devices_lookup_entry(dev_id)->battery_state : BATTERY_STATE_UNKNOWN;
+      }
       profile_func_end;
       return found;
     }
@@ -600,7 +760,9 @@ func b32 devices_get_info(device dev_id, device_info* out_info) {
           if (out_info) {
             out_info->connected = 1;
             devices_cpy_cstring(out_info->name, size_of(out_info->name), SDL_GetGamepadNameForID(ids[idx]));
+            out_info->handle = (void*)(up)ids[idx];
           }
+          devices_update_runtime(dev_id, 1, (void*)(up)ids[idx]);
           break;
         }
       }
@@ -609,6 +771,13 @@ func b32 devices_get_info(device dev_id, device_info* out_info) {
         SDL_free(ids);
       }
 
+      if (!found) {
+        devices_update_runtime(dev_id, 0, NULL);
+      }
+      if (out_info) {
+        out_info->device_state = device_get_state(dev_id);
+        out_info->battery_state = devices_lookup_entry(dev_id) ? devices_lookup_entry(dev_id)->battery_state : BATTERY_STATE_UNKNOWN;
+      }
       profile_func_end;
       return found;
     }
@@ -622,7 +791,9 @@ func b32 devices_get_info(device dev_id, device_info* out_info) {
           if (out_info) {
             out_info->connected = 1;
             devices_cpy_cstring(out_info->name, size_of(out_info->name), SDL_GetJoystickNameForID(ids[idx]));
+            out_info->handle = (void*)(up)ids[idx];
           }
+          devices_update_runtime(dev_id, 1, (void*)(up)ids[idx]);
           break;
         }
       }
@@ -631,6 +802,13 @@ func b32 devices_get_info(device dev_id, device_info* out_info) {
         SDL_free(ids);
       }
 
+      if (!found) {
+        devices_update_runtime(dev_id, 0, NULL);
+      }
+      if (out_info) {
+        out_info->device_state = device_get_state(dev_id);
+        out_info->battery_state = devices_lookup_entry(dev_id) ? devices_lookup_entry(dev_id)->battery_state : BATTERY_STATE_UNKNOWN;
+      }
       profile_func_end;
       return found;
     }
@@ -645,7 +823,9 @@ func b32 devices_get_info(device dev_id, device_info* out_info) {
             out_info->connected = 1;
             devices_cpy_cstring(out_info->name, size_of(out_info->name), SDL_GetTouchDeviceName(ids[idx]));
             out_info->usage = (u16)SDL_GetTouchDeviceType(ids[idx]);
+            out_info->handle = (void*)(up)ids[idx];
           }
+          devices_update_runtime(dev_id, 1, (void*)(up)ids[idx]);
           break;
         }
       }
@@ -654,12 +834,33 @@ func b32 devices_get_info(device dev_id, device_info* out_info) {
         SDL_free(ids);
       }
 
+      if (!found) {
+        devices_update_runtime(dev_id, 0, NULL);
+      }
+      if (out_info) {
+        out_info->device_state = device_get_state(dev_id);
+        out_info->battery_state = devices_lookup_entry(dev_id) ? devices_lookup_entry(dev_id)->battery_state : BATTERY_STATE_UNKNOWN;
+      }
       profile_func_end;
       return found;
     }
     case DEVICE_TYPE_TABLET:
+      if (devices_find_tablet_info(dev_id, out_info)) {
+        devices_update_runtime(dev_id, 1, (void*)(up)devices_get_instance(dev_id));
+        if (out_info) {
+          out_info->device_state = device_get_state(dev_id);
+          out_info->battery_state = devices_lookup_entry(dev_id) ? devices_lookup_entry(dev_id)->battery_state : BATTERY_STATE_UNKNOWN;
+        }
+        profile_func_end;
+        return true;
+      }
+      devices_update_runtime(dev_id, 0, NULL);
+      if (out_info) {
+        out_info->device_state = device_get_state(dev_id);
+        out_info->battery_state = devices_lookup_entry(dev_id) ? devices_lookup_entry(dev_id)->battery_state : BATTERY_STATE_UNKNOWN;
+      }
       profile_func_end;
-      return devices_find_tablet_info(dev_id, out_info);
+      return false;
     case DEVICE_TYPE_AUDIO: {
       int audio_count = 0;
       u64 native_id = devices_audio_decode_native_id(instance);
@@ -684,7 +885,9 @@ func b32 devices_get_info(device dev_id, device_info* out_info) {
             out_info->connected = 1;
             out_info->usage = (u16)audio_type;
             devices_cpy_cstring(out_info->name, size_of(out_info->name), SDL_GetAudioDeviceName(ids[idx]));
+            out_info->handle = (void*)(up)ids[idx];
           }
+          devices_update_runtime(dev_id, 1, (void*)(up)ids[idx]);
           break;
         }
       }
@@ -693,6 +896,13 @@ func b32 devices_get_info(device dev_id, device_info* out_info) {
         SDL_free(ids);
       }
 
+      if (!found) {
+        devices_update_runtime(dev_id, 0, NULL);
+      }
+      if (out_info) {
+        out_info->device_state = device_get_state(dev_id);
+        out_info->battery_state = devices_lookup_entry(dev_id) ? devices_lookup_entry(dev_id)->battery_state : BATTERY_STATE_UNKNOWN;
+      }
       profile_func_end;
       return found;
     }
@@ -707,7 +917,9 @@ func b32 devices_get_info(device dev_id, device_info* out_info) {
             out_info->connected = 1;
             devices_cpy_cstring(out_info->name, size_of(out_info->name), SDL_GetCameraName(ids[idx]));
             out_info->usage = (u16)SDL_GetCameraPosition(ids[idx]);
+            out_info->handle = (void*)(up)ids[idx];
           }
+          devices_update_runtime(dev_id, 1, (void*)(up)ids[idx]);
           break;
         }
       }
@@ -716,6 +928,13 @@ func b32 devices_get_info(device dev_id, device_info* out_info) {
         SDL_free(ids);
       }
 
+      if (!found) {
+        devices_update_runtime(dev_id, 0, NULL);
+      }
+      if (out_info) {
+        out_info->device_state = device_get_state(dev_id);
+        out_info->battery_state = devices_lookup_entry(dev_id) ? devices_lookup_entry(dev_id)->battery_state : BATTERY_STATE_UNKNOWN;
+      }
       profile_func_end;
       return found;
     }
@@ -730,7 +949,9 @@ func b32 devices_get_info(device dev_id, device_info* out_info) {
             out_info->connected = 1;
             devices_cpy_cstring(out_info->name, size_of(out_info->name), SDL_GetSensorNameForID(ids[idx]));
             out_info->usage = (u16)SDL_GetSensorTypeForID(ids[idx]);
+            out_info->handle = (void*)(up)ids[idx];
           }
+          devices_update_runtime(dev_id, 1, (void*)(up)ids[idx]);
           break;
         }
       }
@@ -739,6 +960,13 @@ func b32 devices_get_info(device dev_id, device_info* out_info) {
         SDL_free(ids);
       }
 
+      if (!found) {
+        devices_update_runtime(dev_id, 0, NULL);
+      }
+      if (out_info) {
+        out_info->device_state = device_get_state(dev_id);
+        out_info->battery_state = devices_lookup_entry(dev_id) ? devices_lookup_entry(dev_id)->battery_state : BATTERY_STATE_UNKNOWN;
+      }
       profile_func_end;
       return found;
     }
@@ -752,7 +980,9 @@ func b32 devices_get_info(device dev_id, device_info* out_info) {
           if (out_info) {
             out_info->connected = 1;
             devices_cpy_cstring(out_info->name, size_of(out_info->name), SDL_GetDisplayName(ids[idx]));
+            out_info->handle = (void*)(up)ids[idx];
           }
+          devices_update_runtime(dev_id, 1, (void*)(up)ids[idx]);
           break;
         }
       }
@@ -761,6 +991,13 @@ func b32 devices_get_info(device dev_id, device_info* out_info) {
         SDL_free(ids);
       }
 
+      if (!found) {
+        devices_update_runtime(dev_id, 0, NULL);
+      }
+      if (out_info) {
+        out_info->device_state = device_get_state(dev_id);
+        out_info->battery_state = devices_lookup_entry(dev_id) ? devices_lookup_entry(dev_id)->battery_state : BATTERY_STATE_UNKNOWN;
+      }
       profile_func_end;
       return found;
     }

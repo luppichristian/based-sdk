@@ -2,6 +2,7 @@
 // Copyright (c) 2026 Christian Luppi
 
 #include "input/sensor.h"
+#include "basic/assert.h"
 #include "../internal.h"
 #include "context/thread_ctx.h"
 #include "../sdl3_include.h"
@@ -14,12 +15,11 @@ typedef struct sensor_state_entry {
   b32 is_started;
 } sensor_state_entry;
 
-#define SENSOR_STATE_CAP ((sz)128)
-global_var sensor_state_entry sensor_states[SENSOR_STATE_CAP] = {0};
+global_var sensor_state_entry sensor_states[DEVICES_HANDLE_CAP] = {0};
 
 func sensor_state_entry* sensor_find_state(SDL_SensorID sensor_id, b32 create_if_missing) {
   profile_func_begin;
-  safe_for (sz item_idx = 0; item_idx < SENSOR_STATE_CAP; item_idx += 1) {
+  safe_for (sz item_idx = 0; item_idx < DEVICES_HANDLE_CAP; item_idx += 1) {
     if (sensor_states[item_idx].sensor_id == sensor_id) {
       profile_func_end;
       return &sensor_states[item_idx];
@@ -29,7 +29,7 @@ func sensor_state_entry* sensor_find_state(SDL_SensorID sensor_id, b32 create_if
     profile_func_end;
     return NULL;
   }
-  safe_for (sz item_idx = 0; item_idx < SENSOR_STATE_CAP; item_idx += 1) {
+  safe_for (sz item_idx = 0; item_idx < DEVICES_HANDLE_CAP; item_idx += 1) {
     if (sensor_states[item_idx].sensor_id == 0) {
       sensor_states[item_idx].sensor_id = sensor_id;
       profile_func_end;
@@ -44,23 +44,37 @@ func sensor_state_entry* sensor_find_state(SDL_SensorID sensor_id, b32 create_if
 }
 
 func b32 sensor_is_valid(sensor src) {
-  return src != NULL;
+  return src != NULL && devices_get_type((device)src) == DEVICE_TYPE_SENSOR;
 }
 
-func sensor sensor_from_device(device src) {
+func sensor device_get_sensor(device src) {
   if (devices_get_type(src) != DEVICE_TYPE_SENSOR) {
+    invalid_code_path;
     return NULL;
   }
 
-  return (sensor)(up)devices_get_instance(src);
+  return (sensor)src;
 }
 
 func sensor sensor_from_native_id(up native_id) {
-  return (sensor)(up)native_id;
+  return device_get_sensor(devices_make_id(DEVICE_TYPE_SENSOR, (u64)native_id));
 }
 
 func up sensor_to_native_id(sensor src) {
-  return (up)src;
+  if (!sensor_is_valid(src)) {
+    return 0;
+  }
+
+  return (up)devices_get_instance(sensor_to_device(src));
+}
+
+func device sensor_to_device(sensor src) {
+  if (!sensor_is_valid(src)) {
+    invalid_code_path;
+    return NULL;
+  }
+
+  return (device)src;
 }
 
 func sz sensor_get_total_count(void) {
@@ -81,15 +95,12 @@ func sz sensor_get_total_count(void) {
   return result;
 }
 
-func b32 sensor_get_from_idx(sz idx, sensor* out_id) {
+func sensor sensor_get_from_idx(sz idx) {
   profile_func_begin;
   int count = 0;
   SDL_SensorID* ids = SDL_GetSensors(&count);
   b32 found = ids != NULL && idx < (sz)count;
-
-  if (out_id) {
-    *out_id = NULL;
-  }
+  sensor out_id = NULL;
 
   if (ids == NULL && count != 0) {
     thread_log_error("Failed to enumerate sensors for id lookup idx=%zu error=%s", (size_t)idx, SDL_GetError());
@@ -97,8 +108,9 @@ func b32 sensor_get_from_idx(sz idx, sensor* out_id) {
     thread_log_warn("Sensor id lookup missed idx=%zu count=%d", (size_t)idx, count);
   }
 
-  if (found && out_id) {
-    *out_id = sensor_from_native_id((up)ids[idx]);
+  if (found) {
+    out_id = sensor_from_native_id((up)ids[idx]);
+    devices_update_runtime(sensor_to_device(out_id), 1, (void*)(up)ids[idx]);
   }
 
   if (ids) {
@@ -106,7 +118,16 @@ func b32 sensor_get_from_idx(sz idx, sensor* out_id) {
   }
 
   profile_func_end;
-  return found;
+  return out_id;
+}
+
+func sensor sensor_get_primary(void) {
+  return sensor_get_from_idx(0);
+}
+
+func sensor sensor_get_focused(void) {
+  device src = devices_get_focused_device(DEVICE_TYPE_SENSOR);
+  return device_is_valid(src) ? device_get_sensor(src) : NULL;
 }
 
 func cstr8 sensor_get_name(sensor id) {

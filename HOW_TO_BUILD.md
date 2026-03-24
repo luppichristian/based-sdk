@@ -43,6 +43,7 @@ sudo apt-get install -y \
   libegl1-mesa-dev \
   libdbus-1-dev \
   libibus-1.0-dev \
+  libinput-dev \
   libudev-dev \
   libthai-dev \
   libpipewire-0.3-dev \

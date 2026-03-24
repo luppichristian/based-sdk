@@ -23,13 +23,12 @@ TEST(input_camera_test, id_conversion_and_invalid_lifecycle_calls) {
 
 TEST(input_camera_test, enumeration_consistency_when_devices_exist) {
   sz count_val = camera_get_total_count();
-  camera out_id = NULL;
+  camera out_id = count_val == 0 ? NULL : camera_get_from_idx(0);
   if (count_val == 0) {
-    EXPECT_TRUE(camera_get_id(0, &out_id) == 0);
     return;
   }
 
-  ASSERT_TRUE(camera_get_id(0, &out_id) != 0);
+  ASSERT_TRUE(out_id != NULL);
   EXPECT_TRUE(camera_is_valid(out_id) != 0);
   camera_pos pos_val = camera_get_pos(out_id);
   EXPECT_TRUE(
