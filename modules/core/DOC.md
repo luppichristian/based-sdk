@@ -2,7 +2,7 @@
 
 `core` is the foundational module of based. Use it for platform abstractions, memory/context systems, containers, I/O and filesystem utilities, input/event flow, threading, and shared diagnostics/logging primitives.
 
-This guide is organized by API area and then by header so you can quickly jump to relevant types and functions.
+The canonical API reference remains `./api_index.txt`. This guide is organized by API area and then by header so you can quickly locate public types, functions, and macros.
 
 ## API Areas
 
@@ -21,458 +21,468 @@ This guide is organized by API area and then by header so you can quickly jump t
 
 ## basic
 
-Compiler/platform layer, primitive types, assertions, crash routing, intrinsics and foundational macros.
+Compiler/platform layer, primitive types, assertions, crash routing, intrinsics, and foundational macros.
 
 ### `basic/assert.h`
 
 - Types: **1**
 - Functions: **3**
+- Macros: **5**
 
 #### Types
 
-- `assert_mode` (enum)
-  - What it represents: Represents a set of named constants for `assert mode`
-  - Members:
-    - `ASSERT_MODE_DEBUG`: `enum value`
-    - `ASSERT_MODE_QUIT`: `enum value`
-    - `ASSERT_MODE_ABORT`: `enum value`
-    - `ASSERT_MODE_LOG`: `enum value`
-    - `ASSERT_MODE_IGNORE`: `enum value`
+| Type | Declaration |
+| --- | --- |
+| `assert_mode` | `typedef enum assert_mode { ... } assert_mode;` |
 
 #### Functions
 
-- `_assert(b32 condition, const char* msg, callsite site) -> void`
-  - What it does: Performs  assert
-  - Parameters:
-    - `condition` (`b32`): Input parameter
-    - `msg` (`const char*`): Input parameter
-    - `site` (`callsite`): Input parameter
-- `assert_set_mode(assert_mode mode) -> void`
-  - What it does: Sets assert set mode
-  - Parameters:
-    - `mode` (`assert_mode`): Configuration value controlling behavior
-- `assert_get_mode() -> assert_mode`
-  - What it does: Gets assert get mode
-  - Parameters: none
+| Function | Declaration |
+| --- | --- |
+| `_assert` | `func void _assert(b32 condition, const char* msg, callsite site);` |
+| `assert_set_mode` | `func void assert_set_mode(assert_mode mode);` |
+| `assert_get_mode` | `func assert_mode assert_get_mode(void);` |
 
-### `basic/crash.h`
+#### Macros
 
-- Types: **0**
-- Functions: **3**
-
-#### Types
-
-- None
-
-#### Functions
-
-- `crash_install() -> b32`
-  - What it does: Installs platform crash handlers that route unhandled faults through the assert system
-  - Parameters: none
-- `crash_uninstall() -> void`
-  - What it does: Restores the previous platform crash handlers
-  - Parameters: none
-- `crash_is_installed() -> b32`
-  - What it does: Reports whether the crash handler is currently installed
-  - Parameters: none
+| Macro | Form |
+| --- | --- |
+| `assert` | `assert(condition)` |
+| `assert_msg` | `assert_msg(condition, msg)` |
+| `invalid_code_path` | `invalid_code_path` |
+| `ASSERT_STACKTRACE_DEPTH` | `ASSERT_STACKTRACE_DEPTH` |
+| `ASSERT_MODE_DEFAULT` | `ASSERT_MODE_DEFAULT` |
 
 ### `basic/codespace.h`
 
 - Types: **2**
 - Functions: **0**
+- Macros: **2**
 
 #### Types
 
-- `callsite` (struct)
-  - What it represents: Represents `callsite` data grouped in a struct
-  - Members:
-    - `filename`: `cstr8`
-    - `function`: `cstr8`
-    - `line`: `u32`
-- `src_loc` (struct)
-  - What it represents: Represents `src loc` data grouped in a struct
-  - Members:
-    - `filename`: `cstr8`
-    - `line`: `u32`
+| Type | Declaration |
+| --- | --- |
+| `callsite` | `typedef struct callsite { ... } callsite;` |
+| `src_loc` | `typedef struct src_loc { ... } src_loc;` |
 
 #### Functions
 
-- None
+| Function | Declaration |
+| --- | --- |
+| None | - |
+
+#### Macros
+
+| Macro | Form |
+| --- | --- |
+| `CALLSITE_HERE` | `CALLSITE_HERE` |
+| `SRC_LOC_HERE` | `SRC_LOC_HERE` |
+
+### `basic/crash.h`
+
+- Types: **0**
+- Functions: **3**
+- Macros: **0**
+
+#### Types
+
+| Type | Declaration |
+| --- | --- |
+| None | - |
+
+#### Functions
+
+| Function | Declaration |
+| --- | --- |
+| `crash_install` | `func b32 crash_install(void);` |
+| `crash_uninstall` | `func void crash_uninstall(void);` |
+| `crash_is_installed` | `func b32 crash_is_installed(void);` |
+
+#### Macros
+
+| Macro | Form |
+| --- | --- |
+| None | - |
 
 ### `basic/entry.h`
 
 - Types: **7**
 - Functions: **11**
+- Macros: **5**
 
 #### Types
 
-- `app_result` (enum)
-  - What it represents: Represents a set of named constants for `app result`
-  - Members:
-    - `APP_RESULT_CONTINUE`: `enum value`
-    - `APP_RESULT_SUCCESS`: `enum value`
-    - `APP_RESULT_FAIL`: `enum value`
-    - `APP_RESULT_MAX`: `enum value`
-- `entry_app_init_fn` (alias)
-  - What it represents: Type alias used for `entry app init fn`
-  - Members: none (alias/function type)
-- `entry_app_update_fn` (alias)
-  - What it represents: Type alias used for `entry app update fn`
-  - Members: none (alias/function type)
-- `entry_app_quit_fn` (alias)
-  - What it represents: Type alias used for `entry app quit fn`
-  - Members: none (alias/function type)
-- `entry_app_callbacks` (struct)
-  - What it represents: Represents `entry app callbacks` data grouped in a struct
-  - Members:
-    - `init_fn`: `entry_app_init_fn*`
-    - `update_fn`: `entry_app_update_fn*`
-    - `quit_fn`: `entry_app_quit_fn*`
-- `entry_run_fn` (alias)
-  - What it represents: Type alias used for `entry run fn`
-  - Members: none (alias/function type)
-- `entry_run_callbacks` (struct)
-  - What it represents: Represents `entry run callbacks` data grouped in a struct
-  - Members:
-    - `run_fn`: `entry_run_fn*`
+| Type | Declaration |
+| --- | --- |
+| `app_result` | `typedef enum app_result { ... } app_result;` |
+| `entry_app_init_fn` | `typedef app_result entry_app_init_fn(cmdline cmdl, void** state);` |
+| `entry_app_update_fn` | `typedef app_result entry_app_update_fn(void* state);` |
+| `entry_app_quit_fn` | `typedef void entry_app_quit_fn(void* state, app_result result);` |
+| `entry_app_callbacks` | `typedef struct entry_app_callbacks { ... } entry_app_callbacks;` |
+| `entry_run_fn` | `typedef b32 entry_run_fn(cmdline cmdl);` |
+| `entry_run_callbacks` | `typedef struct entry_run_callbacks { ... } entry_run_callbacks;` |
 
 #### Functions
 
-- `entry_init(cmdline cmdline) -> b32`
-  - What it does: Initializes entry init
-  - Parameters:
-    - `cmdline` (`cmdline`): Input parameter
-- `entry_get_cmdline() -> cmdline`
-  - What it does: Gets entry get cmdline
-  - Parameters: none
-- `entry_get_allocator() -> allocator`
-  - What it does: Gets entry get allocator
-  - Parameters: none
-- `entry_get_ctx_setup() -> ctx_setup`
-  - What it does: Gets entry get ctx setup
-  - Parameters: none
-- `entry_quit() -> void`
-  - What it does: Shuts down entry quit
-  - Parameters: none
-- `app_init(cmdline cmdl, void** state) -> app_result`
-  - What it does: Initializes app init
-  - Parameters:
-    - `cmdl` (`cmdline`): Input parameter
-    - `state` (`void**`): Configuration value controlling behavior
-- `app_update(void* state) -> app_result`
-  - What it does: Performs app update
-  - Parameters:
-    - `state` (`void*`): Configuration value controlling behavior
-- `app_quit(void* state, app_result result) -> void`
-  - What it does: Shuts down app quit
-  - Parameters:
-    - `state` (`void*`): Configuration value controlling behavior
-    - `result` (`app_result`): Input parameter
-- `run(cmdline cmdl) -> b32`
-  - What it does: Performs run
-  - Parameters:
-    - `cmdl` (`cmdline`): Input parameter
-- `mod_init() -> dll_export b32`
-  - What it does: Initializes mod init
-  - Parameters: none
-- `mod_quit() -> dll_export void`
-  - What it does: Shuts down mod quit
-  - Parameters: none
+| Function | Declaration |
+| --- | --- |
+| `entry_init` | `func b32 entry_init(cmdline cmdline);` |
+| `entry_get_cmdline` | `func cmdline entry_get_cmdline(void);` |
+| `entry_get_allocator` | `func allocator entry_get_allocator(void);` |
+| `entry_get_ctx_setup` | `func ctx_setup entry_get_ctx_setup(void);` |
+| `entry_quit` | `func void entry_quit(void);` |
+| `app_init` | `func app_result app_init(cmdline cmdl, void** state);` |
+| `app_update` | `func app_result app_update(void* state);` |
+| `app_quit` | `func void app_quit(void* state, app_result result);` |
+| `run` | `func b32 run(cmdline cmdl);` |
+| `mod_init` | `func dll_export b32 mod_init(void);` |
+| `mod_quit` | `func dll_export void mod_quit(void);` |
+
+#### Macros
+
+| Macro | Form |
+| --- | --- |
+| `ENTRY_GET_GLOBAL_ALLOCATOR` | `ENTRY_GET_GLOBAL_ALLOCATOR` |
+| `ENTRY_GET_GLOBAL_CTX_SETUP` | `ENTRY_GET_GLOBAL_CTX_SETUP()` |
+| `ENTRY_FUNCTION_NAME` | `ENTRY_FUNCTION_NAME` |
+| `ENTRY_CALLBACKS_TYPE` | `ENTRY_CALLBACKS_TYPE` |
+| `ENTRY_CALLBACKS_INIT` | `ENTRY_CALLBACKS_INIT()` |
 
 ### `basic/entry_impl.h`
 
 - Types: **3**
 - Functions: **0**
+- Macros: **3**
 
 #### Types
 
-- `HINSTANCE` (alias)
-  - What it represents: Type alias used for `HINSTANCE`
-  - Members: none (alias/function type)
-- `LPSTR` (alias)
-  - What it represents: Type alias used for `LPSTR`
-  - Members: none (alias/function type)
-- `PWSTR` (alias)
-  - What it represents: Type alias used for `PWSTR`
-  - Members: none (alias/function type)
+| Type | Declaration |
+| --- | --- |
+| `HINSTANCE` | `typedef struct HINSTANCE__* HINSTANCE;` |
+| `LPSTR` | `typedef char* LPSTR;` |
+| `PWSTR` | `typedef wchar_t* PWSTR;` |
 
 #### Functions
 
-- None
+| Function | Declaration |
+| --- | --- |
+| None | - |
+
+#### Macros
+
+| Macro | Form |
+| --- | --- |
+| `ENTRY_IMPL` | `ENTRY_IMPL` |
+| `ENTRY_BOOT` | `ENTRY_BOOT(argc, argv)` |
+| `WINAPI` | `WINAPI` |
 
 ### `basic/env_defines.h`
 
 - Types: **0**
 - Functions: **0**
+- Macros: **9**
 
 #### Types
 
-- None
+| Type | Declaration |
+| --- | --- |
+| None | - |
 
 #### Functions
 
-- None
+| Function | Declaration |
+| --- | --- |
+| None | - |
+
+#### Macros
+
+| Macro | Form |
+| --- | --- |
+| `PLATFORM_WINDOWS` | `PLATFORM_WINDOWS` |
+| `PLATFORM_LINUX` | `PLATFORM_LINUX` |
+| `PLATFORM_MACOS` | `PLATFORM_MACOS` |
+| `PLATFORM_UNIX` | `PLATFORM_UNIX` |
+| `PLATFORM_DESKTOP` | `PLATFORM_DESKTOP` |
+| `ARCH_X86_64` | `ARCH_X86_64` |
+| `ARCH_ARM64` | `ARCH_ARM64` |
+| `BUILD_RELEASE` | `BUILD_RELEASE` |
+| `BUILD_DEBUG` | `BUILD_DEBUG` |
 
 ### `basic/intrinsics.h`
 
 - Types: **0**
 - Functions: **15**
+- Macros: **0**
 
 #### Types
 
-- None
+| Type | Declaration |
+| --- | --- |
+| None | - |
 
 #### Functions
 
-- `popcount_u32(u32 val) -> i32`
-  - What it does: Performs popcount u32
-  - Parameters:
-    - `val` (`u32`): Input parameter
-- `popcount_u64(u64 val) -> i32`
-  - What it does: Performs popcount u64
-  - Parameters:
-    - `val` (`u64`): Input parameter
-- `ctz_u32(u32 val) -> i32`
-  - What it does: Performs ctz u32
-  - Parameters:
-    - `val` (`u32`): Input parameter
-- `ctz_u64(u64 val) -> i32`
-  - What it does: Performs ctz u64
-  - Parameters:
-    - `val` (`u64`): Input parameter
-- `clz_u32(u32 val) -> i32`
-  - What it does: Performs clz u32
-  - Parameters:
-    - `val` (`u32`): Input parameter
-- `clz_u64(u64 val) -> i32`
-  - What it does: Performs clz u64
-  - Parameters:
-    - `val` (`u64`): Input parameter
-- `bsr_u32(u32 val) -> i32`
-  - What it does: Performs bsr u32
-  - Parameters:
-    - `val` (`u32`): Input parameter
-- `bsr_u64(u64 val) -> i32`
-  - What it does: Performs bsr u64
-  - Parameters:
-    - `val` (`u64`): Input parameter
-- `bswap_u16(u16 val) -> u16`
-  - What it does: Performs bswap u16
-  - Parameters:
-    - `val` (`u16`): Input parameter
-- `bswap_u32(u32 val) -> u32`
-  - What it does: Performs bswap u32
-  - Parameters:
-    - `val` (`u32`): Input parameter
-- `bswap_u64(u64 val) -> u64`
-  - What it does: Performs bswap u64
-  - Parameters:
-    - `val` (`u64`): Input parameter
-- `rotl_u32(u32 val, i32 cnt) -> u32`
-  - What it does: Performs rotl u32
-  - Parameters:
-    - `val` (`u32`): Input parameter
-    - `cnt` (`i32`): Input parameter
-- `rotl_u64(u64 val, i32 cnt) -> u64`
-  - What it does: Performs rotl u64
-  - Parameters:
-    - `val` (`u64`): Input parameter
-    - `cnt` (`i32`): Input parameter
-- `rotr_u32(u32 val, i32 cnt) -> u32`
-  - What it does: Performs rotr u32
-  - Parameters:
-    - `val` (`u32`): Input parameter
-    - `cnt` (`i32`): Input parameter
-- `rotr_u64(u64 val, i32 cnt) -> u64`
-  - What it does: Performs rotr u64
-  - Parameters:
-    - `val` (`u64`): Input parameter
-    - `cnt` (`i32`): Input parameter
+| Function | Declaration |
+| --- | --- |
+| `popcount_u32` | `func i32 popcount_u32(u32 val);` |
+| `popcount_u64` | `func i32 popcount_u64(u64 val);` |
+| `ctz_u32` | `func i32 ctz_u32(u32 val);` |
+| `ctz_u64` | `func i32 ctz_u64(u64 val);` |
+| `clz_u32` | `func i32 clz_u32(u32 val);` |
+| `clz_u64` | `func i32 clz_u64(u64 val);` |
+| `bsr_u32` | `func i32 bsr_u32(u32 val);` |
+| `bsr_u64` | `func i32 bsr_u64(u64 val);` |
+| `bswap_u16` | `func u16 bswap_u16(u16 val);` |
+| `bswap_u32` | `func u32 bswap_u32(u32 val);` |
+| `bswap_u64` | `func u64 bswap_u64(u64 val);` |
+| `rotl_u32` | `func u32 rotl_u32(u32 val, i32 cnt);` |
+| `rotl_u64` | `func u64 rotl_u64(u64 val, i32 cnt);` |
+| `rotr_u32` | `func u32 rotr_u32(u32 val, i32 cnt);` |
+| `rotr_u64` | `func u64 rotr_u64(u64 val, i32 cnt);` |
+
+#### Macros
+
+| Macro | Form |
+| --- | --- |
+| None | - |
 
 ### `basic/keyword_defines.h`
 
 - Types: **0**
 - Functions: **0**
+- Macros: **18**
 
 #### Types
 
-- None
+| Type | Declaration |
+| --- | --- |
+| None | - |
 
 #### Functions
 
-- None
+| Function | Declaration |
+| --- | --- |
+| None | - |
+
+#### Macros
+
+| Macro | Form |
+| --- | --- |
+| `thread_local` | `thread_local` |
+| `dll_export` | `dll_export` |
+| `dll_import` | `dll_import` |
+| `static_assert` | `static_assert(expr)` |
+| `no_return` | `no_return` |
+| `force_inline` | `force_inline` |
+| `no_inline` | `no_inline` |
+| `align_as` | `align_as(x)` |
+| `align_of` | `align_of(x)` |
+| `size_of` | `size_of(x)` |
+| `type_of` | `type_of(x)` |
+| `likely` | `likely(x)` |
+| `unlikely` | `unlikely(x)` |
+| `c_begin` | `c_begin` |
+| `c_end` | `c_end` |
+| `local_persist` | `local_persist` |
+| `global_var` | `global_var` |
+| `func` | `func` |
 
 ### `basic/primitive_types.h`
 
-- Types: **36**
+- Types: **33**
 - Functions: **0**
+- Macros: **0**
 
 #### Types
 
-- `i8` (alias)
-  - What it represents: Type alias used for `i8`
-  - Members: none (alias/function type)
-- `u8` (alias)
-  - What it represents: Type alias used for `u8`
-  - Members: none (alias/function type)
-- `i16` (alias)
-  - What it represents: Type alias used for `i16`
-  - Members: none (alias/function type)
-- `u16` (alias)
-  - What it represents: Type alias used for `u16`
-  - Members: none (alias/function type)
-- `i32` (alias)
-  - What it represents: Type alias used for `i32`
-  - Members: none (alias/function type)
-- `u32` (alias)
-  - What it represents: Type alias used for `u32`
-  - Members: none (alias/function type)
-- `i64` (alias)
-  - What it represents: Type alias used for `i64`
-  - Members: none (alias/function type)
-- `u64` (alias)
-  - What it represents: Type alias used for `u64`
-  - Members: none (alias/function type)
-- `f32` (alias)
-  - What it represents: Type alias used for `f32`
-  - Members: none (alias/function type)
-- `f64` (alias)
-  - What it represents: Type alias used for `f64`
-  - Members: none (alias/function type)
-- `b8` (alias)
-  - What it represents: Type alias used for `b8`
-  - Members: none (alias/function type)
-- `b16` (alias)
-  - What it represents: Type alias used for `b16`
-  - Members: none (alias/function type)
-- `b32` (alias)
-  - What it represents: Type alias used for `b32`
-  - Members: none (alias/function type)
-- `b64` (alias)
-  - What it represents: Type alias used for `b64`
-  - Members: none (alias/function type)
-- `c8` (alias)
-  - What it represents: Type alias used for `c8`
-  - Members: none (alias/function type)
-- `c16` (alias)
-  - What it represents: Type alias used for `c16`
-  - Members: none (alias/function type)
-- `c32` (alias)
-  - What it represents: Type alias used for `c32`
-  - Members: none (alias/function type)
-- `cstr8` (alias)
-  - What it represents: Type alias used for `cstr8`
-  - Members: none (alias/function type)
-- `cstr16` (alias)
-  - What it represents: Type alias used for `cstr16`
-  - Members: none (alias/function type)
-- `cstr32` (alias)
-  - What it represents: Type alias used for `cstr32`
-  - Members: none (alias/function type)
-- `i8x` (alias)
-  - What it represents: Type alias used for `i8x`
-  - Members: none (alias/function type)
-- `u8x` (alias)
-  - What it represents: Type alias used for `u8x`
-  - Members: none (alias/function type)
-- `i16x` (alias)
-  - What it represents: Type alias used for `i16x`
-  - Members: none (alias/function type)
-- `u16x` (alias)
-  - What it represents: Type alias used for `u16x`
-  - Members: none (alias/function type)
-- `i32x` (alias)
-  - What it represents: Type alias used for `i32x`
-  - Members: none (alias/function type)
-- `u32x` (alias)
-  - What it represents: Type alias used for `u32x`
-  - Members: none (alias/function type)
-- `i64x` (alias)
-  - What it represents: Type alias used for `i64x`
-  - Members: none (alias/function type)
-- `u64x` (alias)
-  - What it represents: Type alias used for `u64x`
-  - Members: none (alias/function type)
-- `b8x` (alias)
-  - What it represents: Type alias used for `b8x`
-  - Members: none (alias/function type)
-- `b16x` (alias)
-  - What it represents: Type alias used for `b16x`
-  - Members: none (alias/function type)
-- `b32x` (alias)
-  - What it represents: Type alias used for `b32x`
-  - Members: none (alias/function type)
-- `b64x` (alias)
-  - What it represents: Type alias used for `b64x`
-  - Members: none (alias/function type)
-- `sz` (alias)
-  - What it represents: Type alias used for `sz`
-  - Members: none (alias/function type)
-- `up` (alias)
-  - What it represents: Type alias used for `up`
-  - Members: none (alias/function type)
-- `sp` (alias)
-  - What it represents: Type alias used for `sp`
-  - Members: none (alias/function type)
-- `dp` (alias)
-  - What it represents: Type alias used for `dp`
-  - Members: none (alias/function type)
+| Type | Declaration |
+| --- | --- |
+| `i8` | `typedef int8_t i8;` |
+| `u8` | `typedef uint8_t u8;` |
+| `i16` | `typedef int16_t i16;` |
+| `u16` | `typedef uint16_t u16;` |
+| `i32` | `typedef int32_t i32;` |
+| `u32` | `typedef uint32_t u32;` |
+| `i64` | `typedef int64_t i64;` |
+| `u64` | `typedef uint64_t u64;` |
+| `f32` | `typedef float f32;` |
+| `f64` | `typedef double f64;` |
+| `b8` | `typedef uint8_t b8;` |
+| `b16` | `typedef uint16_t b16;` |
+| `b32` | `typedef uint32_t b32;` |
+| `b64` | `typedef uint64_t b64;` |
+| `c8` | `typedef char c8;` |
+| `c16` | `typedef uint16_t c16;` |
+| `c32` | `typedef uint32_t c32;` |
+| `i8x` | `typedef const c8* cstr8; // Null terminated UTF-8 C String typedef const c16* cstr16; // Null terminated UTF-16 C String typedef const c32* cstr32; // Null terminated UTF-32 C String typedef int_fast8_t i8x;` |
+| `u8x` | `typedef uint_fast8_t u8x;` |
+| `i16x` | `typedef int_fast16_t i16x;` |
+| `u16x` | `typedef uint_fast16_t u16x;` |
+| `i32x` | `typedef int_fast32_t i32x;` |
+| `u32x` | `typedef uint_fast32_t u32x;` |
+| `i64x` | `typedef int_fast64_t i64x;` |
+| `u64x` | `typedef uint_fast64_t u64x;` |
+| `b8x` | `typedef uint_fast8_t b8x;` |
+| `b16x` | `typedef uint_fast16_t b16x;` |
+| `b32x` | `typedef uint_fast32_t b32x;` |
+| `b64x` | `typedef uint_fast64_t b64x;` |
+| `sz` | `typedef size_t sz;` |
+| `up` | `typedef uintptr_t up;` |
+| `sp` | `typedef intptr_t sp;` |
+| `dp` | `typedef ptrdiff_t dp;` |
 
 #### Functions
 
-- None
+| Function | Declaration |
+| --- | --- |
+| None | - |
+
+#### Macros
+
+| Macro | Form |
+| --- | --- |
+| None | - |
 
 ### `basic/profiler.h`
 
 - Types: **0**
 - Functions: **0**
+- Macros: **6**
 
 #### Types
 
-- None
+| Type | Declaration |
+| --- | --- |
+| None | - |
 
 #### Functions
 
-- None
+| Function | Declaration |
+| --- | --- |
+| None | - |
+
+#### Macros
+
+| Macro | Form |
+| --- | --- |
+| `TRACY_ENABLE` | `TRACY_ENABLE` |
+| `TRACY_CALLSTACK` | `TRACY_CALLSTACK` |
+| `profile_func_begin` | `profile_func_begin` |
+| `profile_func_end` | `profile_func_end` |
+| `TracyCAlloc` | `TracyCAlloc(ptr, size)` |
+| `TracyCFree` | `TracyCFree(ptr)` |
 
 ### `basic/safe.h`
 
 - Types: **0**
 - Functions: **0**
+- Macros: **5**
 
 #### Types
 
-- None
+| Type | Declaration |
+| --- | --- |
+| None | - |
 
 #### Functions
 
-- None
+| Function | Declaration |
+| --- | --- |
+| None | - |
+
+#### Macros
+
+| Macro | Form |
+| --- | --- |
+| `SAFE_LOOP_MAX_ITERATION_COUNT` | `SAFE_LOOP_MAX_ITERATION_COUNT` |
+| `SAFE_WHILE_IMPL` | `SAFE_WHILE_IMPL(cond, id)` |
+| `safe_while` | `safe_while(cond)` |
+| `SAFE_FOR_IMPL` | `SAFE_FOR_IMPL(id, ...)` |
+| `safe_for` | `safe_for(...)` |
 
 ### `basic/third_party.h`
 
 - Types: **0**
 - Functions: **0**
+- Macros: **3**
 
 #### Types
 
-- None
+| Type | Declaration |
+| --- | --- |
+| None | - |
 
 #### Functions
 
-- None
+| Function | Declaration |
+| --- | --- |
+| None | - |
+
+#### Macros
+
+| Macro | Form |
+| --- | --- |
+| `LM2_ENABLE_UNPREFIXED_NAMES` | `LM2_ENABLE_UNPREFIXED_NAMES` |
+| `LM2_CUSTOM_ASSERT` | `LM2_CUSTOM_ASSERT` |
+| `LM2_NO_GENERICS` | `LM2_NO_GENERICS` |
 
 ### `basic/utility_defines.h`
 
 - Types: **0**
 - Functions: **0**
+- Macros: **34**
 
 #### Types
 
-- None
+| Type | Declaration |
+| --- | --- |
+| None | - |
 
 #### Functions
 
-- None
+| Function | Declaration |
+| --- | --- |
+| None | - |
+
+#### Macros
+
+| Macro | Form |
+| --- | --- |
+| `strfy` | `strfy(x)` |
+| `strfy_exp` | `strfy_exp(x)` |
+| `cat` | `cat(x, y)` |
+| `cat_exp` | `cat_exp(x, y)` |
+| `expr` | `expr(x)` |
+| `stmt` | `stmt(x)` |
+| `count_of` | `count_of(x)` |
+| `size_of_each` | `size_of_each(x)` |
+| `multiline_literal` | `multiline_literal(...)` |
+| `bit` | `bit(x)` |
+| `bit64` | `bit64(x)` |
+| `bit_is_set` | `bit_is_set(bits, b)` |
+| `bit_set` | `bit_set(bits, b)` |
+| `bit_unset` | `bit_unset(bits, b)` |
+| `bit_toggle` | `bit_toggle(bits, b)` |
+| `field_of` | `field_of(type, field)` |
+| `size_of_field` | `size_of_field(type, field)` |
+| `offset_of` | `offset_of(type, field)` |
+| `container_of` | `container_of(ptr, type, field)` |
+| `in_range` | `in_range(x, lo, hi)` |
+| `in_bounds` | `in_bounds(arr, i)` |
+| `swap_value` | `swap_value(a, b)` |
+| `swap_ptr` | `swap_ptr(a_ptr, b_ptr)` |
+| `is_pow2` | `is_pow2(x)` |
+| `align_up` | `align_up(x, n)` |
+| `align_down` | `align_down(x, n)` |
+| `kb` | `kb(b)` |
+| `mb` | `mb(b)` |
+| `gb` | `gb(b)` |
+| `tb` | `tb(b)` |
+| `th` | `th(x)` |
+| `mil` | `mil(x)` |
+| `bil` | `bil(x)` |
+| `tril` | `tril(x)` |
 
 ## containers
 
@@ -482,8524 +492,3664 @@ Intrusive containers and sorting helpers for lightweight data structures.
 
 - Types: **0**
 - Functions: **0**
+- Macros: **15**
 
 #### Types
 
-- None
+| Type | Declaration |
+| --- | --- |
+| None | - |
 
 #### Functions
 
-- None
+| Function | Declaration |
+| --- | --- |
+| None | - |
+
+#### Macros
+
+| Macro | Form |
+| --- | --- |
+| `BINARY_TREE_IS_ROOT` | `BINARY_TREE_IS_ROOT(node)` |
+| `BINARY_TREE_IS_LEAF` | `BINARY_TREE_IS_LEAF(node)` |
+| `BINARY_TREE_FIRST_INORDER` | `BINARY_TREE_FIRST_INORDER(root, out)` |
+| `BINARY_TREE_NEXT_INORDER` | `BINARY_TREE_NEXT_INORDER(root, node, out)` |
+| `BINARY_TREE_FIRST_POSTORDER` | `BINARY_TREE_FIRST_POSTORDER(root, out)` |
+| `BINARY_TREE_NEXT_POSTORDER` | `BINARY_TREE_NEXT_POSTORDER(root, node, out)` |
+| `BINARY_TREE_NEXT_PREORDER` | `BINARY_TREE_NEXT_PREORDER(root, node, out)` |
+| `BINARY_TREE_INSERT_LEFT` | `BINARY_TREE_INSERT_LEFT(parent, node)` |
+| `BINARY_TREE_INSERT_RIGHT` | `BINARY_TREE_INSERT_RIGHT(parent, node)` |
+| `BINARY_TREE_REMOVE` | `BINARY_TREE_REMOVE(root_ptr, node)` |
+| `BINARY_TREE_ROTATE_LEFT` | `BINARY_TREE_ROTATE_LEFT(root_ptr, node)` |
+| `BINARY_TREE_ROTATE_RIGHT` | `BINARY_TREE_ROTATE_RIGHT(root_ptr, node)` |
+| `BINARY_TREE_FOREACH_PREORDER` | `BINARY_TREE_FOREACH_PREORDER(root, it)` |
+| `BINARY_TREE_FOREACH_INORDER` | `BINARY_TREE_FOREACH_INORDER(root, it)` |
+| `BINARY_TREE_FOREACH_POSTORDER` | `BINARY_TREE_FOREACH_POSTORDER(root, it)` |
 
 ### `containers/bitset.h`
 
 - Types: **0**
 - Functions: **0**
+- Macros: **12**
 
 #### Types
 
-- None
+| Type | Declaration |
+| --- | --- |
+| None | - |
 
 #### Functions
 
-- None
+| Function | Declaration |
+| --- | --- |
+| None | - |
+
+#### Macros
+
+| Macro | Form |
+| --- | --- |
+| `BITSET_WORD_COUNT` | `BITSET_WORD_COUNT(n)` |
+| `BITSET_SET` | `BITSET_SET(arr, idx)` |
+| `BITSET_CLEAR` | `BITSET_CLEAR(arr, idx)` |
+| `BITSET_TOGGLE` | `BITSET_TOGGLE(arr, idx)` |
+| `BITSET_TEST` | `BITSET_TEST(arr, idx)` |
+| `BITSET_CLEAR_ALL` | `BITSET_CLEAR_ALL(arr, word_count)` |
+| `BITSET_SET_ALL` | `BITSET_SET_ALL(arr, word_count)` |
+| `BITSET_COUNT` | `BITSET_COUNT(arr, word_count, out)` |
+| `BITSET_FIRST_SET` | `BITSET_FIRST_SET(arr, word_count, out)` |
+| `BITSET_FIRST_CLEAR` | `BITSET_FIRST_CLEAR(arr, word_count, out)` |
+| `BITSET_FIND_NEXT_SET` | `BITSET_FIND_NEXT_SET(arr, word_count, from_idx, out)` |
+| `BITSET_FOREACH_SET` | `BITSET_FOREACH_SET(arr, word_count, idx)` |
 
 ### `containers/doubly_list.h`
 
 - Types: **0**
 - Functions: **0**
+- Macros: **13**
 
 #### Types
 
-- None
+| Type | Declaration |
+| --- | --- |
+| None | - |
 
 #### Functions
 
-- None
+| Function | Declaration |
+| --- | --- |
+| None | - |
+
+#### Macros
+
+| Macro | Form |
+| --- | --- |
+| `DOUBLY_LIST_EMPTY` | `DOUBLY_LIST_EMPTY(head, tail)` |
+| `DOUBLY_LIST_COUNT` | `DOUBLY_LIST_COUNT(head, tail, count)` |
+| `DOUBLY_LIST_HEAD` | `DOUBLY_LIST_HEAD(head, tail)` |
+| `DOUBLY_LIST_TAIL` | `DOUBLY_LIST_TAIL(head, tail)` |
+| `DOUBLY_LIST_PUSH_FRONT` | `DOUBLY_LIST_PUSH_FRONT(head, tail, node)` |
+| `DOUBLY_LIST_PUSH_BACK` | `DOUBLY_LIST_PUSH_BACK(head, tail, node)` |
+| `DOUBLY_LIST_POP_FRONT` | `DOUBLY_LIST_POP_FRONT(head, tail, node)` |
+| `DOUBLY_LIST_POP_BACK` | `DOUBLY_LIST_POP_BACK(head, tail, node)` |
+| `DOUBLY_LIST_REMOVE` | `DOUBLY_LIST_REMOVE(head, tail, node)` |
+| `DOUBLY_LIST_INSERT_AFTER` | `DOUBLY_LIST_INSERT_AFTER(head, tail, after, node)` |
+| `DOUBLY_LIST_INSERT_BEFORE` | `DOUBLY_LIST_INSERT_BEFORE(head, tail, before, node)` |
+| `DOUBLY_LIST_FOREACH` | `DOUBLY_LIST_FOREACH(head, tail, it)` |
+| `DOUBLY_LIST_FOREACH_REVERSE` | `DOUBLY_LIST_FOREACH_REVERSE(head, tail, it)` |
 
 ### `containers/hash_map.h`
 
 - Types: **3**
 - Functions: **13**
+- Macros: **1**
 
 #### Types
 
-- `hash_map_slot` (struct)
-  - What it represents: Represents `hash map slot` data grouped in a struct
-  - Members:
-    - `key`: `u64`
-    - `value`: `void*`
-    - `probe_dist`: `u32`
-    - `occupied`: `b32`
-- `hash_map` (struct)
-  - What it represents: Represents `hash map` data grouped in a struct
-  - Members:
-    - `slots`: `hash_map_slot*`
-    - `count`: `sz`
-    - `cap`: `sz`
-    - `alloc`: `allocator`
-- `hash_map_iter` (alias)
-  - What it represents: Type alias used for `hash map iter`
-  - Members: none (alias/function type)
+| Type | Declaration |
+| --- | --- |
+| `hash_map_slot` | `typedef struct hash_map_slot { ... } hash_map_slot;` |
+| `hash_map` | `typedef struct hash_map { ... } hash_map;` |
+| `hash_map_iter` | `typedef sz hash_map_iter;` |
 
 #### Functions
 
-- `hash_map_create(sz cap, allocator alloc) -> hash_map`
-  - What it does: Creates hash map create resources or state
-  - Parameters:
-    - `cap` (`sz`): Input parameter
-    - `alloc` (`allocator`): Allocator/context used for memory management
-- `hash_map_destroy(hash_map* map) -> void`
-  - What it does: Destroys hash map destroy resources or state
-  - Parameters:
-    - `map` (`hash_map*`): Input parameter
-- `hash_map_clear(hash_map* map) -> void`
-  - What it does: Performs hash map clear
-  - Parameters:
-    - `map` (`hash_map*`): Input parameter
-- `hash_map_count(hash_map const* map) -> sz`
-  - What it does: Performs hash map count
-  - Parameters:
-    - `map` (`hash_map const*`): Input parameter
-- `hash_map_capacity(hash_map const* map) -> sz`
-  - What it does: Performs hash map capacity
-  - Parameters:
-    - `map` (`hash_map const*`): Input parameter
-- `hash_map_load_factor(hash_map const* map) -> f32`
-  - What it does: Performs hash map load factor
-  - Parameters:
-    - `map` (`hash_map const*`): Input parameter
-- `hash_map_rehash(hash_map* map, sz new_cap) -> b32`
-  - What it does: Performs hash map rehash
-  - Parameters:
-    - `map` (`hash_map*`): Input parameter
-    - `new_cap` (`sz`): Input parameter
-- `hash_map_reserve(hash_map* map, sz min_cap) -> b32`
-  - What it does: Performs hash map reserve
-  - Parameters:
-    - `map` (`hash_map*`): Input parameter
-    - `min_cap` (`sz`): Input parameter
-- `hash_map_set(hash_map* map, u64 key, void* value) -> b32`
-  - What it does: Performs hash map set
-  - Parameters:
-    - `map` (`hash_map*`): Input parameter
-    - `key` (`u64`): Input parameter
-    - `value` (`void*`): Input parameter
-- `hash_map_get(hash_map* map, u64 key) -> void*`
-  - What it does: Performs hash map get
-  - Parameters:
-    - `map` (`hash_map*`): Input parameter
-    - `key` (`u64`): Input parameter
-- `hash_map_has(hash_map* map, u64 key) -> b32`
-  - What it does: Performs hash map has
-  - Parameters:
-    - `map` (`hash_map*`): Input parameter
-    - `key` (`u64`): Input parameter
-- `hash_map_remove(hash_map* map, u64 key) -> b32`
-  - What it does: Removes hash map remove
-  - Parameters:
-    - `map` (`hash_map*`): Input parameter
-    - `key` (`u64`): Input parameter
-- `hash_map_next(hash_map* map, hash_map_iter* iter) -> hash_map_slot*`
-  - What it does: Performs hash map next
-  - Parameters:
-    - `map` (`hash_map*`): Input parameter
-    - `iter` (`hash_map_iter*`): Input parameter
+| Function | Declaration |
+| --- | --- |
+| `hash_map_create` | `func hash_map hash_map_create(sz cap, allocator alloc);` |
+| `hash_map_destroy` | `func void hash_map_destroy(hash_map* map);` |
+| `hash_map_clear` | `func void hash_map_clear(hash_map* map);` |
+| `hash_map_count` | `func sz hash_map_count(hash_map const* map);` |
+| `hash_map_capacity` | `func sz hash_map_capacity(hash_map const* map);` |
+| `hash_map_load_factor` | `func f32 hash_map_load_factor(hash_map const* map);` |
+| `hash_map_rehash` | `func b32 hash_map_rehash(hash_map* map, sz new_cap);` |
+| `hash_map_reserve` | `func b32 hash_map_reserve(hash_map* map, sz min_cap);` |
+| `hash_map_set` | `func b32 hash_map_set(hash_map* map, u64 key, void* value);` |
+| `hash_map_get` | `func void* hash_map_get(hash_map* map, u64 key);` |
+| `hash_map_has` | `func b32 hash_map_has(hash_map* map, u64 key);` |
+| `hash_map_remove` | `func b32 hash_map_remove(hash_map* map, u64 key);` |
+| `hash_map_next` | `func hash_map_slot* hash_map_next(hash_map* map, hash_map_iter* iter);` |
+
+#### Macros
+
+| Macro | Form |
+| --- | --- |
+| `HASH_MAP_FOREACH` | `HASH_MAP_FOREACH(map, it)` |
 
 ### `containers/ring_list.h`
 
 - Types: **0**
 - Functions: **0**
+- Macros: **13**
 
 #### Types
 
-- None
+| Type | Declaration |
+| --- | --- |
+| None | - |
 
 #### Functions
 
-- None
+| Function | Declaration |
+| --- | --- |
+| None | - |
+
+#### Macros
+
+| Macro | Form |
+| --- | --- |
+| `RING_LIST_EMPTY` | `RING_LIST_EMPTY(head)` |
+| `RING_LIST_COUNT` | `RING_LIST_COUNT(head, count)` |
+| `RING_LIST_HEAD` | `RING_LIST_HEAD(head)` |
+| `RING_LIST_TAIL` | `RING_LIST_TAIL(head)` |
+| `RING_LIST_PUSH_FRONT` | `RING_LIST_PUSH_FRONT(head, node)` |
+| `RING_LIST_PUSH_BACK` | `RING_LIST_PUSH_BACK(head, node)` |
+| `RING_LIST_POP_FRONT` | `RING_LIST_POP_FRONT(head, node)` |
+| `RING_LIST_POP_BACK` | `RING_LIST_POP_BACK(head, node)` |
+| `RING_LIST_REMOVE` | `RING_LIST_REMOVE(head, node)` |
+| `RING_LIST_INSERT_AFTER` | `RING_LIST_INSERT_AFTER(head, after, node)` |
+| `RING_LIST_INSERT_BEFORE` | `RING_LIST_INSERT_BEFORE(head, before, node)` |
+| `RING_LIST_FOREACH` | `RING_LIST_FOREACH(head, it)` |
+| `RING_LIST_FOREACH_REVERSE` | `RING_LIST_FOREACH_REVERSE(head, it)` |
 
 ### `containers/singly_list.h`
 
 - Types: **0**
 - Functions: **0**
+- Macros: **8**
 
 #### Types
 
-- None
+| Type | Declaration |
+| --- | --- |
+| None | - |
 
 #### Functions
 
-- None
+| Function | Declaration |
+| --- | --- |
+| None | - |
+
+#### Macros
+
+| Macro | Form |
+| --- | --- |
+| `SINGLY_LIST_EMPTY` | `SINGLY_LIST_EMPTY(head, tail)` |
+| `SINGLY_LIST_COUNT` | `SINGLY_LIST_COUNT(head, tail, count)` |
+| `SINGLY_LIST_HEAD` | `SINGLY_LIST_HEAD(head, tail)` |
+| `SINGLY_LIST_TAIL` | `SINGLY_LIST_TAIL(head, tail)` |
+| `SINGLY_LIST_PUSH_FRONT` | `SINGLY_LIST_PUSH_FRONT(head, tail, node)` |
+| `SINGLY_LIST_PUSH_BACK` | `SINGLY_LIST_PUSH_BACK(head, tail, node)` |
+| `SINGLY_LIST_POP_FRONT` | `SINGLY_LIST_POP_FRONT(head, tail, node)` |
+| `SINGLY_LIST_FOREACH` | `SINGLY_LIST_FOREACH(head, tail, it)` |
 
 ### `containers/sort.h`
 
 - Types: **1**
 - Functions: **8**
+- Macros: **0**
 
 #### Types
 
-- `sort_compare_fn` (alias)
-  - What it represents: Type alias used for `sort compare fn`
-  - Members: none (alias/function type)
+| Type | Declaration |
+| --- | --- |
+| `sort_compare_fn` | `typedef i32 sort_compare_fn(const void* lhs_ptr, const void* rhs_ptr, void* user_data);` |
 
 #### Functions
 
-- `sort_check(const void* ptr, sz elem_count, sz elem_size, sort_compare_fn* compare, void* user_data) -> b32`
-  - What it does: Performs sort check
-  - Parameters:
-    - `ptr` (`const void*`): Input data used by the operation
-    - `elem_count` (`sz`): Number of elements/items involved
-    - `elem_size` (`sz`): Size or capacity value used by the operation
-    - `compare` (`sort_compare_fn*`): Input parameter
-    - `user_data` (`void*`): Input parameter
-- `sort_bubble(void* ptr, sz elem_count, sz elem_size, sort_compare_fn* compare, void* user_data) -> sz`
-  - What it does: Performs sort bubble
-  - Parameters:
-    - `ptr` (`void*`): Input data used by the operation
-    - `elem_count` (`sz`): Number of elements/items involved
-    - `elem_size` (`sz`): Size or capacity value used by the operation
-    - `compare` (`sort_compare_fn*`): Input parameter
-    - `user_data` (`void*`): Input parameter
-- `sort_quick(void* ptr, sz elem_count, sz elem_size, sort_compare_fn* compare, void* user_data, allocator allocator) -> sz`
-  - What it does: Performs sort quick
-  - Parameters:
-    - `ptr` (`void*`): Input data used by the operation
-    - `elem_count` (`sz`): Number of elements/items involved
-    - `elem_size` (`sz`): Size or capacity value used by the operation
-    - `compare` (`sort_compare_fn*`): Input parameter
-    - `user_data` (`void*`): Input parameter
-    - `allocator` (`allocator`): Allocator/context used for memory management
-- `sort_merge(void* ptr, sz elem_count, sz elem_size, sort_compare_fn* compare, void* user_data, allocator allocator) -> sz`
-  - What it does: Performs sort merge
-  - Parameters:
-    - `ptr` (`void*`): Input data used by the operation
-    - `elem_count` (`sz`): Number of elements/items involved
-    - `elem_size` (`sz`): Size or capacity value used by the operation
-    - `compare` (`sort_compare_fn*`): Input parameter
-    - `user_data` (`void*`): Input parameter
-    - `allocator` (`allocator`): Allocator/context used for memory management
-- `sort_selection(void* ptr, sz elem_count, sz elem_size, sort_compare_fn* compare, void* user_data) -> sz`
-  - What it does: Performs sort selection
-  - Parameters:
-    - `ptr` (`void*`): Input data used by the operation
-    - `elem_count` (`sz`): Number of elements/items involved
-    - `elem_size` (`sz`): Size or capacity value used by the operation
-    - `compare` (`sort_compare_fn*`): Input parameter
-    - `user_data` (`void*`): Input parameter
-- `sort_insertion(void* ptr, sz elem_count, sz elem_size, sort_compare_fn* compare, void* user_data) -> sz`
-  - What it does: Performs sort insertion
-  - Parameters:
-    - `ptr` (`void*`): Input data used by the operation
-    - `elem_count` (`sz`): Number of elements/items involved
-    - `elem_size` (`sz`): Size or capacity value used by the operation
-    - `compare` (`sort_compare_fn*`): Input parameter
-    - `user_data` (`void*`): Input parameter
-- `sort_radix32(u32* ptr, sz elem_count) -> sz`
-  - What it does: Performs sort radix32
-  - Parameters:
-    - `ptr` (`u32*`): Input data used by the operation
-    - `elem_count` (`sz`): Number of elements/items involved
-- `sort_radix64(u64* ptr, sz elem_count) -> sz`
-  - What it does: Performs sort radix64
-  - Parameters:
-    - `ptr` (`u64*`): Input data used by the operation
-    - `elem_count` (`sz`): Number of elements/items involved
+| Function | Declaration |
+| --- | --- |
+| `sort_check` | `func b32 sort_check( const void* ptr, sz elem_count, sz elem_size, sort_compare_fn* compare, void* user_data);` |
+| `sort_bubble` | `func sz sort_bubble( void* ptr, sz elem_count, sz elem_size, sort_compare_fn* compare, void* user_data);` |
+| `sort_quick` | `func sz sort_quick( void* ptr, sz elem_count, sz elem_size, sort_compare_fn* compare, void* user_data, allocator allocator);` |
+| `sort_merge` | `func sz sort_merge( void* ptr, sz elem_count, sz elem_size, sort_compare_fn* compare, void* user_data, allocator allocator);` |
+| `sort_selection` | `func sz sort_selection( void* ptr, sz elem_count, sz elem_size, sort_compare_fn* compare, void* user_data);` |
+| `sort_insertion` | `func sz sort_insertion( void* ptr, sz elem_count, sz elem_size, sort_compare_fn* compare, void* user_data);` |
+| `sort_radix32` | `func sz sort_radix32(u32* ptr, sz elem_count);` |
+| `sort_radix64` | `func sz sort_radix64(u64* ptr, sz elem_count);` |
+
+#### Macros
+
+| Macro | Form |
+| --- | --- |
+| None | - |
 
 ### `containers/stack_list.h`
 
 - Types: **0**
 - Functions: **0**
+- Macros: **7**
 
 #### Types
 
-- None
+| Type | Declaration |
+| --- | --- |
+| None | - |
 
 #### Functions
 
-- None
+| Function | Declaration |
+| --- | --- |
+| None | - |
+
+#### Macros
+
+| Macro | Form |
+| --- | --- |
+| `STACK_LIST_EMPTY` | `STACK_LIST_EMPTY(head)` |
+| `STACK_LIST_COUNT` | `STACK_LIST_COUNT(head, count)` |
+| `STACK_LIST_HEAD` | `STACK_LIST_HEAD(head)` |
+| `STACK_LIST_NEXT` | `STACK_LIST_NEXT(node)` |
+| `STACK_LIST_PUSH` | `STACK_LIST_PUSH(head, node)` |
+| `STACK_LIST_POP` | `STACK_LIST_POP(head, node)` |
+| `STACK_LIST_FOREACH` | `STACK_LIST_FOREACH(head, it)` |
 
 ### `containers/tree.h`
 
 - Types: **0**
 - Functions: **0**
+- Macros: **11**
 
 #### Types
 
-- None
+| Type | Declaration |
+| --- | --- |
+| None | - |
 
 #### Functions
 
-- None
+| Function | Declaration |
+| --- | --- |
+| None | - |
+
+#### Macros
+
+| Macro | Form |
+| --- | --- |
+| `TREE_IS_ROOT` | `TREE_IS_ROOT(node)` |
+| `TREE_IS_LEAF` | `TREE_IS_LEAF(node)` |
+| `TREE_NEXT_PREORDER` | `TREE_NEXT_PREORDER(root, node, out)` |
+| `TREE_INSERT_CHILD_FRONT` | `TREE_INSERT_CHILD_FRONT(parent, node)` |
+| `TREE_INSERT_CHILD_BACK` | `TREE_INSERT_CHILD_BACK(parent, node)` |
+| `TREE_INSERT_BEFORE` | `TREE_INSERT_BEFORE(before, node)` |
+| `TREE_INSERT_AFTER` | `TREE_INSERT_AFTER(after, node)` |
+| `TREE_REMOVE` | `TREE_REMOVE(node)` |
+| `TREE_FOREACH_CHILDREN` | `TREE_FOREACH_CHILDREN(parent, it)` |
+| `TREE_FOREACH_CHILDREN_REVERSE` | `TREE_FOREACH_CHILDREN_REVERSE(parent, it)` |
+| `TREE_FOREACH_PREORDER` | `TREE_FOREACH_PREORDER(root, it)` |
 
 ## context
 
-Global/thread context setup, allocators and log state access.
+Global/thread context setup, allocators, user data slots, and log-state access.
 
 ### `context/ctx.h`
 
 - Types: **3**
 - Functions: **15**
+- Macros: **1**
 
 #### Types
 
-- `ctx_user_data_idx` (alias)
-  - What it represents: Type alias used for `ctx user data idx`
-  - Members: none (alias/function type)
-- `ctx_setup` (struct)
-  - What it represents: Represents `ctx setup` data grouped in a struct
-  - Members:
-    - `main_allocator`: `allocator`
-    - `mutex_handle`: `mutex`
-    - `use_arena_allocs`: `b32`
-    - `use_heap_allocs`: `b32`
-    - `use_temp_allocs`: `b32`
-    - `perm_arena_block_size`: `sz`
-    - `temp_arena_block_size`: `sz`
-    - `perm_heap_block_size`: `sz`
-    - `temp_heap_block_size`: `sz`
-- `ctx` (struct)
-  - What it represents: Represents `ctx` data grouped in a struct
-  - Members:
-    - `is_init`: `b32`
-    - `setup`: `ctx_setup`
-    - `perm_arena`: `arena`
-    - `temp_arena`: `arena`
-    - `perm_heap`: `heap`
-    - `temp_heap`: `heap`
-    - `log`: `log_state`
-    - `user_data`: `void* [CTX_USER_DATA_COUNT]`
+| Type | Declaration |
+| --- | --- |
+| `ctx_user_data_idx` | `typedef sz ctx_user_data_idx;` |
+| `ctx_setup` | `typedef struct ctx_setup { ... } ctx_setup;` |
+| `ctx` | `typedef struct ctx { ... } ctx;` |
 
 #### Functions
 
-- `ctx_setup_is_valid(ctx_setup* setup) -> b32`
-  - What it does: Performs ctx setup is valid
-  - Parameters:
-    - `setup` (`ctx_setup*`): Input parameter
-- `ctx_setup_fill_defaults(ctx_setup* setup) -> void`
-  - What it does: Performs ctx setup fill defaults
-  - Parameters:
-    - `setup` (`ctx_setup*`): Input parameter
-- `ctx_init(ctx* context, ctx_setup setup) -> b32`
-  - What it does: Initializes ctx init
-  - Parameters:
-    - `context` (`ctx*`): Input parameter
-    - `setup` (`ctx_setup`): Input parameter
-- `ctx_quit(ctx* context) -> b32`
-  - What it does: Shuts down ctx quit
-  - Parameters:
-    - `context` (`ctx*`): Input parameter
-- `ctx_is_init(ctx* context) -> b32`
-  - What it does: Initializes ctx is init
-  - Parameters:
-    - `context` (`ctx*`): Input parameter
-- `ctx_get_allocator(ctx* context) -> allocator`
-  - What it does: Gets ctx get allocator
-  - Parameters:
-    - `context` (`ctx*`): Input parameter
-- `ctx_get_setup(ctx* context) -> ctx_setup`
-  - What it does: Gets ctx get setup
-  - Parameters:
-    - `context` (`ctx*`): Input parameter
-- `ctx_get_log_state(ctx* context) -> log_state*`
-  - What it does: Gets ctx get log state
-  - Parameters:
-    - `context` (`ctx*`): Input parameter
-- `ctx_get_perm_arena(ctx* context) -> arena*`
-  - What it does: Gets ctx get perm arena
-  - Parameters:
-    - `context` (`ctx*`): Input parameter
-- `ctx_get_temp_arena(ctx* context) -> arena*`
-  - What it does: Gets ctx get temp arena
-  - Parameters:
-    - `context` (`ctx*`): Input parameter
-- `ctx_get_perm_heap(ctx* context) -> heap*`
-  - What it does: Gets ctx get perm heap
-  - Parameters:
-    - `context` (`ctx*`): Input parameter
-- `ctx_get_temp_heap(ctx* context) -> heap*`
-  - What it does: Gets ctx get temp heap
-  - Parameters:
-    - `context` (`ctx*`): Input parameter
-- `ctx_get_user_data(ctx* context, ctx_user_data_idx idx) -> void*`
-  - What it does: Gets ctx get user data
-  - Parameters:
-    - `context` (`ctx*`): Input parameter
-    - `idx` (`ctx_user_data_idx`): Zero-based index used to select an item
-- `ctx_set_user_data(ctx* context, ctx_user_data_idx idx, void* user_data) -> b32`
-  - What it does: Sets ctx set user data
-  - Parameters:
-    - `context` (`ctx*`): Input parameter
-    - `idx` (`ctx_user_data_idx`): Zero-based index used to select an item
-    - `user_data` (`void*`): Input parameter
-- `ctx_clear_temp(ctx* context) -> void`
-  - What it does: Performs ctx clear temp
-  - Parameters:
-    - `context` (`ctx*`): Input parameter
+| Function | Declaration |
+| --- | --- |
+| `ctx_setup_is_valid` | `func b32 ctx_setup_is_valid(ctx_setup* setup);` |
+| `ctx_setup_fill_defaults` | `func void ctx_setup_fill_defaults(ctx_setup* setup);` |
+| `ctx_init` | `func b32 ctx_init(ctx* context, ctx_setup setup);` |
+| `ctx_quit` | `func b32 ctx_quit(ctx* context);` |
+| `ctx_is_init` | `func b32 ctx_is_init(ctx* context);` |
+| `ctx_get_allocator` | `func allocator ctx_get_allocator(ctx* context);` |
+| `ctx_get_setup` | `func ctx_setup ctx_get_setup(ctx* context);` |
+| `ctx_get_log_state` | `func log_state* ctx_get_log_state(ctx* context);` |
+| `ctx_get_perm_arena` | `func arena* ctx_get_perm_arena(ctx* context);` |
+| `ctx_get_temp_arena` | `func arena* ctx_get_temp_arena(ctx* context);` |
+| `ctx_get_perm_heap` | `func heap* ctx_get_perm_heap(ctx* context);` |
+| `ctx_get_temp_heap` | `func heap* ctx_get_temp_heap(ctx* context);` |
+| `ctx_get_user_data` | `func void* ctx_get_user_data(ctx* context, ctx_user_data_idx idx);` |
+| `ctx_set_user_data` | `func b32 ctx_set_user_data(ctx* context, ctx_user_data_idx idx, void* user_data);` |
+| `ctx_clear_temp` | `func void ctx_clear_temp(ctx* context);` |
+
+#### Macros
+
+| Macro | Form |
+| --- | --- |
+| `CTX_USER_DATA_COUNT` | `CTX_USER_DATA_COUNT` |
 
 ### `context/global_ctx.h`
 
 - Types: **0**
 - Functions: **23**
+- Macros: **7**
 
 #### Types
 
-- None
+| Type | Declaration |
+| --- | --- |
+| None | - |
 
 #### Functions
 
-- `global_ctx_init(ctx_setup setup) -> b32`
-  - What it does: Initializes global ctx init
-  - Parameters:
-    - `setup` (`ctx_setup`): Input parameter
-- `global_ctx_quit() -> b32`
-  - What it does: Shuts down global ctx quit
-  - Parameters: none
-- `global_ctx_is_init() -> b32`
-  - What it does: Initializes global ctx is init
-  - Parameters: none
-- `global_ctx_get() -> ctx*`
-  - What it does: Performs global ctx get
-  - Parameters: none
-- `global_ctx_lock() -> void`
-  - What it does: Performs global ctx lock
-  - Parameters: none
-- `global_ctx_unlock() -> void`
-  - What it does: Performs global ctx unlock
-  - Parameters: none
-- `global_get_allocator() -> allocator`
-  - What it does: Gets global get allocator
-  - Parameters: none
-- `global_get_setup() -> ctx_setup`
-  - What it does: Gets global get setup
-  - Parameters: none
-- `global_get_main_allocator() -> allocator`
-  - What it does: Gets global get main allocator
-  - Parameters: none
-- `global_get_log_state() -> log_state*`
-  - What it does: Gets global get log state
-  - Parameters: none
-- `global_get_perm_arena() -> arena*`
-  - What it does: Gets global get perm arena
-  - Parameters: none
-- `global_get_temp_arena() -> arena*`
-  - What it does: Gets global get temp arena
-  - Parameters: none
-- `global_get_perm_heap() -> heap*`
-  - What it does: Gets global get perm heap
-  - Parameters: none
-- `global_get_temp_heap() -> heap*`
-  - What it does: Gets global get temp heap
-  - Parameters: none
-- `global_has_user_data_access(ctx_user_data_idx idx) -> b32`
-  - What it does: Performs global has user data access
-  - Parameters:
-    - `idx` (`ctx_user_data_idx`): Zero-based index used to select an item
-- `global_get_user_data(ctx_user_data_idx idx) -> void*`
-  - What it does: Gets global get user data
-  - Parameters:
-    - `idx` (`ctx_user_data_idx`): Zero-based index used to select an item
-- `global_set_user_data(ctx_user_data_idx idx, void* user_data) -> b32`
-  - What it does: Sets global set user data
-  - Parameters:
-    - `idx` (`ctx_user_data_idx`): Zero-based index used to select an item
-    - `user_data` (`void*`): Input parameter
-- `global_set_user_data_access(ctx_user_data_idx idx, b8 has_access) -> b32`
-  - What it does: Sets global set user data access
-  - Parameters:
-    - `idx` (`ctx_user_data_idx`): Zero-based index used to select an item
-    - `has_access` (`b8`): Input parameter
-- `global_set_user_data_access_all(b8 has_access) -> void`
-  - What it does: Sets global set user data access all
-  - Parameters:
-    - `has_access` (`b8`): Input parameter
-- `global_clear_temp() -> void`
-  - What it does: Performs global clear temp
-  - Parameters: none
-- `global_log_set_level(log_level level) -> void`
-  - What it does: Sets global log set level
-  - Parameters:
-    - `level` (`log_level`): Configuration value controlling behavior
-- `global_log_begin_frame() -> void`
-  - What it does: Begins global log begin frame
-  - Parameters: none
-- `global_log_end_frame(u32 severity_mask) -> log_frame*`
-  - What it does: Ends global log end frame
-  - Parameters:
-    - `severity_mask` (`u32`): Input parameter
+| Function | Declaration |
+| --- | --- |
+| `global_ctx_init` | `func b32 global_ctx_init(ctx_setup setup);` |
+| `global_ctx_quit` | `func b32 global_ctx_quit(void);` |
+| `global_ctx_is_init` | `func b32 global_ctx_is_init(void);` |
+| `global_ctx_get` | `func ctx* global_ctx_get(void);` |
+| `global_ctx_lock` | `func void global_ctx_lock(void);` |
+| `global_ctx_unlock` | `func void global_ctx_unlock(void);` |
+| `global_get_allocator` | `func allocator global_get_allocator(void);` |
+| `global_get_setup` | `func ctx_setup global_get_setup(void);` |
+| `global_get_main_allocator` | `func allocator global_get_main_allocator(void);` |
+| `global_get_log_state` | `func log_state* global_get_log_state(void);` |
+| `global_get_perm_arena` | `func arena* global_get_perm_arena(void);` |
+| `global_get_temp_arena` | `func arena* global_get_temp_arena(void);` |
+| `global_get_perm_heap` | `func heap* global_get_perm_heap(void);` |
+| `global_get_temp_heap` | `func heap* global_get_temp_heap(void);` |
+| `global_has_user_data_access` | `func b32 global_has_user_data_access(ctx_user_data_idx idx);` |
+| `global_get_user_data` | `func void* global_get_user_data(ctx_user_data_idx idx);` |
+| `global_set_user_data` | `func b32 global_set_user_data(ctx_user_data_idx idx, void* user_data);` |
+| `global_set_user_data_access` | `func b32 global_set_user_data_access(ctx_user_data_idx idx, b8 has_access);` |
+| `global_set_user_data_access_all` | `func void global_set_user_data_access_all(b8 has_access);` |
+| `global_clear_temp` | `func void global_clear_temp(void);` |
+| `global_log_set_level` | `func void global_log_set_level(log_level level);` |
+| `global_log_begin_frame` | `func void global_log_begin_frame(void);` |
+| `global_log_end_frame` | `func log_frame* global_log_end_frame(u32 severity_mask);` |
+
+#### Macros
+
+| Macro | Form |
+| --- | --- |
+| `global_log_fatal` | `global_log_fatal(...)` |
+| `global_log_error` | `global_log_error(...)` |
+| `global_log_warn` | `global_log_warn(...)` |
+| `global_log_info` | `global_log_info(...)` |
+| `global_log_debug` | `global_log_debug(...)` |
+| `global_log_verbose` | `global_log_verbose(...)` |
+| `global_log_trace` | `global_log_trace(...)` |
 
 ### `context/thread_ctx.h`
 
 - Types: **0**
 - Functions: **18**
+- Macros: **8**
 
 #### Types
 
-- None
+| Type | Declaration |
+| --- | --- |
+| None | - |
 
 #### Functions
 
-- `thread_ctx_get() -> ctx*`
-  - What it does: Performs thread ctx get
-  - Parameters: none
-- `thread_ctx_is_init() -> b32`
-  - What it does: Initializes thread ctx is init
-  - Parameters: none
-- `thread_ctx_init(ctx_setup setup) -> b32`
-  - What it does: Initializes thread ctx init
-  - Parameters:
-    - `setup` (`ctx_setup`): Input parameter
-- `thread_ctx_quit() -> b32`
-  - What it does: Shuts down thread ctx quit
-  - Parameters: none
-- `thread_get_allocator() -> allocator`
-  - What it does: Gets thread get allocator
-  - Parameters: none
-- `thread_get_setup() -> ctx_setup`
-  - What it does: Gets thread get setup
-  - Parameters: none
-- `thread_get_log_state() -> log_state*`
-  - What it does: Gets thread get log state
-  - Parameters: none
-- `thread_get_perm_arena() -> arena*`
-  - What it does: Gets thread get perm arena
-  - Parameters: none
-- `thread_get_temp_arena() -> arena*`
-  - What it does: Gets thread get temp arena
-  - Parameters: none
-- `thread_get_perm_heap() -> heap*`
-  - What it does: Gets thread get perm heap
-  - Parameters: none
-- `thread_get_temp_heap() -> heap*`
-  - What it does: Gets thread get temp heap
-  - Parameters: none
-- `thread_get_user_data(ctx_user_data_idx idx) -> void*`
-  - What it does: Gets thread get user data
-  - Parameters:
-    - `idx` (`ctx_user_data_idx`): Zero-based index used to select an item
-- `thread_set_user_data(ctx_user_data_idx idx, void* user_data) -> b32`
-  - What it does: Sets thread set user data
-  - Parameters:
-    - `idx` (`ctx_user_data_idx`): Zero-based index used to select an item
-    - `user_data` (`void*`): Input parameter
-- `thread_clear_temp() -> void`
-  - What it does: Performs thread clear temp
-  - Parameters: none
-- `thread_log_set_level(log_level level) -> void`
-  - What it does: Sets thread log set level
-  - Parameters:
-    - `level` (`log_level`): Configuration value controlling behavior
-- `thread_log_sync() -> b32`
-  - What it does: Performs thread log sync
-  - Parameters: none
-- `thread_log_begin_frame() -> void`
-  - What it does: Begins thread log begin frame
-  - Parameters: none
-- `thread_log_end_frame(u32 severity_mask) -> log_frame*`
-  - What it does: Ends thread log end frame
-  - Parameters:
-    - `severity_mask` (`u32`): Input parameter
+| Function | Declaration |
+| --- | --- |
+| `thread_ctx_get` | `func ctx* thread_ctx_get(void);` |
+| `thread_ctx_is_init` | `func b32 thread_ctx_is_init(void);` |
+| `thread_ctx_init` | `func b32 thread_ctx_init(ctx_setup setup);` |
+| `thread_ctx_quit` | `func b32 thread_ctx_quit(void);` |
+| `thread_get_allocator` | `func allocator thread_get_allocator(void);` |
+| `thread_get_setup` | `func ctx_setup thread_get_setup(void);` |
+| `thread_get_log_state` | `func log_state* thread_get_log_state(void);` |
+| `thread_get_perm_arena` | `func arena* thread_get_perm_arena(void);` |
+| `thread_get_temp_arena` | `func arena* thread_get_temp_arena(void);` |
+| `thread_get_perm_heap` | `func heap* thread_get_perm_heap(void);` |
+| `thread_get_temp_heap` | `func heap* thread_get_temp_heap(void);` |
+| `thread_get_user_data` | `func void* thread_get_user_data(ctx_user_data_idx idx);` |
+| `thread_set_user_data` | `func b32 thread_set_user_data(ctx_user_data_idx idx, void* user_data);` |
+| `thread_clear_temp` | `func void thread_clear_temp(void);` |
+| `thread_log_set_level` | `func void thread_log_set_level(log_level level);` |
+| `thread_log_sync` | `func b32 thread_log_sync(void);` |
+| `thread_log_begin_frame` | `func void thread_log_begin_frame(void);` |
+| `thread_log_end_frame` | `func log_frame* thread_log_end_frame(u32 severity_mask);` |
+
+#### Macros
+
+| Macro | Form |
+| --- | --- |
+| `THREAD_CTX_USER_DATA_COUNT` | `THREAD_CTX_USER_DATA_COUNT` |
+| `thread_log_fatal` | `thread_log_fatal(...)` |
+| `thread_log_error` | `thread_log_error(...)` |
+| `thread_log_warn` | `thread_log_warn(...)` |
+| `thread_log_info` | `thread_log_info(...)` |
+| `thread_log_debug` | `thread_log_debug(...)` |
+| `thread_log_verbose` | `thread_log_verbose(...)` |
+| `thread_log_trace` | `thread_log_trace(...)` |
 
 ## filesystem
 
-Paths, files, streams, archives, modules and filesystem monitoring.
+Paths, files, streams, archives, modules, and filesystem monitoring.
 
 ### `filesystem/archive.h`
 
 - Types: **4**
 - Functions: **14**
+- Macros: **2**
 
 #### Types
 
-- `archive_entry` (struct)
-  - What it represents: Represents `archive entry` data grouped in a struct
-  - Members:
-    - `item_path`: `path`
-    - `data_ptr`: `u8*`
-    - `data_size`: `sz`
-    - `data_capacity`: `sz`
-    - `is_directory`: `b32`
-- `archive` (struct)
-  - What it represents: Represents `archive` data grouped in a struct
-  - Members:
-    - `entries`: `archive_entry*`
-    - `entry_count`: `sz`
-    - `entry_capacity`: `sz`
-- `archive_entry_info` (struct)
-  - What it represents: Represents `archive entry info` data grouped in a struct
-  - Members:
-    - `item_path`: `path`
-    - `data_size`: `sz`
-    - `is_directory`: `b32`
-- `archive_iterate_callback` (alias)
-  - What it represents: Type alias used for `archive iterate callback`
-  - Members: none (alias/function type)
+| Type | Declaration |
+| --- | --- |
+| `archive_entry` | `typedef struct archive_entry { ... } archive_entry;` |
+| `archive` | `typedef struct archive { ... } archive;` |
+| `archive_entry_info` | `typedef struct archive_entry_info { ... } archive_entry_info;` |
+| `archive_iterate_callback` | `typedef b32 archive_iterate_callback(const archive_entry_info* info, void* user_data);` |
 
 #### Functions
 
-- `_archive_create(callsite site) -> archive`
-  - What it does: Creates  archive create resources or state
-  - Parameters:
-    - `site` (`callsite`): Input parameter
-- `_archive_destroy(archive* arc, callsite site) -> void`
-  - What it does: Destroys  archive destroy resources or state
-  - Parameters:
-    - `arc` (`archive*`): Input parameter
-    - `site` (`callsite`): Input parameter
-- `archive_clear(archive* arc) -> void`
-  - What it does: Performs archive clear
-  - Parameters:
-    - `arc` (`archive*`): Input parameter
-- `archive_count(const archive* arc) -> sz`
-  - What it does: Performs archive count
-  - Parameters:
-    - `arc` (`const archive*`): Input parameter
-- `archive_exists(const archive* arc, const path* src) -> b32`
-  - What it does: Performs archive exists
-  - Parameters:
-    - `arc` (`const archive*`): Input parameter
-    - `src` (`const path*`): Input data used by the operation
-- `archive_load_file(archive* arc, const path* src) -> b32`
-  - What it does: Performs archive load file
-  - Parameters:
-    - `arc` (`archive*`): Input parameter
-    - `src` (`const path*`): Input data used by the operation
-- `archive_save_file(const archive* arc, const path* dst) -> b32`
-  - What it does: Performs archive save file
-  - Parameters:
-    - `arc` (`const archive*`): Input parameter
-    - `dst` (`const path*`): Destination storage for output data
-- `archive_write_all(archive* arc, const path* src, buffer data) -> b32`
-  - What it does: Writes data for archive write all
-  - Parameters:
-    - `arc` (`archive*`): Input parameter
-    - `src` (`const path*`): Input data used by the operation
-    - `data` (`buffer`): Input data used by the operation
-- `archive_remove(archive* arc, const path* src) -> b32`
-  - What it does: Removes archive remove
-  - Parameters:
-    - `arc` (`archive*`): Input parameter
-    - `src` (`const path*`): Input data used by the operation
-- `archive_read_all(const archive* arc, const path* src, allocator* alloc, buffer* out_data) -> b32`
-  - What it does: Reads data for archive read all
-  - Parameters:
-    - `arc` (`const archive*`): Input parameter
-    - `src` (`const path*`): Input data used by the operation
-    - `alloc` (`allocator*`): Allocator/context used for memory management
-    - `out_data` (`buffer*`): Output value written by the function
-- `archive_add_file(archive* arc, const path* archive_path, const path* disk_path) -> b32`
-  - What it does: Adds archive add file
-  - Parameters:
-    - `arc` (`archive*`): Input parameter
-    - `archive_path` (`const path*`): Path used by the operation
-    - `disk_path` (`const path*`): Path used by the operation
-- `archive_iterate(const archive* arc, archive_iterate_callback* callback, void* user_data) -> b32`
-  - What it does: Performs archive iterate
-  - Parameters:
-    - `arc` (`const archive*`): Input parameter
-    - `callback` (`archive_iterate_callback*`): Input parameter
-    - `user_data` (`void*`): Input parameter
-- `archive_get_entry_info(const archive* arc, const path* src, archive_entry_info* out_info) -> b32`
-  - What it does: Gets archive get entry info
-  - Parameters:
-    - `arc` (`const archive*`): Input parameter
-    - `src` (`const path*`): Input data used by the operation
-    - `out_info` (`archive_entry_info*`): Output value written by the function
-- `archive_get_entry_data(const archive* arc, const path* src, buffer* out_data) -> b32`
-  - What it does: Gets archive get entry data
-  - Parameters:
-    - `arc` (`const archive*`): Input parameter
-    - `src` (`const path*`): Input data used by the operation
-    - `out_data` (`buffer*`): Output value written by the function
+| Function | Declaration |
+| --- | --- |
+| `_archive_create` | `func archive _archive_create(callsite site);` |
+| `_archive_destroy` | `func void _archive_destroy(archive* arc, callsite site);` |
+| `archive_clear` | `func void archive_clear(archive* arc);` |
+| `archive_count` | `func sz archive_count(const archive* arc);` |
+| `archive_exists` | `func b32 archive_exists(const archive* arc, const path* src);` |
+| `archive_load_file` | `func b32 archive_load_file(archive* arc, const path* src);` |
+| `archive_save_file` | `func b32 archive_save_file(const archive* arc, const path* dst);` |
+| `archive_write_all` | `func b32 archive_write_all(archive* arc, const path* src, buffer data);` |
+| `archive_remove` | `func b32 archive_remove(archive* arc, const path* src);` |
+| `archive_read_all` | `func b32 archive_read_all(const archive* arc, const path* src, allocator* alloc, buffer* out_data);` |
+| `archive_add_file` | `func b32 archive_add_file(archive* arc, const path* archive_path, const path* disk_path);` |
+| `archive_iterate` | `func b32 archive_iterate(const archive* arc, archive_iterate_callback* callback, void* user_data);` |
+| `archive_get_entry_info` | `func b32 archive_get_entry_info(const archive* arc, const path* src, archive_entry_info* out_info);` |
+| `archive_get_entry_data` | `func b32 archive_get_entry_data(const archive* arc, const path* src, buffer* out_data);` |
+
+#### Macros
+
+| Macro | Form |
+| --- | --- |
+| `archive_create` | `archive_create()` |
+| `archive_destroy` | `archive_destroy(arc)` |
 
 ### `filesystem/directory.h`
 
 - Types: **3**
 - Functions: **12**
+- Macros: **0**
 
 #### Types
 
-- `dir_entry` (struct)
-  - What it represents: Represents `dir entry` data grouped in a struct
-  - Members:
-    - `full_path`: `path`
-    - `relative_path`: `path`
-    - `is_directory`: `b32`
-- `dir_system_path` (enum)
-  - What it represents: Represents a set of named constants for `dir system path`
-  - Members:
-    - `DIR_SYSTEM_PATH_HOME`: `enum value`
-    - `DIR_SYSTEM_PATH_DESKTOP`: `enum value`
-    - `DIR_SYSTEM_PATH_DOCUMENTS`: `enum value`
-    - `DIR_SYSTEM_PATH_DOWNLOADS`: `enum value`
-    - `DIR_SYSTEM_PATH_MUSIC`: `enum value`
-    - `DIR_SYSTEM_PATH_PICTURES`: `enum value`
-    - `DIR_SYSTEM_PATH_PUBLICSHARE`: `enum value`
-    - `DIR_SYSTEM_PATH_SAVEDGAMES`: `enum value`
-    - `DIR_SYSTEM_PATH_SCREENSHOTS`: `enum value`
-    - `DIR_SYSTEM_PATH_TEMPLATES`: `enum value`
-    - `DIR_SYSTEM_PATH_VIDEOS`: `enum value`
-    - `DIR_SYSTEM_PATH_COUNT`: `enum value`
-- `dir_iterate_callback` (alias)
-  - What it represents: Type alias used for `dir iterate callback`
-  - Members: none (alias/function type)
+| Type | Declaration |
+| --- | --- |
+| `dir_entry` | `typedef struct dir_entry { ... } dir_entry;` |
+| `dir_system_path` | `typedef enum dir_system_path { ... } dir_system_path;` |
+| `dir_iterate_callback` | `typedef b32 dir_iterate_callback(const dir_entry* entry, void* user_data);` |
 
 #### Functions
 
-- `dir_get_base() -> path`
-  - What it does: Gets dir get base
-  - Parameters: none
-- `dir_get_pref(cstr8 org_name, cstr8 app_name) -> path`
-  - What it does: Gets dir get pref
-  - Parameters:
-    - `org_name` (`cstr8`): Input parameter
-    - `app_name` (`cstr8`): Input parameter
-- `dir_get_system(dir_system_path location) -> path`
-  - What it does: Gets dir get system
-  - Parameters:
-    - `location` (`dir_system_path`): Input parameter
-- `dir_create(const path* src) -> b32`
-  - What it does: Creates dir create resources or state
-  - Parameters:
-    - `src` (`const path*`): Input data used by the operation
-- `dir_remove(const path* src) -> b32`
-  - What it does: Removes dir remove
-  - Parameters:
-    - `src` (`const path*`): Input data used by the operation
-- `dir_rename(const path* old_src, const path* new_src) -> b32`
-  - What it does: Performs dir rename
-  - Parameters:
-    - `old_src` (`const path*`): Input parameter
-    - `new_src` (`const path*`): Input parameter
-- `dir_cpy_recursive(const path* src, const path* dst, b32 overwrite_existing) -> b32`
-  - What it does: Performs dir cpy recursive
-  - Parameters:
-    - `src` (`const path*`): Input data used by the operation
-    - `dst` (`const path*`): Destination storage for output data
-    - `overwrite_existing` (`b32`): Input parameter
-- `dir_exists(const path* src) -> b32`
-  - What it does: Performs dir exists
-  - Parameters:
-    - `src` (`const path*`): Input data used by the operation
-- `dir_create_recursive(const path* src) -> b32`
-  - What it does: Creates dir create recursive resources or state
-  - Parameters:
-    - `src` (`const path*`): Input data used by the operation
-- `dir_remove_recursive(const path* src) -> b32`
-  - What it does: Removes dir remove recursive
-  - Parameters:
-    - `src` (`const path*`): Input data used by the operation
-- `dir_iterate(const path* src, dir_iterate_callback* callback, void* user_data) -> b32`
-  - What it does: Performs dir iterate
-  - Parameters:
-    - `src` (`const path*`): Input data used by the operation
-    - `callback` (`dir_iterate_callback*`): Input parameter
-    - `user_data` (`void*`): Input parameter
-- `dir_iterate_recursive(const path* src, dir_iterate_callback* callback, void* user_data) -> b32`
-  - What it does: Performs dir iterate recursive
-  - Parameters:
-    - `src` (`const path*`): Input data used by the operation
-    - `callback` (`dir_iterate_callback*`): Input parameter
-    - `user_data` (`void*`): Input parameter
+| Function | Declaration |
+| --- | --- |
+| `dir_get_base` | `func path dir_get_base(void);` |
+| `dir_get_pref` | `func path dir_get_pref(cstr8 org_name, cstr8 app_name);` |
+| `dir_get_system` | `func path dir_get_system(dir_system_path location);` |
+| `dir_create` | `func b32 dir_create(const path* src);` |
+| `dir_remove` | `func b32 dir_remove(const path* src);` |
+| `dir_rename` | `func b32 dir_rename(const path* old_src, const path* new_src);` |
+| `dir_cpy_recursive` | `func b32 dir_cpy_recursive(const path* src, const path* dst, b32 overwrite_existing);` |
+| `dir_exists` | `func b32 dir_exists(const path* src);` |
+| `dir_create_recursive` | `func b32 dir_create_recursive(const path* src);` |
+| `dir_remove_recursive` | `func b32 dir_remove_recursive(const path* src);` |
+| `dir_iterate` | `func b32 dir_iterate(const path* src, dir_iterate_callback* callback, void* user_data);` |
+| `dir_iterate_recursive` | `func b32 dir_iterate_recursive( const path* src, dir_iterate_callback* callback, void* user_data);` |
+
+#### Macros
+
+| Macro | Form |
+| --- | --- |
+| None | - |
 
 ### `filesystem/file.h`
 
 - Types: **0**
 - Functions: **10**
+- Macros: **0**
 
 #### Types
 
-- None
+| Type | Declaration |
+| --- | --- |
+| None | - |
 
 #### Functions
 
-- `file_create(const path* src) -> b32`
-  - What it does: Creates file create resources or state
-  - Parameters:
-    - `src` (`const path*`): Input data used by the operation
-- `file_delete(const path* src) -> b32`
-  - What it does: Performs file delete
-  - Parameters:
-    - `src` (`const path*`): Input data used by the operation
-- `file_rename(const path* old_src, const path* new_src) -> b32`
-  - What it does: Performs file rename
-  - Parameters:
-    - `old_src` (`const path*`): Input parameter
-    - `new_src` (`const path*`): Input parameter
-- `file_cpy(const path* src, const path* dst, b32 overwrite_existing) -> b32`
-  - What it does: Performs file cpy
-  - Parameters:
-    - `src` (`const path*`): Input data used by the operation
-    - `dst` (`const path*`): Destination storage for output data
-    - `overwrite_existing` (`b32`): Input parameter
-- `file_exists(const path* src) -> b32`
-  - What it does: Performs file exists
-  - Parameters:
-    - `src` (`const path*`): Input data used by the operation
-- `file_get_size(const path* src, sz* out_size) -> b32`
-  - What it does: Gets file get size
-  - Parameters:
-    - `src` (`const path*`): Input data used by the operation
-    - `out_size` (`sz*`): Output value written by the function
-- `file_read_all(const path* src, allocator* alloc, buffer* out_data) -> b32`
-  - What it does: Reads data for file read all
-  - Parameters:
-    - `src` (`const path*`): Input data used by the operation
-    - `alloc` (`allocator*`): Allocator/context used for memory management
-    - `out_data` (`buffer*`): Output value written by the function
-- `file_write_all(const path* src, buffer data) -> b32`
-  - What it does: Writes data for file write all
-  - Parameters:
-    - `src` (`const path*`): Input data used by the operation
-    - `data` (`buffer`): Input data used by the operation
-- `file_append_all(const path* src, buffer data) -> b32`
-  - What it does: Performs file append all
-  - Parameters:
-    - `src` (`const path*`): Input data used by the operation
-    - `data` (`buffer`): Input data used by the operation
-- `file_write_all_atomic(const path* src, buffer data) -> b32`
-  - What it does: Writes data for file write all atomic
-  - Parameters:
-    - `src` (`const path*`): Input data used by the operation
-    - `data` (`buffer`): Input data used by the operation
+| Function | Declaration |
+| --- | --- |
+| `file_create` | `func b32 file_create(const path* src);` |
+| `file_delete` | `func b32 file_delete(const path* src);` |
+| `file_rename` | `func b32 file_rename(const path* old_src, const path* new_src);` |
+| `file_cpy` | `func b32 file_cpy(const path* src, const path* dst, b32 overwrite_existing);` |
+| `file_exists` | `func b32 file_exists(const path* src);` |
+| `file_get_size` | `func b32 file_get_size(const path* src, sz* out_size);` |
+| `file_read_all` | `func b32 file_read_all(const path* src, allocator* alloc, buffer* out_data);` |
+| `file_write_all` | `func b32 file_write_all(const path* src, buffer data);` |
+| `file_append_all` | `func b32 file_append_all(const path* src, buffer data);` |
+| `file_write_all_atomic` | `func b32 file_write_all_atomic(const path* src, buffer data);` |
+
+#### Macros
+
+| Macro | Form |
+| --- | --- |
+| None | - |
 
 ### `filesystem/filemap.h`
 
 - Types: **3**
 - Functions: **7**
+- Macros: **2**
 
 #### Types
 
-- `filemap_access` (enum)
-  - What it represents: Represents a set of named constants for `filemap access`
-  - Members:
-    - `FILEMAP_ACCESS_READ`: `enum value`
-    - `FILEMAP_ACCESS_READ_WRITE`: `enum value`
-    - `FILEMAP_ACCESS_COPY_ON_WRITE`: `enum value`
-- `filemap_error` (enum)
-  - What it represents: Represents a set of named constants for `filemap error`
-  - Members:
-    - `FILEMAP_ERROR_NONE`: `enum value`
-    - `FILEMAP_ERROR_INVALID_ARGUMENT`: `enum value`
-    - `FILEMAP_ERROR_OPEN_FAILED`: `enum value`
-    - `FILEMAP_ERROR_MAP_FAILED`: `enum value`
-    - `FILEMAP_ERROR_IO_FAILED`: `enum value`
-- `filemap` (struct)
-  - What it represents: Represents `filemap` data grouped in a struct
-  - Members:
-    - `data_ptr`: `void*`
-    - `data_size`: `sz`
-    - `native_file`: `void*`
-    - `native_mapping`: `void*`
-    - `writable`: `b32`
-    - `dirty`: `b32`
-    - `uses_fallback_cpy`: `b32`
-    - `source_path`: `path`
+| Type | Declaration |
+| --- | --- |
+| `filemap_access` | `typedef enum filemap_access { ... } filemap_access;` |
+| `filemap_error` | `typedef enum filemap_error { ... } filemap_error;` |
+| `filemap` | `typedef struct filemap { ... } filemap;` |
 
 #### Functions
 
-- `_filemap_open(const path* src, filemap_access access, callsite site) -> filemap`
-  - What it does: Opens  filemap open
-  - Parameters:
-    - `src` (`const path*`): Input data used by the operation
-    - `access` (`filemap_access`): Input parameter
-    - `site` (`callsite`): Input parameter
-- `filemap_is_open(const filemap* map) -> b32`
-  - What it does: Opens filemap is open
-  - Parameters:
-    - `map` (`const filemap*`): Input parameter
-- `filemap_flush(filemap* map) -> b32`
-  - What it does: Performs filemap flush
-  - Parameters:
-    - `map` (`filemap*`): Input parameter
-- `_filemap_close(filemap* map, callsite site) -> void`
-  - What it does: Closes  filemap close
-  - Parameters:
-    - `map` (`filemap*`): Input parameter
-    - `site` (`callsite`): Input parameter
-- `filemap_is_writable(const filemap* map) -> b32`
-  - What it does: Performs filemap is writable
-  - Parameters:
-    - `map` (`const filemap*`): Input parameter
-- `filemap_mark_dirty(filemap* map) -> void`
-  - What it does: Performs filemap mark dirty
-  - Parameters:
-    - `map` (`filemap*`): Input parameter
-- `filemap_get_last_error() -> filemap_error`
-  - What it does: Gets filemap get last error
-  - Parameters: none
+| Function | Declaration |
+| --- | --- |
+| `_filemap_open` | `func filemap _filemap_open(const path* src, filemap_access access, callsite site);` |
+| `filemap_is_open` | `func b32 filemap_is_open(const filemap* map);` |
+| `filemap_flush` | `func b32 filemap_flush(filemap* map);` |
+| `_filemap_close` | `func void _filemap_close(filemap* map, callsite site);` |
+| `filemap_is_writable` | `func b32 filemap_is_writable(const filemap* map);` |
+| `filemap_mark_dirty` | `func void filemap_mark_dirty(filemap* map);` |
+| `filemap_get_last_error` | `func filemap_error filemap_get_last_error(void);` |
+
+#### Macros
+
+| Macro | Form |
+| --- | --- |
+| `filemap_open` | `filemap_open(src, access)` |
+| `filemap_close` | `filemap_close(map)` |
 
 ### `filesystem/filestream.h`
 
 - Types: **5**
 - Functions: **14**
+- Macros: **3**
 
 #### Types
 
-- `archive` (alias)
-  - What it represents: Type alias used for `archive`
-  - Members: none (alias/function type)
-- `filestream_kind` (enum)
-  - What it represents: Represents a set of named constants for `filestream kind`
-  - Members:
-    - `FILESTREAM_KIND_NONE`: `enum value`
-    - `FILESTREAM_KIND_NATIVE`: `enum value`
-    - `FILESTREAM_KIND_ARCHIVE`: `enum value`
-- `filestream_seek_basis` (enum)
-  - What it represents: Represents a set of named constants for `filestream seek basis`
-  - Members:
-    - `FILESTREAM_SEEK_BASIS_BEGIN`: `enum value`
-    - `FILESTREAM_SEEK_BASIS_CURRENT`: `enum value`
-    - `FILESTREAM_SEEK_BASIS_END`: `enum value`
-- `filestream_error` (enum)
-  - What it represents: Represents a set of named constants for `filestream error`
-  - Members:
-    - `FILESTREAM_ERROR_NONE`: `enum value`
-    - `FILESTREAM_ERROR_NOT_OPEN`: `enum value`
-    - `FILESTREAM_ERROR_ACCESS`: `enum value`
-    - `FILESTREAM_ERROR_EOF`: `enum value`
-    - `FILESTREAM_ERROR_SEEK`: `enum value`
-    - `FILESTREAM_ERROR_IO`: `enum value`
-    - `FILESTREAM_ERROR_ALLOC`: `enum value`
-- `filestream` (struct)
-  - What it represents: Represents `filestream` data grouped in a struct
-  - Members:
-    - `kind`: `filestream_kind`
-    - `mode_flags`: `u32`
-    - `native_handle`: `void*`
-    - `archive_ref`: `archive*`
-    - `archive_path`: `path`
-    - `memory_ptr`: `u8*`
-    - `memory_size`: `sz`
-    - `memory_capacity`: `sz`
-    - `cursor`: `sz`
-    - `dirty`: `b32`
-    - `error_code`: `filestream_error`
+| Type | Declaration |
+| --- | --- |
+| `archive` | `typedef struct archive archive;` |
+| `filestream_kind` | `typedef enum filestream_kind { ... } filestream_kind;` |
+| `filestream_seek_basis` | `typedef enum filestream_seek_basis { ... } filestream_seek_basis;` |
+| `filestream_error` | `typedef enum filestream_error { ... } filestream_error;` |
+| `filestream` | `typedef struct filestream { ... } filestream;` |
 
 #### Functions
 
-- `_filestream_open(const path* src, u32 mode_flags, callsite site) -> filestream`
-  - What it does: Opens  filestream open
-  - Parameters:
-    - `src` (`const path*`): Input data used by the operation
-    - `mode_flags` (`u32`): Input parameter
-    - `site` (`callsite`): Input parameter
-- `_filestream_open_archive(archive* arc, const path* src, u32 mode_flags, callsite site) -> filestream`
-  - What it does: Opens  filestream open archive
-  - Parameters:
-    - `arc` (`archive*`): Input parameter
-    - `src` (`const path*`): Input data used by the operation
-    - `mode_flags` (`u32`): Input parameter
-    - `site` (`callsite`): Input parameter
-- `_filestream_close(filestream* stm, callsite site) -> void`
-  - What it does: Closes  filestream close
-  - Parameters:
-    - `stm` (`filestream*`): Input parameter
-    - `site` (`callsite`): Input parameter
-- `filestream_is_open(const filestream* stm) -> b32`
-  - What it does: Opens filestream is open
-  - Parameters:
-    - `stm` (`const filestream*`): Input parameter
-- `filestream_flush(filestream* stm) -> b32`
-  - What it does: Performs filestream flush
-  - Parameters:
-    - `stm` (`filestream*`): Input parameter
-- `filestream_read(filestream* stm, void* dst, sz size) -> sz`
-  - What it does: Reads data for filestream read
-  - Parameters:
-    - `stm` (`filestream*`): Input parameter
-    - `dst` (`void*`): Destination storage for output data
-    - `size` (`sz`): Size or capacity value used by the operation
-- `filestream_read_exact(filestream* stm, void* dst, sz size) -> b32`
-  - What it does: Reads data for filestream read exact
-  - Parameters:
-    - `stm` (`filestream*`): Input parameter
-    - `dst` (`void*`): Destination storage for output data
-    - `size` (`sz`): Size or capacity value used by the operation
-- `filestream_write(filestream* stm, const void* src, sz size) -> sz`
-  - What it does: Writes data for filestream write
-  - Parameters:
-    - `stm` (`filestream*`): Input parameter
-    - `src` (`const void*`): Input data used by the operation
-    - `size` (`sz`): Size or capacity value used by the operation
-- `filestream_write_exact(filestream* stm, const void* src, sz size) -> b32`
-  - What it does: Writes data for filestream write exact
-  - Parameters:
-    - `stm` (`filestream*`): Input parameter
-    - `src` (`const void*`): Input data used by the operation
-    - `size` (`sz`): Size or capacity value used by the operation
-- `filestream_seek(filestream* stm, i64 offset, filestream_seek_basis basis) -> b32`
-  - What it does: Performs filestream seek
-  - Parameters:
-    - `stm` (`filestream*`): Input parameter
-    - `offset` (`i64`): Input parameter
-    - `basis` (`filestream_seek_basis`): Input parameter
-- `filestream_tell(const filestream* stm) -> sz`
-  - What it does: Performs filestream tell
-  - Parameters:
-    - `stm` (`const filestream*`): Input parameter
-- `filestream_size(const filestream* stm) -> sz`
-  - What it does: Performs filestream size
-  - Parameters:
-    - `stm` (`const filestream*`): Input parameter
-- `filestream_eof(const filestream* stm) -> b32`
-  - What it does: Performs filestream eof
-  - Parameters:
-    - `stm` (`const filestream*`): Input parameter
-- `filestream_get_error(const filestream* stm) -> filestream_error`
-  - What it does: Gets filestream get error
-  - Parameters:
-    - `stm` (`const filestream*`): Input parameter
+| Function | Declaration |
+| --- | --- |
+| `_filestream_open` | `func filestream _filestream_open(const path* src, u32 mode_flags, callsite site);` |
+| `_filestream_open_archive` | `func filestream _filestream_open_archive(archive* arc, const path* src, u32 mode_flags, callsite site);` |
+| `_filestream_close` | `func void _filestream_close(filestream* stm, callsite site);` |
+| `filestream_is_open` | `func b32 filestream_is_open(const filestream* stm);` |
+| `filestream_flush` | `func b32 filestream_flush(filestream* stm);` |
+| `filestream_read` | `func sz filestream_read(filestream* stm, void* dst, sz size);` |
+| `filestream_read_exact` | `func b32 filestream_read_exact(filestream* stm, void* dst, sz size);` |
+| `filestream_write` | `func sz filestream_write(filestream* stm, const void* src, sz size);` |
+| `filestream_write_exact` | `func b32 filestream_write_exact(filestream* stm, const void* src, sz size);` |
+| `filestream_seek` | `func b32 filestream_seek(filestream* stm, i64 offset, filestream_seek_basis basis);` |
+| `filestream_tell` | `func sz filestream_tell(const filestream* stm);` |
+| `filestream_size` | `func sz filestream_size(const filestream* stm);` |
+| `filestream_eof` | `func b32 filestream_eof(const filestream* stm);` |
+| `filestream_get_error` | `func filestream_error filestream_get_error(const filestream* stm);` |
+
+#### Macros
+
+| Macro | Form |
+| --- | --- |
+| `filestream_open` | `filestream_open(src, mode_flags)` |
+| `filestream_open_archive` | `filestream_open_archive(arc, src, mode_flags)` |
+| `filestream_close` | `filestream_close(stm)` |
 
 ### `filesystem/module.h`
 
 - Types: **3**
 - Functions: **5**
+- Macros: **0**
 
 #### Types
 
-- `mod_init_func` (alias)
-  - What it represents: Type alias used for `mod init func`
-  - Members: none (alias/function type)
-- `mod_quit_func` (alias)
-  - What it represents: Type alias used for `mod quit func`
-  - Members: none (alias/function type)
-- `mod` (struct)
-  - What it represents: Represents `mod` data grouped in a struct
-  - Members:
-    - `native_handle`: `void*`
-    - `init_func`: `mod_init_func*`
-    - `quit_func`: `mod_quit_func*`
-    - `source_path`: `path`
-    - `initialized`: `b32`
+| Type | Declaration |
+| --- | --- |
+| `mod_init_func` | `typedef b32 mod_init_func(void);` |
+| `mod_quit_func` | `typedef void mod_quit_func(void);` |
+| `mod` | `typedef struct mod { ... } mod;` |
 
 #### Functions
 
-- `mod_open(const path* src) -> mod`
-  - What it does: Opens mod open
-  - Parameters:
-    - `src` (`const path*`): Input data used by the operation
-- `mod_is_open(const mod* mod_ptr) -> b32`
-  - What it does: Opens mod is open
-  - Parameters:
-    - `mod_ptr` (`const mod*`): Input parameter
-- `mod_get_func(const mod* mod_ptr, cstr8 name) -> void*`
-  - What it does: Gets mod get func
-  - Parameters:
-    - `mod_ptr` (`const mod*`): Input parameter
-    - `name` (`cstr8`): Input parameter
-- `mod_get_extension() -> cstr8`
-  - What it does: Gets mod get extension
-  - Parameters: none
-- `mod_close(mod* mod_ptr) -> void`
-  - What it does: Closes mod close
-  - Parameters:
-    - `mod_ptr` (`mod*`): Input parameter
+| Function | Declaration |
+| --- | --- |
+| `mod_open` | `func mod mod_open(const path* src);` |
+| `mod_is_open` | `func b32 mod_is_open(const mod* mod_ptr);` |
+| `mod_get_func` | `func void* mod_get_func(const mod* mod_ptr, cstr8 name);` |
+| `mod_get_extension` | `func cstr8 mod_get_extension(void);` |
+| `mod_close` | `func void mod_close(mod* mod_ptr);` |
+
+#### Macros
+
+| Macro | Form |
+| --- | --- |
+| None | - |
 
 ### `filesystem/path.h`
 
 - Types: **1**
 - Functions: **29**
+- Macros: **0**
 
 #### Types
 
-- `path` (struct)
-  - What it represents: Represents `path` data grouped in a struct
-  - Members:
-    - `buf`: `str8_medium`
+| Type | Declaration |
+| --- | --- |
+| `path` | `typedef struct path { ... } path;` |
 
 #### Functions
 
-- `path_from_cstr(cstr8 src) -> path`
-  - What it does: Performs path from cstr
-  - Parameters:
-    - `src` (`cstr8`): Input data used by the operation
-- `path_from_str8(str8 src) -> path`
-  - What it does: Performs path from str8
-  - Parameters:
-    - `src` (`str8`): Input data used by the operation
-- `path_join(const path* lhs, const path* rhs) -> path`
-  - What it does: Performs path join
-  - Parameters:
-    - `lhs` (`const path*`): Input data used by the operation
-    - `rhs` (`const path*`): Input data used by the operation
-- `path_join_cstr(const path* lhs, cstr8 rhs) -> path`
-  - What it does: Performs path join cstr
-  - Parameters:
-    - `lhs` (`const path*`): Input data used by the operation
-    - `rhs` (`cstr8`): Input data used by the operation
-- `path_append(path* dst, const path* src) -> sz`
-  - What it does: Performs path append
-  - Parameters:
-    - `dst` (`path*`): Destination storage for output data
-    - `src` (`const path*`): Input data used by the operation
-- `path_append_cstr(path* dst, cstr8 src) -> sz`
-  - What it does: Performs path append cstr
-  - Parameters:
-    - `dst` (`path*`): Destination storage for output data
-    - `src` (`cstr8`): Input data used by the operation
-- `path_norm(path* src) -> void`
-  - What it does: Performs path norm
-  - Parameters:
-    - `src` (`path*`): Input data used by the operation
-- `path_norm_trimmed_cpy(const path* src) -> path`
-  - What it does: Performs path norm trimmed cpy
-  - Parameters:
-    - `src` (`const path*`): Input data used by the operation
-- `path_cmd_normd(const path* lhs, const path* rhs) -> b32`
-  - What it does: Performs path cmd normd
-  - Parameters:
-    - `lhs` (`const path*`): Input data used by the operation
-    - `rhs` (`const path*`): Input data used by the operation
-- `path_ends_with(const path* src, cstr8 suffix) -> b32`
-  - What it does: Ends path ends with
-  - Parameters:
-    - `src` (`const path*`): Input data used by the operation
-    - `suffix` (`cstr8`): Input parameter
-- `path_is_absolute(const path* src) -> b32`
-  - What it does: Performs path is absolute
-  - Parameters:
-    - `src` (`const path*`): Input data used by the operation
-- `path_is_relative(const path* src) -> b32`
-  - What it does: Performs path is relative
-  - Parameters:
-    - `src` (`const path*`): Input data used by the operation
-- `path_remove_extension(path* src) -> void`
-  - What it does: Removes path remove extension
-  - Parameters:
-    - `src` (`path*`): Input data used by the operation
-- `path_remove_name(path* src) -> void`
-  - What it does: Removes path remove name
-  - Parameters:
-    - `src` (`path*`): Input data used by the operation
-- `path_remove_directory(path* src) -> void`
-  - What it does: Removes path remove directory
-  - Parameters:
-    - `src` (`path*`): Input data used by the operation
-- `path_remove_trailing_slash(path* src) -> void`
-  - What it does: Removes path remove trailing slash
-  - Parameters:
-    - `src` (`path*`): Input data used by the operation
-- `path_get_extension(const path* src) -> path`
-  - What it does: Gets path get extension
-  - Parameters:
-    - `src` (`const path*`): Input data used by the operation
-- `path_get_name(const path* src) -> path`
-  - What it does: Gets path get name
-  - Parameters:
-    - `src` (`const path*`): Input data used by the operation
-- `path_get_basename(const path* src) -> path`
-  - What it does: Gets path get basename
-  - Parameters:
-    - `src` (`const path*`): Input data used by the operation
-- `path_get_directory(const path* src) -> path`
-  - What it does: Gets path get directory
-  - Parameters:
-    - `src` (`const path*`): Input data used by the operation
-- `path_get_common(const path* src_list, sz path_count) -> path`
-  - What it does: Gets path get common
-  - Parameters:
-    - `src_list` (`const path*`): Input parameter
-    - `path_count` (`sz`): Number of elements/items involved
-- `path_get_current() -> path`
-  - What it does: Gets path get current
-  - Parameters: none
-- `path_set_current(const path* src) -> b32`
-  - What it does: Sets path set current
-  - Parameters:
-    - `src` (`const path*`): Input data used by the operation
-- `path_resolve(const path* src) -> path`
-  - What it does: Performs path resolve
-  - Parameters:
-    - `src` (`const path*`): Input data used by the operation
-- `path_make_relative(const path* src, const path* root) -> path`
-  - What it does: Performs path make relative
-  - Parameters:
-    - `src` (`const path*`): Input data used by the operation
-    - `root` (`const path*`): Input parameter
-- `path_exists(const path* src) -> b32`
-  - What it does: Performs path exists
-  - Parameters:
-    - `src` (`const path*`): Input data used by the operation
-- `path_remove(const path* src) -> b32`
-  - What it does: Removes path remove
-  - Parameters:
-    - `src` (`const path*`): Input data used by the operation
-- `path_rename(const path* old_src, const path* new_src) -> b32`
-  - What it does: Performs path rename
-  - Parameters:
-    - `old_src` (`const path*`): Input parameter
-    - `new_src` (`const path*`): Input parameter
-- `path_get_last_write_time(const path* src) -> timestamp`
-  - What it does: Gets path get last write time
-  - Parameters:
-    - `src` (`const path*`): Input data used by the operation
+| Function | Declaration |
+| --- | --- |
+| `path_from_cstr` | `func path path_from_cstr(cstr8 src);` |
+| `path_from_str8` | `func path path_from_str8(str8 src);` |
+| `path_join` | `func path path_join(const path* lhs, const path* rhs);` |
+| `path_join_cstr` | `func path path_join_cstr(const path* lhs, cstr8 rhs);` |
+| `path_append` | `func sz path_append(path* dst, const path* src);` |
+| `path_append_cstr` | `func sz path_append_cstr(path* dst, cstr8 src);` |
+| `path_norm` | `func void path_norm(path* src);` |
+| `path_norm_trimmed_cpy` | `func path path_norm_trimmed_cpy(const path* src);` |
+| `path_cmd_normd` | `func b32 path_cmd_normd(const path* lhs, const path* rhs);` |
+| `path_ends_with` | `func b32 path_ends_with(const path* src, cstr8 suffix);` |
+| `path_is_absolute` | `func b32 path_is_absolute(const path* src);` |
+| `path_is_relative` | `func b32 path_is_relative(const path* src);` |
+| `path_remove_extension` | `func void path_remove_extension(path* src);` |
+| `path_remove_name` | `func void path_remove_name(path* src);` |
+| `path_remove_directory` | `func void path_remove_directory(path* src);` |
+| `path_remove_trailing_slash` | `func void path_remove_trailing_slash(path* src);` |
+| `path_get_extension` | `func path path_get_extension(const path* src);` |
+| `path_get_name` | `func path path_get_name(const path* src);` |
+| `path_get_basename` | `func path path_get_basename(const path* src);` |
+| `path_get_directory` | `func path path_get_directory(const path* src);` |
+| `path_get_common` | `func path path_get_common(const path* src_list, sz path_count);` |
+| `path_get_current` | `func path path_get_current(void);` |
+| `path_set_current` | `func b32 path_set_current(const path* src);` |
+| `path_resolve` | `func path path_resolve(const path* src);` |
+| `path_make_relative` | `func path path_make_relative(const path* src, const path* root);` |
+| `path_exists` | `func b32 path_exists(const path* src);` |
+| `path_remove` | `func b32 path_remove(const path* src);` |
+| `path_rename` | `func b32 path_rename(const path* old_src, const path* new_src);` |
+| `path_get_last_write_time` | `func timestamp path_get_last_write_time(const path* src);` |
+
+#### Macros
+
+| Macro | Form |
+| --- | --- |
+| None | - |
 
 ### `filesystem/pathinfo.h`
 
 - Types: **2**
 - Functions: **1**
+- Macros: **0**
 
 #### Types
 
-- `pathinfo_type` (enum)
-  - What it represents: Represents a set of named constants for `pathinfo type`
-  - Members:
-    - `PATHINFO_TYPE_NONE`: `enum value`
-    - `PATHINFO_TYPE_FILE`: `enum value`
-    - `PATHINFO_TYPE_DIRECTORY`: `enum value`
-    - `PATHINFO_TYPE_SYMLINK`: `enum value`
-    - `PATHINFO_TYPE_OTHER`: `enum value`
-- `pathinfo` (struct)
-  - What it represents: Represents `pathinfo` data grouped in a struct
-  - Members:
-    - `kind`: `pathinfo_type`
-    - `size`: `sz`
-    - `create_time`: `timestamp`
-    - `access_time`: `timestamp`
-    - `write_time`: `timestamp`
-    - `exists`: `b32`
-    - `is_read_only`: `b32`
-    - `hidden`: `b32`
+| Type | Declaration |
+| --- | --- |
+| `pathinfo_type` | `typedef enum pathinfo_type { ... } pathinfo_type;` |
+| `pathinfo` | `typedef struct pathinfo { ... } pathinfo;` |
 
 #### Functions
 
-- `pathinfo_get(const path* src, pathinfo* out_info) -> b32`
-  - What it does: Performs pathinfo get
-  - Parameters:
-    - `src` (`const path*`): Input data used by the operation
-    - `out_info` (`pathinfo*`): Output value written by the function
+| Function | Declaration |
+| --- | --- |
+| `pathinfo_get` | `func b32 pathinfo_get(const path* src, pathinfo* out_info);` |
+
+#### Macros
+
+| Macro | Form |
+| --- | --- |
+| None | - |
 
 ### `filesystem/pathwatch.h`
 
 - Types: **5**
 - Functions: **13**
+- Macros: **4**
 
 #### Types
 
-- `pathwatch_id` (alias)
-  - What it represents: Type alias used for `pathwatch id`
-  - Members: none (alias/function type)
-- `pathwatch_watch_id` (alias)
-  - What it represents: Type alias used for `pathwatch watch id`
-  - Members: none (alias/function type)
-- `pathwatch_action` (enum)
-  - What it represents: Represents a set of named constants for `pathwatch action`
-  - Members:
-    - `PATHWATCH_ACTION_CREATE`: `enum value`
-    - `PATHWATCH_ACTION_DELETE`: `enum value`
-    - `PATHWATCH_ACTION_MODIFY`: `enum value`
-    - `PATHWATCH_ACTION_MOVE`: `enum value`
-- `pathwatch_event` (struct)
-  - What it represents: Represents `pathwatch event` data grouped in a struct
-  - Members:
-    - `pathwatch_id`: `pathwatch_id`
-    - `watch_id`: `pathwatch_watch_id`
-    - `action`: `pathwatch_action`
-    - `watch_path`: `path`
-    - `item_path`: `path`
-    - `old_item_path`: `path`
-- `pathwatch` (struct)
-  - What it represents: Represents `pathwatch` data grouped in a struct
-  - Members:
-    - `id`: `pathwatch_id`
-    - `native_handle`: `void*`
+| Type | Declaration |
+| --- | --- |
+| `pathwatch_id` | `typedef i64 pathwatch_id;` |
+| `pathwatch_watch_id` | `typedef i64 pathwatch_watch_id;` |
+| `pathwatch_action` | `typedef enum pathwatch_action { ... } pathwatch_action;` |
+| `pathwatch_event` | `typedef struct pathwatch_event { ... } pathwatch_event;` |
+| `pathwatch` | `typedef struct pathwatch { ... } pathwatch;` |
 
 #### Functions
 
-- `_pathwatch_create(b32 use_generic_mode, callsite site) -> pathwatch`
-  - What it does: Creates  pathwatch create resources or state
-  - Parameters:
-    - `use_generic_mode` (`b32`): Input parameter
-    - `site` (`callsite`): Input parameter
-- `_pathwatch_destroy(pathwatch* watcher, callsite site) -> void`
-  - What it does: Destroys  pathwatch destroy resources or state
-  - Parameters:
-    - `watcher` (`pathwatch*`): Input parameter
-    - `site` (`callsite`): Input parameter
-- `pathwatch_start(pathwatch* watcher) -> b32`
-  - What it does: Performs pathwatch start
-  - Parameters:
-    - `watcher` (`pathwatch*`): Input parameter
-- `pathwatch_stop(pathwatch* watcher) -> b32`
-  - What it does: Performs pathwatch stop
-  - Parameters:
-    - `watcher` (`pathwatch*`): Input parameter
-- `pathwatch_pause(pathwatch* watcher) -> b32`
-  - What it does: Performs pathwatch pause
-  - Parameters:
-    - `watcher` (`pathwatch*`): Input parameter
-- `pathwatch_resume(pathwatch* watcher) -> b32`
-  - What it does: Performs pathwatch resume
-  - Parameters:
-    - `watcher` (`pathwatch*`): Input parameter
-- `pathwatch_add(pathwatch* watcher, const path* src, b32 recursive) -> pathwatch_watch_id`
-  - What it does: Adds pathwatch add
-  - Parameters:
-    - `watcher` (`pathwatch*`): Input parameter
-    - `src` (`const path*`): Input data used by the operation
-    - `recursive` (`b32`): Input parameter
-- `pathwatch_remove(pathwatch* watcher, pathwatch_watch_id watch_id) -> b32`
-  - What it does: Removes pathwatch remove
-  - Parameters:
-    - `watcher` (`pathwatch*`): Input parameter
-    - `watch_id` (`pathwatch_watch_id`): Input parameter
-- `pathwatch_remove_path(pathwatch* watcher, const path* src) -> b32`
-  - What it does: Removes pathwatch remove path
-  - Parameters:
-    - `watcher` (`pathwatch*`): Input parameter
-    - `src` (`const path*`): Input data used by the operation
-- `pathwatch_get_path(pathwatch_watch_id watch_id, path* out_watch_path) -> b32`
-  - What it does: Gets pathwatch get path
-  - Parameters:
-    - `watch_id` (`pathwatch_watch_id`): Input parameter
-    - `out_watch_path` (`path*`): Output value written by the function
-- `pathwatch_follow_symlinks(pathwatch* watcher, b32 enabled) -> b32`
-  - What it does: Performs pathwatch follow symlinks
-  - Parameters:
-    - `watcher` (`pathwatch*`): Input parameter
-    - `enabled` (`b32`): Input parameter
-- `pathwatch_allow_out_of_scope_links(pathwatch* watcher, b32 enabled) -> b32`
-  - What it does: Performs pathwatch allow out of scope links
-  - Parameters:
-    - `watcher` (`pathwatch*`): Input parameter
-    - `enabled` (`b32`): Input parameter
-- `pathwatch_get_last_error() -> cstr8`
-  - What it does: Gets pathwatch get last error
-  - Parameters: none
+| Function | Declaration |
+| --- | --- |
+| `_pathwatch_create` | `func pathwatch _pathwatch_create(b32 use_generic_mode, callsite site);` |
+| `_pathwatch_destroy` | `func void _pathwatch_destroy(pathwatch* watcher, callsite site);` |
+| `pathwatch_start` | `func b32 pathwatch_start(pathwatch* watcher);` |
+| `pathwatch_stop` | `func b32 pathwatch_stop(pathwatch* watcher);` |
+| `pathwatch_pause` | `func b32 pathwatch_pause(pathwatch* watcher);` |
+| `pathwatch_resume` | `func b32 pathwatch_resume(pathwatch* watcher);` |
+| `pathwatch_add` | `func pathwatch_watch_id pathwatch_add(pathwatch* watcher, const path* src, b32 recursive);` |
+| `pathwatch_remove` | `func b32 pathwatch_remove(pathwatch* watcher, pathwatch_watch_id watch_id);` |
+| `pathwatch_remove_path` | `func b32 pathwatch_remove_path(pathwatch* watcher, const path* src);` |
+| `pathwatch_get_path` | `func b32 pathwatch_get_path(pathwatch_watch_id watch_id, path* out_watch_path);` |
+| `pathwatch_follow_symlinks` | `func b32 pathwatch_follow_symlinks(pathwatch* watcher, b32 enabled);` |
+| `pathwatch_allow_out_of_scope_links` | `func b32 pathwatch_allow_out_of_scope_links(pathwatch* watcher, b32 enabled);` |
+| `pathwatch_get_last_error` | `func cstr8 pathwatch_get_last_error(void);` |
+
+#### Macros
+
+| Macro | Form |
+| --- | --- |
+| `PATHWATCH_BINDING_CAP` | `PATHWATCH_BINDING_CAP` |
+| `PATHWATCH_WATCH_BINDING_CAP` | `PATHWATCH_WATCH_BINDING_CAP` |
+| `pathwatch_create` | `pathwatch_create(use_generic_mode)` |
+| `pathwatch_destroy` | `pathwatch_destroy(watcher)` |
 
 ## input
 
-Device input APIs and message/event distribution.
+Input devices, events, message payloads, and virtual-key helpers.
 
 ### `input/audio_device.h`
 
 - Types: **2**
 - Functions: **11**
+- Macros: **0**
 
 #### Types
 
-- `audio_device` (alias)
-  - What it represents: Type alias used for `audio device`
-  - Members: none (alias/function type)
-- `audio_device_type` (enum)
-  - What it represents: Represents a set of named constants for `audio device type`
-  - Members:
-    - `AUDIO_DEVICE_TYPE_UNKNOWN`: `enum value`
-    - `AUDIO_DEVICE_TYPE_PLAYBACK`: `enum value`
-    - `AUDIO_DEVICE_TYPE_RECORDING`: `enum value`
+| Type | Declaration |
+| --- | --- |
+| `audio_device` | `typedef void* audio_device;` |
+| `audio_device_type` | `typedef enum audio_device_type { ... } audio_device_type;` |
 
 #### Functions
 
-- `audio_device_is_valid(audio_device src) -> b32`
-  - What it does: Validates an audio device handle
-  - Parameters:
-    - `src` (`audio_device`): Input data used by the operation
-- `device_get_audio_device(device src) -> audio_device`
-  - What it does: Converts a generic device handle into an audio device handle
-  - Parameters:
-    - `src` (`device`): Input data used by the operation
-- `audio_device_to_device(audio_device src) -> device`
-  - What it does: Converts an audio device handle into a generic device handle
-  - Parameters:
-    - `src` (`audio_device`): Input data used by the operation
-- `audio_device_type_is_valid(audio_device_type src) -> b32`
-  - What it does: Validates an audio-device direction
-  - Parameters:
-    - `src` (`audio_device_type`): Input data used by the operation
-- `audio_device_get_type_name(audio_device_type audio_type) -> cstr8`
-  - What it does: Returns the display name for an audio-device direction
-  - Parameters:
-    - `audio_type` (`audio_device_type`): Input parameter
-- `audio_device_get_total_count(audio_device_type audio_type) -> sz`
-  - What it does: Returns the number of currently known audio devices for the requested direction
-  - Parameters:
-    - `audio_type` (`audio_device_type`): Input parameter
-- `audio_device_get_from_idx(audio_device_type audio_type, sz idx) -> audio_device`
-  - What it does: Returns the audio device handle at the requested index for the requested direction
-  - Parameters:
-    - `audio_type` (`audio_device_type`): Input parameter
-    - `idx` (`sz`): Zero-based index used to select an item
-- `audio_device_get_primary(audio_device_type audio_type) -> audio_device`
-  - What it does: Returns the primary audio device handle for the requested direction
-  - Parameters:
-    - `audio_type` (`audio_device_type`): Input parameter
-- `audio_device_get_focused(audio_device_type audio_type) -> audio_device`
-  - What it does: Returns the focused audio device handle for the requested direction, or the primary device when none is focused
-  - Parameters:
-    - `audio_type` (`audio_device_type`): Input parameter
-- `audio_device_get_type(audio_device aud_id) -> audio_device_type`
-  - What it does: Returns the direction encoded by an audio device handle
-  - Parameters:
-    - `aud_id` (`audio_device`): Input parameter
-- `audio_device_get_name(audio_device aud_id) -> cstr8`
-  - What it does: Returns the backend-defined name for an audio device handle
-  - Parameters:
-    - `aud_id` (`audio_device`): Input parameter
+| Function | Declaration |
+| --- | --- |
+| `audio_device_is_valid` | `func b32 audio_device_is_valid(audio_device src);` |
+| `device_get_audio_device` | `func audio_device device_get_audio_device(device src);` |
+| `audio_device_to_device` | `func device audio_device_to_device(audio_device src);` |
+| `audio_device_type_is_valid` | `func b32 audio_device_type_is_valid(audio_device_type src);` |
+| `audio_device_get_type_name` | `func cstr8 audio_device_get_type_name(audio_device_type audio_type);` |
+| `audio_device_get_total_count` | `func sz audio_device_get_total_count(audio_device_type audio_type);` |
+| `audio_device_get_from_idx` | `func audio_device audio_device_get_from_idx(audio_device_type audio_type, sz idx);` |
+| `audio_device_get_primary` | `func audio_device audio_device_get_primary(audio_device_type audio_type);` |
+| `audio_device_get_focused` | `func audio_device audio_device_get_focused(audio_device_type audio_type);` |
+| `audio_device_get_type` | `func audio_device_type audio_device_get_type(audio_device aud_id);` |
+| `audio_device_get_name` | `func cstr8 audio_device_get_name(audio_device aud_id);` |
+
+#### Macros
+
+| Macro | Form |
+| --- | --- |
+| None | - |
 
 ### `input/camera.h`
 
 - Types: **2**
 - Functions: **14**
+- Macros: **0**
 
 #### Types
 
-- `camera` (alias)
-  - What it represents: Type alias used for `camera`
-  - Members: none (alias/function type)
-- `camera_pos` (enum)
-  - What it represents: Represents a set of named constants for `camera pos`
-  - Members:
-    - `CAMERA_POS_UNKNOWN`: `enum value`
-    - `CAMERA_POS_FRONT_FACING`: `enum value`
-    - `CAMERA_POS_BACK_FACING`: `enum value`
+| Type | Declaration |
+| --- | --- |
+| `camera` | `typedef void* camera;` |
+| `camera_pos` | `typedef enum camera_pos { ... } camera_pos;` |
 
 #### Functions
 
-- `camera_is_valid(camera src) -> b32`
-  - What it does: Validates a camera handle
-  - Parameters:
-    - `src` (`camera`): Input data used by the operation
-- `device_get_camera(device src) -> camera`
-  - What it does: Converts a generic device handle into a camera handle
-  - Parameters:
-    - `src` (`device`): Input data used by the operation
-- `camera_to_device(camera src) -> device`
-  - What it does: Converts a camera handle into a generic device handle
-  - Parameters:
-    - `src` (`camera`): Input data used by the operation
-- `camera_get_total_count() -> sz`
-  - What it does: Returns the number of currently known cameras
-  - Parameters: none
-- `camera_get_from_idx(sz idx) -> camera`
-  - What it does: Returns the camera handle at the requested index
-  - Parameters:
-    - `idx` (`sz`): Zero-based index used to select an item
-- `camera_get_primary() -> camera`
-  - What it does: Returns the primary camera handle
-  - Parameters: none
-- `camera_get_focused() -> camera`
-  - What it does: Returns the focused camera handle, or the primary camera when none is focused
-  - Parameters: none
-- `camera_get_name(camera cam_id) -> cstr8`
-  - What it does: Returns the backend-defined name for a camera handle
-  - Parameters:
-    - `cam_id` (`camera`): Input parameter
-- `camera_get_pos(camera cam_id) -> camera_pos`
-  - What it does: Returns the reported physical position of a camera
-  - Parameters:
-    - `cam_id` (`camera`): Input parameter
-- `camera_open(camera cam_id) -> b32`
-  - What it does: Opens a camera for lifecycle tracking
-  - Parameters:
-    - `cam_id` (`camera`): Input parameter
-- `camera_close(camera cam_id) -> b32`
-  - What it does: Closes a camera tracked by the module
-  - Parameters:
-    - `cam_id` (`camera`): Input parameter
-- `camera_start(camera cam_id) -> b32`
-  - What it does: Marks a camera as started
-  - Parameters:
-    - `cam_id` (`camera`): Input parameter
-- `camera_stop(camera cam_id) -> b32`
-  - What it does: Marks a camera as stopped
-  - Parameters:
-    - `cam_id` (`camera`): Input parameter
-- `camera_read(camera cam_id, buffer* out_frame) -> b32`
-  - What it does: Reads a frame into the supplied output buffer metadata
-  - Parameters:
-    - `cam_id` (`camera`): Input parameter
-    - `out_frame` (`buffer*`): Output value written by the function
+| Function | Declaration |
+| --- | --- |
+| `camera_is_valid` | `func b32 camera_is_valid(camera src);` |
+| `device_get_camera` | `func camera device_get_camera(device src);` |
+| `camera_to_device` | `func device camera_to_device(camera src);` |
+| `camera_get_total_count` | `func sz camera_get_total_count(void);` |
+| `camera_get_from_idx` | `func camera camera_get_from_idx(sz idx);` |
+| `camera_get_primary` | `func camera camera_get_primary(void);` |
+| `camera_get_focused` | `func camera camera_get_focused(void);` |
+| `camera_get_name` | `func cstr8 camera_get_name(camera cam_id);` |
+| `camera_get_pos` | `func camera_pos camera_get_pos(camera cam_id);` |
+| `camera_open` | `func b32 camera_open(camera cam_id);` |
+| `camera_close` | `func b32 camera_close(camera cam_id);` |
+| `camera_start` | `func b32 camera_start(camera cam_id);` |
+| `camera_stop` | `func b32 camera_stop(camera cam_id);` |
+| `camera_read` | `func b32 camera_read(camera cam_id, buffer* out_frame);` |
+
+#### Macros
+
+| Macro | Form |
+| --- | --- |
+| None | - |
 
 ### `input/clipboard.h`
 
 - Types: **0**
 - Functions: **7**
+- Macros: **0**
 
 #### Types
 
-- None
+| Type | Declaration |
+| --- | --- |
+| None | - |
 
 #### Functions
 
-- `clipboard_has_text() -> b32`
-  - What it does: Performs clipboard has text
-  - Parameters: none
-- `clipboard_has_data(cstr8 mime_type) -> b32`
-  - What it does: Performs clipboard has data
-  - Parameters:
-    - `mime_type` (`cstr8`): Input parameter
-- `clipboard_set_text(cstr8 src) -> b32`
-  - What it does: Sets clipboard set text
-  - Parameters:
-    - `src` (`cstr8`): Input data used by the operation
-- `clipboard_set_data(cstr8 mime_type, buffer src_data) -> b32`
-  - What it does: Sets clipboard set data
-  - Parameters:
-    - `mime_type` (`cstr8`): Input parameter
-    - `src_data` (`buffer`): Input data used by the operation
-- `clipboard_get_text(c8* out_text, sz out_capacity) -> b32`
-  - What it does: Gets clipboard get text
-  - Parameters:
-    - `out_text` (`c8*`): Output value written by the function
-    - `out_capacity` (`sz`): Output value written by the function
-- `clipboard_get_data(cstr8 mime_type, buffer out_data, sz* out_size) -> b32`
-  - What it does: Gets clipboard get data
-  - Parameters:
-    - `mime_type` (`cstr8`): Input parameter
-    - `out_data` (`buffer`): Output value written by the function
-    - `out_size` (`sz*`): Output value written by the function
-- `clipboard_clear() -> b32`
-  - What it does: Performs clipboard clear
-  - Parameters: none
+| Function | Declaration |
+| --- | --- |
+| `clipboard_has_text` | `func b32 clipboard_has_text(void);` |
+| `clipboard_has_data` | `func b32 clipboard_has_data(cstr8 mime_type);` |
+| `clipboard_set_text` | `func b32 clipboard_set_text(cstr8 src);` |
+| `clipboard_set_data` | `func b32 clipboard_set_data(cstr8 mime_type, buffer src_data);` |
+| `clipboard_get_text` | `func b32 clipboard_get_text(c8* out_text, sz out_capacity);` |
+| `clipboard_get_data` | `func b32 clipboard_get_data(cstr8 mime_type, buffer out_data, sz* out_size);` |
+| `clipboard_clear` | `func b32 clipboard_clear(void);` |
+
+#### Macros
+
+| Macro | Form |
+| --- | --- |
+| None | - |
 
 ### `input/devices.h`
 
 - Types: **4**
 - Functions: **10**
+- Macros: **1**
 
 #### Types
 
-- `device` (alias)
-  - What it represents: Type alias used for `device`
-  - Members: none (alias/function type)
-- `battery_state` (enum)
-  - What it represents: Represents device battery and power states shared by device-bound input APIs
-  - Members:
-    - `BATTERY_STATE_UNKNOWN`: `enum value`
-    - `BATTERY_STATE_ERROR`: `enum value`
-    - `BATTERY_STATE_ON_BATTERY`: `enum value`
-    - `BATTERY_STATE_NO_BATTERY`: `enum value`
-    - `BATTERY_STATE_CHARGING`: `enum value`
-    - `BATTERY_STATE_CHARGED`: `enum value`
-- `device_type` (enum)
-  - What it represents: Represents a set of named constants for `device type`
-  - Members:
-    - `DEVICE_TYPE_UNKNOWN`: `enum value`
-    - `DEVICE_TYPE_KEYBOARD`: `enum value`
-    - `DEVICE_TYPE_MOUSE`: `enum value`
-    - `DEVICE_TYPE_GAMEPAD`: `enum value`
-    - `DEVICE_TYPE_JOYSTICK`: `enum value`
-    - `DEVICE_TYPE_TABLET`: `enum value`
-    - `DEVICE_TYPE_TOUCH`: `enum value`
-    - `DEVICE_TYPE_AUDIO`: `enum value`
-    - `DEVICE_TYPE_CAMERA`: `enum value`
-    - `DEVICE_TYPE_SENSOR`: `enum value`
-    - `DEVICE_TYPE_MONITOR`: `enum value`
-- `device_info` (struct)
-  - What it represents: Represents `device info` data grouped in a struct
-  - Members:
-    - `id`: `device`
-    - `connected`: `b32`
-    - `device_state`: `u64`
-    - `battery_state`: `battery_state`
-    - `handle`: `void*`
-    - `name`: `str8_short`
-    - `vendor_id`: `u16`
-    - `product_id`: `u16`
-    - `usage_page`: `u16`
-    - `usage`: `u16`
+| Type | Declaration |
+| --- | --- |
+| `device` | `typedef void* device;` |
+| `battery_state` | `typedef enum battery_state { ... } battery_state;` |
+| `device_type` | `typedef enum device_type { ... } device_type;` |
+| `device_info` | `typedef struct device_info { ... } device_info;` |
 
 #### Functions
 
-- `device_is_valid(device src) -> b32`
-  - What it does: Validates a generic device handle
-  - Parameters:
-    - `src` (`device`): Input data used by the operation
-- `devices_get_type(device src) -> device_type`
-  - What it does: Returns the encoded device category for a handle
-  - Parameters:
-    - `src` (`device`): Input data used by the operation
-- `device_get_handle(device src) -> void*`
-  - What it does: Returns the backend or native handle currently associated with a device
-  - Parameters:
-    - `src` (`device`): Input data used by the operation
-- `device_get_state(device src) -> u64`
-  - What it does: Returns the lifecycle state counter for a device
-  - Parameters:
-    - `src` (`device`): Input data used by the operation
-- `devices_get_type_name(device_type type) -> cstr8`
-  - What it does: Returns the display name for a device category
-  - Parameters:
-    - `type` (`device_type`): Input parameter
-- `devices_get_count(device_type type) -> sz`
-  - What it does: Returns the number of currently known devices of the requested type
-  - Parameters:
-    - `type` (`device_type`): Input parameter
-- `devices_get_type_count(device_type type) -> u32`
-  - What it does: Returns the number of currently known devices of the requested type as a 32-bit count
-  - Parameters:
-    - `type` (`device_type`): Input parameter
-- `devices_get_device(device_type type, sz idx) -> device`
-  - What it does: Returns the generic device handle at the requested index for a device category
-  - Parameters:
-    - `type` (`device_type`): Input parameter
-    - `idx` (`sz`): Zero-based index used to select an item
-- `devices_is_connected(device dev_id) -> b32`
-  - What it does: Reports whether a generic device handle is currently connected
-  - Parameters:
-    - `dev_id` (`device`): Input parameter
-- `devices_get_info(device dev_id, device_info* out_info) -> b32`
-  - What it does: Fills the current metadata snapshot for a generic device handle
-  - Parameters:
-    - `dev_id` (`device`): Input parameter
-    - `out_info` (`device_info*`): Output value written by the function
+| Function | Declaration |
+| --- | --- |
+| `device_is_valid` | `func b32 device_is_valid(device src);` |
+| `devices_get_type` | `func device_type devices_get_type(device src);` |
+| `device_get_handle` | `func void* device_get_handle(device src);` |
+| `device_get_state` | `func u64 device_get_state(device src);` |
+| `devices_get_type_name` | `func cstr8 devices_get_type_name(device_type type);` |
+| `devices_get_count` | `func sz devices_get_count(device_type type);` |
+| `devices_get_type_count` | `func u32 devices_get_type_count(device_type type);` |
+| `devices_get_device` | `func device devices_get_device(device_type type, sz idx);` |
+| `devices_is_connected` | `func b32 devices_is_connected(device dev_id);` |
+| `devices_get_info` | `func b32 devices_get_info(device dev_id, device_info* out_info);` |
+
+#### Macros
+
+| Macro | Form |
+| --- | --- |
+| `DEVICES_HANDLE_CAP` | `DEVICES_HANDLE_CAP` |
 
 ### `input/gamepads.h`
 
 - Types: **6**
-- Functions: **15**
+- Functions: **17**
+- Macros: **1**
 
 #### Types
 
-- `gamepad` (alias)
-  - What it represents: Type alias used for `gamepad`
-  - Members: none (alias/function type)
-- `gamepad_button` (enum)
-  - What it represents: Represents a set of named constants for `gamepad button`
-  - Members:
-    - `GAMEPAD_BUTTON_INVALID`: `enum value`
-    - `GAMEPAD_BUTTON_SOUTH`: `enum value`
-    - `GAMEPAD_BUTTON_EAST`: `enum value`
-    - `GAMEPAD_BUTTON_WEST`: `enum value`
-    - `GAMEPAD_BUTTON_NORTH`: `enum value`
-    - `GAMEPAD_BUTTON_BACK`: `enum value`
-    - `GAMEPAD_BUTTON_GUIDE`: `enum value`
-    - `GAMEPAD_BUTTON_START`: `enum value`
-    - `GAMEPAD_BUTTON_LEFT_STICK`: `enum value`
-    - `GAMEPAD_BUTTON_RIGHT_STICK`: `enum value`
-    - `GAMEPAD_BUTTON_LEFT_SHOULDER`: `enum value`
-    - `GAMEPAD_BUTTON_RIGHT_SHOULDER`: `enum value`
-    - `GAMEPAD_BUTTON_DPAD_UP`: `enum value`
-    - `GAMEPAD_BUTTON_DPAD_DOWN`: `enum value`
-    - `GAMEPAD_BUTTON_DPAD_LEFT`: `enum value`
-    - `GAMEPAD_BUTTON_DPAD_RIGHT`: `enum value`
-    - `GAMEPAD_BUTTON_MISC1`: `enum value`
-    - `GAMEPAD_BUTTON_RIGHT_PADDLE1`: `enum value`
-    - `GAMEPAD_BUTTON_LEFT_PADDLE1`: `enum value`
-    - `GAMEPAD_BUTTON_RIGHT_PADDLE2`: `enum value`
-    - `GAMEPAD_BUTTON_LEFT_PADDLE2`: `enum value`
-    - `GAMEPAD_BUTTON_TOUCHPAD`: `enum value`
-    - `GAMEPAD_BUTTON_MISC2`: `enum value`
-    - `GAMEPAD_BUTTON_MISC3`: `enum value`
-    - `GAMEPAD_BUTTON_MISC4`: `enum value`
-    - `GAMEPAD_BUTTON_MISC5`: `enum value`
-    - `GAMEPAD_BUTTON_MISC6`: `enum value`
-    - `GAMEPAD_BUTTON_COUNT`: `enum value`
-- `gamepad_axis` (enum)
-  - What it represents: Represents a set of named constants for `gamepad axis`
-  - Members:
-    - `GAMEPAD_AXIS_INVALID`: `enum value`
-    - `GAMEPAD_AXIS_LEFTX`: `enum value`
-    - `GAMEPAD_AXIS_LEFTY`: `enum value`
-    - `GAMEPAD_AXIS_RIGHTX`: `enum value`
-    - `GAMEPAD_AXIS_RIGHTY`: `enum value`
-    - `GAMEPAD_AXIS_LEFT_TRIGGER`: `enum value`
-    - `GAMEPAD_AXIS_RIGHT_TRIGGER`: `enum value`
-    - `GAMEPAD_AXIS_COUNT`: `enum value`
-- `gamepad_touchpad_idx` (alias)
-  - What it represents: Type alias used for `gamepad touchpad idx`
-  - Members: none (alias/function type)
-- `gamepad_finger_idx` (alias)
-  - What it represents: Type alias used for `gamepad finger idx`
-  - Members: none (alias/function type)
-- `gamepad_sensor_kind` (enum)
-  - What it represents: Represents a set of named constants for `gamepad sensor kind`
-  - Members:
-    - `GAMEPAD_SENSOR_KIND_INVALID`: `enum value`
-    - `GAMEPAD_SENSOR_KIND_UNKNOWN`: `enum value`
-    - `GAMEPAD_SENSOR_KIND_ACCEL`: `enum value`
-    - `GAMEPAD_SENSOR_KIND_GYRO`: `enum value`
-    - `GAMEPAD_SENSOR_KIND_ACCEL_L`: `enum value`
-    - `GAMEPAD_SENSOR_KIND_GYRO_L`: `enum value`
-    - `GAMEPAD_SENSOR_KIND_ACCEL_R`: `enum value`
-    - `GAMEPAD_SENSOR_KIND_GYRO_R`: `enum value`
+| Type | Declaration |
+| --- | --- |
+| `gamepad` | `typedef void* gamepad;` |
+| `gamepad_button` | `typedef enum gamepad_button { ... } gamepad_button;` |
+| `gamepad_axis` | `typedef enum gamepad_axis { ... } gamepad_axis;` |
+| `gamepad_touchpad_idx` | `typedef i32 gamepad_touchpad_idx;` |
+| `gamepad_finger_idx` | `typedef i32 gamepad_finger_idx;` |
+| `gamepad_sensor_kind` | `typedef enum gamepad_sensor_kind { ... } gamepad_sensor_kind;` |
 
 #### Functions
 
-- `gamepad_is_valid(gamepad src) -> b32`
-  - What it does: Validates a gamepad handle
-  - Parameters:
-    - `src` (`gamepad`): Input data used by the operation
-- `device_get_gamepad(device src) -> gamepad`
-  - What it does: Converts a generic device handle into a gamepad handle
-  - Parameters:
-    - `src` (`device`): Input data used by the operation
-- `gamepad_to_device(gamepad src) -> device`
-  - What it does: Converts a gamepad handle into a generic device handle
-  - Parameters:
-    - `src` (`gamepad`): Input data used by the operation
-- `gamepad_get_total_count() -> sz`
-  - What it does: Returns the number of currently known gamepads
-  - Parameters: none
-- `gamepad_get_from_idx(sz idx) -> gamepad`
-  - What it does: Returns the gamepad handle at the requested index
-  - Parameters:
-    - `idx` (`sz`): Zero-based index used to select an item
-- `gamepad_get_primary() -> gamepad`
-  - What it does: Returns the primary gamepad handle
-  - Parameters: none
-- `gamepad_get_focused() -> gamepad`
-  - What it does: Returns the focused gamepad handle, or the primary gamepad when none is focused
-  - Parameters: none
-- `gamepad_is_connected(gamepad src) -> b32`
-  - What it does: Reports whether the supplied gamepad is connected
-  - Parameters:
-    - `src` (`gamepad`): Input data used by the operation
-- `gamepad_get_name(gamepad src) -> cstr8`
-  - What it does: Returns the backend-defined name for a gamepad handle
-  - Parameters:
-    - `src` (`gamepad`): Input parameter
-- `gamepad_has_button(gamepad src, gamepad_button button) -> b32`
-  - What it does: Reports whether the gamepad exposes the requested button
-  - Parameters:
-    - `src` (`gamepad`): Input parameter
-    - `button` (`gamepad_button`): Input parameter
-- `gamepad_get_button(gamepad src, gamepad_button button) -> b32`
-  - What it does: Returns the cached state of a gamepad button
-  - Parameters:
-    - `src` (`gamepad`): Input parameter
-    - `button` (`gamepad_button`): Input parameter
-- `gamepad_has_axis(gamepad src, gamepad_axis axis) -> b32`
-  - What it does: Reports whether the gamepad exposes the requested axis
-  - Parameters:
-    - `src` (`gamepad`): Input parameter
-    - `axis` (`gamepad_axis`): Input parameter
-- `gamepad_get_axis(gamepad src, gamepad_axis axis) -> i16`
-  - What it does: Returns the cached signed value of a gamepad axis
-  - Parameters:
-    - `src` (`gamepad`): Input parameter
-    - `axis` (`gamepad_axis`): Input parameter
-- `gamepad_set_rumble(gamepad src, u16 low_freq, u16 high_freq, u32 duration_ms) -> b32`
-  - What it does: Starts gamepad rumble on a specific device
-  - Parameters:
-    - `src` (`gamepad`): Input parameter
-    - `low_freq` (`u16`): Input parameter
-    - `high_freq` (`u16`): Input parameter
-    - `duration_ms` (`u32`): Input parameter
-- `gamepad_set_led(gamepad src, u8 red, u8 green, u8 blue) -> b32`
-  - What it does: Sets the LED color on a specific gamepad
-  - Parameters:
-    - `src` (`gamepad`): Input parameter
-    - `red` (`u8`): Input parameter
-    - `green` (`u8`): Input parameter
-    - `blue` (`u8`): Input parameter
-- `gamepad_set_axis_deadzone(gamepad src, gamepad_axis axis, i16 deadzone) -> b32`
-  - What it does: Sets the deadzone used for a specific gamepad axis
-  - Parameters:
-    - `src` (`gamepad`): Input parameter
-    - `axis` (`gamepad_axis`): Input parameter
-    - `deadzone` (`i16`): Input parameter
-- `gamepad_get_axis_deadzone(gamepad src, gamepad_axis axis) -> i16`
-  - What it does: Returns the current deadzone for a specific gamepad axis
-  - Parameters:
-    - `src` (`gamepad`): Input parameter
-    - `axis` (`gamepad_axis`): Input parameter
+| Function | Declaration |
+| --- | --- |
+| `gamepad_is_valid` | `func b32 gamepad_is_valid(gamepad src);` |
+| `device_get_gamepad` | `func gamepad device_get_gamepad(device src);` |
+| `gamepad_to_device` | `func device gamepad_to_device(gamepad src);` |
+| `gamepad_get_total_count` | `func sz gamepad_get_total_count(void);` |
+| `gamepad_get_from_idx` | `func gamepad gamepad_get_from_idx(sz idx);` |
+| `gamepad_get_primary` | `func gamepad gamepad_get_primary(void);` |
+| `gamepad_get_focused` | `func gamepad gamepad_get_focused(void);` |
+| `gamepad_is_connected` | `func b32 gamepad_is_connected(gamepad src);` |
+| `gamepad_get_name` | `func cstr8 gamepad_get_name(gamepad src);` |
+| `gamepad_has_button` | `func b32 gamepad_has_button(gamepad src, gamepad_button button);` |
+| `gamepad_get_button` | `func b32 gamepad_get_button(gamepad src, gamepad_button button);` |
+| `gamepad_has_axis` | `func b32 gamepad_has_axis(gamepad src, gamepad_axis axis);` |
+| `gamepad_get_axis` | `func i16 gamepad_get_axis(gamepad src, gamepad_axis axis);` |
+| `gamepad_set_rumble` | `func b32 gamepad_set_rumble(gamepad src, u16 low_freq, u16 high_freq, u32 duration_ms);` |
+| `gamepad_set_led` | `func b32 gamepad_set_led(gamepad src, u8 red, u8 green, u8 blue);` |
+| `gamepad_set_axis_deadzone` | `func b32 gamepad_set_axis_deadzone(gamepad src, gamepad_axis axis, i16 deadzone);` |
+| `gamepad_get_axis_deadzone` | `func i16 gamepad_get_axis_deadzone(gamepad src, gamepad_axis axis);` |
+
+#### Macros
+
+| Macro | Form |
+| --- | --- |
+| `GAMEPADS_MAX_COUNT` | `GAMEPADS_MAX_COUNT` |
 
 ### `input/joystick.h`
 
 - Types: **2**
 - Functions: **18**
+- Macros: **0**
 
 #### Types
 
-- `joystick` (alias)
-  - What it represents: Type alias used for `joystick`
-  - Members: none (alias/function type)
-- `joystick_hat_state` (enum)
-  - What it represents: Represents a set of named constants for `joystick hat state`
-  - Members:
-    - `JOYSTICK_HAT_STATE_CENTERED`: `enum value`
-    - `JOYSTICK_HAT_STATE_UP`: `enum value`
-    - `JOYSTICK_HAT_STATE_RIGHT`: `enum value`
-    - `JOYSTICK_HAT_STATE_DOWN`: `enum value`
-    - `JOYSTICK_HAT_STATE_LEFT`: `enum value`
-    - `JOYSTICK_HAT_STATE_RIGHT_UP`: `enum value`
-    - `JOYSTICK_HAT_STATE_RIGHT_DOWN`: `enum value`
-    - `JOYSTICK_HAT_STATE_LEFT_UP`: `enum value`
-    - `JOYSTICK_HAT_STATE_LEFT_DOWN`: `enum value`
+| Type | Declaration |
+| --- | --- |
+| `joystick` | `typedef void* joystick;` |
+| `joystick_hat_state` | `typedef enum joystick_hat_state { ... } joystick_hat_state;` |
 
 #### Functions
 
-- `joystick_is_valid(joystick src) -> b32`
-  - What it does: Validates a joystick handle
-  - Parameters:
-    - `src` (`joystick`): Input data used by the operation
-- `device_get_joystick(device src) -> joystick`
-  - What it does: Converts a generic device handle into a joystick handle
-  - Parameters:
-    - `src` (`device`): Input data used by the operation
-- `joystick_to_device(joystick src) -> device`
-  - What it does: Converts a joystick handle into a generic device handle
-  - Parameters:
-    - `src` (`joystick`): Input data used by the operation
-- `joystick_get_total_count() -> sz`
-  - What it does: Returns the number of currently known joysticks
-  - Parameters: none
-- `joystick_get_from_idx(sz idx) -> joystick`
-  - What it does: Returns the joystick handle at the requested index
-  - Parameters:
-    - `idx` (`sz`): Zero-based index used to select an item
-- `joystick_get_primary() -> joystick`
-  - What it does: Returns the primary joystick handle
-  - Parameters: none
-- `joystick_get_focused() -> joystick`
-  - What it does: Returns the focused joystick handle, or the primary joystick when none is focused
-  - Parameters: none
-- `joystick_get_name(joystick joy_id) -> cstr8`
-  - What it does: Returns the backend-defined name for a joystick handle
-  - Parameters:
-    - `joy_id` (`joystick`): Input parameter
-- `joystick_is_connected(joystick joy_id) -> b32`
-  - What it does: Reports whether a joystick handle is connected
-  - Parameters:
-    - `joy_id` (`joystick`): Input parameter
-- `joystick_get_axis_count(joystick joy_id) -> sz`
-  - What it does: Returns the number of joystick axes
-  - Parameters:
-    - `joy_id` (`joystick`): Input parameter
-- `joystick_get_ball_count(joystick joy_id) -> sz`
-  - What it does: Returns the number of joystick trackballs
-  - Parameters:
-    - `joy_id` (`joystick`): Input parameter
-- `joystick_get_hat_count(joystick joy_id) -> sz`
-  - What it does: Returns the number of joystick hats
-  - Parameters:
-    - `joy_id` (`joystick`): Input parameter
-- `joystick_get_button_count(joystick joy_id) -> sz`
-  - What it does: Returns the number of joystick buttons
-  - Parameters:
-    - `joy_id` (`joystick`): Input parameter
-- `joystick_get_axis(joystick joy_id, sz axis_idx) -> i16`
-  - What it does: Returns the current value for a joystick axis
-  - Parameters:
-    - `joy_id` (`joystick`): Input parameter
-    - `axis_idx` (`sz`): Zero-based index used to select an item
-- `joystick_get_ball(joystick joy_id, sz ball_idx, i32* out_xrel, i32* out_yrel) -> b32`
-  - What it does: Returns relative trackball motion for a joystick ball control
-  - Parameters:
-    - `joy_id` (`joystick`): Input parameter
-    - `ball_idx` (`sz`): Zero-based index used to select an item
-    - `out_xrel` (`i32*`): Output value written by the function
-    - `out_yrel` (`i32*`): Output value written by the function
-- `joystick_get_hat(joystick joy_id, sz hat_idx) -> joystick_hat_state`
-  - What it does: Returns the current hat state for a joystick hat control
-  - Parameters:
-    - `joy_id` (`joystick`): Input parameter
-    - `hat_idx` (`sz`): Zero-based index used to select an item
-- `joystick_get_button(joystick joy_id, sz button_idx) -> b32`
-  - What it does: Returns the current state for a joystick button control
-  - Parameters:
-    - `joy_id` (`joystick`): Input parameter
-    - `button_idx` (`sz`): Zero-based index used to select an item
-- `joystick_get_battery(joystick joy_id, i32* out_percent) -> battery_state`
-  - What it does: Returns the current battery state and optional percentage for a joystick
-  - Parameters:
-    - `joy_id` (`joystick`): Input parameter
-    - `out_percent` (`i32*`): Output value written by the function
+| Function | Declaration |
+| --- | --- |
+| `joystick_is_valid` | `func b32 joystick_is_valid(joystick src);` |
+| `device_get_joystick` | `func joystick device_get_joystick(device src);` |
+| `joystick_to_device` | `func device joystick_to_device(joystick src);` |
+| `joystick_get_total_count` | `func sz joystick_get_total_count(void);` |
+| `joystick_get_from_idx` | `func joystick joystick_get_from_idx(sz idx);` |
+| `joystick_get_primary` | `func joystick joystick_get_primary(void);` |
+| `joystick_get_focused` | `func joystick joystick_get_focused(void);` |
+| `joystick_get_name` | `func cstr8 joystick_get_name(joystick joy_id);` |
+| `joystick_is_connected` | `func b32 joystick_is_connected(joystick joy_id);` |
+| `joystick_get_axis_count` | `func sz joystick_get_axis_count(joystick joy_id);` |
+| `joystick_get_ball_count` | `func sz joystick_get_ball_count(joystick joy_id);` |
+| `joystick_get_hat_count` | `func sz joystick_get_hat_count(joystick joy_id);` |
+| `joystick_get_button_count` | `func sz joystick_get_button_count(joystick joy_id);` |
+| `joystick_get_axis` | `func i16 joystick_get_axis(joystick joy_id, sz axis_idx);` |
+| `joystick_get_ball` | `func b32 joystick_get_ball(joystick joy_id, sz ball_idx, i32* out_xrel, i32* out_yrel);` |
+| `joystick_get_hat` | `func joystick_hat_state joystick_get_hat(joystick joy_id, sz hat_idx);` |
+| `joystick_get_button` | `func b32 joystick_get_button(joystick joy_id, sz button_idx);` |
+| `joystick_get_battery` | `func battery_state joystick_get_battery(joystick joy_id, i32* out_percent);` |
+
+#### Macros
+
+| Macro | Form |
+| --- | --- |
+| None | - |
 
 ### `input/keyboard.h`
 
 - Types: **1**
-- Functions: **12**
+- Functions: **13**
+- Macros: **0**
 
 #### Types
 
-- `keyboard` (alias)
-  - What it represents: Type alias used for `keyboard`
-  - Members: none (alias/function type)
+| Type | Declaration |
+| --- | --- |
+| `keyboard` | `typedef void* keyboard;` |
 
 #### Functions
 
-- `keyboard_is_valid(keyboard src) -> b32`
-  - What it does: Validates a keyboard handle
-  - Parameters:
-    - `src` (`keyboard`): Input data used by the operation
-- `device_get_keyboard(device src) -> keyboard`
-  - What it does: Converts a generic device handle into a keyboard handle
-  - Parameters:
-    - `src` (`device`): Input data used by the operation
-- `keyboard_to_device(keyboard src) -> device`
-  - What it does: Converts a keyboard handle into a generic device handle
-  - Parameters:
-    - `src` (`keyboard`): Input data used by the operation
-- `keyboard_is_available() -> b32`
-  - What it does: Reports whether any keyboard backend is available
-  - Parameters: none
-- `keyboard_get_primary() -> keyboard`
-  - What it does: Returns the primary keyboard handle
-  - Parameters: none
-- `keyboard_get_focused() -> keyboard`
-  - What it does: Returns the focused keyboard handle, or the primary keyboard when none is focused
-  - Parameters: none
-- `keyboard_is_key_down(keyboard src, vkey key) -> b32`
-  - What it does: Reports whether a key is down on a specific keyboard
-  - Parameters:
-    - `src` (`keyboard`): Input parameter
-    - `key` (`vkey`): Input parameter
-- `keyboard_get_mods(keyboard src) -> keymod`
-  - What it does: Returns the cached modifier state for a specific keyboard
-  - Parameters:
-    - `src` (`keyboard`): Input parameter
-- `keyboard_has_mods(keyboard src, keymod required_mods) -> b32`
-  - What it does: Reports whether a keyboard satisfies the requested modifier mask
-  - Parameters:
-    - `src` (`keyboard`): Input parameter
-    - `required_mods` (`keymod`): Input parameter
-- `keyboard_has_mods_exact(keyboard src, keymod required_mods, keymod forbidden_mods) -> b32`
-  - What it does: Reports whether a keyboard satisfies required and forbidden modifier masks
-  - Parameters:
-    - `src` (`keyboard`): Input parameter
-    - `required_mods` (`keymod`): Input parameter
-    - `forbidden_mods` (`keymod`): Input parameter
-- `keyboard_is_key_down_mod(keyboard src, vkey key, keymod required_mods, keymod forbidden_mods) -> b32`
-  - What it does: Reports whether a key is down and a specific keyboard satisfies the modifier requirements
-  - Parameters:
-    - `src` (`keyboard`): Input parameter
-    - `key` (`vkey`): Input parameter
-    - `required_mods` (`keymod`): Input parameter
-    - `forbidden_mods` (`keymod`): Input parameter
-- `keyboard_get_key_name(keyboard src, vkey key) -> cstr8`
-  - What it does: Returns the readable physical-key name for a key query on a specific keyboard
-  - Parameters:
-    - `src` (`keyboard`): Input parameter
-    - `key` (`vkey`): Input parameter
-- `keyboard_get_key_display_name(keyboard src, vkey key, keymod modifiers, b32 key_event) -> cstr8`
-  - What it does: Returns the translated key-display name for a key query on a specific keyboard
-  - Parameters:
-    - `src` (`keyboard`): Input parameter
-    - `key` (`vkey`): Input parameter
-    - `modifiers` (`keymod`): Input parameter
-    - `key_event` (`b32`): Input parameter
+| Function | Declaration |
+| --- | --- |
+| `keyboard_is_valid` | `func b32 keyboard_is_valid(keyboard src);` |
+| `device_get_keyboard` | `func keyboard device_get_keyboard(device src);` |
+| `keyboard_to_device` | `func device keyboard_to_device(keyboard src);` |
+| `keyboard_is_available` | `func b32 keyboard_is_available(void);` |
+| `keyboard_get_primary` | `func keyboard keyboard_get_primary(void);` |
+| `keyboard_get_focused` | `func keyboard keyboard_get_focused(void);` |
+| `keyboard_is_key_down` | `func b32 keyboard_is_key_down(keyboard src, vkey key);` |
+| `keyboard_get_mods` | `func keymod keyboard_get_mods(keyboard src);` |
+| `keyboard_has_mods` | `func b32 keyboard_has_mods(keyboard src, keymod required_mods);` |
+| `keyboard_has_mods_exact` | `func b32 keyboard_has_mods_exact(keyboard src, keymod required_mods, keymod forbidden_mods);` |
+| `keyboard_is_key_down_mod` | `func b32 keyboard_is_key_down_mod(keyboard src, vkey key, keymod required_mods, keymod forbidden_mods);` |
+| `keyboard_get_key_name` | `func cstr8 keyboard_get_key_name(keyboard src, vkey key);` |
+| `keyboard_get_key_display_name` | `func cstr8 keyboard_get_key_display_name(keyboard src, vkey key, keymod modifiers, b32 key_event);` |
+
+#### Macros
+
+| Macro | Form |
+| --- | --- |
+| None | - |
 
 ### `input/mouse.h`
 
 - Types: **4**
-- Functions: **7**
+- Functions: **8**
+- Macros: **0**
 
 #### Types
 
-- `mouse` (alias)
-  - What it represents: Type alias used for `mouse`
-  - Members: none (alias/function type)
-- `mouse_button` (enum)
-  - What it represents: Represents a set of named constants for `mouse button`
-  - Members:
-    - `MOUSE_BUTTON_LEFT`: `enum value`
-    - `MOUSE_BUTTON_MIDDLE`: `enum value`
-    - `MOUSE_BUTTON_RIGHT`: `enum value`
-    - `MOUSE_BUTTON_X1`: `enum value`
-    - `MOUSE_BUTTON_X2`: `enum value`
-    - `MOUSE_BUTTON_COUNT`: `enum value`
-- `mouse_wheel_direction` (enum)
-  - What it represents: Represents a set of named constants for `mouse wheel direction`
-  - Members:
-    - `MOUSE_WHEEL_DIRECTION_NORMAL`: `enum value`
-    - `MOUSE_WHEEL_DIRECTION_FLIPPED`: `enum value`
-- `mouse_state` (alias)
-  - What it represents: Type alias used for `mouse state`
-  - Members: none (alias/function type)
+| Type | Declaration |
+| --- | --- |
+| `mouse` | `typedef void* mouse;` |
+| `mouse_button` | `typedef enum mouse_button { ... } mouse_button;` |
+| `mouse_wheel_direction` | `typedef enum mouse_wheel_direction { ... } mouse_wheel_direction;` |
+| `mouse_state` | `typedef u32 mouse_state;` |
 
 #### Functions
 
-- `mouse_is_valid(mouse src) -> b32`
-  - What it does: Validates a mouse handle
-  - Parameters:
-    - `src` (`mouse`): Input data used by the operation
-- `device_get_mouse(device src) -> mouse`
-  - What it does: Converts a generic device handle into a mouse handle
-  - Parameters:
-    - `src` (`device`): Input data used by the operation
-- `mouse_to_device(mouse src) -> device`
-  - What it does: Converts a mouse handle into a generic device handle
-  - Parameters:
-    - `src` (`mouse`): Input data used by the operation
-- `mouse_is_available() -> b32`
-  - What it does: Reports whether any mouse backend is available
-  - Parameters: none
-- `mouse_get_primary() -> mouse`
-  - What it does: Returns the primary mouse handle
-  - Parameters: none
-- `mouse_get_focused() -> mouse`
-  - What it does: Returns the focused mouse handle, or the primary mouse when none is focused
-  - Parameters: none
-- `mouse_get_state(mouse src) -> mouse_state`
-  - What it does: Returns the cached button state for a specific mouse
-  - Parameters:
-    - `src` (`mouse`): Input parameter
-- `mouse_is_button_down(mouse src, mouse_button button) -> b32`
-  - What it does: Reports whether a button is down on a specific mouse
-  - Parameters:
-    - `src` (`mouse`): Input parameter
-    - `button` (`mouse_button`): Input parameter
+| Function | Declaration |
+| --- | --- |
+| `mouse_is_valid` | `func b32 mouse_is_valid(mouse src);` |
+| `device_get_mouse` | `func mouse device_get_mouse(device src);` |
+| `mouse_to_device` | `func device mouse_to_device(mouse src);` |
+| `mouse_is_available` | `func b32 mouse_is_available(void);` |
+| `mouse_get_primary` | `func mouse mouse_get_primary(void);` |
+| `mouse_get_focused` | `func mouse mouse_get_focused(void);` |
+| `mouse_get_state` | `func mouse_state mouse_get_state(mouse src);` |
+| `mouse_is_button_down` | `func b32 mouse_is_button_down(mouse src, mouse_button button);` |
+
+#### Macros
+
+| Macro | Form |
+| --- | --- |
+| None | - |
 
 ### `input/msg.h`
 
 - Types: **5**
-- Functions: **6**
+- Functions: **5**
+- Macros: **3**
 
 #### Types
 
-- `msg_category` (enum)
-  - What it represents: Represents a set of named constants for `msg category`
-  - Members:
-    - `MSG_CATEGORY_CORE`: `enum value`
-    - `MSG_CATEGORY_GRAPHICS`: `enum value`
-    - `MSG_CATEGORY_AUDIO`: `enum value`
-    - `MSG_CATEGORY_USER0`: `enum value`
-    - `MSG_CATEGORY_USER1`: `enum value`
-    - `MSG_CATEGORY_USER2`: `enum value`
-    - `MSG_CATEGORY_USER3`: `enum value`
-    - `MSG_CATEGORY_MAX`: `enum value`
-- `msg` (struct)
-  - What it represents: Represents `msg` data grouped in a struct
-  - Members:
-    - `type`: `u32`
-    - `timestamp`: `u64`
-    - `post_site`: `callsite`
-    - `data`: `u8 [MSG_DATA_SIZE]`
-    - `category`: `msg_category`
-- `msg_handler_fn` (alias)
-  - What it represents: Type alias used for `msg handler fn`
-  - Members: none (alias/function type)
-- `msg_filter_fn` (alias)
-  - What it represents: Type alias used for `msg filter fn`
-  - Members: none (alias/function type)
-- `msg_handler_desc` (struct)
-  - What it represents: Represents `msg handler desc` data grouped in a struct
-  - Members:
-    - `handler_fn`: `msg_handler_fn`
-    - `user_data`: `void*`
-    - `priority`: `i32`
-    - `category`: `msg_category`
-    - `type`: `u32`
+| Type | Declaration |
+| --- | --- |
+| `msg_category` | `typedef enum msg_category { ... } msg_category;` |
+| `msg` | `typedef struct msg { ... } msg;` |
+| `msg_handler_fn` | `typedef b32 (*msg_handler_fn)(msg* src, void* user_data);` |
+| `msg_filter_fn` | `typedef b32 (*msg_filter_fn)(const msg* src, void* user_data);` |
+| `msg_handler_desc` | `typedef struct msg_handler_desc { ... } msg_handler_desc;` |
 
 #### Functions
 
-- `msg_poll(msg* out_msg) -> b32`
-  - What it does: Performs msg poll
-  - Parameters:
-    - `out_msg` (`msg*`): Output value written by the function
-- `_msg_post(const msg* src, callsite site) -> b32`
-  - What it does: Performs  msg post
-  - Parameters:
-    - `src` (`const msg*`): Input data used by the operation
-    - `site` (`callsite`): Input parameter
-- `msg_add_handler(const msg_handler_desc* desc) -> u64`
-  - What it does: Adds msg add handler
-  - Parameters:
-    - `desc` (`const msg_handler_desc*`): Input parameter
-- `msg_remove_handler(u64 handler_id) -> b32`
-  - What it does: Removes msg remove handler
-  - Parameters:
-    - `handler_id` (`u64`): Input parameter
-- `msg_set_filter(msg_filter_fn filter_fn, void* user_data) -> void`
-  - What it does: Sets msg set filter
-  - Parameters:
-    - `filter_fn` (`msg_filter_fn`): Input parameter
-    - `user_data` (`void*`): Input parameter
+| Function | Declaration |
+| --- | --- |
+| `msg_poll` | `func b32 msg_poll(msg* out_msg);` |
+| `_msg_post` | `func b32 _msg_post(const msg* src, callsite site);` |
+| `msg_add_handler` | `func u64 msg_add_handler(const msg_handler_desc* desc);` |
+| `msg_remove_handler` | `func b32 msg_remove_handler(u64 handler_id);` |
+| `msg_set_filter` | `func void msg_set_filter(msg_filter_fn filter_fn, void* user_data);` |
+
+#### Macros
+
+| Macro | Form |
+| --- | --- |
+| `MSG_HANDLER_CAP` | `MSG_HANDLER_CAP` |
+| `MSG_DATA_SIZE` | `MSG_DATA_SIZE` |
+| `msg_post` | `msg_post(src)` |
 
 ### `input/msg_core.h`
 
 - Types: **49**
 - Functions: **84**
+- Macros: **2**
 
 #### Types
 
-- `msg_core_type` (enum)
-  - What it represents: Represents a set of named constants for `msg core type`
-  - Members:
-    - `MSG_CORE_TYPE_NONE`: `enum value`
-    - `MSG_CORE_TYPE_QUIT`: `enum value`
-    - `MSG_CORE_TYPE_TERMINATING`: `enum value`
-    - `MSG_CORE_TYPE_LOW_MEMORY`: `enum value`
-    - `MSG_CORE_TYPE_WILL_ENTER_BACKGROUND`: `enum value`
-    - `MSG_CORE_TYPE_DID_ENTER_BACKGROUND`: `enum value`
-    - `MSG_CORE_TYPE_WILL_ENTER_FOREGROUND`: `enum value`
-    - `MSG_CORE_TYPE_DID_ENTER_FOREGROUND`: `enum value`
-    - `MSG_CORE_TYPE_LOCALE_CHANGED`: `enum value`
-    - `MSG_CORE_TYPE_SYSTEM_THEME_CHANGED`: `enum value`
-    - `MSG_CORE_TYPE_MONITOR_ORIENTATION`: `enum value`
-    - `MSG_CORE_TYPE_MONITOR_ADDED`: `enum value`
-    - `MSG_CORE_TYPE_MONITOR_REMOVED`: `enum value`
-    - `MSG_CORE_TYPE_MONITOR_MOVED`: `enum value`
-    - `MSG_CORE_TYPE_MONITOR_DESKTOP_MODE_CHANGED`: `enum value`
-    - `MSG_CORE_TYPE_MONITOR_CURRENT_MODE_CHANGED`: `enum value`
-    - `MSG_CORE_TYPE_MONITOR_CONTENT_SCALE_CHANGED`: `enum value`
-    - `MSG_CORE_TYPE_WINDOW_SHOWN`: `enum value`
-    - `MSG_CORE_TYPE_WINDOW_HIDDEN`: `enum value`
-    - `MSG_CORE_TYPE_WINDOW_EXPOSED`: `enum value`
-    - `MSG_CORE_TYPE_WINDOW_MOVED`: `enum value`
-    - `MSG_CORE_TYPE_WINDOW_RESIZED`: `enum value`
-    - `MSG_CORE_TYPE_WINDOW_PIXEL_SIZE_CHANGED`: `enum value`
-    - `MSG_CORE_TYPE_WINDOW_METAL_VIEW_RESIZED`: `enum value`
-    - `MSG_CORE_TYPE_WINDOW_MINIMIZED`: `enum value`
-    - `MSG_CORE_TYPE_WINDOW_MAXIMIZED`: `enum value`
-    - `MSG_CORE_TYPE_WINDOW_RESTORED`: `enum value`
-    - `MSG_CORE_TYPE_WINDOW_MOUSE_ENTER`: `enum value`
-    - `MSG_CORE_TYPE_WINDOW_MOUSE_LEAVE`: `enum value`
-    - `MSG_CORE_TYPE_WINDOW_FOCUS_GAINED`: `enum value`
-    - `MSG_CORE_TYPE_WINDOW_FOCUS_LOST`: `enum value`
-    - `MSG_CORE_TYPE_WINDOW_CLOSE_REQUESTED`: `enum value`
-    - `MSG_CORE_TYPE_WINDOW_HIT_TEST`: `enum value`
-    - `MSG_CORE_TYPE_WINDOW_ICCPROF_CHANGED`: `enum value`
-    - `MSG_CORE_TYPE_WINDOW_MONITOR_CHANGED`: `enum value`
-    - `MSG_CORE_TYPE_WINDOW_MONITOR_SCALE_CHANGED`: `enum value`
-    - `MSG_CORE_TYPE_WINDOW_SAFE_AREA_CHANGED`: `enum value`
-    - `MSG_CORE_TYPE_WINDOW_OCCLUDED`: `enum value`
-    - `MSG_CORE_TYPE_WINDOW_ENTER_FULLSCREEN`: `enum value`
-    - `MSG_CORE_TYPE_WINDOW_LEAVE_FULLSCREEN`: `enum value`
-    - `MSG_CORE_TYPE_WINDOW_DESTROYED`: `enum value`
-    - `MSG_CORE_TYPE_WINDOW_HDR_STATE_CHANGED`: `enum value`
-    - `MSG_CORE_TYPE_KEY_DOWN`: `enum value`
-    - `MSG_CORE_TYPE_KEY_UP`: `enum value`
-    - `MSG_CORE_TYPE_TEXT_EDITING`: `enum value`
-    - `MSG_CORE_TYPE_TEXT_INPUT`: `enum value`
-    - `MSG_CORE_TYPE_KEYMAP_CHANGED`: `enum value`
-    - `MSG_CORE_TYPE_KEYBOARD_ADDED`: `enum value`
-    - `MSG_CORE_TYPE_KEYBOARD_REMOVED`: `enum value`
-    - `MSG_CORE_TYPE_TEXT_EDITING_CANDIDATES`: `enum value`
-    - `MSG_CORE_TYPE_MOUSE_MOTION`: `enum value`
-    - `MSG_CORE_TYPE_MOUSE_BUTTON_DOWN`: `enum value`
-    - `MSG_CORE_TYPE_MOUSE_BUTTON_UP`: `enum value`
-    - `MSG_CORE_TYPE_MOUSE_WHEEL`: `enum value`
-    - `MSG_CORE_TYPE_MOUSE_ADDED`: `enum value`
-    - `MSG_CORE_TYPE_MOUSE_REMOVED`: `enum value`
-    - `MSG_CORE_TYPE_JOYSTICK_AXIS_MOTION`: `enum value`
-    - `MSG_CORE_TYPE_JOYSTICK_BALL_MOTION`: `enum value`
-    - `MSG_CORE_TYPE_JOYSTICK_HAT_MOTION`: `enum value`
-    - `MSG_CORE_TYPE_JOYSTICK_BUTTON_DOWN`: `enum value`
-    - `MSG_CORE_TYPE_JOYSTICK_BUTTON_UP`: `enum value`
-    - `MSG_CORE_TYPE_JOYSTICK_ADDED`: `enum value`
-    - `MSG_CORE_TYPE_JOYSTICK_REMOVED`: `enum value`
-    - `MSG_CORE_TYPE_JOYSTICK_BATTERY_UPDATED`: `enum value`
-    - `MSG_CORE_TYPE_JOYSTICK_UPDATE_COMPLETE`: `enum value`
-    - `MSG_CORE_TYPE_GAMEPAD_AXIS_MOTION`: `enum value`
-    - `MSG_CORE_TYPE_GAMEPAD_BUTTON_DOWN`: `enum value`
-    - `MSG_CORE_TYPE_GAMEPAD_BUTTON_UP`: `enum value`
-    - `MSG_CORE_TYPE_GAMEPAD_ADDED`: `enum value`
-    - `MSG_CORE_TYPE_GAMEPAD_REMOVED`: `enum value`
-    - `MSG_CORE_TYPE_GAMEPAD_REMAPPED`: `enum value`
-    - `MSG_CORE_TYPE_GAMEPAD_TOUCHPAD_DOWN`: `enum value`
-    - `MSG_CORE_TYPE_GAMEPAD_TOUCHPAD_MOTION`: `enum value`
-    - `MSG_CORE_TYPE_GAMEPAD_TOUCHPAD_UP`: `enum value`
-    - `MSG_CORE_TYPE_GAMEPAD_SENSOR_UPDATE`: `enum value`
-    - `MSG_CORE_TYPE_GAMEPAD_UPDATE_COMPLETE`: `enum value`
-    - `MSG_CORE_TYPE_GAMEPAD_STEAM_HANDLE_UPDATED`: `enum value`
-    - `MSG_CORE_TYPE_FINGER_DOWN`: `enum value`
-    - `MSG_CORE_TYPE_FINGER_UP`: `enum value`
-    - `MSG_CORE_TYPE_FINGER_MOTION`: `enum value`
-    - `MSG_CORE_TYPE_FINGER_CANCELED`: `enum value`
-    - `MSG_CORE_TYPE_CLIPBOARD_UPDATE`: `enum value`
-    - `MSG_CORE_TYPE_DROP_FILE`: `enum value`
-    - `MSG_CORE_TYPE_DROP_TEXT`: `enum value`
-    - `MSG_CORE_TYPE_DROP_BEGIN`: `enum value`
-    - `MSG_CORE_TYPE_DROP_COMPLETE`: `enum value`
-    - `MSG_CORE_TYPE_DROP_POS`: `enum value`
-    - `MSG_CORE_TYPE_AUDIO_DEVICE_ADDED`: `enum value`
-    - `MSG_CORE_TYPE_AUDIO_DEVICE_REMOVED`: `enum value`
-    - `MSG_CORE_TYPE_AUDIO_DEVICE_FORMAT_CHANGED`: `enum value`
-    - `MSG_CORE_TYPE_SENSOR_UPDATE`: `enum value`
-    - `MSG_CORE_TYPE_PEN_PROXIMITY_IN`: `enum value`
-    - `MSG_CORE_TYPE_PEN_PROXIMITY_OUT`: `enum value`
-    - `MSG_CORE_TYPE_PEN_DOWN`: `enum value`
-    - `MSG_CORE_TYPE_PEN_UP`: `enum value`
-    - `MSG_CORE_TYPE_PEN_BUTTON_DOWN`: `enum value`
-    - `MSG_CORE_TYPE_PEN_BUTTON_UP`: `enum value`
-    - `MSG_CORE_TYPE_PEN_MOTION`: `enum value`
-    - `MSG_CORE_TYPE_PEN_AXIS`: `enum value`
-    - `MSG_CORE_TYPE_CAMERA_DEVICE_ADDED`: `enum value`
-    - `MSG_CORE_TYPE_CAMERA_DEVICE_REMOVED`: `enum value`
-    - `MSG_CORE_TYPE_CAMERA_DEVICE_APPROVED`: `enum value`
-    - `MSG_CORE_TYPE_CAMERA_DEVICE_DENIED`: `enum value`
-    - `MSG_CORE_TYPE_RENDER_TARGETS_RESET`: `enum value`
-    - `MSG_CORE_TYPE_RENDER_DEVICE_RESET`: `enum value`
-    - `MSG_CORE_TYPE_RENDER_DEVICE_LOST`: `enum value`
-    - `MSG_CORE_TYPE_USER`: `enum value`
-    - `MSG_CORE_TYPE_OBJECT_LIFECYCLE`: `enum value`
-    - `MSG_CORE_TYPE_THREAD_CTX`: `enum value`
-    - `MSG_CORE_TYPE_PATHWATCH`: `enum value`
-    - `MSG_CORE_TYPE_LOG`: `enum value`
-    - `MSG_CORE_TYPE_ASSERT`: `enum value`
-    - `MSG_CORE_TYPE_TOUCH_ADDED`: `enum value`
-    - `MSG_CORE_TYPE_TOUCH_REMOVED`: `enum value`
-    - `MSG_CORE_TYPE_TABLET_ADDED`: `enum value`
-    - `MSG_CORE_TYPE_TABLET_REMOVED`: `enum value`
-    - `MSG_CORE_TYPE_GLOBAL_CTX`: `enum value`
-- `msg_core_object_event_kind` (enum)
-  - What it represents: Represents a set of named constants for `msg core object event kind`
-  - Members:
-    - `MSG_CORE_OBJECT_EVENT_CREATE`: `enum value`
-    - `MSG_CORE_OBJECT_EVENT_DESTROY`: `enum value`
-- `msg_core_object_type` (enum)
-  - What it represents: Represents a set of named constants for `msg core object type`
-  - Members:
-    - `MSG_CORE_OBJECT_TYPE_THREAD`: `enum value`
-    - `MSG_CORE_OBJECT_TYPE_THREAD_GROUP`: `enum value`
-    - `MSG_CORE_OBJECT_TYPE_MUTEX`: `enum value`
-    - `MSG_CORE_OBJECT_TYPE_CONDVAR`: `enum value`
-    - `MSG_CORE_OBJECT_TYPE_RWLOCK`: `enum value`
-    - `MSG_CORE_OBJECT_TYPE_SEMAPHORE`: `enum value`
-    - `MSG_CORE_OBJECT_TYPE_SPINLOCK`: `enum value`
-    - `MSG_CORE_OBJECT_TYPE_ARENA`: `enum value`
-    - `MSG_CORE_OBJECT_TYPE_HEAP`: `enum value`
-    - `MSG_CORE_OBJECT_TYPE_POOL`: `enum value`
-    - `MSG_CORE_OBJECT_TYPE_RING`: `enum value`
-    - `MSG_CORE_OBJECT_TYPE_PROCESS`: `enum value`
-    - `MSG_CORE_OBJECT_TYPE_ARCHIVE`: `enum value`
-    - `MSG_CORE_OBJECT_TYPE_PATHWATCH`: `enum value`
-    - `MSG_CORE_OBJECT_TYPE_LOG_STATE`: `enum value`
-    - `MSG_CORE_OBJECT_TYPE_FILEMAP`: `enum value`
-    - `MSG_CORE_OBJECT_TYPE_FILESTREAM`: `enum value`
-    - `MSG_CORE_OBJECT_TYPE_PIPE`: `enum value`
-- `msg_core_thread_ctx_event_kind` (enum)
-  - What it represents: Represents a set of named constants for `msg core thread ctx event kind`
-  - Members:
-    - `MSG_CORE_THREAD_CTX_EVENT_INIT`: `enum value`
-    - `MSG_CORE_THREAD_CTX_EVENT_QUIT`: `enum value`
-- `msg_core_pathwatch_event_kind` (enum)
-  - What it represents: Represents a set of named constants for `msg core pathwatch event kind`
-  - Members:
-    - `MSG_CORE_PATHWATCH_EVENT_ITEM`: `enum value`
-    - `MSG_CORE_PATHWATCH_EVENT_MISSED`: `enum value`
-- `msg_core_global_ctx_event_kind` (enum)
-  - What it represents: Represents a set of named constants for `msg core global ctx event kind`
-  - Members:
-    - `MSG_CORE_GLOBAL_CTX_EVENT_INIT`: `enum value`
-    - `MSG_CORE_GLOBAL_CTX_EVENT_QUIT`: `enum value`
-- `msg_core_monitor_data` (struct)
-  - What it represents: Represents `msg core monitor data` data grouped in a struct
-  - Members:
-    - `monitor`: `monitor`
-    - `data1`: `i32`
-    - `data2`: `i32`
-- `msg_core_window_data` (struct)
-  - What it represents: Represents `msg core window data` data grouped in a struct
-  - Members:
-    - `window`: `window`
-    - `data1`: `i32`
-    - `data2`: `i32`
-- `msg_core_keyboard_device_data` (struct)
-  - What it represents: Represents `msg core keyboard device data` data grouped in a struct
-  - Members:
-    - `device`: `device`
-- `msg_core_keyboard_data` (struct)
-  - What it represents: Represents `msg core keyboard data` data grouped in a struct
-  - Members:
-    - `window`: `window`
-    - `device`: `device`
-    - `key`: `vkey`
-    - `modifiers`: `keymod`
-    - `down`: `b32`
-    - `repeat`: `b32`
-- `msg_core_text_editing_data` (struct)
-  - What it represents: Represents `msg core text editing data` data grouped in a struct
-  - Members:
-    - `window`: `window`
-    - `text`: `cstr8`
-    - `start`: `i32`
-    - `length`: `i32`
-- `msg_core_text_editing_candidates_data` (struct)
-  - What it represents: Represents `msg core text editing candidates data` data grouped in a struct
-  - Members:
-    - `window`: `window`
-    - `candidates`: `cstr8 const*`
-    - `num_candidates`: `i32`
-    - `selected_candidate`: `i32`
-    - `horizontal`: `b32`
-- `msg_core_text_input_data` (struct)
-  - What it represents: Represents `msg core text input data` data grouped in a struct
-  - Members:
-    - `window`: `window`
-    - `text`: `cstr8`
-- `msg_core_mouse_device_data` (struct)
-  - What it represents: Represents `msg core mouse device data` data grouped in a struct
-  - Members:
-    - `device`: `device`
-- `msg_core_mouse_motion_data` (struct)
-  - What it represents: Represents `msg core mouse motion data` data grouped in a struct
-  - Members:
-    - `window`: `window`
-    - `device`: `device`
-    - `button_mask`: `u32`
-    - `x`: `f32`
-    - `y`: `f32`
-    - `xrel`: `f32`
-    - `yrel`: `f32`
-- `msg_core_mouse_button_data` (struct)
-  - What it represents: Represents `msg core mouse button data` data grouped in a struct
-  - Members:
-    - `window`: `window`
-    - `device`: `device`
-    - `button`: `mouse_button`
-    - `down`: `b32`
-    - `clicks`: `u8`
-    - `x`: `f32`
-    - `y`: `f32`
-- `msg_core_mouse_wheel_data` (struct)
-  - What it represents: Represents `msg core mouse wheel data` data grouped in a struct
-  - Members:
-    - `window`: `window`
-    - `device`: `device`
-    - `x`: `f32`
-    - `y`: `f32`
-    - `direction`: `mouse_wheel_direction`
-    - `mouse_x`: `f32`
-    - `mouse_y`: `f32`
-- `msg_core_joystick_device_data` (struct)
-  - What it represents: Represents `msg core joystick device data` data grouped in a struct
-  - Members:
-    - `joystick`: `joystick`
-- `msg_core_joystick_axis_data` (struct)
-  - What it represents: Represents `msg core joystick axis data` data grouped in a struct
-  - Members:
-    - `joystick`: `joystick`
-    - `axis`: `u8`
-    - `value`: `i16`
-- `msg_core_joystick_ball_data` (struct)
-  - What it represents: Represents `msg core joystick ball data` data grouped in a struct
-  - Members:
-    - `joystick`: `joystick`
-    - `ball`: `u8`
-    - `xrel`: `i16`
-    - `yrel`: `i16`
-- `msg_core_joystick_hat_data` (struct)
-  - What it represents: Represents `msg core joystick hat data` data grouped in a struct
-  - Members:
-    - `joystick`: `joystick`
-    - `hat`: `u8`
-    - `value`: `joystick_hat_state`
-- `msg_core_joystick_button_data` (struct)
-  - What it represents: Represents `msg core joystick button data` data grouped in a struct
-  - Members:
-    - `joystick`: `joystick`
-    - `button`: `u8`
-    - `down`: `b32`
-- `msg_core_joystick_battery_data` (struct)
-  - What it represents: Represents `msg core joystick battery data` data grouped in a struct
-  - Members:
-    - `joystick`: `joystick`
-    - `state`: `battery_state`
-    - `percent`: `i32`
-- `msg_core_gamepad_device_data` (struct)
-  - What it represents: Represents `msg core gamepad device data` data grouped in a struct
-  - Members:
-    - `device`: `device`
-- `msg_core_gamepad_axis_data` (struct)
-  - What it represents: Represents `msg core gamepad axis data` data grouped in a struct
-  - Members:
-    - `device`: `device`
-    - `axis`: `gamepad_axis`
-    - `value`: `i16`
-- `msg_core_gamepad_button_data` (struct)
-  - What it represents: Represents `msg core gamepad button data` data grouped in a struct
-  - Members:
-    - `device`: `device`
-    - `button`: `gamepad_button`
-    - `down`: `b32`
-- `msg_core_gamepad_touchpad_data` (struct)
-  - What it represents: Represents `msg core gamepad touchpad data` data grouped in a struct
-  - Members:
-    - `device`: `device`
-    - `touchpad`: `gamepad_touchpad_idx`
-    - `finger`: `gamepad_finger_idx`
-    - `x`: `f32`
-    - `y`: `f32`
-    - `pressure`: `f32`
-- `msg_core_gamepad_sensor_data` (struct)
-  - What it represents: Represents `msg core gamepad sensor data` data grouped in a struct
-  - Members:
-    - `device`: `device`
-    - `sensor`: `gamepad_sensor_kind`
-    - `data`: `f32 [3]`
-    - `sensor_timestamp`: `u64`
-- `msg_core_audio_device_data` (struct)
-  - What it represents: Represents `msg core audio device data` data grouped in a struct
-  - Members:
-    - `audio`: `audio_device`
-- `msg_core_camera_device_data` (struct)
-  - What it represents: Represents `msg core camera device data` data grouped in a struct
-  - Members:
-    - `camera`: `camera`
-- `msg_core_render_data` (struct)
-  - What it represents: Represents `msg core render data` data grouped in a struct
-  - Members:
-    - `window`: `window`
-- `msg_core_touch_device_data` (struct)
-  - What it represents: Represents `msg core touch device data` data grouped in a struct
-  - Members:
-    - `device`: `device`
-- `msg_core_tablet_device_data` (struct)
-  - What it represents: Represents `msg core tablet device data` data grouped in a struct
-  - Members:
-    - `device`: `device`
-- `msg_core_touch_data` (struct)
-  - What it represents: Represents `msg core touch data` data grouped in a struct
-  - Members:
-    - `device`: `device`
-    - `finger_id`: `finger_id`
-    - `x`: `f32`
-    - `y`: `f32`
-    - `dx`: `f32`
-    - `dy`: `f32`
-    - `pressure`: `f32`
-    - `window`: `window`
-- `msg_core_pen_proximity_data` (struct)
-  - What it represents: Represents `msg core pen proximity data` data grouped in a struct
-  - Members:
-    - `window`: `window`
-    - `device`: `device`
-    - `pen_id`: `pen_id`
-- `msg_core_pen_motion_data` (struct)
-  - What it represents: Represents `msg core pen motion data` data grouped in a struct
-  - Members:
-    - `window`: `window`
-    - `device`: `device`
-    - `pen_id`: `pen_id`
-    - `pen_state`: `tablet_input_flags`
-    - `x`: `f32`
-    - `y`: `f32`
-- `msg_core_pen_touch_data` (struct)
-  - What it represents: Represents `msg core pen touch data` data grouped in a struct
-  - Members:
-    - `window`: `window`
-    - `device`: `device`
-    - `pen_id`: `pen_id`
-    - `pen_state`: `tablet_input_flags`
-    - `x`: `f32`
-    - `y`: `f32`
-    - `eraser`: `b32`
-    - `down`: `b32`
-- `msg_core_pen_button_data` (struct)
-  - What it represents: Represents `msg core pen button data` data grouped in a struct
-  - Members:
-    - `window`: `window`
-    - `device`: `device`
-    - `pen_id`: `pen_id`
-    - `pen_state`: `tablet_input_flags`
-    - `x`: `f32`
-    - `y`: `f32`
-    - `button`: `tablet_button`
-    - `down`: `b32`
-- `msg_core_pen_axis_data` (struct)
-  - What it represents: Represents `msg core pen axis data` data grouped in a struct
-  - Members:
-    - `window`: `window`
-    - `device`: `device`
-    - `pen_id`: `pen_id`
-    - `pen_state`: `tablet_input_flags`
-    - `x`: `f32`
-    - `y`: `f32`
-    - `axis`: `tablet_axis`
-    - `value`: `f32`
-- `msg_core_drop_data` (struct)
-  - What it represents: Represents `msg core drop data` data grouped in a struct
-  - Members:
-    - `window`: `window`
-    - `x`: `f32`
-    - `y`: `f32`
-    - `source`: `cstr8`
-    - `data`: `cstr8`
-- `msg_core_clipboard_data` (struct)
-  - What it represents: Represents `msg core clipboard data` data grouped in a struct
-  - Members:
-    - `owner`: `b32`
-    - `num_mime_types`: `i32`
-    - `mime_types`: `cstr8 const*`
-- `msg_core_sensor_data` (struct)
-  - What it represents: Represents `msg core sensor data` data grouped in a struct
-  - Members:
-    - `sensor`: `sensor`
-    - `data`: `f32 [6]`
-    - `sensor_timestamp`: `u64`
-- `msg_core_object_lifecycle_data` (struct)
-  - What it represents: Represents `msg core object lifecycle data` data grouped in a struct
-  - Members:
-    - `object_type`: `msg_core_object_type`
-    - `event_kind`: `msg_core_object_event_kind`
-    - `object_ptr`: `void*`
-    - `site`: `callsite`
-- `msg_core_thread_ctx_data` (struct)
-  - What it represents: Represents `msg core thread ctx data` data grouped in a struct
-  - Members:
-    - `event_kind`: `msg_core_thread_ctx_event_kind`
-    - `thread_id`: `u64`
-    - `ctx_ptr`: `ctx*`
-- `msg_core_pathwatch_data` (struct)
-  - What it represents: Represents `msg core pathwatch data` data grouped in a struct
-  - Members:
-    - `event_kind`: `msg_core_pathwatch_event_kind`
-    - `pathwatch_id`: `pathwatch_id`
-    - `watch_id`: `pathwatch_watch_id`
-    - `action`: `pathwatch_action`
-- `msg_core_log_data` (struct)
-  - What it represents: Represents `msg core log data` data grouped in a struct
-  - Members:
-    - `state_ptr`: `log_state*`
-    - `level`: `log_level`
-    - `source_site`: `callsite`
-    - `text`: `str8_medium`
-- `msg_core_global_ctx_data` (struct)
-  - What it represents: Represents `msg core global ctx data` data grouped in a struct
-  - Members:
-    - `event_kind`: `msg_core_global_ctx_event_kind`
-    - `ctx_ptr`: `ctx*`
-- `msg_core_assert_data` (struct)
-  - What it represents: Represents `msg core assert data` data grouped in a struct
-  - Members:
-    - `mode`: `assert_mode`
-    - `source_site`: `callsite`
-    - `text`: `cstr8`
-- `msg_core_data` (union)
-  - What it represents: Represents `msg core data` data in alternative memory layouts
-  - Members:
-    - `monitor`: `msg_core_monitor_data`
-    - `window`: `msg_core_window_data`
-    - `keyboard_device`: `msg_core_keyboard_device_data`
-    - `keyboard`: `msg_core_keyboard_data`
-    - `text_editing`: `msg_core_text_editing_data`
-    - `text_editing_candidates`: `msg_core_text_editing_candidates_data`
-    - `text_input`: `msg_core_text_input_data`
-    - `mouse_device`: `msg_core_mouse_device_data`
-    - `mouse_motion`: `msg_core_mouse_motion_data`
-    - `mouse_button`: `msg_core_mouse_button_data`
-    - `mouse_wheel`: `msg_core_mouse_wheel_data`
-    - `joystick_device`: `msg_core_joystick_device_data`
-    - `joystick_axis`: `msg_core_joystick_axis_data`
-    - `joystick_ball`: `msg_core_joystick_ball_data`
-    - `joystick_hat`: `msg_core_joystick_hat_data`
-    - `joystick_button`: `msg_core_joystick_button_data`
-    - `joystick_battery`: `msg_core_joystick_battery_data`
-    - `gamepad_device`: `msg_core_gamepad_device_data`
-    - `gamepad_axis`: `msg_core_gamepad_axis_data`
-    - `gamepad_button`: `msg_core_gamepad_button_data`
-    - `gamepad_touchpad`: `msg_core_gamepad_touchpad_data`
-    - `gamepad_sensor`: `msg_core_gamepad_sensor_data`
-    - `audio_device`: `msg_core_audio_device_data`
-    - `camera_device`: `msg_core_camera_device_data`
-    - `render`: `msg_core_render_data`
-    - `touch_device`: `msg_core_touch_device_data`
-    - `touch`: `msg_core_touch_data`
-    - `tablet_device`: `msg_core_tablet_device_data`
-    - `pen_proximity`: `msg_core_pen_proximity_data`
-    - `pen_motion`: `msg_core_pen_motion_data`
-    - `pen_touch`: `msg_core_pen_touch_data`
-    - `pen_button`: `msg_core_pen_button_data`
-    - `pen_axis`: `msg_core_pen_axis_data`
-    - `drop`: `msg_core_drop_data`
-    - `clipboard`: `msg_core_clipboard_data`
-    - `sensor`: `msg_core_sensor_data`
-    - `object_lifecycle`: `msg_core_object_lifecycle_data`
-    - `thread_ctx`: `msg_core_thread_ctx_data`
-    - `pathwatch`: `msg_core_pathwatch_data`
-    - `log`: `msg_core_log_data`
-    - `assert`: `msg_core_assert_data`
-    - `global_ctx`: `msg_core_global_ctx_data`
+| Type | Declaration |
+| --- | --- |
+| `msg_core_type` | `typedef enum msg_core_type { ... } msg_core_type;` |
+| `msg_core_object_event_kind` | `typedef enum msg_core_object_event_kind { ... } msg_core_object_event_kind;` |
+| `msg_core_object_type` | `typedef enum msg_core_object_type { ... } msg_core_object_type;` |
+| `msg_core_thread_ctx_event_kind` | `typedef enum msg_core_thread_ctx_event_kind { ... } msg_core_thread_ctx_event_kind;` |
+| `msg_core_pathwatch_event_kind` | `typedef enum msg_core_pathwatch_event_kind { ... } msg_core_pathwatch_event_kind;` |
+| `msg_core_global_ctx_event_kind` | `typedef enum msg_core_global_ctx_event_kind { ... } msg_core_global_ctx_event_kind;` |
+| `msg_core_monitor_data` | `typedef struct msg_core_monitor_data { ... } msg_core_monitor_data;` |
+| `msg_core_window_data` | `typedef struct msg_core_window_data { ... } msg_core_window_data;` |
+| `msg_core_keyboard_device_data` | `typedef struct msg_core_keyboard_device_data { ... } msg_core_keyboard_device_data;` |
+| `msg_core_keyboard_data` | `typedef struct msg_core_keyboard_data { ... } msg_core_keyboard_data;` |
+| `msg_core_text_editing_data` | `typedef struct msg_core_text_editing_data { ... } msg_core_text_editing_data;` |
+| `msg_core_text_editing_candidates_data` | `typedef struct msg_core_text_editing_candidates_data { ... } msg_core_text_editing_candidates_data;` |
+| `msg_core_text_input_data` | `typedef struct msg_core_text_input_data { ... } msg_core_text_input_data;` |
+| `msg_core_mouse_device_data` | `typedef struct msg_core_mouse_device_data { ... } msg_core_mouse_device_data;` |
+| `msg_core_mouse_motion_data` | `typedef struct msg_core_mouse_motion_data { ... } msg_core_mouse_motion_data;` |
+| `msg_core_mouse_button_data` | `typedef struct msg_core_mouse_button_data { ... } msg_core_mouse_button_data;` |
+| `msg_core_mouse_wheel_data` | `typedef struct msg_core_mouse_wheel_data { ... } msg_core_mouse_wheel_data;` |
+| `msg_core_joystick_device_data` | `typedef struct msg_core_joystick_device_data { ... } msg_core_joystick_device_data;` |
+| `msg_core_joystick_axis_data` | `typedef struct msg_core_joystick_axis_data { ... } msg_core_joystick_axis_data;` |
+| `msg_core_joystick_ball_data` | `typedef struct msg_core_joystick_ball_data { ... } msg_core_joystick_ball_data;` |
+| `msg_core_joystick_hat_data` | `typedef struct msg_core_joystick_hat_data { ... } msg_core_joystick_hat_data;` |
+| `msg_core_joystick_button_data` | `typedef struct msg_core_joystick_button_data { ... } msg_core_joystick_button_data;` |
+| `msg_core_joystick_battery_data` | `typedef struct msg_core_joystick_battery_data { ... } msg_core_joystick_battery_data;` |
+| `msg_core_gamepad_device_data` | `typedef struct msg_core_gamepad_device_data { ... } msg_core_gamepad_device_data;` |
+| `msg_core_gamepad_axis_data` | `typedef struct msg_core_gamepad_axis_data { ... } msg_core_gamepad_axis_data;` |
+| `msg_core_gamepad_button_data` | `typedef struct msg_core_gamepad_button_data { ... } msg_core_gamepad_button_data;` |
+| `msg_core_gamepad_touchpad_data` | `typedef struct msg_core_gamepad_touchpad_data { ... } msg_core_gamepad_touchpad_data;` |
+| `msg_core_gamepad_sensor_data` | `typedef struct msg_core_gamepad_sensor_data { ... } msg_core_gamepad_sensor_data;` |
+| `msg_core_audio_device_data` | `typedef struct msg_core_audio_device_data { ... } msg_core_audio_device_data;` |
+| `msg_core_camera_device_data` | `typedef struct msg_core_camera_device_data { ... } msg_core_camera_device_data;` |
+| `msg_core_render_data` | `typedef struct msg_core_render_data { ... } msg_core_render_data;` |
+| `msg_core_touch_device_data` | `typedef struct msg_core_touch_device_data { ... } msg_core_touch_device_data;` |
+| `msg_core_tablet_device_data` | `typedef struct msg_core_tablet_device_data { ... } msg_core_tablet_device_data;` |
+| `msg_core_touch_data` | `typedef struct msg_core_touch_data { ... } msg_core_touch_data;` |
+| `msg_core_pen_proximity_data` | `typedef struct msg_core_pen_proximity_data { ... } msg_core_pen_proximity_data;` |
+| `msg_core_pen_motion_data` | `typedef struct msg_core_pen_motion_data { ... } msg_core_pen_motion_data;` |
+| `msg_core_pen_touch_data` | `typedef struct msg_core_pen_touch_data { ... } msg_core_pen_touch_data;` |
+| `msg_core_pen_button_data` | `typedef struct msg_core_pen_button_data { ... } msg_core_pen_button_data;` |
+| `msg_core_pen_axis_data` | `typedef struct msg_core_pen_axis_data { ... } msg_core_pen_axis_data;` |
+| `msg_core_drop_data` | `typedef struct msg_core_drop_data { ... } msg_core_drop_data;` |
+| `msg_core_clipboard_data` | `typedef struct msg_core_clipboard_data { ... } msg_core_clipboard_data;` |
+| `msg_core_sensor_data` | `typedef struct msg_core_sensor_data { ... } msg_core_sensor_data;` |
+| `msg_core_object_lifecycle_data` | `typedef struct msg_core_object_lifecycle_data { ... } msg_core_object_lifecycle_data;` |
+| `msg_core_thread_ctx_data` | `typedef struct msg_core_thread_ctx_data { ... } msg_core_thread_ctx_data;` |
+| `msg_core_pathwatch_data` | `typedef struct msg_core_pathwatch_data { ... } msg_core_pathwatch_data;` |
+| `msg_core_log_data` | `typedef struct msg_core_log_data { ... } msg_core_log_data;` |
+| `msg_core_global_ctx_data` | `typedef struct msg_core_global_ctx_data { ... } msg_core_global_ctx_data;` |
+| `msg_core_assert_data` | `typedef struct msg_core_assert_data { ... } msg_core_assert_data;` |
+| `msg_core_data` | `typedef union msg_core_data { ... } msg_core_data;` |
 
 #### Functions
 
-- `msg_core_fill_monitor(msg* src, const msg_core_monitor_data* core_data) -> void`
-  - What it does: Performs msg core fill monitor
-  - Parameters:
-    - `src` (`msg*`): Input data used by the operation
-    - `core_data` (`const msg_core_monitor_data*`): Input parameter
-- `msg_core_fill_window(msg* src, const msg_core_window_data* core_data) -> void`
-  - What it does: Performs msg core fill window
-  - Parameters:
-    - `src` (`msg*`): Input data used by the operation
-    - `core_data` (`const msg_core_window_data*`): Input parameter
-- `msg_core_fill_keyboard_device(msg* src, const msg_core_keyboard_device_data* core_data) -> void`
-  - What it does: Performs msg core fill keyboard device
-  - Parameters:
-    - `src` (`msg*`): Input data used by the operation
-    - `core_data` (`const msg_core_keyboard_device_data*`): Input parameter
-- `msg_core_fill_keyboard(msg* src, const msg_core_keyboard_data* core_data) -> void`
-  - What it does: Performs msg core fill keyboard
-  - Parameters:
-    - `src` (`msg*`): Input data used by the operation
-    - `core_data` (`const msg_core_keyboard_data*`): Input parameter
-- `msg_core_fill_text_editing(msg* src, const msg_core_text_editing_data* core_data) -> void`
-  - What it does: Performs msg core fill text editing
-  - Parameters:
-    - `src` (`msg*`): Input data used by the operation
-    - `core_data` (`const msg_core_text_editing_data*`): Input parameter
-- `msg_core_fill_text_editing_candidates(msg* src, const msg_core_text_editing_candidates_data* core_data) -> void`
-  - What it does: Performs msg core fill text editing candidates
-  - Parameters:
-    - `src` (`msg*`): Input data used by the operation
-    - `core_data` (`const msg_core_text_editing_candidates_data*`): Input parameter
-- `msg_core_fill_text_input(msg* src, const msg_core_text_input_data* core_data) -> void`
-  - What it does: Performs msg core fill text input
-  - Parameters:
-    - `src` (`msg*`): Input data used by the operation
-    - `core_data` (`const msg_core_text_input_data*`): Input parameter
-- `msg_core_fill_mouse_device(msg* src, const msg_core_mouse_device_data* core_data) -> void`
-  - What it does: Performs msg core fill mouse device
-  - Parameters:
-    - `src` (`msg*`): Input data used by the operation
-    - `core_data` (`const msg_core_mouse_device_data*`): Input parameter
-- `msg_core_fill_mouse_motion(msg* src, const msg_core_mouse_motion_data* core_data) -> void`
-  - What it does: Performs msg core fill mouse motion
-  - Parameters:
-    - `src` (`msg*`): Input data used by the operation
-    - `core_data` (`const msg_core_mouse_motion_data*`): Input parameter
-- `msg_core_fill_mouse_button(msg* src, const msg_core_mouse_button_data* core_data) -> void`
-  - What it does: Performs msg core fill mouse button
-  - Parameters:
-    - `src` (`msg*`): Input data used by the operation
-    - `core_data` (`const msg_core_mouse_button_data*`): Input parameter
-- `msg_core_fill_mouse_wheel(msg* src, const msg_core_mouse_wheel_data* core_data) -> void`
-  - What it does: Performs msg core fill mouse wheel
-  - Parameters:
-    - `src` (`msg*`): Input data used by the operation
-    - `core_data` (`const msg_core_mouse_wheel_data*`): Input parameter
-- `msg_core_fill_joystick_device(msg* src, const msg_core_joystick_device_data* core_data) -> void`
-  - What it does: Performs msg core fill joystick device
-  - Parameters:
-    - `src` (`msg*`): Input data used by the operation
-    - `core_data` (`const msg_core_joystick_device_data*`): Input parameter
-- `msg_core_fill_joystick_axis(msg* src, const msg_core_joystick_axis_data* core_data) -> void`
-  - What it does: Performs msg core fill joystick axis
-  - Parameters:
-    - `src` (`msg*`): Input data used by the operation
-    - `core_data` (`const msg_core_joystick_axis_data*`): Input parameter
-- `msg_core_fill_joystick_ball(msg* src, const msg_core_joystick_ball_data* core_data) -> void`
-  - What it does: Performs msg core fill joystick ball
-  - Parameters:
-    - `src` (`msg*`): Input data used by the operation
-    - `core_data` (`const msg_core_joystick_ball_data*`): Input parameter
-- `msg_core_fill_joystick_hat(msg* src, const msg_core_joystick_hat_data* core_data) -> void`
-  - What it does: Performs msg core fill joystick hat
-  - Parameters:
-    - `src` (`msg*`): Input data used by the operation
-    - `core_data` (`const msg_core_joystick_hat_data*`): Input parameter
-- `msg_core_fill_joystick_button(msg* src, const msg_core_joystick_button_data* core_data) -> void`
-  - What it does: Performs msg core fill joystick button
-  - Parameters:
-    - `src` (`msg*`): Input data used by the operation
-    - `core_data` (`const msg_core_joystick_button_data*`): Input parameter
-- `msg_core_fill_joystick_battery(msg* src, const msg_core_joystick_battery_data* core_data) -> void`
-  - What it does: Performs msg core fill joystick battery
-  - Parameters:
-    - `src` (`msg*`): Input data used by the operation
-    - `core_data` (`const msg_core_joystick_battery_data*`): Input parameter
-- `msg_core_fill_gamepad_device(msg* src, const msg_core_gamepad_device_data* core_data) -> void`
-  - What it does: Performs msg core fill gamepad device
-  - Parameters:
-    - `src` (`msg*`): Input data used by the operation
-    - `core_data` (`const msg_core_gamepad_device_data*`): Input parameter
-- `msg_core_fill_gamepad_axis(msg* src, const msg_core_gamepad_axis_data* core_data) -> void`
-  - What it does: Performs msg core fill gamepad axis
-  - Parameters:
-    - `src` (`msg*`): Input data used by the operation
-    - `core_data` (`const msg_core_gamepad_axis_data*`): Input parameter
-- `msg_core_fill_gamepad_button(msg* src, const msg_core_gamepad_button_data* core_data) -> void`
-  - What it does: Performs msg core fill gamepad button
-  - Parameters:
-    - `src` (`msg*`): Input data used by the operation
-    - `core_data` (`const msg_core_gamepad_button_data*`): Input parameter
-- `msg_core_fill_gamepad_touchpad(msg* src, const msg_core_gamepad_touchpad_data* core_data) -> void`
-  - What it does: Performs msg core fill gamepad touchpad
-  - Parameters:
-    - `src` (`msg*`): Input data used by the operation
-    - `core_data` (`const msg_core_gamepad_touchpad_data*`): Input parameter
-- `msg_core_fill_gamepad_sensor(msg* src, const msg_core_gamepad_sensor_data* core_data) -> void`
-  - What it does: Performs msg core fill gamepad sensor
-  - Parameters:
-    - `src` (`msg*`): Input data used by the operation
-    - `core_data` (`const msg_core_gamepad_sensor_data*`): Input parameter
-- `msg_core_fill_audio_device(msg* src, const msg_core_audio_device_data* core_data) -> void`
-  - What it does: Performs msg core fill audio device
-  - Parameters:
-    - `src` (`msg*`): Input data used by the operation
-    - `core_data` (`const msg_core_audio_device_data*`): Input parameter
-- `msg_core_fill_camera_device(msg* src, const msg_core_camera_device_data* core_data) -> void`
-  - What it does: Performs msg core fill camera device
-  - Parameters:
-    - `src` (`msg*`): Input data used by the operation
-    - `core_data` (`const msg_core_camera_device_data*`): Input parameter
-- `msg_core_fill_render(msg* src, const msg_core_render_data* core_data) -> void`
-  - What it does: Performs msg core fill render
-  - Parameters:
-    - `src` (`msg*`): Input data used by the operation
-    - `core_data` (`const msg_core_render_data*`): Input parameter
-- `msg_core_fill_touch_device(msg* src, const msg_core_touch_device_data* core_data) -> void`
-  - What it does: Performs msg core fill touch device
-  - Parameters:
-    - `src` (`msg*`): Input data used by the operation
-    - `core_data` (`const msg_core_touch_device_data*`): Input parameter
-- `msg_core_fill_touch(msg* src, const msg_core_touch_data* core_data) -> void`
-  - What it does: Performs msg core fill touch
-  - Parameters:
-    - `src` (`msg*`): Input data used by the operation
-    - `core_data` (`const msg_core_touch_data*`): Input parameter
-- `msg_core_fill_tablet_device(msg* src, const msg_core_tablet_device_data* core_data) -> void`
-  - What it does: Performs msg core fill tablet device
-  - Parameters:
-    - `src` (`msg*`): Input data used by the operation
-    - `core_data` (`const msg_core_tablet_device_data*`): Input parameter
-- `msg_core_fill_pen_proximity(msg* src, const msg_core_pen_proximity_data* core_data) -> void`
-  - What it does: Performs msg core fill pen proximity
-  - Parameters:
-    - `src` (`msg*`): Input data used by the operation
-    - `core_data` (`const msg_core_pen_proximity_data*`): Input parameter
-- `msg_core_fill_pen_motion(msg* src, const msg_core_pen_motion_data* core_data) -> void`
-  - What it does: Performs msg core fill pen motion
-  - Parameters:
-    - `src` (`msg*`): Input data used by the operation
-    - `core_data` (`const msg_core_pen_motion_data*`): Input parameter
-- `msg_core_fill_pen_touch(msg* src, const msg_core_pen_touch_data* core_data) -> void`
-  - What it does: Performs msg core fill pen touch
-  - Parameters:
-    - `src` (`msg*`): Input data used by the operation
-    - `core_data` (`const msg_core_pen_touch_data*`): Input parameter
-- `msg_core_fill_pen_button(msg* src, const msg_core_pen_button_data* core_data) -> void`
-  - What it does: Performs msg core fill pen button
-  - Parameters:
-    - `src` (`msg*`): Input data used by the operation
-    - `core_data` (`const msg_core_pen_button_data*`): Input parameter
-- `msg_core_fill_pen_axis(msg* src, const msg_core_pen_axis_data* core_data) -> void`
-  - What it does: Performs msg core fill pen axis
-  - Parameters:
-    - `src` (`msg*`): Input data used by the operation
-    - `core_data` (`const msg_core_pen_axis_data*`): Input parameter
-- `msg_core_fill_drop(msg* src, const msg_core_drop_data* core_data) -> void`
-  - What it does: Performs msg core fill drop
-  - Parameters:
-    - `src` (`msg*`): Input data used by the operation
-    - `core_data` (`const msg_core_drop_data*`): Input parameter
-- `msg_core_fill_clipboard(msg* src, const msg_core_clipboard_data* core_data) -> void`
-  - What it does: Performs msg core fill clipboard
-  - Parameters:
-    - `src` (`msg*`): Input data used by the operation
-    - `core_data` (`const msg_core_clipboard_data*`): Input parameter
-- `msg_core_fill_sensor(msg* src, const msg_core_sensor_data* core_data) -> void`
-  - What it does: Performs msg core fill sensor
-  - Parameters:
-    - `src` (`msg*`): Input data used by the operation
-    - `core_data` (`const msg_core_sensor_data*`): Input parameter
-- `msg_core_fill_object_lifecycle(msg* src, const msg_core_object_lifecycle_data* core_data) -> void`
-  - What it does: Performs msg core fill object lifecycle
-  - Parameters:
-    - `src` (`msg*`): Input data used by the operation
-    - `core_data` (`const msg_core_object_lifecycle_data*`): Input parameter
-- `msg_core_fill_thread_ctx(msg* src, const msg_core_thread_ctx_data* core_data) -> void`
-  - What it does: Performs msg core fill thread ctx
-  - Parameters:
-    - `src` (`msg*`): Input data used by the operation
-    - `core_data` (`const msg_core_thread_ctx_data*`): Input parameter
-- `msg_core_fill_pathwatch(msg* src, const msg_core_pathwatch_data* core_data) -> void`
-  - What it does: Performs msg core fill pathwatch
-  - Parameters:
-    - `src` (`msg*`): Input data used by the operation
-    - `core_data` (`const msg_core_pathwatch_data*`): Input parameter
-- `msg_core_fill_log(msg* src, const msg_core_log_data* core_data) -> void`
-  - What it does: Performs msg core fill log
-  - Parameters:
-    - `src` (`msg*`): Input data used by the operation
-    - `core_data` (`const msg_core_log_data*`): Input parameter
-- `msg_core_fill_assert(msg* src, const msg_core_assert_data* core_data) -> void`
-  - What it does: Performs msg core fill assert
-  - Parameters:
-    - `src` (`msg*`): Input data used by the operation
-    - `core_data` (`const msg_core_assert_data*`): Input parameter
-- `msg_core_fill_global_ctx(msg* src, const msg_core_global_ctx_data* core_data) -> void`
-  - What it does: Performs msg core fill global ctx
-  - Parameters:
-    - `src` (`msg*`): Input data used by the operation
-    - `core_data` (`const msg_core_global_ctx_data*`): Input parameter
-- `msg_core_get_monitor(msg* src) -> msg_core_monitor_data*`
-  - What it does: Gets msg core get monitor
-  - Parameters:
-    - `src` (`msg*`): Input data used by the operation
-- `msg_core_get_window(msg* src) -> msg_core_window_data*`
-  - What it does: Gets msg core get window
-  - Parameters:
-    - `src` (`msg*`): Input data used by the operation
-- `msg_core_get_keyboard_device(msg* src) -> msg_core_keyboard_device_data*`
-  - What it does: Gets msg core get keyboard device
-  - Parameters:
-    - `src` (`msg*`): Input data used by the operation
-- `msg_core_get_keyboard(msg* src) -> msg_core_keyboard_data*`
-  - What it does: Gets msg core get keyboard
-  - Parameters:
-    - `src` (`msg*`): Input data used by the operation
-- `msg_core_get_text_editing(msg* src) -> msg_core_text_editing_data*`
-  - What it does: Gets msg core get text editing
-  - Parameters:
-    - `src` (`msg*`): Input data used by the operation
-- `msg_core_get_text_editing_candidates(msg* src) -> msg_core_text_editing_candidates_data*`
-  - What it does: Gets msg core get text editing candidates
-  - Parameters:
-    - `src` (`msg*`): Input data used by the operation
-- `msg_core_get_text_input(msg* src) -> msg_core_text_input_data*`
-  - What it does: Gets msg core get text input
-  - Parameters:
-    - `src` (`msg*`): Input data used by the operation
-- `msg_core_get_mouse_device(msg* src) -> msg_core_mouse_device_data*`
-  - What it does: Gets msg core get mouse device
-  - Parameters:
-    - `src` (`msg*`): Input data used by the operation
-- `msg_core_get_mouse_motion(msg* src) -> msg_core_mouse_motion_data*`
-  - What it does: Gets msg core get mouse motion
-  - Parameters:
-    - `src` (`msg*`): Input data used by the operation
-- `msg_core_get_mouse_button(msg* src) -> msg_core_mouse_button_data*`
-  - What it does: Gets msg core get mouse button
-  - Parameters:
-    - `src` (`msg*`): Input data used by the operation
-- `msg_core_get_mouse_wheel(msg* src) -> msg_core_mouse_wheel_data*`
-  - What it does: Gets msg core get mouse wheel
-  - Parameters:
-    - `src` (`msg*`): Input data used by the operation
-- `msg_core_get_joystick_device(msg* src) -> msg_core_joystick_device_data*`
-  - What it does: Gets msg core get joystick device
-  - Parameters:
-    - `src` (`msg*`): Input data used by the operation
-- `msg_core_get_joystick_axis(msg* src) -> msg_core_joystick_axis_data*`
-  - What it does: Gets msg core get joystick axis
-  - Parameters:
-    - `src` (`msg*`): Input data used by the operation
-- `msg_core_get_joystick_ball(msg* src) -> msg_core_joystick_ball_data*`
-  - What it does: Gets msg core get joystick ball
-  - Parameters:
-    - `src` (`msg*`): Input data used by the operation
-- `msg_core_get_joystick_hat(msg* src) -> msg_core_joystick_hat_data*`
-  - What it does: Gets msg core get joystick hat
-  - Parameters:
-    - `src` (`msg*`): Input data used by the operation
-- `msg_core_get_joystick_button(msg* src) -> msg_core_joystick_button_data*`
-  - What it does: Gets msg core get joystick button
-  - Parameters:
-    - `src` (`msg*`): Input data used by the operation
-- `msg_core_get_joystick_battery(msg* src) -> msg_core_joystick_battery_data*`
-  - What it does: Gets msg core get joystick battery
-  - Parameters:
-    - `src` (`msg*`): Input data used by the operation
-- `msg_core_get_gamepad_device(msg* src) -> msg_core_gamepad_device_data*`
-  - What it does: Gets msg core get gamepad device
-  - Parameters:
-    - `src` (`msg*`): Input data used by the operation
-- `msg_core_get_gamepad_axis(msg* src) -> msg_core_gamepad_axis_data*`
-  - What it does: Gets msg core get gamepad axis
-  - Parameters:
-    - `src` (`msg*`): Input data used by the operation
-- `msg_core_get_gamepad_button(msg* src) -> msg_core_gamepad_button_data*`
-  - What it does: Gets msg core get gamepad button
-  - Parameters:
-    - `src` (`msg*`): Input data used by the operation
-- `msg_core_get_gamepad_touchpad(msg* src) -> msg_core_gamepad_touchpad_data*`
-  - What it does: Gets msg core get gamepad touchpad
-  - Parameters:
-    - `src` (`msg*`): Input data used by the operation
-- `msg_core_get_gamepad_sensor(msg* src) -> msg_core_gamepad_sensor_data*`
-  - What it does: Gets msg core get gamepad sensor
-  - Parameters:
-    - `src` (`msg*`): Input data used by the operation
-- `msg_core_get_audio_device(msg* src) -> msg_core_audio_device_data*`
-  - What it does: Gets msg core get audio device
-  - Parameters:
-    - `src` (`msg*`): Input data used by the operation
-- `msg_core_get_camera_device(msg* src) -> msg_core_camera_device_data*`
-  - What it does: Gets msg core get camera device
-  - Parameters:
-    - `src` (`msg*`): Input data used by the operation
-- `msg_core_get_render(msg* src) -> msg_core_render_data*`
-  - What it does: Gets msg core get render
-  - Parameters:
-    - `src` (`msg*`): Input data used by the operation
-- `msg_core_get_touch_device(msg* src) -> msg_core_touch_device_data*`
-  - What it does: Gets msg core get touch device
-  - Parameters:
-    - `src` (`msg*`): Input data used by the operation
-- `msg_core_get_touch(msg* src) -> msg_core_touch_data*`
-  - What it does: Gets msg core get touch
-  - Parameters:
-    - `src` (`msg*`): Input data used by the operation
-- `msg_core_get_tablet_device(msg* src) -> msg_core_tablet_device_data*`
-  - What it does: Gets msg core get tablet device
-  - Parameters:
-    - `src` (`msg*`): Input data used by the operation
-- `msg_core_get_pen_proximity(msg* src) -> msg_core_pen_proximity_data*`
-  - What it does: Gets msg core get pen proximity
-  - Parameters:
-    - `src` (`msg*`): Input data used by the operation
-- `msg_core_get_pen_motion(msg* src) -> msg_core_pen_motion_data*`
-  - What it does: Gets msg core get pen motion
-  - Parameters:
-    - `src` (`msg*`): Input data used by the operation
-- `msg_core_get_pen_touch(msg* src) -> msg_core_pen_touch_data*`
-  - What it does: Gets msg core get pen touch
-  - Parameters:
-    - `src` (`msg*`): Input data used by the operation
-- `msg_core_get_pen_button(msg* src) -> msg_core_pen_button_data*`
-  - What it does: Gets msg core get pen button
-  - Parameters:
-    - `src` (`msg*`): Input data used by the operation
-- `msg_core_get_pen_axis(msg* src) -> msg_core_pen_axis_data*`
-  - What it does: Gets msg core get pen axis
-  - Parameters:
-    - `src` (`msg*`): Input data used by the operation
-- `msg_core_get_drop(msg* src) -> msg_core_drop_data*`
-  - What it does: Gets msg core get drop
-  - Parameters:
-    - `src` (`msg*`): Input data used by the operation
-- `msg_core_get_clipboard(msg* src) -> msg_core_clipboard_data*`
-  - What it does: Gets msg core get clipboard
-  - Parameters:
-    - `src` (`msg*`): Input data used by the operation
-- `msg_core_get_sensor(msg* src) -> msg_core_sensor_data*`
-  - What it does: Gets msg core get sensor
-  - Parameters:
-    - `src` (`msg*`): Input data used by the operation
-- `msg_core_get_object_lifecycle(msg* src) -> msg_core_object_lifecycle_data*`
-  - What it does: Gets msg core get object lifecycle
-  - Parameters:
-    - `src` (`msg*`): Input data used by the operation
-- `msg_core_get_thread_ctx(msg* src) -> msg_core_thread_ctx_data*`
-  - What it does: Gets msg core get thread ctx
-  - Parameters:
-    - `src` (`msg*`): Input data used by the operation
-- `msg_core_get_pathwatch(msg* src) -> msg_core_pathwatch_data*`
-  - What it does: Gets msg core get pathwatch
-  - Parameters:
-    - `src` (`msg*`): Input data used by the operation
-- `msg_core_get_log(msg* src) -> msg_core_log_data*`
-  - What it does: Gets msg core get log
-  - Parameters:
-    - `src` (`msg*`): Input data used by the operation
-- `msg_core_get_assert(msg* src) -> msg_core_assert_data*`
-  - What it does: Gets msg core get assert
-  - Parameters:
-    - `src` (`msg*`): Input data used by the operation
-- `msg_core_get_global_ctx(msg* src) -> msg_core_global_ctx_data*`
-  - What it does: Gets msg core get global ctx
-  - Parameters:
-    - `src` (`msg*`): Input data used by the operation
+| Function | Declaration |
+| --- | --- |
+| `msg_core_fill_monitor` | `func void msg_core_fill_monitor(msg* src, const msg_core_monitor_data* core_data);` |
+| `msg_core_fill_window` | `func void msg_core_fill_window(msg* src, const msg_core_window_data* core_data);` |
+| `msg_core_fill_keyboard_device` | `func void msg_core_fill_keyboard_device(msg* src, const msg_core_keyboard_device_data* core_data);` |
+| `msg_core_fill_keyboard` | `func void msg_core_fill_keyboard(msg* src, const msg_core_keyboard_data* core_data);` |
+| `msg_core_fill_text_editing` | `func void msg_core_fill_text_editing(msg* src, const msg_core_text_editing_data* core_data);` |
+| `msg_core_fill_text_editing_candidates` | `func void msg_core_fill_text_editing_candidates(msg* src, const msg_core_text_editing_candidates_data* core_data);` |
+| `msg_core_fill_text_input` | `func void msg_core_fill_text_input(msg* src, const msg_core_text_input_data* core_data);` |
+| `msg_core_fill_mouse_device` | `func void msg_core_fill_mouse_device(msg* src, const msg_core_mouse_device_data* core_data);` |
+| `msg_core_fill_mouse_motion` | `func void msg_core_fill_mouse_motion(msg* src, const msg_core_mouse_motion_data* core_data);` |
+| `msg_core_fill_mouse_button` | `func void msg_core_fill_mouse_button(msg* src, const msg_core_mouse_button_data* core_data);` |
+| `msg_core_fill_mouse_wheel` | `func void msg_core_fill_mouse_wheel(msg* src, const msg_core_mouse_wheel_data* core_data);` |
+| `msg_core_fill_joystick_device` | `func void msg_core_fill_joystick_device(msg* src, const msg_core_joystick_device_data* core_data);` |
+| `msg_core_fill_joystick_axis` | `func void msg_core_fill_joystick_axis(msg* src, const msg_core_joystick_axis_data* core_data);` |
+| `msg_core_fill_joystick_ball` | `func void msg_core_fill_joystick_ball(msg* src, const msg_core_joystick_ball_data* core_data);` |
+| `msg_core_fill_joystick_hat` | `func void msg_core_fill_joystick_hat(msg* src, const msg_core_joystick_hat_data* core_data);` |
+| `msg_core_fill_joystick_button` | `func void msg_core_fill_joystick_button(msg* src, const msg_core_joystick_button_data* core_data);` |
+| `msg_core_fill_joystick_battery` | `func void msg_core_fill_joystick_battery(msg* src, const msg_core_joystick_battery_data* core_data);` |
+| `msg_core_fill_gamepad_device` | `func void msg_core_fill_gamepad_device(msg* src, const msg_core_gamepad_device_data* core_data);` |
+| `msg_core_fill_gamepad_axis` | `func void msg_core_fill_gamepad_axis(msg* src, const msg_core_gamepad_axis_data* core_data);` |
+| `msg_core_fill_gamepad_button` | `func void msg_core_fill_gamepad_button(msg* src, const msg_core_gamepad_button_data* core_data);` |
+| `msg_core_fill_gamepad_touchpad` | `func void msg_core_fill_gamepad_touchpad(msg* src, const msg_core_gamepad_touchpad_data* core_data);` |
+| `msg_core_fill_gamepad_sensor` | `func void msg_core_fill_gamepad_sensor(msg* src, const msg_core_gamepad_sensor_data* core_data);` |
+| `msg_core_fill_audio_device` | `func void msg_core_fill_audio_device(msg* src, const msg_core_audio_device_data* core_data);` |
+| `msg_core_fill_camera_device` | `func void msg_core_fill_camera_device(msg* src, const msg_core_camera_device_data* core_data);` |
+| `msg_core_fill_render` | `func void msg_core_fill_render(msg* src, const msg_core_render_data* core_data);` |
+| `msg_core_fill_touch_device` | `func void msg_core_fill_touch_device(msg* src, const msg_core_touch_device_data* core_data);` |
+| `msg_core_fill_touch` | `func void msg_core_fill_touch(msg* src, const msg_core_touch_data* core_data);` |
+| `msg_core_fill_tablet_device` | `func void msg_core_fill_tablet_device(msg* src, const msg_core_tablet_device_data* core_data);` |
+| `msg_core_fill_pen_proximity` | `func void msg_core_fill_pen_proximity(msg* src, const msg_core_pen_proximity_data* core_data);` |
+| `msg_core_fill_pen_motion` | `func void msg_core_fill_pen_motion(msg* src, const msg_core_pen_motion_data* core_data);` |
+| `msg_core_fill_pen_touch` | `func void msg_core_fill_pen_touch(msg* src, const msg_core_pen_touch_data* core_data);` |
+| `msg_core_fill_pen_button` | `func void msg_core_fill_pen_button(msg* src, const msg_core_pen_button_data* core_data);` |
+| `msg_core_fill_pen_axis` | `func void msg_core_fill_pen_axis(msg* src, const msg_core_pen_axis_data* core_data);` |
+| `msg_core_fill_drop` | `func void msg_core_fill_drop(msg* src, const msg_core_drop_data* core_data);` |
+| `msg_core_fill_clipboard` | `func void msg_core_fill_clipboard(msg* src, const msg_core_clipboard_data* core_data);` |
+| `msg_core_fill_sensor` | `func void msg_core_fill_sensor(msg* src, const msg_core_sensor_data* core_data);` |
+| `msg_core_fill_object_lifecycle` | `func void msg_core_fill_object_lifecycle(msg* src, const msg_core_object_lifecycle_data* core_data);` |
+| `msg_core_fill_thread_ctx` | `func void msg_core_fill_thread_ctx(msg* src, const msg_core_thread_ctx_data* core_data);` |
+| `msg_core_fill_pathwatch` | `func void msg_core_fill_pathwatch(msg* src, const msg_core_pathwatch_data* core_data);` |
+| `msg_core_fill_log` | `func void msg_core_fill_log(msg* src, const msg_core_log_data* core_data);` |
+| `msg_core_fill_assert` | `func void msg_core_fill_assert(msg* src, const msg_core_assert_data* core_data);` |
+| `msg_core_fill_global_ctx` | `func void msg_core_fill_global_ctx(msg* src, const msg_core_global_ctx_data* core_data);` |
+| `msg_core_get_monitor` | `func msg_core_monitor_data* msg_core_get_monitor(msg* src);` |
+| `msg_core_get_window` | `func msg_core_window_data* msg_core_get_window(msg* src);` |
+| `msg_core_get_keyboard_device` | `func msg_core_keyboard_device_data* msg_core_get_keyboard_device(msg* src);` |
+| `msg_core_get_keyboard` | `func msg_core_keyboard_data* msg_core_get_keyboard(msg* src);` |
+| `msg_core_get_text_editing` | `func msg_core_text_editing_data* msg_core_get_text_editing(msg* src);` |
+| `msg_core_get_text_editing_candidates` | `func msg_core_text_editing_candidates_data* msg_core_get_text_editing_candidates(msg* src);` |
+| `msg_core_get_text_input` | `func msg_core_text_input_data* msg_core_get_text_input(msg* src);` |
+| `msg_core_get_mouse_device` | `func msg_core_mouse_device_data* msg_core_get_mouse_device(msg* src);` |
+| `msg_core_get_mouse_motion` | `func msg_core_mouse_motion_data* msg_core_get_mouse_motion(msg* src);` |
+| `msg_core_get_mouse_button` | `func msg_core_mouse_button_data* msg_core_get_mouse_button(msg* src);` |
+| `msg_core_get_mouse_wheel` | `func msg_core_mouse_wheel_data* msg_core_get_mouse_wheel(msg* src);` |
+| `msg_core_get_joystick_device` | `func msg_core_joystick_device_data* msg_core_get_joystick_device(msg* src);` |
+| `msg_core_get_joystick_axis` | `func msg_core_joystick_axis_data* msg_core_get_joystick_axis(msg* src);` |
+| `msg_core_get_joystick_ball` | `func msg_core_joystick_ball_data* msg_core_get_joystick_ball(msg* src);` |
+| `msg_core_get_joystick_hat` | `func msg_core_joystick_hat_data* msg_core_get_joystick_hat(msg* src);` |
+| `msg_core_get_joystick_button` | `func msg_core_joystick_button_data* msg_core_get_joystick_button(msg* src);` |
+| `msg_core_get_joystick_battery` | `func msg_core_joystick_battery_data* msg_core_get_joystick_battery(msg* src);` |
+| `msg_core_get_gamepad_device` | `func msg_core_gamepad_device_data* msg_core_get_gamepad_device(msg* src);` |
+| `msg_core_get_gamepad_axis` | `func msg_core_gamepad_axis_data* msg_core_get_gamepad_axis(msg* src);` |
+| `msg_core_get_gamepad_button` | `func msg_core_gamepad_button_data* msg_core_get_gamepad_button(msg* src);` |
+| `msg_core_get_gamepad_touchpad` | `func msg_core_gamepad_touchpad_data* msg_core_get_gamepad_touchpad(msg* src);` |
+| `msg_core_get_gamepad_sensor` | `func msg_core_gamepad_sensor_data* msg_core_get_gamepad_sensor(msg* src);` |
+| `msg_core_get_audio_device` | `func msg_core_audio_device_data* msg_core_get_audio_device(msg* src);` |
+| `msg_core_get_camera_device` | `func msg_core_camera_device_data* msg_core_get_camera_device(msg* src);` |
+| `msg_core_get_render` | `func msg_core_render_data* msg_core_get_render(msg* src);` |
+| `msg_core_get_touch_device` | `func msg_core_touch_device_data* msg_core_get_touch_device(msg* src);` |
+| `msg_core_get_touch` | `func msg_core_touch_data* msg_core_get_touch(msg* src);` |
+| `msg_core_get_tablet_device` | `func msg_core_tablet_device_data* msg_core_get_tablet_device(msg* src);` |
+| `msg_core_get_pen_proximity` | `func msg_core_pen_proximity_data* msg_core_get_pen_proximity(msg* src);` |
+| `msg_core_get_pen_motion` | `func msg_core_pen_motion_data* msg_core_get_pen_motion(msg* src);` |
+| `msg_core_get_pen_touch` | `func msg_core_pen_touch_data* msg_core_get_pen_touch(msg* src);` |
+| `msg_core_get_pen_button` | `func msg_core_pen_button_data* msg_core_get_pen_button(msg* src);` |
+| `msg_core_get_pen_axis` | `func msg_core_pen_axis_data* msg_core_get_pen_axis(msg* src);` |
+| `msg_core_get_drop` | `func msg_core_drop_data* msg_core_get_drop(msg* src);` |
+| `msg_core_get_clipboard` | `func msg_core_clipboard_data* msg_core_get_clipboard(msg* src);` |
+| `msg_core_get_sensor` | `func msg_core_sensor_data* msg_core_get_sensor(msg* src);` |
+| `msg_core_get_object_lifecycle` | `func msg_core_object_lifecycle_data* msg_core_get_object_lifecycle(msg* src);` |
+| `msg_core_get_thread_ctx` | `func msg_core_thread_ctx_data* msg_core_get_thread_ctx(msg* src);` |
+| `msg_core_get_pathwatch` | `func msg_core_pathwatch_data* msg_core_get_pathwatch(msg* src);` |
+| `msg_core_get_log` | `func msg_core_log_data* msg_core_get_log(msg* src);` |
+| `msg_core_get_assert` | `func msg_core_assert_data* msg_core_get_assert(msg* src);` |
+| `msg_core_get_global_ctx` | `func msg_core_global_ctx_data* msg_core_get_global_ctx(msg* src);` |
+
+#### Macros
+
+| Macro | Form |
+| --- | --- |
+| `MSG_LOG_TEXT_CAP` | `MSG_LOG_TEXT_CAP` |
+| `MSG_ASSERT_TEXT_CAP` | `MSG_ASSERT_TEXT_CAP` |
 
 ### `input/sensor.h`
 
 - Types: **2**
 - Functions: **14**
+- Macros: **0**
 
 #### Types
 
-- `sensor` (alias)
-  - What it represents: Type alias used for `sensor`
-  - Members: none (alias/function type)
-- `sensor_kind` (enum)
-  - What it represents: Represents a set of named constants for `sensor kind`
-  - Members:
-    - `SENSOR_KIND_INVALID`: `enum value`
-    - `SENSOR_KIND_UNKNOWN`: `enum value`
-    - `SENSOR_KIND_ACCEL`: `enum value`
-    - `SENSOR_KIND_GYRO`: `enum value`
-    - `SENSOR_KIND_ACCEL_L`: `enum value`
-    - `SENSOR_KIND_GYRO_L`: `enum value`
-    - `SENSOR_KIND_ACCEL_R`: `enum value`
-    - `SENSOR_KIND_GYRO_R`: `enum value`
+| Type | Declaration |
+| --- | --- |
+| `sensor` | `typedef void* sensor;` |
+| `sensor_kind` | `typedef enum sensor_kind { ... } sensor_kind;` |
 
 #### Functions
 
-- `sensor_is_valid(sensor src) -> b32`
-  - What it does: Performs sensor is valid
-  - Parameters:
-    - `src` (`sensor`): Input data used by the operation
-- `device_get_sensor(device src) -> sensor`
-  - What it does: Converts a generic device handle into a sensor handle
-  - Parameters:
-    - `src` (`device`): Input data used by the operation
-- `sensor_to_device(sensor src) -> device`
-  - What it does: Converts a sensor handle into a generic device handle
-  - Parameters:
-    - `src` (`sensor`): Input data used by the operation
-- `sensor_get_total_count() -> sz`
-  - What it does: Gets sensor get total count
-  - Parameters: none
-- `sensor_get_from_idx(sz idx) -> sensor`
-  - What it does: Returns the sensor handle at the requested index
-  - Parameters:
-    - `idx` (`sz`): Zero-based index used to select an item
-- `sensor_get_primary() -> sensor`
-  - What it does: Returns the primary sensor handle
-  - Parameters: none
-- `sensor_get_focused() -> sensor`
-  - What it does: Returns the focused sensor handle, or the primary sensor when none is focused
-  - Parameters: none
-- `sensor_get_name(sensor sen_id) -> cstr8`
-  - What it does: Gets sensor get name
-  - Parameters:
-    - `sen_id` (`sensor`): Input parameter
-- `sensor_get_kind(sensor sen_id) -> sensor_kind`
-  - What it does: Gets sensor get kind
-  - Parameters:
-    - `sen_id` (`sensor`): Input parameter
-- `sensor_open(sensor sen_id) -> b32`
-  - What it does: Opens sensor open
-  - Parameters:
-    - `sen_id` (`sensor`): Input parameter
-- `sensor_close(sensor sen_id) -> b32`
-  - What it does: Closes sensor close
-  - Parameters:
-    - `sen_id` (`sensor`): Input parameter
-- `sensor_start(sensor sen_id) -> b32`
-  - What it does: Performs sensor start
-  - Parameters:
-    - `sen_id` (`sensor`): Input parameter
-- `sensor_stop(sensor sen_id) -> b32`
-  - What it does: Performs sensor stop
-  - Parameters:
-    - `sen_id` (`sensor`): Input parameter
-- `sensor_read(sensor sen_id, buffer* out_samples) -> b32`
-  - What it does: Reads data for sensor read
-  - Parameters:
-    - `sen_id` (`sensor`): Input parameter
-    - `out_samples` (`buffer*`): Output value written by the function
+| Function | Declaration |
+| --- | --- |
+| `sensor_is_valid` | `func b32 sensor_is_valid(sensor src);` |
+| `device_get_sensor` | `func sensor device_get_sensor(device src);` |
+| `sensor_to_device` | `func device sensor_to_device(sensor src);` |
+| `sensor_get_total_count` | `func sz sensor_get_total_count(void);` |
+| `sensor_get_from_idx` | `func sensor sensor_get_from_idx(sz idx);` |
+| `sensor_get_primary` | `func sensor sensor_get_primary(void);` |
+| `sensor_get_focused` | `func sensor sensor_get_focused(void);` |
+| `sensor_get_name` | `func cstr8 sensor_get_name(sensor sen_id);` |
+| `sensor_get_kind` | `func sensor_kind sensor_get_kind(sensor sen_id);` |
+| `sensor_open` | `func b32 sensor_open(sensor sen_id);` |
+| `sensor_close` | `func b32 sensor_close(sensor sen_id);` |
+| `sensor_start` | `func b32 sensor_start(sensor sen_id);` |
+| `sensor_stop` | `func b32 sensor_stop(sensor sen_id);` |
+| `sensor_read` | `func b32 sensor_read(sensor sen_id, buffer* out_samples);` |
+
+#### Macros
+
+| Macro | Form |
+| --- | --- |
+| None | - |
 
 ### `input/tablet.h`
 
 - Types: **7**
-- Functions: **8**
+- Functions: **10**
+- Macros: **0**
 
 #### Types
 
-- `tablet` (alias)
-  - What it represents: Type alias used for `tablet`
-  - Members: none (alias/function type)
-- `pen_id` (alias)
-  - What it represents: Type alias used for `pen id`
-  - Members: none (alias/function type)
-- `tablet_axis` (enum)
-  - What it represents: Represents a set of named constants for `tablet axis`
-  - Members:
-    - `TABLET_AXIS_PRESSURE`: `enum value`
-    - `TABLET_AXIS_XTILT`: `enum value`
-    - `TABLET_AXIS_YTILT`: `enum value`
-    - `TABLET_AXIS_DISTANCE`: `enum value`
-    - `TABLET_AXIS_ROTATION`: `enum value`
-    - `TABLET_AXIS_SLIDER`: `enum value`
-    - `TABLET_AXIS_TANGENTIAL_PRESSURE`: `enum value`
-    - `TABLET_AXIS_COUNT`: `enum value`
-- `tablet_input_flag` (enum)
-  - What it represents: Represents a set of named constants for `tablet input flag`
-  - Members:
-    - `TABLET_INPUT_FLAG_NONE`: `enum value`
-    - `TABLET_INPUT_FLAG_DOWN`: `enum value`
-    - `TABLET_INPUT_FLAG_BUTTON_1`: `enum value`
-    - `TABLET_INPUT_FLAG_BUTTON_2`: `enum value`
-    - `TABLET_INPUT_FLAG_BUTTON_3`: `enum value`
-    - `TABLET_INPUT_FLAG_ERASER_TIP`: `enum value`
-- `tablet_input_flags` (alias)
-  - What it represents: Type alias used for `tablet input flags`
-  - Members: none (alias/function type)
-- `tablet_button` (enum)
-  - What it represents: Represents a set of named constants for `tablet button`
-  - Members:
-    - `TABLET_BUTTON_PRIMARY`: `enum value`
-    - `TABLET_BUTTON_SECONDARY`: `enum value`
-    - `TABLET_BUTTON_TERTIARY`: `enum value`
-- `tablet_pen_state` (struct)
-  - What it represents: Represents `tablet pen state` data grouped in a struct
-  - Members:
-    - `id`: `device`
-    - `pen_id`: `pen_id`
-    - `in_proximity`: `b32`
-    - `touching`: `b32`
-    - `eraser`: `b32`
-    - `input_mask`: `tablet_input_flags`
-    - `window`: `window`
-    - `x`: `f32`
-    - `y`: `f32`
-    - `axis_values`: `f32 [TABLET_AXIS_COUNT]`
+| Type | Declaration |
+| --- | --- |
+| `tablet` | `typedef void* tablet;` |
+| `pen_id` | `typedef u32 pen_id;` |
+| `tablet_axis` | `typedef enum tablet_axis { ... } tablet_axis;` |
+| `tablet_input_flag` | `typedef enum tablet_input_flag { ... } tablet_input_flag;` |
+| `tablet_input_flags` | `typedef u32 tablet_input_flags;` |
+| `tablet_button` | `typedef enum tablet_button { ... } tablet_button;` |
+| `tablet_pen_state` | `typedef struct tablet_pen_state { ... } tablet_pen_state;` |
 
 #### Functions
 
-- `tablet_is_valid(tablet src) -> b32`
-  - What it does: Validates a tablet handle
-  - Parameters:
-    - `src` (`tablet`): Input data used by the operation
-- `device_get_tablet(device src) -> tablet`
-  - What it does: Converts a generic device handle into a tablet handle
-  - Parameters:
-    - `src` (`device`): Input data used by the operation
-- `tablet_to_device(tablet src) -> device`
-  - What it does: Converts a tablet handle into a generic device handle
-  - Parameters:
-    - `src` (`tablet`): Input data used by the operation
-- `tablet_is_available() -> b32`
-  - What it does: Performs tablet is available
-  - Parameters: none
-- `tablet_get_total_count() -> sz`
-  - What it does: Gets tablet get total count
-  - Parameters: none
-- `tablet_get_from_idx(sz idx) -> tablet`
-  - What it does: Returns the tablet handle at the requested index
-  - Parameters:
-    - `idx` (`sz`): Zero-based index used to select an item
-- `tablet_get_primary() -> tablet`
-  - What it does: Returns the primary tablet handle
-  - Parameters: none
-- `tablet_get_focused() -> tablet`
-  - What it does: Returns the focused tablet handle, or the primary tablet when none is focused
-  - Parameters: none
-- `tablet_get_last_pen_state(tablet src, tablet_pen_state* out_state) -> b32`
-  - What it does: Returns the last cached pen state for a specific tablet
-  - Parameters:
-    - `src` (`tablet`): Input parameter
-    - `out_state` (`tablet_pen_state*`): Output value written by the function
-- `tablet_read_hid_report(tablet src, void* dst, sz capacity, sz* out_size, i32 timeout_ms) -> b32`
-  - What it does: Reads data for tablet read hid report
-  - Parameters:
-    - `src` (`tablet`): Input parameter
-    - `dst` (`void*`): Destination storage for output data
-    - `capacity` (`sz`): Size or capacity value used by the operation
-    - `out_size` (`sz*`): Output value written by the function
-    - `timeout_ms` (`i32`): Input parameter
+| Function | Declaration |
+| --- | --- |
+| `tablet_is_valid` | `func b32 tablet_is_valid(tablet src);` |
+| `device_get_tablet` | `func tablet device_get_tablet(device src);` |
+| `tablet_to_device` | `func device tablet_to_device(tablet src);` |
+| `tablet_is_available` | `func b32 tablet_is_available(void);` |
+| `tablet_get_total_count` | `func sz tablet_get_total_count(void);` |
+| `tablet_get_from_idx` | `func tablet tablet_get_from_idx(sz idx);` |
+| `tablet_get_primary` | `func tablet tablet_get_primary(void);` |
+| `tablet_get_focused` | `func tablet tablet_get_focused(void);` |
+| `tablet_get_last_pen_state` | `func b32 tablet_get_last_pen_state(tablet src, tablet_pen_state* out_state);` |
+| `tablet_read_hid_report` | `func b32 tablet_read_hid_report(tablet src, void* dst, sz capacity, sz* out_size, i32 timeout_ms);` |
+
+#### Macros
+
+| Macro | Form |
+| --- | --- |
+| None | - |
 
 ### `input/touch.h`
 
 - Types: **4**
-- Functions: **9**
+- Functions: **11**
+- Macros: **0**
 
 #### Types
 
-- `touch` (alias)
-  - What it represents: Type alias used for `touch`
-  - Members: none (alias/function type)
-- `finger_id` (alias)
-  - What it represents: Type alias used for `finger id`
-  - Members: none (alias/function type)
-- `touch_device_kind` (enum)
-  - What it represents: Represents a set of named constants for `touch device kind`
-  - Members:
-    - `TOUCH_DEVICE_INVALID`: `enum value`
-    - `TOUCH_DEVICE_DIRECT`: `enum value`
-    - `TOUCH_DEVICE_INDIRECT_ABSOLUTE`: `enum value`
-    - `TOUCH_DEVICE_INDIRECT_RELATIVE`: `enum value`
-- `touch_finger_state` (struct)
-  - What it represents: Represents `touch finger state` data grouped in a struct
-  - Members:
-    - `id`: `finger_id`
-    - `x`: `f32`
-    - `y`: `f32`
-    - `pressure`: `f32`
+| Type | Declaration |
+| --- | --- |
+| `touch` | `typedef void* touch;` |
+| `finger_id` | `typedef u64 finger_id;` |
+| `touch_device_kind` | `typedef enum touch_device_kind { ... } touch_device_kind;` |
+| `touch_finger_state` | `typedef struct touch_finger_state { ... } touch_finger_state;` |
 
 #### Functions
 
-- `touch_is_valid(touch src) -> b32`
-  - What it does: Validates a touch-device handle
-  - Parameters:
-    - `src` (`touch`): Input data used by the operation
-- `device_get_touch(device src) -> touch`
-  - What it does: Converts a generic device handle into a touch-device handle
-  - Parameters:
-    - `src` (`device`): Input data used by the operation
-- `touch_to_device(touch src) -> device`
-  - What it does: Converts a touch-device handle into a generic device handle
-  - Parameters:
-    - `src` (`touch`): Input data used by the operation
-- `touch_is_available() -> b32`
-  - What it does: Performs touch is available
-  - Parameters: none
-- `touch_get_total_count() -> sz`
-  - What it does: Gets touch get total count
-  - Parameters: none
-- `touch_get_from_idx(sz idx) -> touch`
-  - What it does: Returns the touch-device handle at the requested index
-  - Parameters:
-    - `idx` (`sz`): Zero-based index used to select an item
-- `touch_get_primary() -> touch`
-  - What it does: Returns the primary touch-device handle
-  - Parameters: none
-- `touch_get_focused() -> touch`
-  - What it does: Returns the focused touch-device handle, or the primary touch device when none is focused
-  - Parameters: none
-- `touch_get_device_kind(touch src) -> touch_device_kind`
-  - What it does: Gets touch get device kind
-  - Parameters:
-    - `src` (`touch`): Input parameter
-- `touch_get_finger_count(touch src) -> sz`
-  - What it does: Gets touch get finger count
-  - Parameters:
-    - `src` (`touch`): Input parameter
-- `touch_get_finger(touch src, sz idx, touch_finger_state* out_finger) -> b32`
-  - What it does: Gets touch get finger
-  - Parameters:
-    - `src` (`touch`): Input parameter
-    - `idx` (`sz`): Zero-based index used to select an item
-    - `out_finger` (`touch_finger_state*`): Output value written by the function
+| Function | Declaration |
+| --- | --- |
+| `touch_is_valid` | `func b32 touch_is_valid(touch src);` |
+| `device_get_touch` | `func touch device_get_touch(device src);` |
+| `touch_to_device` | `func device touch_to_device(touch src);` |
+| `touch_is_available` | `func b32 touch_is_available(void);` |
+| `touch_get_total_count` | `func sz touch_get_total_count(void);` |
+| `touch_get_from_idx` | `func touch touch_get_from_idx(sz idx);` |
+| `touch_get_primary` | `func touch touch_get_primary(void);` |
+| `touch_get_focused` | `func touch touch_get_focused(void);` |
+| `touch_get_device_kind` | `func touch_device_kind touch_get_device_kind(touch src);` |
+| `touch_get_finger_count` | `func sz touch_get_finger_count(touch src);` |
+| `touch_get_finger` | `func b32 touch_get_finger(touch src, sz idx, touch_finger_state* out_finger);` |
+
+#### Macros
+
+| Macro | Form |
+| --- | --- |
+| None | - |
 
 ### `input/vkeys.h`
 
 - Types: **2**
-- Functions: **0**
+- Functions: **1**
+- Macros: **1**
 
 #### Types
 
-- `vkey` (enum)
-  - What it represents: Represents a set of named constants for `vkey`
-  - Members: none (alias/function type)
-- `keymod` (enum)
-  - What it represents: Represents a set of named constants for `keymod`
-  - Members:
-    - `KEYMOD_NONE`: `enum value`
-    - `KEYMOD_LSHIFT`: `enum value`
-    - `KEYMOD_RSHIFT`: `enum value`
-    - `KEYMOD_LEVEL5`: `enum value`
-    - `KEYMOD_LCTRL`: `enum value`
-    - `KEYMOD_RCTRL`: `enum value`
-    - `KEYMOD_LALT`: `enum value`
-    - `KEYMOD_RALT`: `enum value`
-    - `KEYMOD_LGUI`: `enum value`
-    - `KEYMOD_RGUI`: `enum value`
-    - `KEYMOD_NUM`: `enum value`
-    - `KEYMOD_CAPS`: `enum value`
-    - `KEYMOD_MODE`: `enum value`
-    - `KEYMOD_SCROLL`: `enum value`
-    - `KEYMOD_SHIFT`: `enum value`
-    - `KEYMOD_CTRL`: `enum value`
-    - `KEYMOD_ALT`: `enum value`
-    - `KEYMOD_GUI`: `enum value`
+| Type | Declaration |
+| --- | --- |
+| `vkey` | `typedef enum vkey { ... } vkey;` |
+| `keymod` | `typedef enum keymod { ... } keymod;` |
 
 #### Functions
 
-- None
+| Function | Declaration |
+| --- | --- |
+| `BASED_VKEY_LIST` | `func force_inline b32 vkey_is_valid(vkey key) { switch (key) { #define BASED_VKEY_CASE(name, value) case name: BASED_VKEY_LIST(BASED_VKEY_CASE) #undef BASED_VKEY_CASE return true;` |
+
+#### Macros
+
+| Macro | Form |
+| --- | --- |
+| `BASED_VKEY_LIST` | `BASED_VKEY_LIST(X)` |
 
 ## interface
 
-Windowing and desktop interface abstractions.
+Windowing, monitor, cursor, icon, dialog, DPI, and text-input APIs.
 
 ### `interface/cursor.h`
 
 - Types: **1**
 - Functions: **12**
+- Macros: **0**
 
 #### Types
 
-- `cursor_pos` (struct)
-  - What it represents: Represents `cursor pos` data grouped in a struct
-  - Members:
-    - `x`: `f32`
-    - `y`: `f32`
+| Type | Declaration |
+| --- | --- |
+| `cursor_pos` | `typedef struct cursor_pos { ... } cursor_pos;` |
 
 #### Functions
 
-- `cursor_set_icon(icon icon_id) -> b32`
-  - What it does: Sets cursor set icon
-  - Parameters:
-    - `icon_id` (`icon`): Input parameter
-- `cursor_reset_icon() -> b32`
-  - What it does: Performs cursor reset icon
-  - Parameters: none
-- `cursor_set_visible(b32 visible) -> b32`
-  - What it does: Sets cursor set visible
-  - Parameters:
-    - `visible` (`b32`): Input parameter
-- `cursor_is_visible() -> b32`
-  - What it does: Performs cursor is visible
-  - Parameters: none
-- `cursor_set_capture(window opt_window, b32 enabled) -> b32`
-  - What it does: Sets cursor set capture
-  - Parameters:
-    - `opt_window` (`window`): Input parameter
-    - `enabled` (`b32`): Input parameter
-- `cursor_is_captured(window opt_window) -> b32`
-  - What it does: Performs cursor is captured
-  - Parameters:
-    - `opt_window` (`window`): Input parameter
-- `cursor_set_relative_mode(window opt_window, b32 enabled) -> b32`
-  - What it does: Sets cursor set relative mode
-  - Parameters:
-    - `opt_window` (`window`): Input parameter
-    - `enabled` (`b32`): Input parameter
-- `cursor_is_relative_mode(window opt_window) -> b32`
-  - What it does: Performs cursor is relative mode
-  - Parameters:
-    - `opt_window` (`window`): Input parameter
-- `cursor_get_pos() -> cursor_pos`
-  - What it does: Gets cursor get pos
-  - Parameters: none
-- `cursor_get_global_pos() -> cursor_pos`
-  - What it does: Gets cursor get global pos
-  - Parameters: none
-- `cursor_get_relative_pos() -> cursor_pos`
-  - What it does: Gets cursor get relative pos
-  - Parameters: none
-- `cursor_warp(window opt_window, f32 xpos, f32 ypos) -> b32`
-  - What it does: Performs cursor warp
-  - Parameters:
-    - `opt_window` (`window`): Input parameter
-    - `xpos` (`f32`): Input parameter
-    - `ypos` (`f32`): Input parameter
+| Function | Declaration |
+| --- | --- |
+| `cursor_set_icon` | `func b32 cursor_set_icon(icon icon_id);` |
+| `cursor_reset_icon` | `func b32 cursor_reset_icon(void);` |
+| `cursor_set_visible` | `func b32 cursor_set_visible(b32 visible);` |
+| `cursor_is_visible` | `func b32 cursor_is_visible(void);` |
+| `cursor_set_capture` | `func b32 cursor_set_capture(window opt_window, b32 enabled);` |
+| `cursor_is_captured` | `func b32 cursor_is_captured(window opt_window);` |
+| `cursor_set_relative_mode` | `func b32 cursor_set_relative_mode(window opt_window, b32 enabled);` |
+| `cursor_is_relative_mode` | `func b32 cursor_is_relative_mode(window opt_window);` |
+| `cursor_get_pos` | `func cursor_pos cursor_get_pos(void);` |
+| `cursor_get_global_pos` | `func cursor_pos cursor_get_global_pos(void);` |
+| `cursor_get_relative_pos` | `func cursor_pos cursor_get_relative_pos(void);` |
+| `cursor_warp` | `func b32 cursor_warp(window opt_window, f32 xpos, f32 ypos);` |
+
+#### Macros
+
+| Macro | Form |
+| --- | --- |
+| None | - |
 
 ### `interface/dialog.h`
 
 - Types: **9**
 - Functions: **5**
+- Macros: **0**
 
 #### Types
 
-- `dialog_message_kind` (enum)
-  - What it represents: Represents a set of named constants for `dialog message kind`
-  - Members:
-    - `DIALOG_MESSAGE_KIND_INFORMATION`: `enum value`
-    - `DIALOG_MESSAGE_KIND_WARNING`: `enum value`
-    - `DIALOG_MESSAGE_KIND_ERROR`: `enum value`
-- `dialog_message_box_flag` (enum)
-  - What it represents: Represents a set of named constants for `dialog message box flag`
-  - Members:
-    - `DIALOG_MESSAGE_BOX_FLAG_ERROR`: `enum value`
-    - `DIALOG_MESSAGE_BOX_FLAG_WARNING`: `enum value`
-    - `DIALOG_MESSAGE_BOX_FLAG_INFORMATION`: `enum value`
-    - `DIALOG_MESSAGE_BOX_FLAG_BUTTONS_LEFT_TO_RIGHT`: `enum value`
-    - `DIALOG_MESSAGE_BOX_FLAG_BUTTONS_RIGHT_TO_LEFT`: `enum value`
-- `dialog_message_box_button_flag` (enum)
-  - What it represents: Represents a set of named constants for `dialog message box button flag`
-  - Members:
-    - `DIALOG_MESSAGE_BOX_BUTTON_FLAG_RETURNKEY_DEFAULT`: `enum value`
-    - `DIALOG_MESSAGE_BOX_BUTTON_FLAG_ESCAPEKEY_DEFAULT`: `enum value`
-- `dialog_message_box_button` (struct)
-  - What it represents: Represents `dialog message box button` data grouped in a struct
-  - Members:
-    - `flags`: `u32`
-    - `button_id`: `i32`
-    - `text`: `cstr8`
-- `dialog_message_box_color` (struct)
-  - What it represents: Represents `dialog message box color` data grouped in a struct
-  - Members:
-    - `red`: `u8`
-    - `green`: `u8`
-    - `blue`: `u8`
-- `dialog_message_box_color_scheme` (struct)
-  - What it represents: Represents `dialog message box color scheme` data grouped in a struct
-  - Members:
-    - `background`: `dialog_message_box_color`
-    - `text`: `dialog_message_box_color`
-    - `button_border`: `dialog_message_box_color`
-    - `button_background`: `dialog_message_box_color`
-    - `button_selected`: `dialog_message_box_color`
-- `dialog_message_box` (struct)
-  - What it represents: Represents `dialog message box` data grouped in a struct
-  - Members:
-    - `flags`: `u32`
-    - `title`: `cstr8`
-    - `message`: `cstr8`
-    - `buttons`: `const dialog_message_box_button*`
-    - `button_count`: `sz`
-    - `color_scheme`: `const dialog_message_box_color_scheme*`
-- `dialog_file_filter` (struct)
-  - What it represents: Represents `dialog file filter` data grouped in a struct
-  - Members:
-    - `name`: `cstr8`
-    - `pattern`: `cstr8`
-- `dialog_file_callback` (alias)
-  - What it represents: Type alias used for `dialog file callback`
-  - Members: none (alias/function type)
+| Type | Declaration |
+| --- | --- |
+| `dialog_message_kind` | `typedef enum dialog_message_kind { ... } dialog_message_kind;` |
+| `dialog_message_box_flag` | `typedef enum dialog_message_box_flag { ... } dialog_message_box_flag;` |
+| `dialog_message_box_button_flag` | `typedef enum dialog_message_box_button_flag { ... } dialog_message_box_button_flag;` |
+| `dialog_message_box_button` | `typedef struct dialog_message_box_button { ... } dialog_message_box_button;` |
+| `dialog_message_box_color` | `typedef struct dialog_message_box_color { ... } dialog_message_box_color;` |
+| `dialog_message_box_color_scheme` | `typedef struct dialog_message_box_color_scheme { ... } dialog_message_box_color_scheme;` |
+| `dialog_message_box` | `typedef struct dialog_message_box { ... } dialog_message_box;` |
+| `dialog_file_filter` | `typedef struct dialog_file_filter { ... } dialog_file_filter;` |
+| `dialog_file_callback` | `typedef void dialog_file_callback( void* user_data, cstr8 const* file_list, i32 filter_idx, b32 is_cancelled, b32 has_error);` |
 
 #### Functions
 
-- `dialog_show_message(window owner, dialog_message_kind message_kind, cstr8 title, cstr8 message) -> b32`
-  - What it does: Performs dialog show message
-  - Parameters:
-    - `owner` (`window`): Input parameter
-    - `message_kind` (`dialog_message_kind`): Input parameter
-    - `title` (`cstr8`): Input parameter
-    - `message` (`cstr8`): Input parameter
-- `dialog_show_message_box(window owner, const dialog_message_box* message_box, i32* out_button_id) -> b32`
-  - What it does: Performs dialog show message box
-  - Parameters:
-    - `owner` (`window`): Input parameter
-    - `message_box` (`const dialog_message_box*`): Input parameter
-    - `out_button_id` (`i32*`): Output value written by the function
-- `dialog_open_file(window owner, const dialog_file_filter* filters, sz filter_count, cstr8 default_location, b32 allow_many, dialog_file_callback* callback, void* user_data) -> b32`
-  - What it does: Opens dialog open file
-  - Parameters:
-    - `owner` (`window`): Input parameter
-    - `filters` (`const dialog_file_filter*`): Input parameter
-    - `filter_count` (`sz`): Number of elements/items involved
-    - `default_location` (`cstr8`): Input parameter
-    - `allow_many` (`b32`): Input parameter
-    - `callback` (`dialog_file_callback*`): Input parameter
-    - `user_data` (`void*`): Input parameter
-- `dialog_save_file(window owner, const dialog_file_filter* filters, sz filter_count, cstr8 default_location, dialog_file_callback* callback, void* user_data) -> b32`
-  - What it does: Performs dialog save file
-  - Parameters:
-    - `owner` (`window`): Input parameter
-    - `filters` (`const dialog_file_filter*`): Input parameter
-    - `filter_count` (`sz`): Number of elements/items involved
-    - `default_location` (`cstr8`): Input parameter
-    - `callback` (`dialog_file_callback*`): Input parameter
-    - `user_data` (`void*`): Input parameter
-- `dialog_open_folder(window owner, cstr8 default_location, b32 allow_many, dialog_file_callback* callback, void* user_data) -> b32`
-  - What it does: Opens dialog open folder
-  - Parameters:
-    - `owner` (`window`): Input parameter
-    - `default_location` (`cstr8`): Input parameter
-    - `allow_many` (`b32`): Input parameter
-    - `callback` (`dialog_file_callback*`): Input parameter
-    - `user_data` (`void*`): Input parameter
+| Function | Declaration |
+| --- | --- |
+| `dialog_show_message` | `func b32 dialog_show_message( window owner, dialog_message_kind message_kind, cstr8 title, cstr8 message);` |
+| `dialog_show_message_box` | `func b32 dialog_show_message_box(window owner, const dialog_message_box* message_box, i32* out_button_id);` |
+| `dialog_open_file` | `func b32 dialog_open_file( window owner, const dialog_file_filter* filters, sz filter_count, cstr8 default_location, b32 allow_many, dialog_file_callback* callback, void* user_data);` |
+| `dialog_save_file` | `func b32 dialog_save_file( window owner, const dialog_file_filter* filters, sz filter_count, cstr8 default_location, dialog_file_callback* callback, void* user_data);` |
+| `dialog_open_folder` | `func b32 dialog_open_folder( window owner, cstr8 default_location, b32 allow_many, dialog_file_callback* callback, void* user_data);` |
+
+#### Macros
+
+| Macro | Form |
+| --- | --- |
+| None | - |
 
 ### `interface/dpi.h`
 
 - Types: **1**
 - Functions: **5**
+- Macros: **0**
 
 #### Types
 
-- `dpi_metrics` (struct)
-  - What it represents: Represents `dpi metrics` data grouped in a struct
-  - Members:
-    - `content_scale`: `f32`
-    - `pixel_density`: `f32`
-    - `display_scale`: `f32`
+| Type | Declaration |
+| --- | --- |
+| `dpi_metrics` | `typedef struct dpi_metrics { ... } dpi_metrics;` |
 
 #### Functions
 
-- `dpi_metrics_make_default() -> dpi_metrics`
-  - What it does: Performs dpi metrics make default
-  - Parameters: none
-- `dpi_get_monitor_metrics(monitor monitor_id, dpi_metrics* out_metrics) -> b32`
-  - What it does: Gets dpi get monitor metrics
-  - Parameters:
-    - `monitor_id` (`monitor`): Input parameter
-    - `out_metrics` (`dpi_metrics*`): Output value written by the function
-- `dpi_get_window_metrics(window window_id, dpi_metrics* out_metrics) -> b32`
-  - What it does: Gets dpi get window metrics
-  - Parameters:
-    - `window_id` (`window`): Input parameter
-    - `out_metrics` (`dpi_metrics*`): Output value written by the function
-- `dpi_scale_f32(f32 value, f32 scale) -> f32`
-  - What it does: Performs dpi scale f32
-  - Parameters:
-    - `value` (`f32`): Input parameter
-    - `scale` (`f32`): Input parameter
-- `dpi_scale_i32(i32 value, f32 scale) -> i32`
-  - What it does: Performs dpi scale i32
-  - Parameters:
-    - `value` (`i32`): Input parameter
-    - `scale` (`f32`): Input parameter
+| Function | Declaration |
+| --- | --- |
+| `dpi_metrics_make_default` | `func dpi_metrics dpi_metrics_make_default(void);` |
+| `dpi_get_monitor_metrics` | `func b32 dpi_get_monitor_metrics(monitor monitor_id, dpi_metrics* out_metrics);` |
+| `dpi_get_window_metrics` | `func b32 dpi_get_window_metrics(window window_id, dpi_metrics* out_metrics);` |
+| `dpi_scale_f32` | `func f32 dpi_scale_f32(f32 value, f32 scale);` |
+| `dpi_scale_i32` | `func i32 dpi_scale_i32(i32 value, f32 scale);` |
+
+#### Macros
+
+| Macro | Form |
+| --- | --- |
+| None | - |
 
 ### `interface/icon.h`
 
 - Types: **2**
 - Functions: **9**
+- Macros: **0**
 
 #### Types
 
-- `icon` (alias)
-  - What it represents: Type alias used for `icon`
-  - Members: none (alias/function type)
-- `icon_system` (enum)
-  - What it represents: Represents a set of named constants for `icon system`
-  - Members:
-    - `ICON_SYSTEM_DEFAULT`: `enum value`
-    - `ICON_SYSTEM_TEXT`: `enum value`
-    - `ICON_SYSTEM_WAIT`: `enum value`
-    - `ICON_SYSTEM_CROSSHAIR`: `enum value`
-    - `ICON_SYSTEM_PROGRESS`: `enum value`
-    - `ICON_SYSTEM_NWSE_RESIZE`: `enum value`
-    - `ICON_SYSTEM_NESW_RESIZE`: `enum value`
-    - `ICON_SYSTEM_EW_RESIZE`: `enum value`
-    - `ICON_SYSTEM_NS_RESIZE`: `enum value`
-    - `ICON_SYSTEM_MOVE`: `enum value`
-    - `ICON_SYSTEM_NOT_ALLOWED`: `enum value`
-    - `ICON_SYSTEM_POINTER`: `enum value`
-    - `ICON_SYSTEM_NW_RESIZE`: `enum value`
-    - `ICON_SYSTEM_N_RESIZE`: `enum value`
-    - `ICON_SYSTEM_NE_RESIZE`: `enum value`
-    - `ICON_SYSTEM_E_RESIZE`: `enum value`
-    - `ICON_SYSTEM_SE_RESIZE`: `enum value`
-    - `ICON_SYSTEM_S_RESIZE`: `enum value`
-    - `ICON_SYSTEM_SW_RESIZE`: `enum value`
-    - `ICON_SYSTEM_W_RESIZE`: `enum value`
+| Type | Declaration |
+| --- | --- |
+| `icon` | `typedef void* icon;` |
+| `icon_system` | `typedef enum icon_system { ... } icon_system;` |
 
 #### Functions
 
-- `icon_id_is_valid(icon src) -> b32`
-  - What it does: Performs icon id is valid
-  - Parameters:
-    - `src` (`icon`): Input data used by the operation
-- `icon_create_rgba(i32 width, i32 height, const u8* rgba_pixels, i32 hot_xpos, i32 hot_ypos) -> icon`
-  - What it does: Creates icon create rgba resources or state
-  - Parameters:
-    - `width` (`i32`): Input parameter
-    - `height` (`i32`): Input parameter
-    - `rgba_pixels` (`const u8*`): Input parameter
-    - `hot_xpos` (`i32`): Input parameter
-    - `hot_ypos` (`i32`): Input parameter
-- `icon_create_system(icon_system system_icon) -> icon`
-  - What it does: Creates icon create system resources or state
-  - Parameters:
-    - `system_icon` (`icon_system`): Input parameter
-- `icon_destroy(icon icon_id) -> b32`
-  - What it does: Destroys icon destroy resources or state
-  - Parameters:
-    - `icon_id` (`icon`): Input parameter
-- `icon_get_size(icon icon_id, i32* out_width, i32* out_height) -> b32`
-  - What it does: Gets icon get size
-  - Parameters:
-    - `icon_id` (`icon`): Input parameter
-    - `out_width` (`i32*`): Output value written by the function
-    - `out_height` (`i32*`): Output value written by the function
-- `icon_get_hotspot(icon icon_id, i32* out_xpos, i32* out_ypos) -> b32`
-  - What it does: Gets icon get hotspot
-  - Parameters:
-    - `icon_id` (`icon`): Input parameter
-    - `out_xpos` (`i32*`): Output value written by the function
-    - `out_ypos` (`i32*`): Output value written by the function
-- `icon_get_system(icon icon_id, icon_system* out_system_icon) -> b32`
-  - What it does: Gets icon get system
-  - Parameters:
-    - `icon_id` (`icon`): Input parameter
-    - `out_system_icon` (`icon_system*`): Output value written by the function
-- `icon_is_rgba(icon icon_id) -> b32`
-  - What it does: Performs icon is rgba
-  - Parameters:
-    - `icon_id` (`icon`): Input parameter
-- `icon_is_system(icon icon_id) -> b32`
-  - What it does: Performs icon is system
-  - Parameters:
-    - `icon_id` (`icon`): Input parameter
+| Function | Declaration |
+| --- | --- |
+| `icon_id_is_valid` | `func b32 icon_id_is_valid(icon src);` |
+| `icon_create_rgba` | `func icon icon_create_rgba(i32 width, i32 height, const u8* rgba_pixels, i32 hot_xpos, i32 hot_ypos);` |
+| `icon_create_system` | `func icon icon_create_system(icon_system system_icon);` |
+| `icon_destroy` | `func b32 icon_destroy(icon icon_id);` |
+| `icon_get_size` | `func b32 icon_get_size(icon icon_id, i32* out_width, i32* out_height);` |
+| `icon_get_hotspot` | `func b32 icon_get_hotspot(icon icon_id, i32* out_xpos, i32* out_ypos);` |
+| `icon_get_system` | `func b32 icon_get_system(icon icon_id, icon_system* out_system_icon);` |
+| `icon_is_rgba` | `func b32 icon_is_rgba(icon icon_id);` |
+| `icon_is_system` | `func b32 icon_is_system(icon icon_id);` |
+
+#### Macros
+
+| Macro | Form |
+| --- | --- |
+| None | - |
 
 ### `interface/monitor.h`
 
 - Types: **3**
 - Functions: **15**
+- Macros: **0**
 
 #### Types
 
-- `monitor` (alias)
-  - What it represents: Type alias used for `monitor`
-  - Members: none (alias/function type)
-- `monitor_mode` (struct)
-  - What it represents: Represents `monitor mode` data grouped in a struct
-  - Members:
-    - `width`: `i32`
-    - `height`: `i32`
-    - `pixel_format`: `u32`
-    - `refresh_rate`: `f32`
-- `monitor_orientation` (enum)
-  - What it represents: Represents a set of named constants for `monitor orientation`
-  - Members:
-    - `MONITOR_ORIENTATION_UNKNOWN`: `enum value`
-    - `MONITOR_ORIENTATION_LANDSCAPE`: `enum value`
-    - `MONITOR_ORIENTATION_LANDSCAPE_FLIPPED`: `enum value`
-    - `MONITOR_ORIENTATION_PORTRAIT`: `enum value`
-    - `MONITOR_ORIENTATION_PORTRAIT_FLIPPED`: `enum value`
+| Type | Declaration |
+| --- | --- |
+| `monitor` | `typedef void* monitor;` |
+| `monitor_mode` | `typedef struct monitor_mode { ... } monitor_mode;` |
+| `monitor_orientation` | `typedef enum monitor_orientation { ... } monitor_orientation;` |
 
 #### Functions
 
-- `monitor_id_is_valid(monitor src) -> b32`
-  - What it does: Performs monitor id is valid
-  - Parameters:
-    - `src` (`monitor`): Input data used by the operation
-- `monitor_from_device(device src) -> monitor`
-  - What it does: Performs monitor from device
-  - Parameters:
-    - `src` (`device`): Input data used by the operation
-- `monitor_get_total_count() -> sz`
-  - What it does: Gets monitor get total count
-  - Parameters: none
-- `monitor_get_from_idx(sz idx) -> monitor`
-  - What it does: Gets monitor get from idx
-  - Parameters:
-    - `idx` (`sz`): Zero-based index used to select an item
-- `monitor_get_primary_id() -> monitor`
-  - What it does: Gets monitor get primary id
-  - Parameters: none
-- `monitor_get_bounds(monitor mon_id) -> r2_i32`
-  - What it does: Gets monitor get bounds
-  - Parameters:
-    - `mon_id` (`monitor`): Input parameter
-- `monitor_get_usable_bounds(monitor mon_id) -> r2_i32`
-  - What it does: Gets monitor get usable bounds
-  - Parameters:
-    - `mon_id` (`monitor`): Input parameter
-- `monitor_get_mode_count(monitor mon_id) -> sz`
-  - What it does: Gets monitor get mode count
-  - Parameters:
-    - `mon_id` (`monitor`): Input parameter
-- `monitor_get_mode(monitor mon_id, sz idx, monitor_mode* out_mode) -> b32`
-  - What it does: Gets monitor get mode
-  - Parameters:
-    - `mon_id` (`monitor`): Input parameter
-    - `idx` (`sz`): Zero-based index used to select an item
-    - `out_mode` (`monitor_mode*`): Output value written by the function
-- `monitor_get_current_mode(monitor mon_id, monitor_mode* out_mode) -> b32`
-  - What it does: Gets monitor get current mode
-  - Parameters:
-    - `mon_id` (`monitor`): Input parameter
-    - `out_mode` (`monitor_mode*`): Output value written by the function
-- `monitor_get_desktop_mode(monitor mon_id, monitor_mode* out_mode) -> b32`
-  - What it does: Gets monitor get desktop mode
-  - Parameters:
-    - `mon_id` (`monitor`): Input parameter
-    - `out_mode` (`monitor_mode*`): Output value written by the function
-- `monitor_get_name(monitor mon_id) -> cstr8`
-  - What it does: Gets monitor get name
-  - Parameters:
-    - `mon_id` (`monitor`): Input parameter
-- `monitor_get_refresh_rate(monitor mon_id) -> f32`
-  - What it does: Gets monitor get refresh rate
-  - Parameters:
-    - `mon_id` (`monitor`): Input parameter
-- `monitor_get_content_scale(monitor mon_id) -> f32`
-  - What it does: Gets monitor get content scale
-  - Parameters:
-    - `mon_id` (`monitor`): Input parameter
-- `monitor_get_orientation(monitor mon_id) -> monitor_orientation`
-  - What it does: Gets monitor get orientation
-  - Parameters:
-    - `mon_id` (`monitor`): Input parameter
+| Function | Declaration |
+| --- | --- |
+| `monitor_id_is_valid` | `func b32 monitor_id_is_valid(monitor src);` |
+| `monitor_from_device` | `func monitor monitor_from_device(device src);` |
+| `monitor_get_total_count` | `func sz monitor_get_total_count(void);` |
+| `monitor_get_from_idx` | `func monitor monitor_get_from_idx(sz idx);` |
+| `monitor_get_primary_id` | `func monitor monitor_get_primary_id(void);` |
+| `monitor_get_bounds` | `func r2_i32 monitor_get_bounds(monitor mon_id);` |
+| `monitor_get_usable_bounds` | `func r2_i32 monitor_get_usable_bounds(monitor mon_id);` |
+| `monitor_get_mode_count` | `func sz monitor_get_mode_count(monitor mon_id);` |
+| `monitor_get_mode` | `func b32 monitor_get_mode(monitor mon_id, sz idx, monitor_mode* out_mode);` |
+| `monitor_get_current_mode` | `func b32 monitor_get_current_mode(monitor mon_id, monitor_mode* out_mode);` |
+| `monitor_get_desktop_mode` | `func b32 monitor_get_desktop_mode(monitor mon_id, monitor_mode* out_mode);` |
+| `monitor_get_name` | `func cstr8 monitor_get_name(monitor mon_id);` |
+| `monitor_get_refresh_rate` | `func f32 monitor_get_refresh_rate(monitor mon_id);` |
+| `monitor_get_content_scale` | `func f32 monitor_get_content_scale(monitor mon_id);` |
+| `monitor_get_orientation` | `func monitor_orientation monitor_get_orientation(monitor mon_id);` |
+
+#### Macros
+
+| Macro | Form |
+| --- | --- |
+| None | - |
 
 ### `interface/text_input.h`
 
 - Types: **0**
 - Functions: **4**
+- Macros: **0**
 
 #### Types
 
-- None
+| Type | Declaration |
+| --- | --- |
+| None | - |
 
 #### Functions
 
-- `text_input_start(window opt_window) -> b32`
-  - What it does: Performs text input start
-  - Parameters:
-    - `opt_window` (`window`): Input parameter
-- `text_input_stop(window opt_window) -> b32`
-  - What it does: Performs text input stop
-  - Parameters:
-    - `opt_window` (`window`): Input parameter
-- `text_input_is_active(window opt_window) -> b32`
-  - What it does: Performs text input is active
-  - Parameters:
-    - `opt_window` (`window`): Input parameter
-- `text_input_set_area(window opt_window, i32 xpos, i32 ypos, i32 width, i32 height) -> b32`
-  - What it does: Sets text input set area
-  - Parameters:
-    - `opt_window` (`window`): Input parameter
-    - `xpos` (`i32`): Input parameter
-    - `ypos` (`i32`): Input parameter
-    - `width` (`i32`): Input parameter
-    - `height` (`i32`): Input parameter
+| Function | Declaration |
+| --- | --- |
+| `text_input_start` | `func b32 text_input_start(window opt_window);` |
+| `text_input_stop` | `func b32 text_input_stop(window opt_window);` |
+| `text_input_is_active` | `func b32 text_input_is_active(window opt_window);` |
+| `text_input_set_area` | `func b32 text_input_set_area(window opt_window, i32 xpos, i32 ypos, i32 width, i32 height);` |
+
+#### Macros
+
+| Macro | Form |
+| --- | --- |
+| None | - |
 
 ### `interface/window.h`
 
 - Types: **3**
 - Functions: **33**
+- Macros: **0**
 
 #### Types
 
-- `window` (alias)
-  - What it represents: Type alias used for `window`
-  - Members: none (alias/function type)
-- `window_mode` (enum)
-  - What it represents: Represents a set of named constants for `window mode`
-  - Members:
-    - `WINDOW_MODE_WINDOWED`: `enum value`
-    - `WINDOW_MODE_UNDECORATED`: `enum value`
-    - `WINDOW_MODE_FULLSCREEN`: `enum value`
-    - `WINDOW_MODE_WINDOWED_FULLSCREEN`: `enum value`
-- `window_center_axis` (enum)
-  - What it represents: Represents a set of named constants for `window center axis`
-  - Members:
-    - `WINDOW_CENTER_AXIS_NONE`: `enum value`
-    - `WINDOW_CENTER_AXIS_HORIZONTAL`: `enum value`
-    - `WINDOW_CENTER_AXIS_VERTICAL`: `enum value`
-    - `WINDOW_CENTER_AXIS_BOTH`: `enum value`
+| Type | Declaration |
+| --- | --- |
+| `window` | `typedef void* window;` |
+| `window_mode` | `typedef enum window_mode { ... } window_mode;` |
+| `window_center_axis` | `typedef enum window_center_axis { ... } window_center_axis;` |
 
 #### Functions
 
-- `window_id_is_valid(window src) -> b32`
-  - What it does: Performs window id is valid
-  - Parameters:
-    - `src` (`window`): Input data used by the operation
-- `window_get_total_count() -> sz`
-  - What it does: Gets window get total count
-  - Parameters: none
-- `window_get_from_idx(sz idx) -> window`
-  - What it does: Gets window get from idx
-  - Parameters:
-    - `idx` (`sz`): Zero-based index used to select an item
-- `window_is_valid(window window_id) -> b32`
-  - What it does: Performs window is valid
-  - Parameters:
-    - `window_id` (`window`): Input parameter
-- `window_create(cstr8 title, i32 width, i32 height, window_mode mode, u64 flags) -> window`
-  - What it does: Creates window create resources or state
-  - Parameters:
-    - `title` (`cstr8`): Input parameter
-    - `width` (`i32`): Input parameter
-    - `height` (`i32`): Input parameter
-    - `mode` (`window_mode`): Configuration value controlling behavior
-    - `flags` (`u64`): Configuration value controlling behavior
-- `window_destroy(window window_id) -> b32`
-  - What it does: Destroys window destroy resources or state
-  - Parameters:
-    - `window_id` (`window`): Input parameter
-- `window_is_hidden(window window_id) -> b32`
-  - What it does: Performs window is hidden
-  - Parameters:
-    - `window_id` (`window`): Input parameter
-- `window_show(window window_id) -> b32`
-  - What it does: Performs window show
-  - Parameters:
-    - `window_id` (`window`): Input parameter
-- `window_hide(window window_id) -> b32`
-  - What it does: Performs window hide
-  - Parameters:
-    - `window_id` (`window`): Input parameter
-- `window_set_pos(window window_id, i32 xpos, i32 ypos) -> b32`
-  - What it does: Sets window set pos
-  - Parameters:
-    - `window_id` (`window`): Input parameter
-    - `xpos` (`i32`): Input parameter
-    - `ypos` (`i32`): Input parameter
-- `window_get_pos(window window_id, i32* out_xpos, i32* out_ypos) -> b32`
-  - What it does: Gets window get pos
-  - Parameters:
-    - `window_id` (`window`): Input parameter
-    - `out_xpos` (`i32*`): Output value written by the function
-    - `out_ypos` (`i32*`): Output value written by the function
-- `window_set_size(window window_id, i32 width, i32 height) -> b32`
-  - What it does: Sets window set size
-  - Parameters:
-    - `window_id` (`window`): Input parameter
-    - `width` (`i32`): Input parameter
-    - `height` (`i32`): Input parameter
-- `window_get_size(window window_id, i32* out_width, i32* out_height) -> b32`
-  - What it does: Gets window get size
-  - Parameters:
-    - `window_id` (`window`): Input parameter
-    - `out_width` (`i32*`): Output value written by the function
-    - `out_height` (`i32*`): Output value written by the function
-- `window_set_mode(window window_id, window_mode mode) -> b32`
-  - What it does: Sets window set mode
-  - Parameters:
-    - `window_id` (`window`): Input parameter
-    - `mode` (`window_mode`): Configuration value controlling behavior
-- `window_get_mode(window window_id) -> window_mode`
-  - What it does: Gets window get mode
-  - Parameters:
-    - `window_id` (`window`): Input parameter
-- `window_is_minimized(window window_id) -> b32`
-  - What it does: Performs window is minimized
-  - Parameters:
-    - `window_id` (`window`): Input parameter
-- `window_is_maximized(window window_id) -> b32`
-  - What it does: Performs window is maximized
-  - Parameters:
-    - `window_id` (`window`): Input parameter
-- `window_has_input_focus(window window_id) -> b32`
-  - What it does: Performs window has input focus
-  - Parameters:
-    - `window_id` (`window`): Input parameter
-- `window_has_mouse_focus(window window_id) -> b32`
-  - What it does: Performs window has mouse focus
-  - Parameters:
-    - `window_id` (`window`): Input parameter
-- `window_is_topmost(window window_id) -> b32`
-  - What it does: Performs window is topmost
-  - Parameters:
-    - `window_id` (`window`): Input parameter
-- `window_minimize(window window_id) -> b32`
-  - What it does: Performs window minimize
-  - Parameters:
-    - `window_id` (`window`): Input parameter
-- `window_maximize(window window_id) -> b32`
-  - What it does: Performs window maximize
-  - Parameters:
-    - `window_id` (`window`): Input parameter
-- `window_restore(window window_id) -> b32`
-  - What it does: Performs window restore
-  - Parameters:
-    - `window_id` (`window`): Input parameter
-- `window_focus(window window_id) -> b32`
-  - What it does: Performs window focus
-  - Parameters:
-    - `window_id` (`window`): Input parameter
-- `window_set_topmost(window window_id, b32 enabled) -> b32`
-  - What it does: Sets window set topmost
-  - Parameters:
-    - `window_id` (`window`): Input parameter
-    - `enabled` (`b32`): Input parameter
-- `window_get_title(window window_id) -> cstr8`
-  - What it does: Gets window get title
-  - Parameters:
-    - `window_id` (`window`): Input parameter
-- `window_set_title(window window_id, cstr8 title) -> b32`
-  - What it does: Sets window set title
-  - Parameters:
-    - `window_id` (`window`): Input parameter
-    - `title` (`cstr8`): Input parameter
-- `window_set_icon(window window_id, icon icon_id) -> b32`
-  - What it does: Sets window set icon
-  - Parameters:
-    - `window_id` (`window`): Input parameter
-    - `icon_id` (`icon`): Input parameter
-- `window_get_monitor(window window_id, monitor* out_monitor_id) -> b32`
-  - What it does: Gets window get monitor
-  - Parameters:
-    - `window_id` (`window`): Input parameter
-    - `out_monitor_id` (`monitor*`): Output value written by the function
-- `window_get_creation_monitor(window window_id, monitor* out_monitor_id) -> b32`
-  - What it does: Gets window get creation monitor
-  - Parameters:
-    - `window_id` (`window`): Input parameter
-    - `out_monitor_id` (`monitor*`): Output value written by the function
-- `window_center_in_monitor(window window_id, monitor monitor_id, window_center_axis axis_mask) -> b32`
-  - What it does: Performs window center in monitor
-  - Parameters:
-    - `window_id` (`window`): Input parameter
-    - `monitor_id` (`monitor`): Input parameter
-    - `axis_mask` (`window_center_axis`): Input parameter
-- `window_get_keyboard_focus() -> window`
-  - What it does: Gets window get keyboard focus
-  - Parameters: none
-- `window_get_cursor_focus() -> window`
-  - What it does: Gets window get cursor focus
-  - Parameters: none
+| Function | Declaration |
+| --- | --- |
+| `window_id_is_valid` | `func b32 window_id_is_valid(window src);` |
+| `window_get_total_count` | `func sz window_get_total_count(void);` |
+| `window_get_from_idx` | `func window window_get_from_idx(sz idx);` |
+| `window_is_valid` | `func b32 window_is_valid(window window_id);` |
+| `window_create` | `func window window_create(cstr8 title, i32 width, i32 height, window_mode mode, u64 flags);` |
+| `window_destroy` | `func b32 window_destroy(window window_id);` |
+| `window_is_hidden` | `func b32 window_is_hidden(window window_id);` |
+| `window_show` | `func b32 window_show(window window_id);` |
+| `window_hide` | `func b32 window_hide(window window_id);` |
+| `window_set_pos` | `func b32 window_set_pos(window window_id, i32 xpos, i32 ypos);` |
+| `window_get_pos` | `func b32 window_get_pos(window window_id, i32* out_xpos, i32* out_ypos);` |
+| `window_set_size` | `func b32 window_set_size(window window_id, i32 width, i32 height);` |
+| `window_get_size` | `func b32 window_get_size(window window_id, i32* out_width, i32* out_height);` |
+| `window_set_mode` | `func b32 window_set_mode(window window_id, window_mode mode);` |
+| `window_get_mode` | `func window_mode window_get_mode(window window_id);` |
+| `window_is_minimized` | `func b32 window_is_minimized(window window_id);` |
+| `window_is_maximized` | `func b32 window_is_maximized(window window_id);` |
+| `window_has_input_focus` | `func b32 window_has_input_focus(window window_id);` |
+| `window_has_mouse_focus` | `func b32 window_has_mouse_focus(window window_id);` |
+| `window_is_topmost` | `func b32 window_is_topmost(window window_id);` |
+| `window_minimize` | `func b32 window_minimize(window window_id);` |
+| `window_maximize` | `func b32 window_maximize(window window_id);` |
+| `window_restore` | `func b32 window_restore(window window_id);` |
+| `window_focus` | `func b32 window_focus(window window_id);` |
+| `window_set_topmost` | `func b32 window_set_topmost(window window_id, b32 enabled);` |
+| `window_get_title` | `func cstr8 window_get_title(window window_id);` |
+| `window_set_title` | `func b32 window_set_title(window window_id, cstr8 title);` |
+| `window_set_icon` | `func b32 window_set_icon(window window_id, icon icon_id);` |
+| `window_get_monitor` | `func b32 window_get_monitor(window window_id, monitor* out_monitor_id);` |
+| `window_get_creation_monitor` | `func b32 window_get_creation_monitor(window window_id, monitor* out_monitor_id);` |
+| `window_center_in_monitor` | `func b32 window_center_in_monitor( window window_id, monitor monitor_id, window_center_axis axis_mask);` |
+| `window_get_keyboard_focus` | `func window window_get_keyboard_focus();` |
+| `window_get_cursor_focus` | `func window window_get_cursor_focus();` |
+
+#### Macros
+
+| Macro | Form |
+| --- | --- |
+| None | - |
 
 ## memory
 
-Allocators, arenas, buffers and memory utility APIs.
-
-### `memory/allocator.h`
-
-- Types: **4**
-- Functions: **8**
-
-#### Types
-
-- `allocator_callback_realloc` (alias)
-  - What it represents: Type alias used for `allocator callback realloc`
-  - Members: none (alias/function type)
-- `allocator_callback_alloc` (alias)
-  - What it represents: Type alias used for `allocator callback alloc`
-  - Members: none (alias/function type)
-- `allocator_callback_free` (alias)
-  - What it represents: Type alias used for `allocator callback free`
-  - Members: none (alias/function type)
-- `allocator` (struct)
-  - What it represents: Represents `allocator` data grouped in a struct
-  - Members:
-    - `user_data`: `void*`
-    - `tracker`: `alloc_tracker*`
-    - `alloc_fn`: `allocator_callback_alloc*`
-    - `dealloc_fn`: `allocator_callback_free*`
-    - `realloc_fn`: `allocator_callback_realloc*`
-
-#### Functions
-
-- `allocator_get_user_data(allocator* alloc) -> void*`
-  - What it does: Gets allocator user data
-  - Parameters:
-    - `alloc` (`allocator*`): Allocator/context used for memory management
-- `allocator_set_user_data(allocator* alloc, void* user_data) -> void`
-  - What it does: Sets allocator user data
-  - Parameters:
-    - `alloc` (`allocator*`): Allocator/context used for memory management
-    - `user_data` (`void*`): Input data used by the operation
-- `allocator_get_tracker(allocator* alloc) -> alloc_tracker*`
-  - What it does: Gets allocator tracker
-  - Parameters:
-    - `alloc` (`allocator*`): Allocator/context used for memory management
-- `allocator_set_tracker(allocator* alloc, alloc_tracker* tracker) -> void`
-  - What it does: Sets allocator tracker
-  - Parameters:
-    - `alloc` (`allocator*`): Allocator/context used for memory management
-    - `tracker` (`alloc_tracker*`): Input parameter
-- `_allocator_alloc(allocator alloc, sz size, callsite site) -> void*`
-  - What it does: Performs  allocator alloc
-  - Parameters:
-    - `alloc` (`allocator`): Allocator/context used for memory management
-    - `size` (`sz`): Size or capacity value used by the operation
-    - `site` (`callsite`): Input parameter
-- `_allocator_calloc(allocator alloc, sz count, sz size, callsite site) -> void*`
-  - What it does: Performs  allocator calloc
-  - Parameters:
-    - `alloc` (`allocator`): Allocator/context used for memory management
-    - `count` (`sz`): Number of elements/items involved
-    - `size` (`sz`): Size or capacity value used by the operation
-    - `site` (`callsite`): Input parameter
-- `_allocator_dealloc(allocator alloc, void* ptr, callsite site) -> void`
-  - What it does: Performs  allocator dealloc
-  - Parameters:
-    - `alloc` (`allocator`): Allocator/context used for memory management
-    - `ptr` (`void*`): Input data used by the operation
-    - `site` (`callsite`): Input parameter
-- `_allocator_realloc(allocator alloc, void* ptr, sz new_size, callsite site) -> void*`
-  - What it does: Performs  allocator realloc
-  - Parameters:
-    - `alloc` (`allocator`): Allocator/context used for memory management
-    - `ptr` (`void*`): Input data used by the operation
-    - `new_size` (`sz`): Size or capacity value used by the operation
-    - `site` (`callsite`): Input parameter
+Allocators, arenas, heaps, pools, rings, scratch buffers, and memory helpers.
 
 ### `memory/alloc_tracker.h`
 
 - Types: **5**
 - Functions: **12**
+- Macros: **0**
 
 #### Types
 
-- `alloc_tracker_stats` (struct)
-  - What it represents: Snapshot of allocator-tracker counters
-  - Members:
-    - `alloc_calls`: `u64`
-    - `calloc_calls`: `u64`
-    - `realloc_calls`: `u64`
-    - `free_calls`: `u64`
-    - `live_allocations`: `u64`
-    - `live_allocated_bytes`: `u64`
-    - `peak_live_allocated_bytes`: `u64`
-    - `total_allocated_bytes`: `u64`
-    - `total_freed_bytes`: `u64`
-- `alloc_tracker_callback_alloc` (alias)
-  - What it represents: Type alias used for allocation event callbacks
-  - Members: none (alias/function type)
-- `alloc_tracker_callback_free` (alias)
-  - What it represents: Type alias used for deallocation event callbacks
-  - Members: none (alias/function type)
-- `alloc_tracker_callback_realloc` (alias)
-  - What it represents: Type alias used for reallocation event callbacks
-  - Members: none (alias/function type)
-- `alloc_tracker` (struct)
-  - What it represents: Atomic allocator-tracker state that can be attached to an `allocator`
-  - Members:
-    - `user_data`: `void*`
-    - `alloc_fn`: `alloc_tracker_callback_alloc*`
-    - `dealloc_fn`: `alloc_tracker_callback_free*`
-    - `realloc_fn`: `alloc_tracker_callback_realloc*`
-    - `alloc_calls`: `atomic_u64`
-    - `calloc_calls`: `atomic_u64`
-    - `realloc_calls`: `atomic_u64`
-    - `free_calls`: `atomic_u64`
-    - `live_allocations`: `atomic_u64`
-    - `live_allocated_bytes`: `atomic_u64`
-    - `peak_live_allocated_bytes`: `atomic_u64`
-    - `total_allocated_bytes`: `atomic_u64`
-    - `total_freed_bytes`: `atomic_u64`
+| Type | Declaration |
+| --- | --- |
+| `alloc_tracker_stats` | `typedef struct alloc_tracker_stats { ... } alloc_tracker_stats;` |
+| `alloc_tracker_callback_alloc` | `typedef void alloc_tracker_callback_alloc(void* user_data, callsite site, void* ptr, sz size);` |
+| `alloc_tracker_callback_free` | `typedef void alloc_tracker_callback_free(void* user_data, callsite site, void* ptr, sz size);` |
+| `alloc_tracker_callback_realloc` | `typedef void alloc_tracker_callback_realloc(void* user_data, callsite site, void* old_ptr, void* new_ptr, sz old_size, sz new_size);` |
+| `alloc_tracker` | `typedef struct alloc_tracker { ... } alloc_tracker;` |
 
 #### Functions
 
-- `alloc_tracker_create() -> alloc_tracker`
-  - What it does: Creates a zeroed allocator tracker
-  - Parameters: none
-- `alloc_tracker_get_user_data(alloc_tracker* tracker) -> void*`
-  - What it does: Gets alloc-tracker user data
-  - Parameters:
-    - `tracker` (`alloc_tracker*`): Input parameter
-- `alloc_tracker_set_user_data(alloc_tracker* tracker, void* user_data) -> void`
-  - What it does: Sets alloc-tracker user data
-  - Parameters:
-    - `tracker` (`alloc_tracker*`): Input parameter
-    - `user_data` (`void*`): Input data used by the operation
-- `alloc_tracker_reset(alloc_tracker* tracker) -> void`
-  - What it does: Resets allocator-tracker counters
-  - Parameters:
-    - `tracker` (`alloc_tracker*`): Input parameter
-- `alloc_tracker_get_stats(alloc_tracker* tracker) -> alloc_tracker_stats`
-  - What it does: Reads allocator-tracker counters into a snapshot
-  - Parameters:
-    - `tracker` (`alloc_tracker*`): Input parameter
-- `alloc_tracker_on_alloc_call(alloc_tracker* tracker) -> void`
-  - What it does: Records an allocator alloc call
-  - Parameters:
-    - `tracker` (`alloc_tracker*`): Input parameter
-- `alloc_tracker_on_calloc_call(alloc_tracker* tracker) -> void`
-  - What it does: Records an allocator calloc call
-  - Parameters:
-    - `tracker` (`alloc_tracker*`): Input parameter
-- `alloc_tracker_on_realloc_call(alloc_tracker* tracker) -> void`
-  - What it does: Records an allocator realloc call
-  - Parameters:
-    - `tracker` (`alloc_tracker*`): Input parameter
-- `alloc_tracker_on_free_call(alloc_tracker* tracker) -> void`
-  - What it does: Records an allocator free call
-  - Parameters:
-    - `tracker` (`alloc_tracker*`): Input parameter
-- `alloc_tracker_on_alloc_success(alloc_tracker* tracker, callsite site, void* ptr, sz size) -> void`
-  - What it does: Records a successful allocation
-  - Parameters:
-    - `tracker` (`alloc_tracker*`): Input parameter
-    - `site` (`callsite`): Input parameter
-    - `ptr` (`void*`): Input data used by the operation
-    - `size` (`sz`): Size or capacity value used by the operation
-- `alloc_tracker_on_free_success(alloc_tracker* tracker, callsite site, void* ptr, sz size) -> void`
-  - What it does: Records a successful free
-  - Parameters:
-    - `tracker` (`alloc_tracker*`): Input parameter
-    - `site` (`callsite`): Input parameter
-    - `ptr` (`void*`): Input data used by the operation
-    - `size` (`sz`): Size or capacity value used by the operation
-- `alloc_tracker_on_realloc_success(alloc_tracker* tracker, callsite site, void* old_ptr, void* new_ptr, sz old_size, sz new_size) -> void`
-  - What it does: Records a successful realloc size transition
-  - Parameters:
-    - `tracker` (`alloc_tracker*`): Input parameter
-    - `site` (`callsite`): Input parameter
-    - `old_ptr` (`void*`): Input data used by the operation
-    - `new_ptr` (`void*`): Input data used by the operation
-    - `old_size` (`sz`): Size or capacity value used by the operation
-    - `new_size` (`sz`): Size or capacity value used by the operation
+| Function | Declaration |
+| --- | --- |
+| `alloc_tracker_create` | `func alloc_tracker alloc_tracker_create(void);` |
+| `alloc_tracker_get_user_data` | `func void* alloc_tracker_get_user_data(alloc_tracker* tracker);` |
+| `alloc_tracker_set_user_data` | `func void alloc_tracker_set_user_data(alloc_tracker* tracker, void* user_data);` |
+| `alloc_tracker_reset` | `func void alloc_tracker_reset(alloc_tracker* tracker);` |
+| `alloc_tracker_get_stats` | `func alloc_tracker_stats alloc_tracker_get_stats(alloc_tracker* tracker);` |
+| `alloc_tracker_on_alloc_call` | `func void alloc_tracker_on_alloc_call(alloc_tracker* tracker);` |
+| `alloc_tracker_on_calloc_call` | `func void alloc_tracker_on_calloc_call(alloc_tracker* tracker);` |
+| `alloc_tracker_on_realloc_call` | `func void alloc_tracker_on_realloc_call(alloc_tracker* tracker);` |
+| `alloc_tracker_on_free_call` | `func void alloc_tracker_on_free_call(alloc_tracker* tracker);` |
+| `alloc_tracker_on_alloc_success` | `func void alloc_tracker_on_alloc_success(alloc_tracker* tracker, callsite site, void* ptr, sz size);` |
+| `alloc_tracker_on_free_success` | `func void alloc_tracker_on_free_success(alloc_tracker* tracker, callsite site, void* ptr, sz size);` |
+| `alloc_tracker_on_realloc_success` | `func void alloc_tracker_on_realloc_success( alloc_tracker* tracker, callsite site, void* old_ptr, void* new_ptr, sz old_size, sz new_size);` |
+
+#### Macros
+
+| Macro | Form |
+| --- | --- |
+| None | - |
+
+### `memory/allocator.h`
+
+- Types: **4**
+- Functions: **8**
+- Macros: **4**
+
+#### Types
+
+| Type | Declaration |
+| --- | --- |
+| `allocator_callback_realloc` | `typedef void* allocator_callback_realloc(void* user_data, callsite site, void* ptr, sz new_size);` |
+| `allocator_callback_alloc` | `typedef void* allocator_callback_alloc(void* user_data, callsite site, sz size);` |
+| `allocator_callback_free` | `typedef void allocator_callback_free(void* user_data, callsite site, void* ptr);` |
+| `allocator` | `typedef struct allocator { ... } allocator;` |
+
+#### Functions
+
+| Function | Declaration |
+| --- | --- |
+| `allocator_get_user_data` | `func void* allocator_get_user_data(allocator* alloc);` |
+| `allocator_set_user_data` | `func void allocator_set_user_data(allocator* alloc, void* user_data);` |
+| `allocator_get_tracker` | `func alloc_tracker* allocator_get_tracker(allocator* alloc);` |
+| `allocator_set_tracker` | `func void allocator_set_tracker(allocator* alloc, alloc_tracker* tracker);` |
+| `_allocator_alloc` | `func void* _allocator_alloc(allocator alloc, sz size, callsite site);` |
+| `_allocator_calloc` | `func void* _allocator_calloc(allocator alloc, sz count, sz size, callsite site);` |
+| `_allocator_dealloc` | `func void _allocator_dealloc(allocator alloc, void* ptr, callsite site);` |
+| `_allocator_realloc` | `func void* _allocator_realloc(allocator alloc, void* ptr, sz new_size, callsite site);` |
+
+#### Macros
+
+| Macro | Form |
+| --- | --- |
+| `allocator_alloc` | `allocator_alloc(alloc, size)` |
+| `allocator_dealloc` | `allocator_dealloc(alloc, ptr)` |
+| `allocator_calloc` | `allocator_calloc(alloc, count, size)` |
+| `allocator_realloc` | `allocator_realloc(alloc, ptr, new_size)` |
 
 ### `memory/arena.h`
 
 - Types: **2**
 - Functions: **13**
+- Macros: **8**
 
 #### Types
 
-- `arena_block` (struct)
-  - What it represents: Represents `arena block` data grouped in a struct
-  - Members:
-    - `next`: `struct arena_block*`
-    - `size`: `sz`
-    - `used`: `sz`
-    - `owned`: `b8`
-- `arena` (struct)
-  - What it represents: Represents `arena` data grouped in a struct
-  - Members:
-    - `blocks_head`: `arena_block*`
-    - `blocks_tail`: `arena_block*`
-    - `parent`: `allocator`
-    - `opt_mutex`: `mutex`
-    - `default_block_sz`: `sz`
-    - `mutex_owned`: `b8`
+| Type | Declaration |
+| --- | --- |
+| `arena_block` | `typedef struct arena_block { ... } arena_block;` |
+| `arena` | `typedef struct arena { ... } arena;` |
 
 #### Functions
 
-- `_arena_create(allocator parent_alloc, mutex opt_mutex, sz default_block_sz, callsite site) -> arena`
-  - What it does: Creates  arena create resources or state
-  - Parameters:
-    - `parent_alloc` (`allocator`): Allocator/context used for memory management
-    - `opt_mutex` (`mutex`): Input parameter
-    - `default_block_sz` (`sz`): Input parameter
-    - `site` (`callsite`): Input parameter
-- `_arena_create_mutexed(allocator parent_alloc, sz default_block_sz, callsite site) -> arena`
-  - What it does: Creates  arena create mutexed resources or state
-  - Parameters:
-    - `parent_alloc` (`allocator`): Allocator/context used for memory management
-    - `default_block_sz` (`sz`): Input parameter
-    - `site` (`callsite`): Input parameter
-- `_arena_destroy(arena* arn, callsite site) -> void`
-  - What it does: Destroys  arena destroy resources or state
-  - Parameters:
-    - `arn` (`arena*`): Input parameter
-    - `site` (`callsite`): Input parameter
-- `arena_get_allocator(arena* arn) -> allocator`
-  - What it does: Gets arena get allocator
-  - Parameters:
-    - `arn` (`arena*`): Input parameter
-- `arena_add_block(arena* arn, void* ptr, sz size) -> void`
-  - What it does: Adds arena add block
-  - Parameters:
-    - `arn` (`arena*`): Input parameter
-    - `ptr` (`void*`): Input data used by the operation
-    - `size` (`sz`): Size or capacity value used by the operation
-- `arena_remove_block(arena* arn, void* ptr) -> b32`
-  - What it does: Removes arena remove block
-  - Parameters:
-    - `arn` (`arena*`): Input parameter
-    - `ptr` (`void*`): Input data used by the operation
-- `_arena_alloc(arena* arn, sz size, sz align, callsite site) -> void*`
-  - What it does: Performs  arena alloc
-  - Parameters:
-    - `arn` (`arena*`): Input parameter
-    - `size` (`sz`): Size or capacity value used by the operation
-    - `align` (`sz`): Input parameter
-    - `site` (`callsite`): Input parameter
-- `_arena_realloc(arena* arn, void* ptr, sz old_size, sz new_size, sz align, callsite site) -> void*`
-  - What it does: Performs  arena realloc
-  - Parameters:
-    - `arn` (`arena*`): Input parameter
-    - `ptr` (`void*`): Input data used by the operation
-    - `old_size` (`sz`): Size or capacity value used by the operation
-    - `new_size` (`sz`): Size or capacity value used by the operation
-    - `align` (`sz`): Input parameter
-    - `site` (`callsite`): Input parameter
-- `arena_clear(arena* arn) -> void`
-  - What it does: Performs arena clear
-  - Parameters:
-    - `arn` (`arena*`): Input parameter
-- `arena_block_count(arena* arn) -> sz`
-  - What it does: Performs arena block count
-  - Parameters:
-    - `arn` (`arena*`): Input parameter
-- `arena_total_size(arena* arn) -> sz`
-  - What it does: Performs arena total size
-  - Parameters:
-    - `arn` (`arena*`): Input parameter
-- `arena_total_used(arena* arn) -> sz`
-  - What it does: Performs arena total used
-  - Parameters:
-    - `arn` (`arena*`): Input parameter
-- `arena_total_free(arena* arn) -> sz`
-  - What it does: Performs arena total free
-  - Parameters:
-    - `arn` (`arena*`): Input parameter
+| Function | Declaration |
+| --- | --- |
+| `_arena_create` | `func arena _arena_create( allocator parent_alloc, mutex opt_mutex, sz default_block_sz, callsite site);` |
+| `_arena_create_mutexed` | `func arena _arena_create_mutexed(allocator parent_alloc, sz default_block_sz, callsite site);` |
+| `_arena_destroy` | `func void _arena_destroy(arena* arn, callsite site);` |
+| `arena_get_allocator` | `func allocator arena_get_allocator(arena* arn);` |
+| `arena_add_block` | `func void arena_add_block(arena* arn, void* ptr, sz size);` |
+| `arena_remove_block` | `func b32 arena_remove_block(arena* arn, void* ptr);` |
+| `_arena_alloc` | `func void* _arena_alloc(arena* arn, sz size, sz align, callsite site);` |
+| `_arena_realloc` | `func void* _arena_realloc( arena* arn, void* ptr, sz old_size, sz new_size, sz align, callsite site);` |
+| `arena_clear` | `func void arena_clear(arena* arn);` |
+| `arena_block_count` | `func sz arena_block_count(arena* arn);` |
+| `arena_total_size` | `func sz arena_total_size(arena* arn);` |
+| `arena_total_used` | `func sz arena_total_used(arena* arn);` |
+| `arena_total_free` | `func sz arena_total_free(arena* arn);` |
+
+#### Macros
+
+| Macro | Form |
+| --- | --- |
+| `arena_create` | `arena_create(parent_alloc, opt_mutex, default_block_sz)` |
+| `arena_create_mutexed` | `arena_create_mutexed(parent_alloc, default_block_sz)` |
+| `arena_destroy` | `arena_destroy(arn)` |
+| `arena_alloc` | `arena_alloc(arn, size, align)` |
+| `arena_realloc` | `arena_realloc(arn, ptr, old_size, new_size, align)` |
+| `arena_alloc_type` | `arena_alloc_type(arn, type)` |
+| `arena_alloc_array` | `arena_alloc_array(arn, type, count)` |
+| `arena_realloc_array` | `arena_realloc_array(arn, ptr, old_count, new_count, type)` |
 
 ### `memory/buffer.h`
 
 - Types: **1**
 - Functions: **15**
+- Macros: **0**
 
 #### Types
 
-- `buffer` (struct)
-  - What it represents: Represents `buffer` data grouped in a struct
-  - Members:
-    - `size`: `sz`
-    - `ptr`: `void*`
+| Type | Declaration |
+| --- | --- |
+| `buffer` | `typedef struct buffer { ... } buffer;` |
 
 #### Functions
 
-- `buffer_from(void* ptr, sz size) -> buffer`
-  - What it does: Performs buffer from
-  - Parameters:
-    - `ptr` (`void*`): Input data used by the operation
-    - `size` (`sz`): Size or capacity value used by the operation
-- `buffer_sub_from(buffer buff, sz offset) -> buffer`
-  - What it does: Performs buffer sub from
-  - Parameters:
-    - `buff` (`buffer`): Input parameter
-    - `offset` (`sz`): Input parameter
-- `buffer_sub_from_sized(buffer buff, sz offset, sz size) -> buffer`
-  - What it does: Performs buffer sub from sized
-  - Parameters:
-    - `buff` (`buffer`): Input parameter
-    - `offset` (`sz`): Input parameter
-    - `size` (`sz`): Size or capacity value used by the operation
-- `buffer_slice(buffer buff, sz start, sz end) -> buffer`
-  - What it does: Performs buffer slice
-  - Parameters:
-    - `buff` (`buffer`): Input parameter
-    - `start` (`sz`): Input parameter
-    - `end` (`sz`): Input parameter
-- `buffer_split_offset(buffer* buff, sz offset) -> buffer`
-  - What it does: Performs buffer split offset
-  - Parameters:
-    - `buff` (`buffer*`): Input parameter
-    - `offset` (`sz`): Input parameter
-- `buffer_split_size(buffer* buff, sz size) -> buffer`
-  - What it does: Performs buffer split size
-  - Parameters:
-    - `buff` (`buffer*`): Input parameter
-    - `size` (`sz`): Size or capacity value used by the operation
-- `buffer_cmp(buffer a, buffer b) -> b32`
-  - What it does: Performs buffer cmp
-  - Parameters:
-    - `a` (`buffer`): Input parameter
-    - `b` (`buffer`): Input parameter
-- `buffer_cmp_common(buffer a, buffer b) -> b32`
-  - What it does: Performs buffer cmp common
-  - Parameters:
-    - `a` (`buffer`): Input parameter
-    - `b` (`buffer`): Input parameter
-- `buffer_get_ptr(buffer buff, sz offset) -> void*`
-  - What it does: Gets buffer get ptr
-  - Parameters:
-    - `buff` (`buffer`): Input parameter
-    - `offset` (`sz`): Input parameter
-- `buffer_get_data(buffer buff, sz offset, sz read_size) -> void*`
-  - What it does: Gets buffer get data
-  - Parameters:
-    - `buff` (`buffer`): Input parameter
-    - `offset` (`sz`): Input parameter
-    - `read_size` (`sz`): Size or capacity value used by the operation
-- `buffer_set8(buffer buff, u8 value) -> void`
-  - What it does: Performs buffer set8
-  - Parameters:
-    - `buff` (`buffer`): Input parameter
-    - `value` (`u8`): Input parameter
-- `buffer_set16(buffer buff, u16 value) -> void`
-  - What it does: Performs buffer set16
-  - Parameters:
-    - `buff` (`buffer`): Input parameter
-    - `value` (`u16`): Input parameter
-- `buffer_set32(buffer buff, u32 value) -> void`
-  - What it does: Performs buffer set32
-  - Parameters:
-    - `buff` (`buffer`): Input parameter
-    - `value` (`u32`): Input parameter
-- `buffer_set64(buffer buff, u64 value) -> void`
-  - What it does: Performs buffer set64
-  - Parameters:
-    - `buff` (`buffer`): Input parameter
-    - `value` (`u64`): Input parameter
-- `buffer_zero(buffer buff) -> void`
-  - What it does: Performs buffer zero
-  - Parameters:
-    - `buff` (`buffer`): Input parameter
+| Function | Declaration |
+| --- | --- |
+| `buffer_from` | `func buffer buffer_from(void* ptr, sz size);` |
+| `buffer_sub_from` | `func buffer buffer_sub_from(buffer buff, sz offset);` |
+| `buffer_sub_from_sized` | `func buffer buffer_sub_from_sized(buffer buff, sz offset, sz size);` |
+| `buffer_slice` | `func buffer buffer_slice(buffer buff, sz start, sz end);` |
+| `buffer_split_offset` | `func buffer buffer_split_offset(buffer* buff, sz offset);` |
+| `buffer_split_size` | `func buffer buffer_split_size(buffer* buff, sz size);` |
+| `buffer_cmp` | `func b32 buffer_cmp(buffer a, buffer b);` |
+| `buffer_cmp_common` | `func b32 buffer_cmp_common(buffer a, buffer b);` |
+| `buffer_get_ptr` | `func void* buffer_get_ptr(buffer buff, sz offset);` |
+| `buffer_get_data` | `func void* buffer_get_data(buffer buff, sz offset, sz read_size);` |
+| `buffer_set8` | `func void buffer_set8(buffer buff, u8 value);` |
+| `buffer_set16` | `func void buffer_set16(buffer buff, u16 value);` |
+| `buffer_set32` | `func void buffer_set32(buffer buff, u32 value);` |
+| `buffer_set64` | `func void buffer_set64(buffer buff, u64 value);` |
+| `buffer_zero` | `func void buffer_zero(buffer buff);` |
+
+#### Macros
+
+| Macro | Form |
+| --- | --- |
+| None | - |
 
 ### `memory/heap.h`
 
 - Types: **3**
 - Functions: **13**
+- Macros: **9**
 
 #### Types
 
-- `heap_chunk` (struct)
-  - What it represents: Represents `heap chunk` data grouped in a struct
-  - Members:
-    - `next_in_block`: `struct heap_chunk*`
-    - `next_free`: `struct heap_chunk*`
-    - `size`: `sz`
-    - `align_pad`: `sz`
-    - `is_free`: `b8`
-- `heap_block` (struct)
-  - What it represents: Represents `heap block` data grouped in a struct
-  - Members:
-    - `next`: `struct heap_block*`
-    - `size`: `sz`
-    - `owned`: `b8`
-- `heap` (struct)
-  - What it represents: Represents `heap` data grouped in a struct
-  - Members:
-    - `blocks_head`: `heap_block*`
-    - `blocks_tail`: `heap_block*`
-    - `free_head`: `heap_chunk*`
-    - `parent`: `allocator`
-    - `opt_mutex`: `mutex`
-    - `default_block_sz`: `sz`
-    - `mutex_owned`: `b8`
+| Type | Declaration |
+| --- | --- |
+| `heap_chunk` | `typedef struct heap_chunk { ... } heap_chunk;` |
+| `heap_block` | `typedef struct heap_block { ... } heap_block;` |
+| `heap` | `typedef struct heap { ... } heap;` |
 
 #### Functions
 
-- `_heap_create(allocator parent_alloc, mutex opt_mutex, sz default_block_sz, callsite site) -> heap`
-  - What it does: Creates  heap create resources or state
-  - Parameters:
-    - `parent_alloc` (`allocator`): Allocator/context used for memory management
-    - `opt_mutex` (`mutex`): Input parameter
-    - `default_block_sz` (`sz`): Input parameter
-    - `site` (`callsite`): Input parameter
-- `_heap_create_mutexed(allocator parent_alloc, sz default_block_sz, callsite site) -> heap`
-  - What it does: Creates  heap create mutexed resources or state
-  - Parameters:
-    - `parent_alloc` (`allocator`): Allocator/context used for memory management
-    - `default_block_sz` (`sz`): Input parameter
-    - `site` (`callsite`): Input parameter
-- `_heap_destroy(heap* hep, callsite site) -> void`
-  - What it does: Destroys  heap destroy resources or state
-  - Parameters:
-    - `hep` (`heap*`): Input parameter
-    - `site` (`callsite`): Input parameter
-- `heap_get_allocator(heap* hep) -> allocator`
-  - What it does: Gets heap get allocator
-  - Parameters:
-    - `hep` (`heap*`): Input parameter
-- `heap_add_block(heap* hep, void* ptr, sz size) -> void`
-  - What it does: Adds heap add block
-  - Parameters:
-    - `hep` (`heap*`): Input parameter
-    - `ptr` (`void*`): Input data used by the operation
-    - `size` (`sz`): Size or capacity value used by the operation
-- `heap_remove_block(heap* hep, void* ptr) -> b32`
-  - What it does: Removes heap remove block
-  - Parameters:
-    - `hep` (`heap*`): Input parameter
-    - `ptr` (`void*`): Input data used by the operation
-- `_heap_alloc(heap* hep, sz size, sz align, callsite site) -> void*`
-  - What it does: Performs  heap alloc
-  - Parameters:
-    - `hep` (`heap*`): Input parameter
-    - `size` (`sz`): Size or capacity value used by the operation
-    - `align` (`sz`): Input parameter
-    - `site` (`callsite`): Input parameter
-- `_heap_dealloc(heap* hep, void* ptr, callsite site) -> void`
-  - What it does: Performs  heap dealloc
-  - Parameters:
-    - `hep` (`heap*`): Input parameter
-    - `ptr` (`void*`): Input data used by the operation
-    - `site` (`callsite`): Input parameter
-- `_heap_realloc(heap* hep, void* ptr, sz old_size, sz new_size, sz align, callsite site) -> void*`
-  - What it does: Performs  heap realloc
-  - Parameters:
-    - `hep` (`heap*`): Input parameter
-    - `ptr` (`void*`): Input data used by the operation
-    - `old_size` (`sz`): Size or capacity value used by the operation
-    - `new_size` (`sz`): Size or capacity value used by the operation
-    - `align` (`sz`): Input parameter
-    - `site` (`callsite`): Input parameter
-- `heap_clear(heap* hep) -> void`
-  - What it does: Performs heap clear
-  - Parameters:
-    - `hep` (`heap*`): Input parameter
-- `heap_block_count(heap* hep) -> sz`
-  - What it does: Performs heap block count
-  - Parameters:
-    - `hep` (`heap*`): Input parameter
-- `heap_total_size(heap* hep) -> sz`
-  - What it does: Performs heap total size
-  - Parameters:
-    - `hep` (`heap*`): Input parameter
-- `heap_total_free(heap* hep) -> sz`
-  - What it does: Performs heap total free
-  - Parameters:
-    - `hep` (`heap*`): Input parameter
+| Function | Declaration |
+| --- | --- |
+| `_heap_create` | `func heap _heap_create(allocator parent_alloc, mutex opt_mutex, sz default_block_sz, callsite site);` |
+| `_heap_create_mutexed` | `func heap _heap_create_mutexed(allocator parent_alloc, sz default_block_sz, callsite site);` |
+| `_heap_destroy` | `func void _heap_destroy(heap* hep, callsite site);` |
+| `heap_get_allocator` | `func allocator heap_get_allocator(heap* hep);` |
+| `heap_add_block` | `func void heap_add_block(heap* hep, void* ptr, sz size);` |
+| `heap_remove_block` | `func b32 heap_remove_block(heap* hep, void* ptr);` |
+| `_heap_alloc` | `func void* _heap_alloc(heap* hep, sz size, sz align, callsite site);` |
+| `_heap_dealloc` | `func void _heap_dealloc(heap* hep, void* ptr, callsite site);` |
+| `_heap_realloc` | `func void* _heap_realloc( heap* hep, void* ptr, sz old_size, sz new_size, sz align, callsite site);` |
+| `heap_clear` | `func void heap_clear(heap* hep);` |
+| `heap_block_count` | `func sz heap_block_count(heap* hep);` |
+| `heap_total_size` | `func sz heap_total_size(heap* hep);` |
+| `heap_total_free` | `func sz heap_total_free(heap* hep);` |
+
+#### Macros
+
+| Macro | Form |
+| --- | --- |
+| `heap_create` | `heap_create(parent_alloc, opt_mutex, default_block_sz)` |
+| `heap_create_mutexed` | `heap_create_mutexed(parent_alloc, default_block_sz)` |
+| `heap_destroy` | `heap_destroy(hep)` |
+| `heap_alloc` | `heap_alloc(hp, size, align)` |
+| `heap_dealloc` | `heap_dealloc(hp, ptr)` |
+| `heap_realloc` | `heap_realloc(hp, ptr, old_size, new_size, align)` |
+| `heap_alloc_type` | `heap_alloc_type(hp, type)` |
+| `heap_alloc_array` | `heap_alloc_array(hp, type, count)` |
+| `heap_realloc_array` | `heap_realloc_array(hp, ptr, old_count, new_count, type)` |
 
 ### `memory/memops.h`
 
 - Types: **0**
 - Functions: **12**
+- Macros: **11**
 
 #### Types
 
-- None
+| Type | Declaration |
+| --- | --- |
+| None | - |
 
 #### Functions
 
-- `mem_set8(void* ptr, u8 value, sz size) -> void`
-  - What it does: Performs mem set8
-  - Parameters:
-    - `ptr` (`void*`): Input data used by the operation
-    - `value` (`u8`): Input parameter
-    - `size` (`sz`): Size or capacity value used by the operation
-- `mem_set16(void* ptr, u16 value, sz count) -> void`
-  - What it does: Performs mem set16
-  - Parameters:
-    - `ptr` (`void*`): Input data used by the operation
-    - `value` (`u16`): Input parameter
-    - `count` (`sz`): Number of elements/items involved
-- `mem_set32(void* ptr, u32 value, sz count) -> void`
-  - What it does: Performs mem set32
-  - Parameters:
-    - `ptr` (`void*`): Input data used by the operation
-    - `value` (`u32`): Input parameter
-    - `count` (`sz`): Number of elements/items involved
-- `mem_set64(void* ptr, u64 value, sz count) -> void`
-  - What it does: Performs mem set64
-  - Parameters:
-    - `ptr` (`void*`): Input data used by the operation
-    - `value` (`u64`): Input parameter
-    - `count` (`sz`): Number of elements/items involved
-- `mem_zero(void* ptr, sz size) -> void`
-  - What it does: Performs mem zero
-  - Parameters:
-    - `ptr` (`void*`): Input data used by the operation
-    - `size` (`sz`): Size or capacity value used by the operation
-- `mem_cpy(void* dst, const void* src, sz size) -> void*`
-  - What it does: Performs mem cpy
-  - Parameters:
-    - `dst` (`void*`): Destination storage for output data
-    - `src` (`const void*`): Input data used by the operation
-    - `size` (`sz`): Size or capacity value used by the operation
-- `mem_mv(void* dst, const void* src, sz size) -> void*`
-  - What it does: Performs mem mv
-  - Parameters:
-    - `dst` (`void*`): Destination storage for output data
-    - `src` (`const void*`): Input data used by the operation
-    - `size` (`sz`): Size or capacity value used by the operation
-- `mem_cmp(const void* lhs, const void* rhs, sz size) -> b32`
-  - What it does: Performs mem cmp
-  - Parameters:
-    - `lhs` (`const void*`): Input data used by the operation
-    - `rhs` (`const void*`): Input data used by the operation
-    - `size` (`sz`): Size or capacity value used by the operation
-- `mem_align_forward(void* ptr, sz align) -> void*`
-  - What it does: Performs mem align forward
-  - Parameters:
-    - `ptr` (`void*`): Input data used by the operation
-    - `align` (`sz`): Input parameter
-- `mem_align_backward(void* ptr, sz align) -> void*`
-  - What it does: Performs mem align backward
-  - Parameters:
-    - `ptr` (`void*`): Input data used by the operation
-    - `align` (`sz`): Input parameter
-- `mem_align_forward_up(up ptr, sz align) -> up`
-  - What it does: Performs mem align forward up
-  - Parameters:
-    - `ptr` (`up`): Input data used by the operation
-    - `align` (`sz`): Input parameter
-- `mem_align_backward_up(up ptr, sz align) -> up`
-  - What it does: Performs mem align backward up
-  - Parameters:
-    - `ptr` (`up`): Input data used by the operation
-    - `align` (`sz`): Input parameter
+| Function | Declaration |
+| --- | --- |
+| `mem_set8` | `func void mem_set8(void* ptr, u8 value, sz size);` |
+| `mem_set16` | `func void mem_set16(void* ptr, u16 value, sz count);` |
+| `mem_set32` | `func void mem_set32(void* ptr, u32 value, sz count);` |
+| `mem_set64` | `func void mem_set64(void* ptr, u64 value, sz count);` |
+| `mem_zero` | `func void mem_zero(void* ptr, sz size);` |
+| `mem_cpy` | `func void* mem_cpy(void* dst, const void* src, sz size);` |
+| `mem_mv` | `func void* mem_mv(void* dst, const void* src, sz size);` |
+| `mem_cmp` | `func b32 mem_cmp(const void* lhs, const void* rhs, sz size);` |
+| `mem_align_forward` | `func void* mem_align_forward(void* ptr, sz align);` |
+| `mem_align_backward` | `func void* mem_align_backward(void* ptr, sz align);` |
+| `mem_align_forward_up` | `func up mem_align_forward_up(up ptr, sz align);` |
+| `mem_align_backward_up` | `func up mem_align_backward_up(up ptr, sz align);` |
+
+#### Macros
+
+| Macro | Form |
+| --- | --- |
+| `mem_set8_type` | `mem_set8_type(ptr, value, type)` |
+| `mem_set8_array` | `mem_set8_array(ptr, value, count, type)` |
+| `mem_set16_type` | `mem_set16_type(ptr, value)` |
+| `mem_set16_array` | `mem_set16_array(ptr, value, count)` |
+| `mem_set32_type` | `mem_set32_type(ptr, value)` |
+| `mem_set32_array` | `mem_set32_array(ptr, value, count)` |
+| `mem_set64_type` | `mem_set64_type(ptr, value)` |
+| `mem_set64_array` | `mem_set64_array(ptr, value, count)` |
+| `mem_zero_value` | `mem_zero_value(ptr)` |
+| `mem_zero_type` | `mem_zero_type(ptr, type)` |
+| `mem_zero_array` | `mem_zero_array(ptr, type, count)` |
 
 ### `memory/pool.h`
 
 - Types: **2**
 - Functions: **12**
+- Macros: **7**
 
 #### Types
 
-- `pool_block` (struct)
-  - What it represents: Represents `pool block` data grouped in a struct
-  - Members:
-    - `next`: `struct pool_block*`
-    - `size`: `sz`
-    - `owned`: `b8`
-- `pool` (struct)
-  - What it represents: Represents `pool` data grouped in a struct
-  - Members:
-    - `blocks_head`: `pool_block*`
-    - `blocks_tail`: `pool_block*`
-    - `free_head`: `void*`
-    - `parent`: `allocator`
-    - `opt_mutex`: `mutex`
-    - `default_block_sz`: `sz`
-    - `object_size`: `sz`
-    - `object_align`: `sz`
-    - `mutex_owned`: `b8`
+| Type | Declaration |
+| --- | --- |
+| `pool_block` | `typedef struct pool_block { ... } pool_block;` |
+| `pool` | `typedef struct pool { ... } pool;` |
 
 #### Functions
 
-- `_pool_create(allocator parent_alloc, mutex opt_mutex, sz default_block_sz, sz object_size, sz object_align, callsite site) -> pool`
-  - What it does: Creates  pool create resources or state
-  - Parameters:
-    - `parent_alloc` (`allocator`): Allocator/context used for memory management
-    - `opt_mutex` (`mutex`): Input parameter
-    - `default_block_sz` (`sz`): Input parameter
-    - `object_size` (`sz`): Size or capacity value used by the operation
-    - `object_align` (`sz`): Input parameter
-    - `site` (`callsite`): Input parameter
-- `_pool_create_mutexed(allocator parent_alloc, sz default_block_sz, sz object_size, sz object_align, callsite site) -> pool`
-  - What it does: Creates  pool create mutexed resources or state
-  - Parameters:
-    - `parent_alloc` (`allocator`): Allocator/context used for memory management
-    - `default_block_sz` (`sz`): Input parameter
-    - `object_size` (`sz`): Size or capacity value used by the operation
-    - `object_align` (`sz`): Input parameter
-    - `site` (`callsite`): Input parameter
-- `_pool_destroy(pool* pol, callsite site) -> void`
-  - What it does: Destroys  pool destroy resources or state
-  - Parameters:
-    - `pol` (`pool*`): Input parameter
-    - `site` (`callsite`): Input parameter
-- `pool_get_allocator(pool* pol) -> allocator`
-  - What it does: Gets pool get allocator
-  - Parameters:
-    - `pol` (`pool*`): Input parameter
-- `pool_add_block(pool* pol, void* ptr, sz size) -> void`
-  - What it does: Adds pool add block
-  - Parameters:
-    - `pol` (`pool*`): Input parameter
-    - `ptr` (`void*`): Input data used by the operation
-    - `size` (`sz`): Size or capacity value used by the operation
-- `pool_remove_block(pool* pol, void* ptr) -> b32`
-  - What it does: Removes pool remove block
-  - Parameters:
-    - `pol` (`pool*`): Input parameter
-    - `ptr` (`void*`): Input data used by the operation
-- `_pool_alloc(pool* pol, callsite site) -> void*`
-  - What it does: Performs  pool alloc
-  - Parameters:
-    - `pol` (`pool*`): Input parameter
-    - `site` (`callsite`): Input parameter
-- `_pool_dealloc(pool* pol, void* ptr, callsite site) -> void`
-  - What it does: Performs  pool dealloc
-  - Parameters:
-    - `pol` (`pool*`): Input parameter
-    - `ptr` (`void*`): Input data used by the operation
-    - `site` (`callsite`): Input parameter
-- `pool_clear(pool* pol) -> void`
-  - What it does: Performs pool clear
-  - Parameters:
-    - `pol` (`pool*`): Input parameter
-- `pool_block_count(pool* pol) -> sz`
-  - What it does: Performs pool block count
-  - Parameters:
-    - `pol` (`pool*`): Input parameter
-- `pool_slot_size(pool* pol) -> sz`
-  - What it does: Performs pool slot size
-  - Parameters:
-    - `pol` (`pool*`): Input parameter
-- `pool_free_count(pool* pol) -> sz`
-  - What it does: Performs pool free count
-  - Parameters:
-    - `pol` (`pool*`): Input parameter
+| Function | Declaration |
+| --- | --- |
+| `_pool_create` | `func pool _pool_create( allocator parent_alloc, mutex opt_mutex, sz default_block_sz, sz object_size, sz object_align, callsite site);` |
+| `_pool_create_mutexed` | `func pool _pool_create_mutexed( allocator parent_alloc, sz default_block_sz, sz object_size, sz object_align, callsite site);` |
+| `_pool_destroy` | `func void _pool_destroy(pool* pol, callsite site);` |
+| `pool_get_allocator` | `func allocator pool_get_allocator(pool* pol);` |
+| `pool_add_block` | `func void pool_add_block(pool* pol, void* ptr, sz size);` |
+| `pool_remove_block` | `func b32 pool_remove_block(pool* pol, void* ptr);` |
+| `_pool_alloc` | `func void* _pool_alloc(pool* pol, callsite site);` |
+| `_pool_dealloc` | `func void _pool_dealloc(pool* pol, void* ptr, callsite site);` |
+| `pool_clear` | `func void pool_clear(pool* pol);` |
+| `pool_block_count` | `func sz pool_block_count(pool* pol);` |
+| `pool_slot_size` | `func sz pool_slot_size(pool* pol);` |
+| `pool_free_count` | `func sz pool_free_count(pool* pol);` |
+
+#### Macros
+
+| Macro | Form |
+| --- | --- |
+| `pool_create` | `pool_create(parent_alloc, opt_mutex, default_block_sz, object_size, object_align)` |
+| `pool_create_mutexed` | `pool_create_mutexed(parent_alloc, default_block_sz, object_size, object_align)` |
+| `pool_destroy` | `pool_destroy(pol)` |
+| `pool_alloc` | `pool_alloc(pol)` |
+| `pool_dealloc` | `pool_dealloc(pol, ptr)` |
+| `pool_alloc_type` | `pool_alloc_type(pol, type)` |
+| `pool_dealloc_type` | `pool_dealloc_type(pol, ptr)` |
 
 ### `memory/ring.h`
 
 - Types: **1**
 - Functions: **17**
+- Macros: **5**
 
 #### Types
 
-- `ring` (struct)
-  - What it represents: Represents `ring` data grouped in a struct
-  - Members:
-    - `ptr`: `u8*`
-    - `capacity`: `sz`
-    - `read_pos`: `sz`
-    - `write_pos`: `sz`
-    - `count`: `sz`
-    - `parent`: `allocator`
-    - `opt_mutex`: `mutex`
-    - `buf_owned`: `b8`
-    - `mutex_owned`: `b8`
+| Type | Declaration |
+| --- | --- |
+| `ring` | `typedef struct ring { ... } ring;` |
 
 #### Functions
 
-- `_ring_create(void* ptr, sz capacity, mutex opt_mutex, callsite site) -> ring`
-  - What it does: Creates  ring create resources or state
-  - Parameters:
-    - `ptr` (`void*`): Input data used by the operation
-    - `capacity` (`sz`): Size or capacity value used by the operation
-    - `opt_mutex` (`mutex`): Input parameter
-    - `site` (`callsite`): Input parameter
-- `_ring_create_mutexed(void* ptr, sz capacity, callsite site) -> ring`
-  - What it does: Creates  ring create mutexed resources or state
-  - Parameters:
-    - `ptr` (`void*`): Input data used by the operation
-    - `capacity` (`sz`): Size or capacity value used by the operation
-    - `site` (`callsite`): Input parameter
-- `_ring_create_alloc(allocator parent_alloc, sz capacity, mutex opt_mutex, callsite site) -> ring`
-  - What it does: Creates  ring create alloc resources or state
-  - Parameters:
-    - `parent_alloc` (`allocator`): Allocator/context used for memory management
-    - `capacity` (`sz`): Size or capacity value used by the operation
-    - `opt_mutex` (`mutex`): Input parameter
-    - `site` (`callsite`): Input parameter
-- `_ring_create_alloc_mutexed(allocator parent_alloc, sz capacity, callsite site) -> ring`
-  - What it does: Creates  ring create alloc mutexed resources or state
-  - Parameters:
-    - `parent_alloc` (`allocator`): Allocator/context used for memory management
-    - `capacity` (`sz`): Size or capacity value used by the operation
-    - `site` (`callsite`): Input parameter
-- `_ring_destroy(ring* rng, callsite site) -> void`
-  - What it does: Destroys  ring destroy resources or state
-  - Parameters:
-    - `rng` (`ring*`): Input parameter
-    - `site` (`callsite`): Input parameter
-- `ring_size(ring* rng) -> sz`
-  - What it does: Performs ring size
-  - Parameters:
-    - `rng` (`ring*`): Input parameter
-- `ring_space(ring* rng) -> sz`
-  - What it does: Performs ring space
-  - Parameters:
-    - `rng` (`ring*`): Input parameter
-- `ring_capacity(ring* rng) -> sz`
-  - What it does: Performs ring capacity
-  - Parameters:
-    - `rng` (`ring*`): Input parameter
-- `ring_write(ring* rng, void* data, sz size) -> sz`
-  - What it does: Writes data for ring write
-  - Parameters:
-    - `rng` (`ring*`): Input parameter
-    - `data` (`void*`): Input data used by the operation
-    - `size` (`sz`): Size or capacity value used by the operation
-- `ring_read(ring* rng, void* out, sz size) -> sz`
-  - What it does: Reads data for ring read
-  - Parameters:
-    - `rng` (`ring*`): Input parameter
-    - `out` (`void*`): Destination storage for output data
-    - `size` (`sz`): Size or capacity value used by the operation
-- `ring_peek(ring* rng, void* out, sz size) -> sz`
-  - What it does: Performs ring peek
-  - Parameters:
-    - `rng` (`ring*`): Input parameter
-    - `out` (`void*`): Destination storage for output data
-    - `size` (`sz`): Size or capacity value used by the operation
-- `ring_skip(ring* rng, sz size) -> sz`
-  - What it does: Performs ring skip
-  - Parameters:
-    - `rng` (`ring*`): Input parameter
-    - `size` (`sz`): Size or capacity value used by the operation
-- `ring_reserve_write(ring* rng, sz* out_size) -> void*`
-  - What it does: Writes data for ring reserve write
-  - Parameters:
-    - `rng` (`ring*`): Input parameter
-    - `out_size` (`sz*`): Output value written by the function
-- `ring_commit_write(ring* rng, sz size) -> b32`
-  - What it does: Writes data for ring commit write
-  - Parameters:
-    - `rng` (`ring*`): Input parameter
-    - `size` (`sz`): Size or capacity value used by the operation
-- `ring_reserve_read(ring* rng, sz* out_size) -> const void*`
-  - What it does: Reads data for ring reserve read
-  - Parameters:
-    - `rng` (`ring*`): Input parameter
-    - `out_size` (`sz*`): Output value written by the function
-- `ring_commit_read(ring* rng, sz size) -> b32`
-  - What it does: Reads data for ring commit read
-  - Parameters:
-    - `rng` (`ring*`): Input parameter
-    - `size` (`sz`): Size or capacity value used by the operation
-- `ring_clear(ring* rng) -> void`
-  - What it does: Performs ring clear
-  - Parameters:
-    - `rng` (`ring*`): Input parameter
+| Function | Declaration |
+| --- | --- |
+| `_ring_create` | `func ring _ring_create(void* ptr, sz capacity, mutex opt_mutex, callsite site);` |
+| `_ring_create_mutexed` | `func ring _ring_create_mutexed(void* ptr, sz capacity, callsite site);` |
+| `_ring_create_alloc` | `func ring _ring_create_alloc(allocator parent_alloc, sz capacity, mutex opt_mutex, callsite site);` |
+| `_ring_create_alloc_mutexed` | `func ring _ring_create_alloc_mutexed(allocator parent_alloc, sz capacity, callsite site);` |
+| `_ring_destroy` | `func void _ring_destroy(ring* rng, callsite site);` |
+| `ring_size` | `func sz ring_size(ring* rng);` |
+| `ring_space` | `func sz ring_space(ring* rng);` |
+| `ring_capacity` | `func sz ring_capacity(ring* rng);` |
+| `ring_write` | `func sz ring_write(ring* rng, void* data, sz size);` |
+| `ring_read` | `func sz ring_read(ring* rng, void* out, sz size);` |
+| `ring_peek` | `func sz ring_peek(ring* rng, void* out, sz size);` |
+| `ring_skip` | `func sz ring_skip(ring* rng, sz size);` |
+| `ring_reserve_write` | `func void* ring_reserve_write(ring* rng, sz* out_size);` |
+| `ring_commit_write` | `func b32 ring_commit_write(ring* rng, sz size);` |
+| `ring_reserve_read` | `func const void* ring_reserve_read(ring* rng, sz* out_size);` |
+| `ring_commit_read` | `func b32 ring_commit_read(ring* rng, sz size);` |
+| `ring_clear` | `func void ring_clear(ring* rng);` |
+
+#### Macros
+
+| Macro | Form |
+| --- | --- |
+| `ring_create` | `ring_create(ptr, capacity, opt_mutex)` |
+| `ring_create_mutexed` | `ring_create_mutexed(ptr, capacity)` |
+| `ring_create_alloc` | `ring_create_alloc(parent_alloc, capacity, opt_mutex)` |
+| `ring_create_alloc_mutexed` | `ring_create_alloc_mutexed(parent_alloc, capacity)` |
+| `ring_destroy` | `ring_destroy(rng)` |
 
 ### `memory/scratch.h`
 
 - Types: **1**
 - Functions: **2**
+- Macros: **0**
 
 #### Types
 
-- `scratch` (struct)
-  - What it represents: Represents `scratch` data grouped in a struct
-  - Members:
-    - `arn`: `arena*`
-    - `saved_tail`: `arena_block*`
-    - `saved_tail_used`: `sz`
+| Type | Declaration |
+| --- | --- |
+| `scratch` | `typedef struct scratch { ... } scratch;` |
 
 #### Functions
 
-- `scratch_begin(arena* arn) -> scratch`
-  - What it does: Begins scratch begin
-  - Parameters:
-    - `arn` (`arena*`): Input parameter
-- `scratch_end(scratch* scr) -> void`
-  - What it does: Ends scratch end
-  - Parameters:
-    - `scr` (`scratch*`): Input parameter
+| Function | Declaration |
+| --- | --- |
+| `scratch_begin` | `func scratch scratch_begin(arena* arn);` |
+| `scratch_end` | `func void scratch_end(scratch* scr);` |
+
+#### Macros
+
+| Macro | Form |
+| --- | --- |
+| None | - |
 
 ### `memory/vmem.h`
 
 - Types: **1**
 - Functions: **11**
+- Macros: **0**
 
 #### Types
 
-- `vmem_stats` (struct)
-  - What it represents: Represents `vmem stats` data grouped in a struct
-  - Members:
-    - `page_size`: `sz`
-    - `reserve_calls`: `u64`
-    - `commit_calls`: `u64`
-    - `decommit_calls`: `u64`
-    - `release_calls`: `u64`
-    - `reserved_bytes`: `sz`
-    - `committed_bytes`: `sz`
-    - `decommitted_bytes`: `sz`
-    - `released_bytes`: `sz`
-    - `alloc_calls`: `u64`
-    - `calloc_calls`: `u64`
-    - `realloc_calls`: `u64`
-    - `free_calls`: `u64`
-    - `live_allocations`: `u64`
-    - `live_allocated_bytes`: `sz`
-    - `peak_live_allocated_bytes`: `sz`
-    - `total_allocated_bytes`: `sz`
-    - `total_freed_bytes`: `sz`
+| Type | Declaration |
+| --- | --- |
+| `vmem_stats` | `typedef struct vmem_stats { ... } vmem_stats;` |
 
 #### Functions
 
-- `vmem_page_size() -> sz`
-  - What it does: Performs vmem page size
-  - Parameters: none
-- `vmem_reserve(sz size) -> void*`
-  - What it does: Performs vmem reserve
-  - Parameters:
-    - `size` (`sz`): Size or capacity value used by the operation
-- `vmem_commit(void* ptr, sz size) -> b32`
-  - What it does: Performs vmem commit
-  - Parameters:
-    - `ptr` (`void*`): Input data used by the operation
-    - `size` (`sz`): Size or capacity value used by the operation
-- `vmem_decommit(void* ptr, sz size) -> b32`
-  - What it does: Performs vmem decommit
-  - Parameters:
-    - `ptr` (`void*`): Input data used by the operation
-    - `size` (`sz`): Size or capacity value used by the operation
-- `vmem_release(void* ptr, sz size) -> b32`
-  - What it does: Performs vmem release
-  - Parameters:
-    - `ptr` (`void*`): Input data used by the operation
-    - `size` (`sz`): Size or capacity value used by the operation
-- `vmem_alloc(sz size) -> void*`
-  - What it does: Performs vmem alloc
-  - Parameters:
-    - `size` (`sz`): Size or capacity value used by the operation
-- `vmem_calloc(sz count, sz size) -> void*`
-  - What it does: Performs vmem calloc
-  - Parameters:
-    - `count` (`sz`): Number of elements/items involved
-    - `size` (`sz`): Size or capacity value used by the operation
-- `vmem_realloc(void* ptr, sz old_size, sz new_size) -> void*`
-  - What it does: Performs vmem realloc
-  - Parameters:
-    - `ptr` (`void*`): Input data used by the operation
-    - `old_size` (`sz`): Size or capacity value used by the operation
-    - `new_size` (`sz`): Size or capacity value used by the operation
-- `vmem_free(void* ptr, sz size) -> b32`
-  - What it does: Performs vmem free
-  - Parameters:
-    - `ptr` (`void*`): Input data used by the operation
-    - `size` (`sz`): Size or capacity value used by the operation
-- `vmem_get_allocator() -> allocator`
-  - What it does: Gets vmem get allocator
-  - Parameters: none
-- `vmem_get_stats() -> vmem_stats`
-  - What it does: Gets vmem get stats
-  - Parameters: none
+| Function | Declaration |
+| --- | --- |
+| `vmem_page_size` | `func sz vmem_page_size(void);` |
+| `vmem_reserve` | `func void* vmem_reserve(sz size);` |
+| `vmem_commit` | `func b32 vmem_commit(void* ptr, sz size);` |
+| `vmem_decommit` | `func b32 vmem_decommit(void* ptr, sz size);` |
+| `vmem_release` | `func b32 vmem_release(void* ptr, sz size);` |
+| `vmem_alloc` | `func void* vmem_alloc(sz size);` |
+| `vmem_calloc` | `func void* vmem_calloc(sz count, sz size);` |
+| `vmem_realloc` | `func void* vmem_realloc(void* ptr, sz old_size, sz new_size);` |
+| `vmem_free` | `func b32 vmem_free(void* ptr, sz size);` |
+| `vmem_get_allocator` | `func allocator vmem_get_allocator(void);` |
+| `vmem_get_stats` | `func vmem_stats vmem_get_stats(void);` |
+
+#### Macros
+
+| Macro | Form |
+| --- | --- |
+| None | - |
 
 ## processes
 
-Process creation, inspection and pipe helpers.
+Process launching, pipes, and current-process utilities.
 
 ### `processes/common_processes.h`
 
 - Types: **0**
 - Functions: **3**
+- Macros: **0**
 
 #### Types
 
-- None
+| Type | Declaration |
+| --- | --- |
+| None | - |
 
 #### Functions
 
-- `process_open_weblink(cstr8 url) -> b32`
-  - What it does: Opens process open weblink
-  - Parameters:
-    - `url` (`cstr8`): Input parameter
-- `process_open_file_window(cstr8 location) -> b32`
-  - What it does: Opens process open file window
-  - Parameters:
-    - `location` (`cstr8`): Input parameter
-- `process_open_terminal(cstr8 location) -> b32`
-  - What it does: Opens process open terminal
-  - Parameters:
-    - `location` (`cstr8`): Input parameter
+| Function | Declaration |
+| --- | --- |
+| `process_open_weblink` | `func b32 process_open_weblink(cstr8 url);` |
+| `process_open_file_window` | `func b32 process_open_file_window(cstr8 location);` |
+| `process_open_terminal` | `func b32 process_open_terminal(cstr8 location);` |
+
+#### Macros
+
+| Macro | Form |
+| --- | --- |
+| None | - |
 
 ### `processes/process.h`
 
 - Types: **3**
 - Functions: **14**
+- Macros: **4**
 
 #### Types
 
-- `process` (alias)
-  - What it represents: Type alias used for `process`
-  - Members: none (alias/function type)
-- `process_snapshot_entry` (struct)
-  - What it represents: Represents `process snapshot entry` data grouped in a struct
-  - Members:
-    - `id`: `u64`
-    - `name`: `c8 [PROCESS_NAME_CAP]`
-- `process_options` (struct)
-  - What it represents: Represents `process options` data grouped in a struct
-  - Members:
-    - `pipe_stdin`: `b32`
-    - `pipe_stdout`: `b32`
-    - `pipe_stderr`: `b32`
-    - `stderr_to_stdout`: `b32`
-    - `background`: `b32`
-    - `cwd`: `cstr8`
-    - `envp`: `cstr8 const*`
-    - `timeout_ms`: `i32`
+| Type | Declaration |
+| --- | --- |
+| `process` | `typedef void* process;` |
+| `process_snapshot_entry` | `typedef struct process_snapshot_entry { ... } process_snapshot_entry;` |
+| `process_options` | `typedef struct process_options { ... } process_options;` |
 
 #### Functions
 
-- `process_options_default() -> process_options`
-  - What it does: Performs process options default
-  - Parameters: none
-- `process_options_captured() -> process_options`
-  - What it does: Performs process options captured
-  - Parameters: none
-- `_process_create(cstr8 const* args, callsite site) -> process`
-  - What it does: Creates  process create resources or state
-  - Parameters:
-    - `args` (`cstr8 const*`): Input parameter
-    - `site` (`callsite`): Input parameter
-- `_process_create_with(cstr8 const* args, process_options options, callsite site) -> process`
-  - What it does: Creates  process create with resources or state
-  - Parameters:
-    - `args` (`cstr8 const*`): Input parameter
-    - `options` (`process_options`): Input parameter
-    - `site` (`callsite`): Input parameter
-- `process_is_valid(process prc) -> b32`
-  - What it does: Performs process is valid
-  - Parameters:
-    - `prc` (`process`): Input parameter
-- `process_get_id(process prc) -> u64`
-  - What it does: Gets process get id
-  - Parameters:
-    - `prc` (`process`): Input parameter
-- `process_snapshot_get(sz* out_count) -> process_snapshot_entry*`
-  - What it does: Performs process snapshot get
-  - Parameters:
-    - `out_count` (`sz*`): Output value written by the function
-- `process_snapshot_free(process_snapshot_entry* ptr) -> void`
-  - What it does: Performs process snapshot free
-  - Parameters:
-    - `ptr` (`process_snapshot_entry*`): Input data used by the operation
-- `process_read(process prc, sz* out_size, i32* out_exit_code) -> void*`
-  - What it does: Reads data for process read
-  - Parameters:
-    - `prc` (`process`): Input parameter
-    - `out_size` (`sz*`): Output value written by the function
-    - `out_exit_code` (`i32*`): Output value written by the function
-- `process_read_free(void* ptr) -> void`
-  - What it does: Reads data for process read free
-  - Parameters:
-    - `ptr` (`void*`): Input data used by the operation
-- `process_wait(process prc, b32 block, i32* out_exit_code) -> b32`
-  - What it does: Performs process wait
-  - Parameters:
-    - `prc` (`process`): Input parameter
-    - `block` (`b32`): Input parameter
-    - `out_exit_code` (`i32*`): Output value written by the function
-- `process_wait_timeout(process prc, i32 timeout_ms, i32* out_exit_code) -> b32`
-  - What it does: Performs process wait timeout
-  - Parameters:
-    - `prc` (`process`): Input parameter
-    - `timeout_ms` (`i32`): Input parameter
-    - `out_exit_code` (`i32*`): Output value written by the function
-- `process_kill(process prc, b32 force) -> b32`
-  - What it does: Performs process kill
-  - Parameters:
-    - `prc` (`process`): Input parameter
-    - `force` (`b32`): Input parameter
-- `_process_destroy(process prc, callsite site) -> void`
-  - What it does: Destroys  process destroy resources or state
-  - Parameters:
-    - `prc` (`process`): Input parameter
-    - `site` (`callsite`): Input parameter
+| Function | Declaration |
+| --- | --- |
+| `process_options_default` | `func process_options process_options_default(void);` |
+| `process_options_captured` | `func process_options process_options_captured(void);` |
+| `_process_create` | `func process _process_create(cstr8 const* args, callsite site);` |
+| `_process_create_with` | `func process _process_create_with(cstr8 const* args, process_options options, callsite site);` |
+| `process_is_valid` | `func b32 process_is_valid(process prc);` |
+| `process_get_id` | `func u64 process_get_id(process prc);` |
+| `process_snapshot_get` | `func process_snapshot_entry* process_snapshot_get(sz* out_count);` |
+| `process_snapshot_free` | `func void process_snapshot_free(process_snapshot_entry* ptr);` |
+| `process_read` | `func void* process_read(process prc, sz* out_size, i32* out_exit_code);` |
+| `process_read_free` | `func void process_read_free(void* ptr);` |
+| `process_wait` | `func b32 process_wait(process prc, b32 block, i32* out_exit_code);` |
+| `process_wait_timeout` | `func b32 process_wait_timeout(process prc, i32 timeout_ms, i32* out_exit_code);` |
+| `process_kill` | `func b32 process_kill(process prc, b32 force);` |
+| `_process_destroy` | `func void _process_destroy(process prc, callsite site);` |
+
+#### Macros
+
+| Macro | Form |
+| --- | --- |
+| `PROCESS_NAME_CAP` | `PROCESS_NAME_CAP` |
+| `process_create` | `process_create(args)` |
+| `process_create_with` | `process_create_with(args, options)` |
+| `process_destroy` | `process_destroy(prc)` |
 
 ### `processes/process_current.h`
 
 - Types: **1**
 - Functions: **7**
+- Macros: **0**
 
 #### Types
 
-- `process_priority` (enum)
-  - What it represents: Represents a set of named constants for `process priority`
-  - Members:
-    - `PROCESS_PRIORITY_LOW`: `enum value`
-    - `PROCESS_PRIORITY_NORMAL`: `enum value`
-    - `PROCESS_PRIORITY_HIGH`: `enum value`
-    - `PROCESS_PRIORITY_REALTIME`: `enum value`
+| Type | Declaration |
+| --- | --- |
+| `process_priority` | `typedef enum process_priority { ... } process_priority;` |
 
 #### Functions
 
-- `process_id() -> u64`
-  - What it does: Performs process id
-  - Parameters: none
-- `process_get_priority() -> process_priority`
-  - What it does: Gets process get priority
-  - Parameters: none
-- `process_set_priority(process_priority priority) -> b32`
-  - What it does: Sets process set priority
-  - Parameters:
-    - `priority` (`process_priority`): Input parameter
-- `process_is_unique() -> b32`
-  - What it does: Performs process is unique
-  - Parameters: none
-- `process_restart() -> b32`
-  - What it does: Performs process restart
-  - Parameters: none
-- `process_exit(i32 exit_code) -> no_return void`
-  - What it does: Performs process exit
-  - Parameters:
-    - `exit_code` (`i32`): Input parameter
-- `process_abort() -> no_return void`
-  - What it does: Performs process abort
-  - Parameters: none
+| Function | Declaration |
+| --- | --- |
+| `process_id` | `func u64 process_id(void);` |
+| `process_get_priority` | `func process_priority process_get_priority(void);` |
+| `process_set_priority` | `func b32 process_set_priority(process_priority priority);` |
+| `process_is_unique` | `func b32 process_is_unique(void);` |
+| `process_restart` | `func b32 process_restart(void);` |
+| `process_exit` | `func no_return void process_exit(i32 exit_code);` |
+| `process_abort` | `func no_return void process_abort(void);` |
+
+#### Macros
+
+| Macro | Form |
+| --- | --- |
+| None | - |
 
 ### `processes/process_pipe.h`
 
 - Types: **1**
 - Functions: **11**
+- Macros: **4**
 
 #### Types
 
-- `process_pipe` (alias)
-  - What it represents: Type alias used for `process pipe`
-  - Members: none (alias/function type)
+| Type | Declaration |
+| --- | --- |
+| `process_pipe` | `typedef void* process_pipe;` |
 
 #### Functions
 
-- `_process_pipe_stdin(process prc, callsite site) -> process_pipe`
-  - What it does: Performs  process pipe stdin
-  - Parameters:
-    - `prc` (`process`): Input parameter
-    - `site` (`callsite`): Input parameter
-- `_process_pipe_stdout(process prc, callsite site) -> process_pipe`
-  - What it does: Performs  process pipe stdout
-  - Parameters:
-    - `prc` (`process`): Input parameter
-    - `site` (`callsite`): Input parameter
-- `_process_pipe_stderr(process prc, callsite site) -> process_pipe`
-  - What it does: Performs  process pipe stderr
-  - Parameters:
-    - `prc` (`process`): Input parameter
-    - `site` (`callsite`): Input parameter
-- `process_pipe_is_valid(process_pipe pip) -> b32`
-  - What it does: Performs process pipe is valid
-  - Parameters:
-    - `pip` (`process_pipe`): Input parameter
-- `process_pipe_read(process_pipe pip, void* ptr, sz size) -> sz`
-  - What it does: Reads data for process pipe read
-  - Parameters:
-    - `pip` (`process_pipe`): Input parameter
-    - `ptr` (`void*`): Input data used by the operation
-    - `size` (`sz`): Size or capacity value used by the operation
-- `process_pipe_write(process_pipe pip, const void* ptr, sz size) -> sz`
-  - What it does: Writes data for process pipe write
-  - Parameters:
-    - `pip` (`process_pipe`): Input parameter
-    - `ptr` (`const void*`): Input data used by the operation
-    - `size` (`sz`): Size or capacity value used by the operation
-- `process_pipe_read_nonblocking(process_pipe pip, void* ptr, sz size) -> sz`
-  - What it does: Reads data for process pipe read nonblocking
-  - Parameters:
-    - `pip` (`process_pipe`): Input parameter
-    - `ptr` (`void*`): Input data used by the operation
-    - `size` (`sz`): Size or capacity value used by the operation
-- `process_pipe_write_nonblocking(process_pipe pip, const void* ptr, sz size) -> sz`
-  - What it does: Writes data for process pipe write nonblocking
-  - Parameters:
-    - `pip` (`process_pipe`): Input parameter
-    - `ptr` (`const void*`): Input data used by the operation
-    - `size` (`sz`): Size or capacity value used by the operation
-- `process_pipe_poll_readable(process_pipe pip, i32 timeout_ms) -> b32`
-  - What it does: Reads data for process pipe poll readable
-  - Parameters:
-    - `pip` (`process_pipe`): Input parameter
-    - `timeout_ms` (`i32`): Input parameter
-- `process_pipe_flush(process_pipe pip) -> b32`
-  - What it does: Performs process pipe flush
-  - Parameters:
-    - `pip` (`process_pipe`): Input parameter
-- `_process_pipe_close(process_pipe pip, callsite site) -> void`
-  - What it does: Closes  process pipe close
-  - Parameters:
-    - `pip` (`process_pipe`): Input parameter
-    - `site` (`callsite`): Input parameter
+| Function | Declaration |
+| --- | --- |
+| `_process_pipe_stdin` | `func process_pipe _process_pipe_stdin(process prc, callsite site);` |
+| `_process_pipe_stdout` | `func process_pipe _process_pipe_stdout(process prc, callsite site);` |
+| `_process_pipe_stderr` | `func process_pipe _process_pipe_stderr(process prc, callsite site);` |
+| `process_pipe_is_valid` | `func b32 process_pipe_is_valid(process_pipe pip);` |
+| `process_pipe_read` | `func sz process_pipe_read(process_pipe pip, void* ptr, sz size);` |
+| `process_pipe_write` | `func sz process_pipe_write(process_pipe pip, const void* ptr, sz size);` |
+| `process_pipe_read_nonblocking` | `func sz process_pipe_read_nonblocking(process_pipe pip, void* ptr, sz size);` |
+| `process_pipe_write_nonblocking` | `func sz process_pipe_write_nonblocking(process_pipe pip, const void* ptr, sz size);` |
+| `process_pipe_poll_readable` | `func b32 process_pipe_poll_readable(process_pipe pip, i32 timeout_ms);` |
+| `process_pipe_flush` | `func b32 process_pipe_flush(process_pipe pip);` |
+| `_process_pipe_close` | `func void _process_pipe_close(process_pipe pip, callsite site);` |
+
+#### Macros
+
+| Macro | Form |
+| --- | --- |
+| `process_pipe_stdin` | `process_pipe_stdin(prc)` |
+| `process_pipe_stdout` | `process_pipe_stdout(prc)` |
+| `process_pipe_stderr` | `process_pipe_stderr(prc)` |
+| `process_pipe_close` | `process_pipe_close(pip)` |
 
 ## strings
 
-Character, C-string and Unicode helpers.
+Character, string, C-string, and Unicode conversion helpers.
 
 ### `strings/char.h`
 
 - Types: **0**
 - Functions: **48**
+- Macros: **0**
 
 #### Types
 
-- None
+| Type | Declaration |
+| --- | --- |
+| None | - |
 
 #### Functions
 
-- `c8_is_alnum(c8 chr) -> b32`
-  - What it does: Performs c8 is alnum
-  - Parameters:
-    - `chr` (`c8`): Input parameter
-- `c8_is_alpha(c8 chr) -> b32`
-  - What it does: Performs c8 is alpha
-  - Parameters:
-    - `chr` (`c8`): Input parameter
-- `c8_is_blank(c8 chr) -> b32`
-  - What it does: Performs c8 is blank
-  - Parameters:
-    - `chr` (`c8`): Input parameter
-- `c8_is_cntrl(c8 chr) -> b32`
-  - What it does: Performs c8 is cntrl
-  - Parameters:
-    - `chr` (`c8`): Input parameter
-- `c8_is_digit(c8 chr) -> b32`
-  - What it does: Performs c8 is digit
-  - Parameters:
-    - `chr` (`c8`): Input parameter
-- `c8_is_graph(c8 chr) -> b32`
-  - What it does: Performs c8 is graph
-  - Parameters:
-    - `chr` (`c8`): Input parameter
-- `c8_is_lower(c8 chr) -> b32`
-  - What it does: Performs c8 is lower
-  - Parameters:
-    - `chr` (`c8`): Input parameter
-- `c8_is_print(c8 chr) -> b32`
-  - What it does: Performs c8 is print
-  - Parameters:
-    - `chr` (`c8`): Input parameter
-- `c8_is_punct(c8 chr) -> b32`
-  - What it does: Performs c8 is punct
-  - Parameters:
-    - `chr` (`c8`): Input parameter
-- `c8_is_space(c8 chr) -> b32`
-  - What it does: Performs c8 is space
-  - Parameters:
-    - `chr` (`c8`): Input parameter
-- `c8_is_upper(c8 chr) -> b32`
-  - What it does: Performs c8 is upper
-  - Parameters:
-    - `chr` (`c8`): Input parameter
-- `c8_is_xdigit(c8 chr) -> b32`
-  - What it does: Performs c8 is xdigit
-  - Parameters:
-    - `chr` (`c8`): Input parameter
-- `c8_to_lower(c8 chr) -> c8`
-  - What it does: Performs c8 to lower
-  - Parameters:
-    - `chr` (`c8`): Input parameter
-- `c8_to_upper(c8 chr) -> c8`
-  - What it does: Performs c8 to upper
-  - Parameters:
-    - `chr` (`c8`): Input parameter
-- `c8_hex_to_nibble(c8 chr) -> i32`
-  - What it does: Performs c8 hex to nibble
-  - Parameters:
-    - `chr` (`c8`): Input parameter
-- `c8_nibble_to_hex(u8 nibble) -> c8`
-  - What it does: Performs c8 nibble to hex
-  - Parameters:
-    - `nibble` (`u8`): Input parameter
-- `c16_is_alnum(c16 chr) -> b32`
-  - What it does: Performs c16 is alnum
-  - Parameters:
-    - `chr` (`c16`): Input parameter
-- `c16_is_alpha(c16 chr) -> b32`
-  - What it does: Performs c16 is alpha
-  - Parameters:
-    - `chr` (`c16`): Input parameter
-- `c16_is_blank(c16 chr) -> b32`
-  - What it does: Performs c16 is blank
-  - Parameters:
-    - `chr` (`c16`): Input parameter
-- `c16_is_cntrl(c16 chr) -> b32`
-  - What it does: Performs c16 is cntrl
-  - Parameters:
-    - `chr` (`c16`): Input parameter
-- `c16_is_digit(c16 chr) -> b32`
-  - What it does: Performs c16 is digit
-  - Parameters:
-    - `chr` (`c16`): Input parameter
-- `c16_is_graph(c16 chr) -> b32`
-  - What it does: Performs c16 is graph
-  - Parameters:
-    - `chr` (`c16`): Input parameter
-- `c16_is_lower(c16 chr) -> b32`
-  - What it does: Performs c16 is lower
-  - Parameters:
-    - `chr` (`c16`): Input parameter
-- `c16_is_print(c16 chr) -> b32`
-  - What it does: Performs c16 is print
-  - Parameters:
-    - `chr` (`c16`): Input parameter
-- `c16_is_punct(c16 chr) -> b32`
-  - What it does: Performs c16 is punct
-  - Parameters:
-    - `chr` (`c16`): Input parameter
-- `c16_is_space(c16 chr) -> b32`
-  - What it does: Performs c16 is space
-  - Parameters:
-    - `chr` (`c16`): Input parameter
-- `c16_is_upper(c16 chr) -> b32`
-  - What it does: Performs c16 is upper
-  - Parameters:
-    - `chr` (`c16`): Input parameter
-- `c16_is_xdigit(c16 chr) -> b32`
-  - What it does: Performs c16 is xdigit
-  - Parameters:
-    - `chr` (`c16`): Input parameter
-- `c16_to_lower(c16 chr) -> c16`
-  - What it does: Performs c16 to lower
-  - Parameters:
-    - `chr` (`c16`): Input parameter
-- `c16_to_upper(c16 chr) -> c16`
-  - What it does: Performs c16 to upper
-  - Parameters:
-    - `chr` (`c16`): Input parameter
-- `c16_hex_to_nibble(c16 chr) -> i32`
-  - What it does: Performs c16 hex to nibble
-  - Parameters:
-    - `chr` (`c16`): Input parameter
-- `c16_nibble_to_hex(u8 nibble) -> c16`
-  - What it does: Performs c16 nibble to hex
-  - Parameters:
-    - `nibble` (`u8`): Input parameter
-- `c32_is_alnum(c32 chr) -> b32`
-  - What it does: Performs c32 is alnum
-  - Parameters:
-    - `chr` (`c32`): Input parameter
-- `c32_is_alpha(c32 chr) -> b32`
-  - What it does: Performs c32 is alpha
-  - Parameters:
-    - `chr` (`c32`): Input parameter
-- `c32_is_blank(c32 chr) -> b32`
-  - What it does: Performs c32 is blank
-  - Parameters:
-    - `chr` (`c32`): Input parameter
-- `c32_is_cntrl(c32 chr) -> b32`
-  - What it does: Performs c32 is cntrl
-  - Parameters:
-    - `chr` (`c32`): Input parameter
-- `c32_is_digit(c32 chr) -> b32`
-  - What it does: Performs c32 is digit
-  - Parameters:
-    - `chr` (`c32`): Input parameter
-- `c32_is_graph(c32 chr) -> b32`
-  - What it does: Performs c32 is graph
-  - Parameters:
-    - `chr` (`c32`): Input parameter
-- `c32_is_lower(c32 chr) -> b32`
-  - What it does: Performs c32 is lower
-  - Parameters:
-    - `chr` (`c32`): Input parameter
-- `c32_is_print(c32 chr) -> b32`
-  - What it does: Performs c32 is print
-  - Parameters:
-    - `chr` (`c32`): Input parameter
-- `c32_is_punct(c32 chr) -> b32`
-  - What it does: Performs c32 is punct
-  - Parameters:
-    - `chr` (`c32`): Input parameter
-- `c32_is_space(c32 chr) -> b32`
-  - What it does: Performs c32 is space
-  - Parameters:
-    - `chr` (`c32`): Input parameter
-- `c32_is_upper(c32 chr) -> b32`
-  - What it does: Performs c32 is upper
-  - Parameters:
-    - `chr` (`c32`): Input parameter
-- `c32_is_xdigit(c32 chr) -> b32`
-  - What it does: Performs c32 is xdigit
-  - Parameters:
-    - `chr` (`c32`): Input parameter
-- `c32_to_lower(c32 chr) -> c32`
-  - What it does: Performs c32 to lower
-  - Parameters:
-    - `chr` (`c32`): Input parameter
-- `c32_to_upper(c32 chr) -> c32`
-  - What it does: Performs c32 to upper
-  - Parameters:
-    - `chr` (`c32`): Input parameter
-- `c32_hex_to_nibble(c32 chr) -> i32`
-  - What it does: Performs c32 hex to nibble
-  - Parameters:
-    - `chr` (`c32`): Input parameter
-- `c32_nibble_to_hex(u8 nibble) -> c32`
-  - What it does: Performs c32 nibble to hex
-  - Parameters:
-    - `nibble` (`u8`): Input parameter
+| Function | Declaration |
+| --- | --- |
+| `c8_is_alnum` | `func b32 c8_is_alnum(c8 chr);` |
+| `c8_is_alpha` | `func b32 c8_is_alpha(c8 chr);` |
+| `c8_is_blank` | `func b32 c8_is_blank(c8 chr);` |
+| `c8_is_cntrl` | `func b32 c8_is_cntrl(c8 chr);` |
+| `c8_is_digit` | `func b32 c8_is_digit(c8 chr);` |
+| `c8_is_graph` | `func b32 c8_is_graph(c8 chr);` |
+| `c8_is_lower` | `func b32 c8_is_lower(c8 chr);` |
+| `c8_is_print` | `func b32 c8_is_print(c8 chr);` |
+| `c8_is_punct` | `func b32 c8_is_punct(c8 chr);` |
+| `c8_is_space` | `func b32 c8_is_space(c8 chr);` |
+| `c8_is_upper` | `func b32 c8_is_upper(c8 chr);` |
+| `c8_is_xdigit` | `func b32 c8_is_xdigit(c8 chr);` |
+| `c8_to_lower` | `func c8 c8_to_lower(c8 chr);` |
+| `c8_to_upper` | `func c8 c8_to_upper(c8 chr);` |
+| `c8_hex_to_nibble` | `func i32 c8_hex_to_nibble(c8 chr);` |
+| `c8_nibble_to_hex` | `func c8 c8_nibble_to_hex(u8 nibble);` |
+| `c16_is_alnum` | `func b32 c16_is_alnum(c16 chr);` |
+| `c16_is_alpha` | `func b32 c16_is_alpha(c16 chr);` |
+| `c16_is_blank` | `func b32 c16_is_blank(c16 chr);` |
+| `c16_is_cntrl` | `func b32 c16_is_cntrl(c16 chr);` |
+| `c16_is_digit` | `func b32 c16_is_digit(c16 chr);` |
+| `c16_is_graph` | `func b32 c16_is_graph(c16 chr);` |
+| `c16_is_lower` | `func b32 c16_is_lower(c16 chr);` |
+| `c16_is_print` | `func b32 c16_is_print(c16 chr);` |
+| `c16_is_punct` | `func b32 c16_is_punct(c16 chr);` |
+| `c16_is_space` | `func b32 c16_is_space(c16 chr);` |
+| `c16_is_upper` | `func b32 c16_is_upper(c16 chr);` |
+| `c16_is_xdigit` | `func b32 c16_is_xdigit(c16 chr);` |
+| `c16_to_lower` | `func c16 c16_to_lower(c16 chr);` |
+| `c16_to_upper` | `func c16 c16_to_upper(c16 chr);` |
+| `c16_hex_to_nibble` | `func i32 c16_hex_to_nibble(c16 chr);` |
+| `c16_nibble_to_hex` | `func c16 c16_nibble_to_hex(u8 nibble);` |
+| `c32_is_alnum` | `func b32 c32_is_alnum(c32 chr);` |
+| `c32_is_alpha` | `func b32 c32_is_alpha(c32 chr);` |
+| `c32_is_blank` | `func b32 c32_is_blank(c32 chr);` |
+| `c32_is_cntrl` | `func b32 c32_is_cntrl(c32 chr);` |
+| `c32_is_digit` | `func b32 c32_is_digit(c32 chr);` |
+| `c32_is_graph` | `func b32 c32_is_graph(c32 chr);` |
+| `c32_is_lower` | `func b32 c32_is_lower(c32 chr);` |
+| `c32_is_print` | `func b32 c32_is_print(c32 chr);` |
+| `c32_is_punct` | `func b32 c32_is_punct(c32 chr);` |
+| `c32_is_space` | `func b32 c32_is_space(c32 chr);` |
+| `c32_is_upper` | `func b32 c32_is_upper(c32 chr);` |
+| `c32_is_xdigit` | `func b32 c32_is_xdigit(c32 chr);` |
+| `c32_to_lower` | `func c32 c32_to_lower(c32 chr);` |
+| `c32_to_upper` | `func c32 c32_to_upper(c32 chr);` |
+| `c32_hex_to_nibble` | `func i32 c32_hex_to_nibble(c32 chr);` |
+| `c32_nibble_to_hex` | `func c32 c32_nibble_to_hex(u8 nibble);` |
+
+#### Macros
+
+| Macro | Form |
+| --- | --- |
+| None | - |
 
 ### `strings/cstrings.h`
 
-- Types: **0**
+- Types: **15**
 - Functions: **111**
+- Macros: **5**
 
 #### Types
 
-- None
+| Type | Declaration |
+| --- | --- |
+| `str8_tiny` | `typedef c8 str8_tiny[STR_CAP_TINY];` |
+| `str8_short` | `typedef c8 str8_short[STR_CAP_SHORT];` |
+| `str8_medium` | `typedef c8 str8_medium[STR_CAP_MEDIUM];` |
+| `str8_long` | `typedef c8 str8_long[STR_CAP_LONG];` |
+| `str8_large` | `typedef c8 str8_large[STR_CAP_LARGE];` |
+| `str16_tiny` | `typedef c16 str16_tiny[STR_CAP_TINY];` |
+| `str16_short` | `typedef c16 str16_short[STR_CAP_SHORT];` |
+| `str16_medium` | `typedef c16 str16_medium[STR_CAP_MEDIUM];` |
+| `str16_long` | `typedef c16 str16_long[STR_CAP_LONG];` |
+| `str16_large` | `typedef c16 str16_large[STR_CAP_LARGE];` |
+| `str32_tiny` | `typedef c32 str32_tiny[STR_CAP_TINY];` |
+| `str32_short` | `typedef c32 str32_short[STR_CAP_SHORT];` |
+| `str32_medium` | `typedef c32 str32_medium[STR_CAP_MEDIUM];` |
+| `str32_long` | `typedef c32 str32_long[STR_CAP_LONG];` |
+| `str32_large` | `typedef c32 str32_large[STR_CAP_LARGE];` |
 
 #### Functions
 
-- `cstr8_len(cstr8 str) -> sz`
-  - What it does: Performs cstr8 len
-  - Parameters:
-    - `str` (`cstr8`): Input parameter
-- `cstr8_is_empty(cstr8 str) -> b32`
-  - What it does: Performs cstr8 is empty
-  - Parameters:
-    - `str` (`cstr8`): Input parameter
-- `cstr8_clear(c8* str) -> void`
-  - What it does: Performs cstr8 clear
-  - Parameters:
-    - `str` (`c8*`): Input parameter
-- `cstr8_cmp(cstr8 lhs, cstr8 rhs) -> b32`
-  - What it does: Performs cstr8 cmp
-  - Parameters:
-    - `lhs` (`cstr8`): Input data used by the operation
-    - `rhs` (`cstr8`): Input data used by the operation
-- `cstr8_cmp_n(cstr8 lhs, cstr8 rhs, sz cnt) -> b32`
-  - What it does: Performs cstr8 cmp n
-  - Parameters:
-    - `lhs` (`cstr8`): Input data used by the operation
-    - `rhs` (`cstr8`): Input data used by the operation
-    - `cnt` (`sz`): Input parameter
-- `cstr8_cmp_nocase(cstr8 lhs, cstr8 rhs) -> b32`
-  - What it does: Performs cstr8 cmp nocase
-  - Parameters:
-    - `lhs` (`cstr8`): Input data used by the operation
-    - `rhs` (`cstr8`): Input data used by the operation
-- `cstr8_cpy(c8* dst, sz dst_size, cstr8 src) -> sz`
-  - What it does: Performs cstr8 cpy
-  - Parameters:
-    - `dst` (`c8*`): Destination storage for output data
-    - `dst_size` (`sz`): Size or capacity value used by the operation
-    - `src` (`cstr8`): Input data used by the operation
-- `cstr8_cpy_n(c8* dst, sz dst_size, cstr8 src, sz cnt) -> sz`
-  - What it does: Performs cstr8 cpy n
-  - Parameters:
-    - `dst` (`c8*`): Destination storage for output data
-    - `dst_size` (`sz`): Size or capacity value used by the operation
-    - `src` (`cstr8`): Input data used by the operation
-    - `cnt` (`sz`): Input parameter
-- `cstr8_cat(c8* dst, sz dst_cap, cstr8 src) -> sz`
-  - What it does: Performs cstr8 cat
-  - Parameters:
-    - `dst` (`c8*`): Destination storage for output data
-    - `dst_cap` (`sz`): Input parameter
-    - `src` (`cstr8`): Input data used by the operation
-- `cstr8_append_char(c8* dst, sz dst_cap, c8 chr) -> sz`
-  - What it does: Performs cstr8 append char
-  - Parameters:
-    - `dst` (`c8*`): Destination storage for output data
-    - `dst_cap` (`sz`): Input parameter
-    - `chr` (`c8`): Input parameter
-- `cstr8_truncate(c8* str, sz length) -> void`
-  - What it does: Performs cstr8 truncate
-  - Parameters:
-    - `str` (`c8*`): Input parameter
-    - `length` (`sz`): Input parameter
-- `cstr8_format(c8* dst, sz dst_cap, cstr8 fmt, ...) -> b32`
-  - What it does: Performs cstr8 format
-  - Parameters:
-    - `dst` (`c8*`): Destination storage for output data
-    - `dst_cap` (`sz`): Input parameter
-    - `fmt` (`cstr8`): Input parameter
-    - `...` (`variadic`): Additional variadic arguments
-- `cstr8_vformat(c8* dst, sz dst_cap, cstr8 fmt, va_list args) -> b32`
-  - What it does: Performs cstr8 vformat
-  - Parameters:
-    - `dst` (`c8*`): Destination storage for output data
-    - `dst_cap` (`sz`): Input parameter
-    - `fmt` (`cstr8`): Input parameter
-    - `args` (`va_list`): Input parameter
-- `cstr8_append_format(c8* dst, sz dst_cap, cstr8 fmt, ...) -> b32`
-  - What it does: Performs cstr8 append format
-  - Parameters:
-    - `dst` (`c8*`): Destination storage for output data
-    - `dst_cap` (`sz`): Input parameter
-    - `fmt` (`cstr8`): Input parameter
-    - `...` (`variadic`): Additional variadic arguments
-- `cstr8_append_vformat(c8* dst, sz dst_cap, cstr8 fmt, va_list args) -> b32`
-  - What it does: Performs cstr8 append vformat
-  - Parameters:
-    - `dst` (`c8*`): Destination storage for output data
-    - `dst_cap` (`sz`): Input parameter
-    - `fmt` (`cstr8`): Input parameter
-    - `args` (`va_list`): Input parameter
-- `cstr8_scan(cstr8 str, cstr8 fmt, ...) -> b32`
-  - What it does: Performs cstr8 scan
-  - Parameters:
-    - `str` (`cstr8`): Input parameter
-    - `fmt` (`cstr8`): Input parameter
-    - `...` (`variadic`): Additional variadic arguments
-- `cstr8_find(cstr8 str, cstr8 sub) -> cstr8`
-  - What it does: Performs cstr8 find
-  - Parameters:
-    - `str` (`cstr8`): Input parameter
-    - `sub` (`cstr8`): Input parameter
-- `cstr8_find_last(cstr8 str, cstr8 sub) -> cstr8`
-  - What it does: Performs cstr8 find last
-  - Parameters:
-    - `str` (`cstr8`): Input parameter
-    - `sub` (`cstr8`): Input parameter
-- `cstr8_find_char(cstr8 str, c8 chr) -> cstr8`
-  - What it does: Performs cstr8 find char
-  - Parameters:
-    - `str` (`cstr8`): Input parameter
-    - `chr` (`c8`): Input parameter
-- `cstr8_find_last_char(cstr8 str, c8 chr) -> cstr8`
-  - What it does: Performs cstr8 find last char
-  - Parameters:
-    - `str` (`cstr8`): Input parameter
-    - `chr` (`c8`): Input parameter
-- `cstr8_count_char(cstr8 str, c8 chr) -> sz`
-  - What it does: Performs cstr8 count char
-  - Parameters:
-    - `str` (`cstr8`): Input parameter
-    - `chr` (`c8`): Input parameter
-- `cstr8_starts_with(cstr8 str, cstr8 prefix) -> b32`
-  - What it does: Performs cstr8 starts with
-  - Parameters:
-    - `str` (`cstr8`): Input parameter
-    - `prefix` (`cstr8`): Input parameter
-- `cstr8_ends_with(cstr8 str, cstr8 suffix) -> b32`
-  - What it does: Ends cstr8 ends with
-  - Parameters:
-    - `str` (`cstr8`): Input parameter
-    - `suffix` (`cstr8`): Input parameter
-- `cstr8_hash32(cstr8 str) -> u32`
-  - What it does: Performs cstr8 hash32
-  - Parameters:
-    - `str` (`cstr8`): Input parameter
-- `cstr8_hash64(cstr8 str) -> u64`
-  - What it does: Performs cstr8 hash64
-  - Parameters:
-    - `str` (`cstr8`): Input parameter
-- `cstr8_to_upper(c8* str) -> void`
-  - What it does: Performs cstr8 to upper
-  - Parameters:
-    - `str` (`c8*`): Input parameter
-- `cstr8_to_lower(c8* str) -> void`
-  - What it does: Performs cstr8 to lower
-  - Parameters:
-    - `str` (`c8*`): Input parameter
-- `cstr8_trim(c8* str) -> void`
-  - What it does: Performs cstr8 trim
-  - Parameters:
-    - `str` (`c8*`): Input parameter
-- `cstr8_replace_char(c8* str, c8 from_chr, c8 to_chr) -> void`
-  - What it does: Performs cstr8 replace char
-  - Parameters:
-    - `str` (`c8*`): Input parameter
-    - `from_chr` (`c8`): Input parameter
-    - `to_chr` (`c8`): Input parameter
-- `cstr8_remove_char(c8* str, c8 chr) -> sz`
-  - What it does: Removes cstr8 remove char
-  - Parameters:
-    - `str` (`c8*`): Input parameter
-    - `chr` (`c8`): Input parameter
-- `cstr8_remove_whitespace(c8* str) -> sz`
-  - What it does: Removes cstr8 remove whitespace
-  - Parameters:
-    - `str` (`c8*`): Input parameter
-- `cstr8_remove_prefix(c8* str, cstr8 prefix) -> b32`
-  - What it does: Removes cstr8 remove prefix
-  - Parameters:
-    - `str` (`c8*`): Input parameter
-    - `prefix` (`cstr8`): Input parameter
-- `cstr8_remove_suffix(c8* str, cstr8 suffix) -> b32`
-  - What it does: Removes cstr8 remove suffix
-  - Parameters:
-    - `str` (`c8*`): Input parameter
-    - `suffix` (`cstr8`): Input parameter
-- `cstr8_replace(c8* str, sz str_cap, cstr8 from, cstr8 rep) -> sz`
-  - What it does: Performs cstr8 replace
-  - Parameters:
-    - `str` (`c8*`): Input parameter
-    - `str_cap` (`sz`): Input parameter
-    - `from` (`cstr8`): Input parameter
-    - `rep` (`cstr8`): Input parameter
-- `cstr8_common_prefix(cstr8 lhs, cstr8 rhs, c8* buf, sz buf_cap) -> sz`
-  - What it does: Performs cstr8 common prefix
-  - Parameters:
-    - `lhs` (`cstr8`): Input data used by the operation
-    - `rhs` (`cstr8`): Input data used by the operation
-    - `buf` (`c8*`): Input parameter
-    - `buf_cap` (`sz`): Input parameter
-- `cstr8_beautify(c8* str) -> void`
-  - What it does: Performs cstr8 beautify
-  - Parameters:
-    - `str` (`c8*`): Input parameter
-- `cstr8_to_i64(cstr8 str, i64* out) -> b32`
-  - What it does: Performs cstr8 to i64
-  - Parameters:
-    - `str` (`cstr8`): Input parameter
-    - `out` (`i64*`): Destination storage for output data
-- `cstr8_to_u64(cstr8 str, u64 max_value, u64* out) -> b32`
-  - What it does: Performs cstr8 to u64
-  - Parameters:
-    - `str` (`cstr8`): Input parameter
-    - `max_value` (`u64`): Input parameter
-    - `out` (`u64*`): Destination storage for output data
-- `cstr8_to_f64(cstr8 str, f64* out) -> b32`
-  - What it does: Performs cstr8 to f64
-  - Parameters:
-    - `str` (`cstr8`): Input parameter
-    - `out` (`f64*`): Destination storage for output data
-- `cstr16_len(cstr16 str) -> sz`
-  - What it does: Performs cstr16 len
-  - Parameters:
-    - `str` (`cstr16`): Input parameter
-- `cstr16_is_empty(cstr16 str) -> b32`
-  - What it does: Performs cstr16 is empty
-  - Parameters:
-    - `str` (`cstr16`): Input parameter
-- `cstr16_clear(c16* str) -> void`
-  - What it does: Performs cstr16 clear
-  - Parameters:
-    - `str` (`c16*`): Input parameter
-- `cstr16_cmp(cstr16 lhs, cstr16 rhs) -> b32`
-  - What it does: Performs cstr16 cmp
-  - Parameters:
-    - `lhs` (`cstr16`): Input data used by the operation
-    - `rhs` (`cstr16`): Input data used by the operation
-- `cstr16_cmp_n(cstr16 lhs, cstr16 rhs, sz cnt) -> b32`
-  - What it does: Performs cstr16 cmp n
-  - Parameters:
-    - `lhs` (`cstr16`): Input data used by the operation
-    - `rhs` (`cstr16`): Input data used by the operation
-    - `cnt` (`sz`): Input parameter
-- `cstr16_cmp_nocase(cstr16 lhs, cstr16 rhs) -> b32`
-  - What it does: Performs cstr16 cmp nocase
-  - Parameters:
-    - `lhs` (`cstr16`): Input data used by the operation
-    - `rhs` (`cstr16`): Input data used by the operation
-- `cstr16_cpy(c16* dst, sz dst_size, cstr16 src) -> sz`
-  - What it does: Performs cstr16 cpy
-  - Parameters:
-    - `dst` (`c16*`): Destination storage for output data
-    - `dst_size` (`sz`): Size or capacity value used by the operation
-    - `src` (`cstr16`): Input data used by the operation
-- `cstr16_cpy_n(c16* dst, sz dst_size, cstr16 src, sz cnt) -> sz`
-  - What it does: Performs cstr16 cpy n
-  - Parameters:
-    - `dst` (`c16*`): Destination storage for output data
-    - `dst_size` (`sz`): Size or capacity value used by the operation
-    - `src` (`cstr16`): Input data used by the operation
-    - `cnt` (`sz`): Input parameter
-- `cstr16_cat(c16* dst, sz dst_cap, cstr16 src) -> sz`
-  - What it does: Performs cstr16 cat
-  - Parameters:
-    - `dst` (`c16*`): Destination storage for output data
-    - `dst_cap` (`sz`): Input parameter
-    - `src` (`cstr16`): Input data used by the operation
-- `cstr16_append_char(c16* dst, sz dst_cap, c16 chr) -> sz`
-  - What it does: Performs cstr16 append char
-  - Parameters:
-    - `dst` (`c16*`): Destination storage for output data
-    - `dst_cap` (`sz`): Input parameter
-    - `chr` (`c16`): Input parameter
-- `cstr16_truncate(c16* str, sz length) -> void`
-  - What it does: Performs cstr16 truncate
-  - Parameters:
-    - `str` (`c16*`): Input parameter
-    - `length` (`sz`): Input parameter
-- `cstr16_find(cstr16 str, cstr16 sub) -> cstr16`
-  - What it does: Performs cstr16 find
-  - Parameters:
-    - `str` (`cstr16`): Input parameter
-    - `sub` (`cstr16`): Input parameter
-- `cstr16_find_last(cstr16 str, cstr16 sub) -> cstr16`
-  - What it does: Performs cstr16 find last
-  - Parameters:
-    - `str` (`cstr16`): Input parameter
-    - `sub` (`cstr16`): Input parameter
-- `cstr16_find_char(cstr16 str, c16 chr) -> cstr16`
-  - What it does: Performs cstr16 find char
-  - Parameters:
-    - `str` (`cstr16`): Input parameter
-    - `chr` (`c16`): Input parameter
-- `cstr16_find_last_char(cstr16 str, c16 chr) -> cstr16`
-  - What it does: Performs cstr16 find last char
-  - Parameters:
-    - `str` (`cstr16`): Input parameter
-    - `chr` (`c16`): Input parameter
-- `cstr16_count_char(cstr16 str, c16 chr) -> sz`
-  - What it does: Performs cstr16 count char
-  - Parameters:
-    - `str` (`cstr16`): Input parameter
-    - `chr` (`c16`): Input parameter
-- `cstr16_starts_with(cstr16 str, cstr16 prefix) -> b32`
-  - What it does: Performs cstr16 starts with
-  - Parameters:
-    - `str` (`cstr16`): Input parameter
-    - `prefix` (`cstr16`): Input parameter
-- `cstr16_ends_with(cstr16 str, cstr16 suffix) -> b32`
-  - What it does: Ends cstr16 ends with
-  - Parameters:
-    - `str` (`cstr16`): Input parameter
-    - `suffix` (`cstr16`): Input parameter
-- `cstr16_hash32(cstr16 str) -> u32`
-  - What it does: Performs cstr16 hash32
-  - Parameters:
-    - `str` (`cstr16`): Input parameter
-- `cstr16_hash64(cstr16 str) -> u64`
-  - What it does: Performs cstr16 hash64
-  - Parameters:
-    - `str` (`cstr16`): Input parameter
-- `cstr16_to_upper(c16* str) -> void`
-  - What it does: Performs cstr16 to upper
-  - Parameters:
-    - `str` (`c16*`): Input parameter
-- `cstr16_to_lower(c16* str) -> void`
-  - What it does: Performs cstr16 to lower
-  - Parameters:
-    - `str` (`c16*`): Input parameter
-- `cstr16_trim(c16* str) -> void`
-  - What it does: Performs cstr16 trim
-  - Parameters:
-    - `str` (`c16*`): Input parameter
-- `cstr16_replace_char(c16* str, c16 from_chr, c16 to_chr) -> void`
-  - What it does: Performs cstr16 replace char
-  - Parameters:
-    - `str` (`c16*`): Input parameter
-    - `from_chr` (`c16`): Input parameter
-    - `to_chr` (`c16`): Input parameter
-- `cstr16_remove_char(c16* str, c16 chr) -> sz`
-  - What it does: Removes cstr16 remove char
-  - Parameters:
-    - `str` (`c16*`): Input parameter
-    - `chr` (`c16`): Input parameter
-- `cstr16_remove_whitespace(c16* str) -> sz`
-  - What it does: Removes cstr16 remove whitespace
-  - Parameters:
-    - `str` (`c16*`): Input parameter
-- `cstr16_remove_prefix(c16* str, cstr16 prefix) -> b32`
-  - What it does: Removes cstr16 remove prefix
-  - Parameters:
-    - `str` (`c16*`): Input parameter
-    - `prefix` (`cstr16`): Input parameter
-- `cstr16_remove_suffix(c16* str, cstr16 suffix) -> b32`
-  - What it does: Removes cstr16 remove suffix
-  - Parameters:
-    - `str` (`c16*`): Input parameter
-    - `suffix` (`cstr16`): Input parameter
-- `cstr16_replace(c16* str, sz str_cap, cstr16 from, cstr16 rep) -> sz`
-  - What it does: Performs cstr16 replace
-  - Parameters:
-    - `str` (`c16*`): Input parameter
-    - `str_cap` (`sz`): Input parameter
-    - `from` (`cstr16`): Input parameter
-    - `rep` (`cstr16`): Input parameter
-- `cstr16_common_prefix(cstr16 lhs, cstr16 rhs, c16* buf, sz buf_cap) -> sz`
-  - What it does: Performs cstr16 common prefix
-  - Parameters:
-    - `lhs` (`cstr16`): Input data used by the operation
-    - `rhs` (`cstr16`): Input data used by the operation
-    - `buf` (`c16*`): Input parameter
-    - `buf_cap` (`sz`): Input parameter
-- `cstr16_beautify(c16* str) -> void`
-  - What it does: Performs cstr16 beautify
-  - Parameters:
-    - `str` (`c16*`): Input parameter
-- `cstr16_to_i64(cstr16 str, i64* out) -> b32`
-  - What it does: Performs cstr16 to i64
-  - Parameters:
-    - `str` (`cstr16`): Input parameter
-    - `out` (`i64*`): Destination storage for output data
-- `cstr16_to_f64(cstr16 str, f64* out) -> b32`
-  - What it does: Performs cstr16 to f64
-  - Parameters:
-    - `str` (`cstr16`): Input parameter
-    - `out` (`f64*`): Destination storage for output data
-- `cstr32_len(cstr32 str) -> sz`
-  - What it does: Performs cstr32 len
-  - Parameters:
-    - `str` (`cstr32`): Input parameter
-- `cstr32_is_empty(cstr32 str) -> b32`
-  - What it does: Performs cstr32 is empty
-  - Parameters:
-    - `str` (`cstr32`): Input parameter
-- `cstr32_clear(c32* str) -> void`
-  - What it does: Performs cstr32 clear
-  - Parameters:
-    - `str` (`c32*`): Input parameter
-- `cstr32_cmp(cstr32 lhs, cstr32 rhs) -> b32`
-  - What it does: Performs cstr32 cmp
-  - Parameters:
-    - `lhs` (`cstr32`): Input data used by the operation
-    - `rhs` (`cstr32`): Input data used by the operation
-- `cstr32_cmp_n(cstr32 lhs, cstr32 rhs, sz cnt) -> b32`
-  - What it does: Performs cstr32 cmp n
-  - Parameters:
-    - `lhs` (`cstr32`): Input data used by the operation
-    - `rhs` (`cstr32`): Input data used by the operation
-    - `cnt` (`sz`): Input parameter
-- `cstr32_cmp_nocase(cstr32 lhs, cstr32 rhs) -> b32`
-  - What it does: Performs cstr32 cmp nocase
-  - Parameters:
-    - `lhs` (`cstr32`): Input data used by the operation
-    - `rhs` (`cstr32`): Input data used by the operation
-- `cstr32_cpy(c32* dst, sz dst_size, cstr32 src) -> sz`
-  - What it does: Performs cstr32 cpy
-  - Parameters:
-    - `dst` (`c32*`): Destination storage for output data
-    - `dst_size` (`sz`): Size or capacity value used by the operation
-    - `src` (`cstr32`): Input data used by the operation
-- `cstr32_cpy_n(c32* dst, sz dst_size, cstr32 src, sz cnt) -> sz`
-  - What it does: Performs cstr32 cpy n
-  - Parameters:
-    - `dst` (`c32*`): Destination storage for output data
-    - `dst_size` (`sz`): Size or capacity value used by the operation
-    - `src` (`cstr32`): Input data used by the operation
-    - `cnt` (`sz`): Input parameter
-- `cstr32_cat(c32* dst, sz dst_cap, cstr32 src) -> sz`
-  - What it does: Performs cstr32 cat
-  - Parameters:
-    - `dst` (`c32*`): Destination storage for output data
-    - `dst_cap` (`sz`): Input parameter
-    - `src` (`cstr32`): Input data used by the operation
-- `cstr32_append_char(c32* dst, sz dst_cap, c32 chr) -> sz`
-  - What it does: Performs cstr32 append char
-  - Parameters:
-    - `dst` (`c32*`): Destination storage for output data
-    - `dst_cap` (`sz`): Input parameter
-    - `chr` (`c32`): Input parameter
-- `cstr32_truncate(c32* str, sz length) -> void`
-  - What it does: Performs cstr32 truncate
-  - Parameters:
-    - `str` (`c32*`): Input parameter
-    - `length` (`sz`): Input parameter
-- `cstr32_find(cstr32 str, cstr32 sub) -> cstr32`
-  - What it does: Performs cstr32 find
-  - Parameters:
-    - `str` (`cstr32`): Input parameter
-    - `sub` (`cstr32`): Input parameter
-- `cstr32_find_last(cstr32 str, cstr32 sub) -> cstr32`
-  - What it does: Performs cstr32 find last
-  - Parameters:
-    - `str` (`cstr32`): Input parameter
-    - `sub` (`cstr32`): Input parameter
-- `cstr32_find_char(cstr32 str, c32 chr) -> cstr32`
-  - What it does: Performs cstr32 find char
-  - Parameters:
-    - `str` (`cstr32`): Input parameter
-    - `chr` (`c32`): Input parameter
-- `cstr32_find_last_char(cstr32 str, c32 chr) -> cstr32`
-  - What it does: Performs cstr32 find last char
-  - Parameters:
-    - `str` (`cstr32`): Input parameter
-    - `chr` (`c32`): Input parameter
-- `cstr32_count_char(cstr32 str, c32 chr) -> sz`
-  - What it does: Performs cstr32 count char
-  - Parameters:
-    - `str` (`cstr32`): Input parameter
-    - `chr` (`c32`): Input parameter
-- `cstr32_starts_with(cstr32 str, cstr32 prefix) -> b32`
-  - What it does: Performs cstr32 starts with
-  - Parameters:
-    - `str` (`cstr32`): Input parameter
-    - `prefix` (`cstr32`): Input parameter
-- `cstr32_ends_with(cstr32 str, cstr32 suffix) -> b32`
-  - What it does: Ends cstr32 ends with
-  - Parameters:
-    - `str` (`cstr32`): Input parameter
-    - `suffix` (`cstr32`): Input parameter
-- `cstr32_hash32(cstr32 str) -> u32`
-  - What it does: Performs cstr32 hash32
-  - Parameters:
-    - `str` (`cstr32`): Input parameter
-- `cstr32_hash64(cstr32 str) -> u64`
-  - What it does: Performs cstr32 hash64
-  - Parameters:
-    - `str` (`cstr32`): Input parameter
-- `cstr32_to_upper(c32* str) -> void`
-  - What it does: Performs cstr32 to upper
-  - Parameters:
-    - `str` (`c32*`): Input parameter
-- `cstr32_to_lower(c32* str) -> void`
-  - What it does: Performs cstr32 to lower
-  - Parameters:
-    - `str` (`c32*`): Input parameter
-- `cstr32_trim(c32* str) -> void`
-  - What it does: Performs cstr32 trim
-  - Parameters:
-    - `str` (`c32*`): Input parameter
-- `cstr32_replace_char(c32* str, c32 from_chr, c32 to_chr) -> void`
-  - What it does: Performs cstr32 replace char
-  - Parameters:
-    - `str` (`c32*`): Input parameter
-    - `from_chr` (`c32`): Input parameter
-    - `to_chr` (`c32`): Input parameter
-- `cstr32_remove_char(c32* str, c32 chr) -> sz`
-  - What it does: Removes cstr32 remove char
-  - Parameters:
-    - `str` (`c32*`): Input parameter
-    - `chr` (`c32`): Input parameter
-- `cstr32_remove_whitespace(c32* str) -> sz`
-  - What it does: Removes cstr32 remove whitespace
-  - Parameters:
-    - `str` (`c32*`): Input parameter
-- `cstr32_remove_prefix(c32* str, cstr32 prefix) -> b32`
-  - What it does: Removes cstr32 remove prefix
-  - Parameters:
-    - `str` (`c32*`): Input parameter
-    - `prefix` (`cstr32`): Input parameter
-- `cstr32_remove_suffix(c32* str, cstr32 suffix) -> b32`
-  - What it does: Removes cstr32 remove suffix
-  - Parameters:
-    - `str` (`c32*`): Input parameter
-    - `suffix` (`cstr32`): Input parameter
-- `cstr32_replace(c32* str, sz str_cap, cstr32 from, cstr32 rep) -> sz`
-  - What it does: Performs cstr32 replace
-  - Parameters:
-    - `str` (`c32*`): Input parameter
-    - `str_cap` (`sz`): Input parameter
-    - `from` (`cstr32`): Input parameter
-    - `rep` (`cstr32`): Input parameter
-- `cstr32_common_prefix(cstr32 lhs, cstr32 rhs, c32* buf, sz buf_cap) -> sz`
-  - What it does: Performs cstr32 common prefix
-  - Parameters:
-    - `lhs` (`cstr32`): Input data used by the operation
-    - `rhs` (`cstr32`): Input data used by the operation
-    - `buf` (`c32*`): Input parameter
-    - `buf_cap` (`sz`): Input parameter
-- `cstr32_beautify(c32* str) -> void`
-  - What it does: Performs cstr32 beautify
-  - Parameters:
-    - `str` (`c32*`): Input parameter
-- `cstr32_to_i64(cstr32 str, i64* out) -> b32`
-  - What it does: Performs cstr32 to i64
-  - Parameters:
-    - `str` (`cstr32`): Input parameter
-    - `out` (`i64*`): Destination storage for output data
-- `cstr32_to_f64(cstr32 str, f64* out) -> b32`
-  - What it does: Performs cstr32 to f64
-  - Parameters:
-    - `str` (`cstr32`): Input parameter
-    - `out` (`f64*`): Destination storage for output data
-- `cstr8_to_cstr16(cstr8 src, c16* buf, sz buf_cap) -> sz`
-  - What it does: Performs cstr8 to cstr16
-  - Parameters:
-    - `src` (`cstr8`): Input data used by the operation
-    - `buf` (`c16*`): Input parameter
-    - `buf_cap` (`sz`): Input parameter
-- `cstr8_to_cstr32(cstr8 src, c32* buf, sz buf_cap) -> sz`
-  - What it does: Performs cstr8 to cstr32
-  - Parameters:
-    - `src` (`cstr8`): Input data used by the operation
-    - `buf` (`c32*`): Input parameter
-    - `buf_cap` (`sz`): Input parameter
-- `cstr16_to_cstr8(cstr16 src, c8* buf, sz buf_cap) -> sz`
-  - What it does: Performs cstr16 to cstr8
-  - Parameters:
-    - `src` (`cstr16`): Input data used by the operation
-    - `buf` (`c8*`): Input parameter
-    - `buf_cap` (`sz`): Input parameter
-- `cstr16_to_cstr32(cstr16 src, c32* buf, sz buf_cap) -> sz`
-  - What it does: Performs cstr16 to cstr32
-  - Parameters:
-    - `src` (`cstr16`): Input data used by the operation
-    - `buf` (`c32*`): Input parameter
-    - `buf_cap` (`sz`): Input parameter
-- `cstr32_to_cstr8(cstr32 src, c8* buf, sz buf_cap) -> sz`
-  - What it does: Performs cstr32 to cstr8
-  - Parameters:
-    - `src` (`cstr32`): Input data used by the operation
-    - `buf` (`c8*`): Input parameter
-    - `buf_cap` (`sz`): Input parameter
-- `cstr32_to_cstr16(cstr32 src, c16* buf, sz buf_cap) -> sz`
-  - What it does: Performs cstr32 to cstr16
-  - Parameters:
-    - `src` (`cstr32`): Input data used by the operation
-    - `buf` (`c16*`): Input parameter
-    - `buf_cap` (`sz`): Input parameter
+| Function | Declaration |
+| --- | --- |
+| `cstr8_len` | `func sz cstr8_len(cstr8 str);` |
+| `cstr8_is_empty` | `func b32 cstr8_is_empty(cstr8 str);` |
+| `cstr8_clear` | `func void cstr8_clear(c8* str);` |
+| `cstr8_cmp` | `func b32 cstr8_cmp(cstr8 lhs, cstr8 rhs);` |
+| `cstr8_cmp_n` | `func b32 cstr8_cmp_n(cstr8 lhs, cstr8 rhs, sz cnt);` |
+| `cstr8_cmp_nocase` | `func b32 cstr8_cmp_nocase(cstr8 lhs, cstr8 rhs);` |
+| `cstr8_cpy` | `func sz cstr8_cpy(c8* dst, sz dst_size, cstr8 src);` |
+| `cstr8_cpy_n` | `func sz cstr8_cpy_n(c8* dst, sz dst_size, cstr8 src, sz cnt);` |
+| `cstr8_cat` | `func sz cstr8_cat(c8* dst, sz dst_cap, cstr8 src);` |
+| `cstr8_append_char` | `func sz cstr8_append_char(c8* dst, sz dst_cap, c8 chr);` |
+| `cstr8_truncate` | `func void cstr8_truncate(c8* str, sz length);` |
+| `cstr8_format` | `func b32 cstr8_format(c8* dst, sz dst_cap, cstr8 fmt, ...);` |
+| `cstr8_vformat` | `func b32 cstr8_vformat(c8* dst, sz dst_cap, cstr8 fmt, va_list args);` |
+| `cstr8_append_format` | `func b32 cstr8_append_format(c8* dst, sz dst_cap, cstr8 fmt, ...);` |
+| `cstr8_append_vformat` | `func b32 cstr8_append_vformat(c8* dst, sz dst_cap, cstr8 fmt, va_list args);` |
+| `cstr8_scan` | `func b32 cstr8_scan(cstr8 str, cstr8 fmt, ...);` |
+| `cstr8_find` | `func cstr8 cstr8_find(cstr8 str, cstr8 sub);` |
+| `cstr8_find_last` | `func cstr8 cstr8_find_last(cstr8 str, cstr8 sub);` |
+| `cstr8_find_char` | `func cstr8 cstr8_find_char(cstr8 str, c8 chr);` |
+| `cstr8_find_last_char` | `func cstr8 cstr8_find_last_char(cstr8 str, c8 chr);` |
+| `cstr8_count_char` | `func sz cstr8_count_char(cstr8 str, c8 chr);` |
+| `cstr8_starts_with` | `func b32 cstr8_starts_with(cstr8 str, cstr8 prefix);` |
+| `cstr8_ends_with` | `func b32 cstr8_ends_with(cstr8 str, cstr8 suffix);` |
+| `cstr8_hash32` | `func u32 cstr8_hash32(cstr8 str);` |
+| `cstr8_hash64` | `func u64 cstr8_hash64(cstr8 str);` |
+| `cstr8_to_upper` | `func void cstr8_to_upper(c8* str);` |
+| `cstr8_to_lower` | `func void cstr8_to_lower(c8* str);` |
+| `cstr8_trim` | `func void cstr8_trim(c8* str);` |
+| `cstr8_replace_char` | `func void cstr8_replace_char(c8* str, c8 from_chr, c8 to_chr);` |
+| `cstr8_remove_char` | `func sz cstr8_remove_char(c8* str, c8 chr);` |
+| `cstr8_remove_whitespace` | `func sz cstr8_remove_whitespace(c8* str);` |
+| `cstr8_remove_prefix` | `func b32 cstr8_remove_prefix(c8* str, cstr8 prefix);` |
+| `cstr8_remove_suffix` | `func b32 cstr8_remove_suffix(c8* str, cstr8 suffix);` |
+| `cstr8_replace` | `func sz cstr8_replace(c8* str, sz str_cap, cstr8 from, cstr8 rep);` |
+| `cstr8_common_prefix` | `func sz cstr8_common_prefix(cstr8 lhs, cstr8 rhs, c8* buf, sz buf_cap);` |
+| `cstr8_beautify` | `func void cstr8_beautify(c8* str);` |
+| `cstr8_to_i64` | `func b32 cstr8_to_i64(cstr8 str, i64* out);` |
+| `cstr8_to_u64` | `func b32 cstr8_to_u64(cstr8 str, u64 max_value, u64* out);` |
+| `cstr8_to_f64` | `func b32 cstr8_to_f64(cstr8 str, f64* out);` |
+| `cstr16_len` | `func sz cstr16_len(cstr16 str);` |
+| `cstr16_is_empty` | `func b32 cstr16_is_empty(cstr16 str);` |
+| `cstr16_clear` | `func void cstr16_clear(c16* str);` |
+| `cstr16_cmp` | `func b32 cstr16_cmp(cstr16 lhs, cstr16 rhs);` |
+| `cstr16_cmp_n` | `func b32 cstr16_cmp_n(cstr16 lhs, cstr16 rhs, sz cnt);` |
+| `cstr16_cmp_nocase` | `func b32 cstr16_cmp_nocase(cstr16 lhs, cstr16 rhs);` |
+| `cstr16_cpy` | `func sz cstr16_cpy(c16* dst, sz dst_size, cstr16 src);` |
+| `cstr16_cpy_n` | `func sz cstr16_cpy_n(c16* dst, sz dst_size, cstr16 src, sz cnt);` |
+| `cstr16_cat` | `func sz cstr16_cat(c16* dst, sz dst_cap, cstr16 src);` |
+| `cstr16_append_char` | `func sz cstr16_append_char(c16* dst, sz dst_cap, c16 chr);` |
+| `cstr16_truncate` | `func void cstr16_truncate(c16* str, sz length);` |
+| `cstr16_find` | `func cstr16 cstr16_find(cstr16 str, cstr16 sub);` |
+| `cstr16_find_last` | `func cstr16 cstr16_find_last(cstr16 str, cstr16 sub);` |
+| `cstr16_find_char` | `func cstr16 cstr16_find_char(cstr16 str, c16 chr);` |
+| `cstr16_find_last_char` | `func cstr16 cstr16_find_last_char(cstr16 str, c16 chr);` |
+| `cstr16_count_char` | `func sz cstr16_count_char(cstr16 str, c16 chr);` |
+| `cstr16_starts_with` | `func b32 cstr16_starts_with(cstr16 str, cstr16 prefix);` |
+| `cstr16_ends_with` | `func b32 cstr16_ends_with(cstr16 str, cstr16 suffix);` |
+| `cstr16_hash32` | `func u32 cstr16_hash32(cstr16 str);` |
+| `cstr16_hash64` | `func u64 cstr16_hash64(cstr16 str);` |
+| `cstr16_to_upper` | `func void cstr16_to_upper(c16* str);` |
+| `cstr16_to_lower` | `func void cstr16_to_lower(c16* str);` |
+| `cstr16_trim` | `func void cstr16_trim(c16* str);` |
+| `cstr16_replace_char` | `func void cstr16_replace_char(c16* str, c16 from_chr, c16 to_chr);` |
+| `cstr16_remove_char` | `func sz cstr16_remove_char(c16* str, c16 chr);` |
+| `cstr16_remove_whitespace` | `func sz cstr16_remove_whitespace(c16* str);` |
+| `cstr16_remove_prefix` | `func b32 cstr16_remove_prefix(c16* str, cstr16 prefix);` |
+| `cstr16_remove_suffix` | `func b32 cstr16_remove_suffix(c16* str, cstr16 suffix);` |
+| `cstr16_replace` | `func sz cstr16_replace(c16* str, sz str_cap, cstr16 from, cstr16 rep);` |
+| `cstr16_common_prefix` | `func sz cstr16_common_prefix(cstr16 lhs, cstr16 rhs, c16* buf, sz buf_cap);` |
+| `cstr16_beautify` | `func void cstr16_beautify(c16* str);` |
+| `cstr16_to_i64` | `func b32 cstr16_to_i64(cstr16 str, i64* out);` |
+| `cstr16_to_f64` | `func b32 cstr16_to_f64(cstr16 str, f64* out);` |
+| `cstr32_len` | `func sz cstr32_len(cstr32 str);` |
+| `cstr32_is_empty` | `func b32 cstr32_is_empty(cstr32 str);` |
+| `cstr32_clear` | `func void cstr32_clear(c32* str);` |
+| `cstr32_cmp` | `func b32 cstr32_cmp(cstr32 lhs, cstr32 rhs);` |
+| `cstr32_cmp_n` | `func b32 cstr32_cmp_n(cstr32 lhs, cstr32 rhs, sz cnt);` |
+| `cstr32_cmp_nocase` | `func b32 cstr32_cmp_nocase(cstr32 lhs, cstr32 rhs);` |
+| `cstr32_cpy` | `func sz cstr32_cpy(c32* dst, sz dst_size, cstr32 src);` |
+| `cstr32_cpy_n` | `func sz cstr32_cpy_n(c32* dst, sz dst_size, cstr32 src, sz cnt);` |
+| `cstr32_cat` | `func sz cstr32_cat(c32* dst, sz dst_cap, cstr32 src);` |
+| `cstr32_append_char` | `func sz cstr32_append_char(c32* dst, sz dst_cap, c32 chr);` |
+| `cstr32_truncate` | `func void cstr32_truncate(c32* str, sz length);` |
+| `cstr32_find` | `func cstr32 cstr32_find(cstr32 str, cstr32 sub);` |
+| `cstr32_find_last` | `func cstr32 cstr32_find_last(cstr32 str, cstr32 sub);` |
+| `cstr32_find_char` | `func cstr32 cstr32_find_char(cstr32 str, c32 chr);` |
+| `cstr32_find_last_char` | `func cstr32 cstr32_find_last_char(cstr32 str, c32 chr);` |
+| `cstr32_count_char` | `func sz cstr32_count_char(cstr32 str, c32 chr);` |
+| `cstr32_starts_with` | `func b32 cstr32_starts_with(cstr32 str, cstr32 prefix);` |
+| `cstr32_ends_with` | `func b32 cstr32_ends_with(cstr32 str, cstr32 suffix);` |
+| `cstr32_hash32` | `func u32 cstr32_hash32(cstr32 str);` |
+| `cstr32_hash64` | `func u64 cstr32_hash64(cstr32 str);` |
+| `cstr32_to_upper` | `func void cstr32_to_upper(c32* str);` |
+| `cstr32_to_lower` | `func void cstr32_to_lower(c32* str);` |
+| `cstr32_trim` | `func void cstr32_trim(c32* str);` |
+| `cstr32_replace_char` | `func void cstr32_replace_char(c32* str, c32 from_chr, c32 to_chr);` |
+| `cstr32_remove_char` | `func sz cstr32_remove_char(c32* str, c32 chr);` |
+| `cstr32_remove_whitespace` | `func sz cstr32_remove_whitespace(c32* str);` |
+| `cstr32_remove_prefix` | `func b32 cstr32_remove_prefix(c32* str, cstr32 prefix);` |
+| `cstr32_remove_suffix` | `func b32 cstr32_remove_suffix(c32* str, cstr32 suffix);` |
+| `cstr32_replace` | `func sz cstr32_replace(c32* str, sz str_cap, cstr32 from, cstr32 rep);` |
+| `cstr32_common_prefix` | `func sz cstr32_common_prefix(cstr32 lhs, cstr32 rhs, c32* buf, sz buf_cap);` |
+| `cstr32_beautify` | `func void cstr32_beautify(c32* str);` |
+| `cstr32_to_i64` | `func b32 cstr32_to_i64(cstr32 str, i64* out);` |
+| `cstr32_to_f64` | `func b32 cstr32_to_f64(cstr32 str, f64* out);` |
+| `cstr8_to_cstr16` | `func sz cstr8_to_cstr16(cstr8 src, c16* buf, sz buf_cap);` |
+| `cstr8_to_cstr32` | `func sz cstr8_to_cstr32(cstr8 src, c32* buf, sz buf_cap);` |
+| `cstr16_to_cstr8` | `func sz cstr16_to_cstr8(cstr16 src, c8* buf, sz buf_cap);` |
+| `cstr16_to_cstr32` | `func sz cstr16_to_cstr32(cstr16 src, c32* buf, sz buf_cap);` |
+| `cstr32_to_cstr8` | `func sz cstr32_to_cstr8(cstr32 src, c8* buf, sz buf_cap);` |
+| `cstr32_to_cstr16` | `func sz cstr32_to_cstr16(cstr32 src, c16* buf, sz buf_cap);` |
+
+#### Macros
+
+| Macro | Form |
+| --- | --- |
+| `STR_CAP_TINY` | `STR_CAP_TINY` |
+| `STR_CAP_SHORT` | `STR_CAP_SHORT` |
+| `STR_CAP_MEDIUM` | `STR_CAP_MEDIUM` |
+| `STR_CAP_LONG` | `STR_CAP_LONG` |
+| `STR_CAP_LARGE` | `STR_CAP_LARGE` |
 
 ### `strings/strings.h`
 
 - Types: **3**
 - Functions: **107**
+- Macros: **0**
 
 #### Types
 
-- `str8` (struct)
-  - What it represents: Represents `str8` data grouped in a struct
-  - Members:
-    - `size`: `sz`
-    - `cap`: `sz`
-    - `ptr`: `c8*`
-- `str16` (struct)
-  - What it represents: Represents `str16` data grouped in a struct
-  - Members:
-    - `size`: `sz`
-    - `cap`: `sz`
-    - `ptr`: `c16*`
-- `str32` (struct)
-  - What it represents: Represents `str32` data grouped in a struct
-  - Members:
-    - `size`: `sz`
-    - `cap`: `sz`
-    - `ptr`: `c32*`
+| Type | Declaration |
+| --- | --- |
+| `str8` | `typedef struct str8 { ... } str8;` |
+| `str16` | `typedef struct str16 { ... } str16;` |
+| `str32` | `typedef struct str32 { ... } str32;` |
 
 #### Functions
 
-- `str8_make(c8* ptr, sz cap) -> str8`
-  - What it does: Performs str8 make
-  - Parameters:
-    - `ptr` (`c8*`): Input data used by the operation
-    - `cap` (`sz`): Input parameter
-- `str8_empty(c8* ptr, sz cap) -> str8`
-  - What it does: Performs str8 empty
-  - Parameters:
-    - `ptr` (`c8*`): Input data used by the operation
-    - `cap` (`sz`): Input parameter
-- `str8_from_cstr(c8* ptr, sz cap, cstr8 src) -> str8`
-  - What it does: Performs str8 from cstr
-  - Parameters:
-    - `ptr` (`c8*`): Input data used by the operation
-    - `cap` (`sz`): Input parameter
-    - `src` (`cstr8`): Input data used by the operation
-- `str8_is_empty(str8 str) -> b32`
-  - What it does: Performs str8 is empty
-  - Parameters:
-    - `str` (`str8`): Input parameter
-- `str8_cmp(str8 lhs, str8 rhs) -> b32`
-  - What it does: Performs str8 cmp
-  - Parameters:
-    - `lhs` (`str8`): Input data used by the operation
-    - `rhs` (`str8`): Input data used by the operation
-- `str8_cmp_nocase(str8 lhs, str8 rhs) -> b32`
-  - What it does: Performs str8 cmp nocase
-  - Parameters:
-    - `lhs` (`str8`): Input data used by the operation
-    - `rhs` (`str8`): Input data used by the operation
-- `str8_find(str8 str, cstr8 sub) -> cstr8`
-  - What it does: Performs str8 find
-  - Parameters:
-    - `str` (`str8`): Input parameter
-    - `sub` (`cstr8`): Input parameter
-- `str8_find_char(str8 str, c8 chr) -> cstr8`
-  - What it does: Performs str8 find char
-  - Parameters:
-    - `str` (`str8`): Input parameter
-    - `chr` (`c8`): Input parameter
-- `str8_find_last(str8 str, cstr8 sub) -> cstr8`
-  - What it does: Performs str8 find last
-  - Parameters:
-    - `str` (`str8`): Input parameter
-    - `sub` (`cstr8`): Input parameter
-- `str8_find_last_char(str8 str, c8 chr) -> cstr8`
-  - What it does: Performs str8 find last char
-  - Parameters:
-    - `str` (`str8`): Input parameter
-    - `chr` (`c8`): Input parameter
-- `str8_count_char(str8 str, c8 chr) -> sz`
-  - What it does: Performs str8 count char
-  - Parameters:
-    - `str` (`str8`): Input parameter
-    - `chr` (`c8`): Input parameter
-- `str8_starts_with(str8 str, cstr8 prefix) -> b32`
-  - What it does: Performs str8 starts with
-  - Parameters:
-    - `str` (`str8`): Input parameter
-    - `prefix` (`cstr8`): Input parameter
-- `str8_ends_with(str8 str, cstr8 suffix) -> b32`
-  - What it does: Ends str8 ends with
-  - Parameters:
-    - `str` (`str8`): Input parameter
-    - `suffix` (`cstr8`): Input parameter
-- `str8_hash32(str8 str) -> u32`
-  - What it does: Performs str8 hash32
-  - Parameters:
-    - `str` (`str8`): Input parameter
-- `str8_hash64(str8 str) -> u64`
-  - What it does: Performs str8 hash64
-  - Parameters:
-    - `str` (`str8`): Input parameter
-- `str8_to_i64(str8 str, i64* out) -> b32`
-  - What it does: Performs str8 to i64
-  - Parameters:
-    - `str` (`str8`): Input parameter
-    - `out` (`i64*`): Destination storage for output data
-- `str8_to_u64(str8 str, u64 max_value, u64* out) -> b32`
-  - What it does: Performs str8 to u64
-  - Parameters:
-    - `str` (`str8`): Input parameter
-    - `max_value` (`u64`): Input parameter
-    - `out` (`u64*`): Destination storage for output data
-- `str8_to_f64(str8 str, f64* out) -> b32`
-  - What it does: Performs str8 to f64
-  - Parameters:
-    - `str` (`str8`): Input parameter
-    - `out` (`f64*`): Destination storage for output data
-- `str8_clear(str8* str) -> void`
-  - What it does: Performs str8 clear
-  - Parameters:
-    - `str` (`str8*`): Input parameter
-- `str8_cpy(str8* str, cstr8 src) -> sz`
-  - What it does: Performs str8 cpy
-  - Parameters:
-    - `str` (`str8*`): Input parameter
-    - `src` (`cstr8`): Input data used by the operation
-- `str8_cat(str8* str, cstr8 src) -> sz`
-  - What it does: Performs str8 cat
-  - Parameters:
-    - `str` (`str8*`): Input parameter
-    - `src` (`cstr8`): Input data used by the operation
-- `str8_append_char(str8* str, c8 chr) -> sz`
-  - What it does: Performs str8 append char
-  - Parameters:
-    - `str` (`str8*`): Input parameter
-    - `chr` (`c8`): Input parameter
-- `str8_truncate(str8* str, sz length) -> void`
-  - What it does: Performs str8 truncate
-  - Parameters:
-    - `str` (`str8*`): Input parameter
-    - `length` (`sz`): Input parameter
-- `str8_format(str8* str, cstr8 fmt, ...) -> b32`
-  - What it does: Performs str8 format
-  - Parameters:
-    - `str` (`str8*`): Input parameter
-    - `fmt` (`cstr8`): Input parameter
-    - `...` (`variadic`): Additional variadic arguments
-- `str8_vformat(str8* str, cstr8 fmt, va_list args) -> b32`
-  - What it does: Performs str8 vformat
-  - Parameters:
-    - `str` (`str8*`): Input parameter
-    - `fmt` (`cstr8`): Input parameter
-    - `args` (`va_list`): Input parameter
-- `str8_append_format(str8* str, cstr8 fmt, ...) -> b32`
-  - What it does: Performs str8 append format
-  - Parameters:
-    - `str` (`str8*`): Input parameter
-    - `fmt` (`cstr8`): Input parameter
-    - `...` (`variadic`): Additional variadic arguments
-- `str8_append_vformat(str8* str, cstr8 fmt, va_list args) -> b32`
-  - What it does: Performs str8 append vformat
-  - Parameters:
-    - `str` (`str8*`): Input parameter
-    - `fmt` (`cstr8`): Input parameter
-    - `args` (`va_list`): Input parameter
-- `str8_to_upper(str8* str) -> void`
-  - What it does: Performs str8 to upper
-  - Parameters:
-    - `str` (`str8*`): Input parameter
-- `str8_to_lower(str8* str) -> void`
-  - What it does: Performs str8 to lower
-  - Parameters:
-    - `str` (`str8*`): Input parameter
-- `str8_trim(str8* str) -> void`
-  - What it does: Performs str8 trim
-  - Parameters:
-    - `str` (`str8*`): Input parameter
-- `str8_replace_char(str8* str, c8 from_chr, c8 to_chr) -> void`
-  - What it does: Performs str8 replace char
-  - Parameters:
-    - `str` (`str8*`): Input parameter
-    - `from_chr` (`c8`): Input parameter
-    - `to_chr` (`c8`): Input parameter
-- `str8_remove_char(str8* str, c8 chr) -> sz`
-  - What it does: Removes str8 remove char
-  - Parameters:
-    - `str` (`str8*`): Input parameter
-    - `chr` (`c8`): Input parameter
-- `str8_remove_whitespace(str8* str) -> sz`
-  - What it does: Removes str8 remove whitespace
-  - Parameters:
-    - `str` (`str8*`): Input parameter
-- `str8_remove_prefix(str8* str, cstr8 prefix) -> b32`
-  - What it does: Removes str8 remove prefix
-  - Parameters:
-    - `str` (`str8*`): Input parameter
-    - `prefix` (`cstr8`): Input parameter
-- `str8_remove_suffix(str8* str, cstr8 suffix) -> b32`
-  - What it does: Removes str8 remove suffix
-  - Parameters:
-    - `str` (`str8*`): Input parameter
-    - `suffix` (`cstr8`): Input parameter
-- `str8_replace(str8* str, cstr8 from, cstr8 rep) -> sz`
-  - What it does: Performs str8 replace
-  - Parameters:
-    - `str` (`str8*`): Input parameter
-    - `from` (`cstr8`): Input parameter
-    - `rep` (`cstr8`): Input parameter
-- `str8_beautify(str8* str) -> void`
-  - What it does: Performs str8 beautify
-  - Parameters:
-    - `str` (`str8*`): Input parameter
-- `str16_make(c16* ptr, sz cap) -> str16`
-  - What it does: Performs str16 make
-  - Parameters:
-    - `ptr` (`c16*`): Input data used by the operation
-    - `cap` (`sz`): Input parameter
-- `str16_empty(c16* ptr, sz cap) -> str16`
-  - What it does: Performs str16 empty
-  - Parameters:
-    - `ptr` (`c16*`): Input data used by the operation
-    - `cap` (`sz`): Input parameter
-- `str16_from_cstr(c16* ptr, sz cap, cstr16 src) -> str16`
-  - What it does: Performs str16 from cstr
-  - Parameters:
-    - `ptr` (`c16*`): Input data used by the operation
-    - `cap` (`sz`): Input parameter
-    - `src` (`cstr16`): Input data used by the operation
-- `str16_is_empty(str16 str) -> b32`
-  - What it does: Performs str16 is empty
-  - Parameters:
-    - `str` (`str16`): Input parameter
-- `str16_cmp(str16 lhs, str16 rhs) -> b32`
-  - What it does: Performs str16 cmp
-  - Parameters:
-    - `lhs` (`str16`): Input data used by the operation
-    - `rhs` (`str16`): Input data used by the operation
-- `str16_cmp_nocase(str16 lhs, str16 rhs) -> b32`
-  - What it does: Performs str16 cmp nocase
-  - Parameters:
-    - `lhs` (`str16`): Input data used by the operation
-    - `rhs` (`str16`): Input data used by the operation
-- `str16_find(str16 str, cstr16 sub) -> cstr16`
-  - What it does: Performs str16 find
-  - Parameters:
-    - `str` (`str16`): Input parameter
-    - `sub` (`cstr16`): Input parameter
-- `str16_find_char(str16 str, c16 chr) -> cstr16`
-  - What it does: Performs str16 find char
-  - Parameters:
-    - `str` (`str16`): Input parameter
-    - `chr` (`c16`): Input parameter
-- `str16_find_last(str16 str, cstr16 sub) -> cstr16`
-  - What it does: Performs str16 find last
-  - Parameters:
-    - `str` (`str16`): Input parameter
-    - `sub` (`cstr16`): Input parameter
-- `str16_find_last_char(str16 str, c16 chr) -> cstr16`
-  - What it does: Performs str16 find last char
-  - Parameters:
-    - `str` (`str16`): Input parameter
-    - `chr` (`c16`): Input parameter
-- `str16_count_char(str16 str, c16 chr) -> sz`
-  - What it does: Performs str16 count char
-  - Parameters:
-    - `str` (`str16`): Input parameter
-    - `chr` (`c16`): Input parameter
-- `str16_starts_with(str16 str, cstr16 prefix) -> b32`
-  - What it does: Performs str16 starts with
-  - Parameters:
-    - `str` (`str16`): Input parameter
-    - `prefix` (`cstr16`): Input parameter
-- `str16_ends_with(str16 str, cstr16 suffix) -> b32`
-  - What it does: Ends str16 ends with
-  - Parameters:
-    - `str` (`str16`): Input parameter
-    - `suffix` (`cstr16`): Input parameter
-- `str16_hash32(str16 str) -> u32`
-  - What it does: Performs str16 hash32
-  - Parameters:
-    - `str` (`str16`): Input parameter
-- `str16_hash64(str16 str) -> u64`
-  - What it does: Performs str16 hash64
-  - Parameters:
-    - `str` (`str16`): Input parameter
-- `str16_to_i64(str16 str, i64* out) -> b32`
-  - What it does: Performs str16 to i64
-  - Parameters:
-    - `str` (`str16`): Input parameter
-    - `out` (`i64*`): Destination storage for output data
-- `str16_to_f64(str16 str, f64* out) -> b32`
-  - What it does: Performs str16 to f64
-  - Parameters:
-    - `str` (`str16`): Input parameter
-    - `out` (`f64*`): Destination storage for output data
-- `str16_clear(str16* str) -> void`
-  - What it does: Performs str16 clear
-  - Parameters:
-    - `str` (`str16*`): Input parameter
-- `str16_cpy(str16* str, cstr16 src) -> sz`
-  - What it does: Performs str16 cpy
-  - Parameters:
-    - `str` (`str16*`): Input parameter
-    - `src` (`cstr16`): Input data used by the operation
-- `str16_cat(str16* str, cstr16 src) -> sz`
-  - What it does: Performs str16 cat
-  - Parameters:
-    - `str` (`str16*`): Input parameter
-    - `src` (`cstr16`): Input data used by the operation
-- `str16_append_char(str16* str, c16 chr) -> sz`
-  - What it does: Performs str16 append char
-  - Parameters:
-    - `str` (`str16*`): Input parameter
-    - `chr` (`c16`): Input parameter
-- `str16_truncate(str16* str, sz length) -> void`
-  - What it does: Performs str16 truncate
-  - Parameters:
-    - `str` (`str16*`): Input parameter
-    - `length` (`sz`): Input parameter
-- `str16_to_upper(str16* str) -> void`
-  - What it does: Performs str16 to upper
-  - Parameters:
-    - `str` (`str16*`): Input parameter
-- `str16_to_lower(str16* str) -> void`
-  - What it does: Performs str16 to lower
-  - Parameters:
-    - `str` (`str16*`): Input parameter
-- `str16_trim(str16* str) -> void`
-  - What it does: Performs str16 trim
-  - Parameters:
-    - `str` (`str16*`): Input parameter
-- `str16_replace_char(str16* str, c16 from_chr, c16 to_chr) -> void`
-  - What it does: Performs str16 replace char
-  - Parameters:
-    - `str` (`str16*`): Input parameter
-    - `from_chr` (`c16`): Input parameter
-    - `to_chr` (`c16`): Input parameter
-- `str16_remove_char(str16* str, c16 chr) -> sz`
-  - What it does: Removes str16 remove char
-  - Parameters:
-    - `str` (`str16*`): Input parameter
-    - `chr` (`c16`): Input parameter
-- `str16_remove_whitespace(str16* str) -> sz`
-  - What it does: Removes str16 remove whitespace
-  - Parameters:
-    - `str` (`str16*`): Input parameter
-- `str16_remove_prefix(str16* str, cstr16 prefix) -> b32`
-  - What it does: Removes str16 remove prefix
-  - Parameters:
-    - `str` (`str16*`): Input parameter
-    - `prefix` (`cstr16`): Input parameter
-- `str16_remove_suffix(str16* str, cstr16 suffix) -> b32`
-  - What it does: Removes str16 remove suffix
-  - Parameters:
-    - `str` (`str16*`): Input parameter
-    - `suffix` (`cstr16`): Input parameter
-- `str16_replace(str16* str, cstr16 from, cstr16 rep) -> sz`
-  - What it does: Performs str16 replace
-  - Parameters:
-    - `str` (`str16*`): Input parameter
-    - `from` (`cstr16`): Input parameter
-    - `rep` (`cstr16`): Input parameter
-- `str16_beautify(str16* str) -> void`
-  - What it does: Performs str16 beautify
-  - Parameters:
-    - `str` (`str16*`): Input parameter
-- `str32_make(c32* ptr, sz cap) -> str32`
-  - What it does: Performs str32 make
-  - Parameters:
-    - `ptr` (`c32*`): Input data used by the operation
-    - `cap` (`sz`): Input parameter
-- `str32_empty(c32* ptr, sz cap) -> str32`
-  - What it does: Performs str32 empty
-  - Parameters:
-    - `ptr` (`c32*`): Input data used by the operation
-    - `cap` (`sz`): Input parameter
-- `str32_from_cstr(c32* ptr, sz cap, cstr32 src) -> str32`
-  - What it does: Performs str32 from cstr
-  - Parameters:
-    - `ptr` (`c32*`): Input data used by the operation
-    - `cap` (`sz`): Input parameter
-    - `src` (`cstr32`): Input data used by the operation
-- `str32_is_empty(str32 str) -> b32`
-  - What it does: Performs str32 is empty
-  - Parameters:
-    - `str` (`str32`): Input parameter
-- `str32_cmp(str32 lhs, str32 rhs) -> b32`
-  - What it does: Performs str32 cmp
-  - Parameters:
-    - `lhs` (`str32`): Input data used by the operation
-    - `rhs` (`str32`): Input data used by the operation
-- `str32_cmp_nocase(str32 lhs, str32 rhs) -> b32`
-  - What it does: Performs str32 cmp nocase
-  - Parameters:
-    - `lhs` (`str32`): Input data used by the operation
-    - `rhs` (`str32`): Input data used by the operation
-- `str32_find(str32 str, cstr32 sub) -> cstr32`
-  - What it does: Performs str32 find
-  - Parameters:
-    - `str` (`str32`): Input parameter
-    - `sub` (`cstr32`): Input parameter
-- `str32_find_char(str32 str, c32 chr) -> cstr32`
-  - What it does: Performs str32 find char
-  - Parameters:
-    - `str` (`str32`): Input parameter
-    - `chr` (`c32`): Input parameter
-- `str32_find_last(str32 str, cstr32 sub) -> cstr32`
-  - What it does: Performs str32 find last
-  - Parameters:
-    - `str` (`str32`): Input parameter
-    - `sub` (`cstr32`): Input parameter
-- `str32_find_last_char(str32 str, c32 chr) -> cstr32`
-  - What it does: Performs str32 find last char
-  - Parameters:
-    - `str` (`str32`): Input parameter
-    - `chr` (`c32`): Input parameter
-- `str32_count_char(str32 str, c32 chr) -> sz`
-  - What it does: Performs str32 count char
-  - Parameters:
-    - `str` (`str32`): Input parameter
-    - `chr` (`c32`): Input parameter
-- `str32_starts_with(str32 str, cstr32 prefix) -> b32`
-  - What it does: Performs str32 starts with
-  - Parameters:
-    - `str` (`str32`): Input parameter
-    - `prefix` (`cstr32`): Input parameter
-- `str32_ends_with(str32 str, cstr32 suffix) -> b32`
-  - What it does: Ends str32 ends with
-  - Parameters:
-    - `str` (`str32`): Input parameter
-    - `suffix` (`cstr32`): Input parameter
-- `str32_hash32(str32 str) -> u32`
-  - What it does: Performs str32 hash32
-  - Parameters:
-    - `str` (`str32`): Input parameter
-- `str32_hash64(str32 str) -> u64`
-  - What it does: Performs str32 hash64
-  - Parameters:
-    - `str` (`str32`): Input parameter
-- `str32_to_i64(str32 str, i64* out) -> b32`
-  - What it does: Performs str32 to i64
-  - Parameters:
-    - `str` (`str32`): Input parameter
-    - `out` (`i64*`): Destination storage for output data
-- `str32_to_f64(str32 str, f64* out) -> b32`
-  - What it does: Performs str32 to f64
-  - Parameters:
-    - `str` (`str32`): Input parameter
-    - `out` (`f64*`): Destination storage for output data
-- `str32_clear(str32* str) -> void`
-  - What it does: Performs str32 clear
-  - Parameters:
-    - `str` (`str32*`): Input parameter
-- `str32_cpy(str32* str, cstr32 src) -> sz`
-  - What it does: Performs str32 cpy
-  - Parameters:
-    - `str` (`str32*`): Input parameter
-    - `src` (`cstr32`): Input data used by the operation
-- `str32_cat(str32* str, cstr32 src) -> sz`
-  - What it does: Performs str32 cat
-  - Parameters:
-    - `str` (`str32*`): Input parameter
-    - `src` (`cstr32`): Input data used by the operation
-- `str32_append_char(str32* str, c32 chr) -> sz`
-  - What it does: Performs str32 append char
-  - Parameters:
-    - `str` (`str32*`): Input parameter
-    - `chr` (`c32`): Input parameter
-- `str32_truncate(str32* str, sz length) -> void`
-  - What it does: Performs str32 truncate
-  - Parameters:
-    - `str` (`str32*`): Input parameter
-    - `length` (`sz`): Input parameter
-- `str32_to_upper(str32* str) -> void`
-  - What it does: Performs str32 to upper
-  - Parameters:
-    - `str` (`str32*`): Input parameter
-- `str32_to_lower(str32* str) -> void`
-  - What it does: Performs str32 to lower
-  - Parameters:
-    - `str` (`str32*`): Input parameter
-- `str32_trim(str32* str) -> void`
-  - What it does: Performs str32 trim
-  - Parameters:
-    - `str` (`str32*`): Input parameter
-- `str32_replace_char(str32* str, c32 from_chr, c32 to_chr) -> void`
-  - What it does: Performs str32 replace char
-  - Parameters:
-    - `str` (`str32*`): Input parameter
-    - `from_chr` (`c32`): Input parameter
-    - `to_chr` (`c32`): Input parameter
-- `str32_remove_char(str32* str, c32 chr) -> sz`
-  - What it does: Removes str32 remove char
-  - Parameters:
-    - `str` (`str32*`): Input parameter
-    - `chr` (`c32`): Input parameter
-- `str32_remove_whitespace(str32* str) -> sz`
-  - What it does: Removes str32 remove whitespace
-  - Parameters:
-    - `str` (`str32*`): Input parameter
-- `str32_remove_prefix(str32* str, cstr32 prefix) -> b32`
-  - What it does: Removes str32 remove prefix
-  - Parameters:
-    - `str` (`str32*`): Input parameter
-    - `prefix` (`cstr32`): Input parameter
-- `str32_remove_suffix(str32* str, cstr32 suffix) -> b32`
-  - What it does: Removes str32 remove suffix
-  - Parameters:
-    - `str` (`str32*`): Input parameter
-    - `suffix` (`cstr32`): Input parameter
-- `str32_replace(str32* str, cstr32 from, cstr32 rep) -> sz`
-  - What it does: Performs str32 replace
-  - Parameters:
-    - `str` (`str32*`): Input parameter
-    - `from` (`cstr32`): Input parameter
-    - `rep` (`cstr32`): Input parameter
-- `str32_beautify(str32* str) -> void`
-  - What it does: Performs str32 beautify
-  - Parameters:
-    - `str` (`str32*`): Input parameter
-- `str8_to_str16(str8 src, str16* dst) -> sz`
-  - What it does: Performs str8 to str16
-  - Parameters:
-    - `src` (`str8`): Input data used by the operation
-    - `dst` (`str16*`): Destination storage for output data
-- `str8_to_str32(str8 src, str32* dst) -> sz`
-  - What it does: Performs str8 to str32
-  - Parameters:
-    - `src` (`str8`): Input data used by the operation
-    - `dst` (`str32*`): Destination storage for output data
-- `str16_to_str8(str16 src, str8* dst) -> sz`
-  - What it does: Performs str16 to str8
-  - Parameters:
-    - `src` (`str16`): Input data used by the operation
-    - `dst` (`str8*`): Destination storage for output data
-- `str16_to_str32(str16 src, str32* dst) -> sz`
-  - What it does: Performs str16 to str32
-  - Parameters:
-    - `src` (`str16`): Input data used by the operation
-    - `dst` (`str32*`): Destination storage for output data
-- `str32_to_str8(str32 src, str8* dst) -> sz`
-  - What it does: Performs str32 to str8
-  - Parameters:
-    - `src` (`str32`): Input data used by the operation
-    - `dst` (`str8*`): Destination storage for output data
-- `str32_to_str16(str32 src, str16* dst) -> sz`
-  - What it does: Performs str32 to str16
-  - Parameters:
-    - `src` (`str32`): Input data used by the operation
-    - `dst` (`str16*`): Destination storage for output data
+| Function | Declaration |
+| --- | --- |
+| `str8_make` | `func str8 str8_make(c8* ptr, sz cap);` |
+| `str8_empty` | `func str8 str8_empty(c8* ptr, sz cap);` |
+| `str8_from_cstr` | `func str8 str8_from_cstr(c8* ptr, sz cap, cstr8 src);` |
+| `str8_is_empty` | `func b32 str8_is_empty(str8 str);` |
+| `str8_cmp` | `func b32 str8_cmp(str8 lhs, str8 rhs);` |
+| `str8_cmp_nocase` | `func b32 str8_cmp_nocase(str8 lhs, str8 rhs);` |
+| `str8_find` | `func cstr8 str8_find(str8 str, cstr8 sub);` |
+| `str8_find_char` | `func cstr8 str8_find_char(str8 str, c8 chr);` |
+| `str8_find_last` | `func cstr8 str8_find_last(str8 str, cstr8 sub);` |
+| `str8_find_last_char` | `func cstr8 str8_find_last_char(str8 str, c8 chr);` |
+| `str8_count_char` | `func sz str8_count_char(str8 str, c8 chr);` |
+| `str8_starts_with` | `func b32 str8_starts_with(str8 str, cstr8 prefix);` |
+| `str8_ends_with` | `func b32 str8_ends_with(str8 str, cstr8 suffix);` |
+| `str8_hash32` | `func u32 str8_hash32(str8 str);` |
+| `str8_hash64` | `func u64 str8_hash64(str8 str);` |
+| `str8_to_i64` | `func b32 str8_to_i64(str8 str, i64* out);` |
+| `str8_to_u64` | `func b32 str8_to_u64(str8 str, u64 max_value, u64* out);` |
+| `str8_to_f64` | `func b32 str8_to_f64(str8 str, f64* out);` |
+| `str8_clear` | `func void str8_clear(str8* str);` |
+| `str8_cpy` | `func sz str8_cpy(str8* str, cstr8 src);` |
+| `str8_cat` | `func sz str8_cat(str8* str, cstr8 src);` |
+| `str8_append_char` | `func sz str8_append_char(str8* str, c8 chr);` |
+| `str8_truncate` | `func void str8_truncate(str8* str, sz length);` |
+| `str8_format` | `func b32 str8_format(str8* str, cstr8 fmt, ...);` |
+| `str8_vformat` | `func b32 str8_vformat(str8* str, cstr8 fmt, va_list args);` |
+| `str8_append_format` | `func b32 str8_append_format(str8* str, cstr8 fmt, ...);` |
+| `str8_append_vformat` | `func b32 str8_append_vformat(str8* str, cstr8 fmt, va_list args);` |
+| `str8_to_upper` | `func void str8_to_upper(str8* str);` |
+| `str8_to_lower` | `func void str8_to_lower(str8* str);` |
+| `str8_trim` | `func void str8_trim(str8* str);` |
+| `str8_replace_char` | `func void str8_replace_char(str8* str, c8 from_chr, c8 to_chr);` |
+| `str8_remove_char` | `func sz str8_remove_char(str8* str, c8 chr);` |
+| `str8_remove_whitespace` | `func sz str8_remove_whitespace(str8* str);` |
+| `str8_remove_prefix` | `func b32 str8_remove_prefix(str8* str, cstr8 prefix);` |
+| `str8_remove_suffix` | `func b32 str8_remove_suffix(str8* str, cstr8 suffix);` |
+| `str8_replace` | `func sz str8_replace(str8* str, cstr8 from, cstr8 rep);` |
+| `str8_beautify` | `func void str8_beautify(str8* str);` |
+| `str16_make` | `func str16 str16_make(c16* ptr, sz cap);` |
+| `str16_empty` | `func str16 str16_empty(c16* ptr, sz cap);` |
+| `str16_from_cstr` | `func str16 str16_from_cstr(c16* ptr, sz cap, cstr16 src);` |
+| `str16_is_empty` | `func b32 str16_is_empty(str16 str);` |
+| `str16_cmp` | `func b32 str16_cmp(str16 lhs, str16 rhs);` |
+| `str16_cmp_nocase` | `func b32 str16_cmp_nocase(str16 lhs, str16 rhs);` |
+| `str16_find` | `func cstr16 str16_find(str16 str, cstr16 sub);` |
+| `str16_find_char` | `func cstr16 str16_find_char(str16 str, c16 chr);` |
+| `str16_find_last` | `func cstr16 str16_find_last(str16 str, cstr16 sub);` |
+| `str16_find_last_char` | `func cstr16 str16_find_last_char(str16 str, c16 chr);` |
+| `str16_count_char` | `func sz str16_count_char(str16 str, c16 chr);` |
+| `str16_starts_with` | `func b32 str16_starts_with(str16 str, cstr16 prefix);` |
+| `str16_ends_with` | `func b32 str16_ends_with(str16 str, cstr16 suffix);` |
+| `str16_hash32` | `func u32 str16_hash32(str16 str);` |
+| `str16_hash64` | `func u64 str16_hash64(str16 str);` |
+| `str16_to_i64` | `func b32 str16_to_i64(str16 str, i64* out);` |
+| `str16_to_f64` | `func b32 str16_to_f64(str16 str, f64* out);` |
+| `str16_clear` | `func void str16_clear(str16* str);` |
+| `str16_cpy` | `func sz str16_cpy(str16* str, cstr16 src);` |
+| `str16_cat` | `func sz str16_cat(str16* str, cstr16 src);` |
+| `str16_append_char` | `func sz str16_append_char(str16* str, c16 chr);` |
+| `str16_truncate` | `func void str16_truncate(str16* str, sz length);` |
+| `str16_to_upper` | `func void str16_to_upper(str16* str);` |
+| `str16_to_lower` | `func void str16_to_lower(str16* str);` |
+| `str16_trim` | `func void str16_trim(str16* str);` |
+| `str16_replace_char` | `func void str16_replace_char(str16* str, c16 from_chr, c16 to_chr);` |
+| `str16_remove_char` | `func sz str16_remove_char(str16* str, c16 chr);` |
+| `str16_remove_whitespace` | `func sz str16_remove_whitespace(str16* str);` |
+| `str16_remove_prefix` | `func b32 str16_remove_prefix(str16* str, cstr16 prefix);` |
+| `str16_remove_suffix` | `func b32 str16_remove_suffix(str16* str, cstr16 suffix);` |
+| `str16_replace` | `func sz str16_replace(str16* str, cstr16 from, cstr16 rep);` |
+| `str16_beautify` | `func void str16_beautify(str16* str);` |
+| `str32_make` | `func str32 str32_make(c32* ptr, sz cap);` |
+| `str32_empty` | `func str32 str32_empty(c32* ptr, sz cap);` |
+| `str32_from_cstr` | `func str32 str32_from_cstr(c32* ptr, sz cap, cstr32 src);` |
+| `str32_is_empty` | `func b32 str32_is_empty(str32 str);` |
+| `str32_cmp` | `func b32 str32_cmp(str32 lhs, str32 rhs);` |
+| `str32_cmp_nocase` | `func b32 str32_cmp_nocase(str32 lhs, str32 rhs);` |
+| `str32_find` | `func cstr32 str32_find(str32 str, cstr32 sub);` |
+| `str32_find_char` | `func cstr32 str32_find_char(str32 str, c32 chr);` |
+| `str32_find_last` | `func cstr32 str32_find_last(str32 str, cstr32 sub);` |
+| `str32_find_last_char` | `func cstr32 str32_find_last_char(str32 str, c32 chr);` |
+| `str32_count_char` | `func sz str32_count_char(str32 str, c32 chr);` |
+| `str32_starts_with` | `func b32 str32_starts_with(str32 str, cstr32 prefix);` |
+| `str32_ends_with` | `func b32 str32_ends_with(str32 str, cstr32 suffix);` |
+| `str32_hash32` | `func u32 str32_hash32(str32 str);` |
+| `str32_hash64` | `func u64 str32_hash64(str32 str);` |
+| `str32_to_i64` | `func b32 str32_to_i64(str32 str, i64* out);` |
+| `str32_to_f64` | `func b32 str32_to_f64(str32 str, f64* out);` |
+| `str32_clear` | `func void str32_clear(str32* str);` |
+| `str32_cpy` | `func sz str32_cpy(str32* str, cstr32 src);` |
+| `str32_cat` | `func sz str32_cat(str32* str, cstr32 src);` |
+| `str32_append_char` | `func sz str32_append_char(str32* str, c32 chr);` |
+| `str32_truncate` | `func void str32_truncate(str32* str, sz length);` |
+| `str32_to_upper` | `func void str32_to_upper(str32* str);` |
+| `str32_to_lower` | `func void str32_to_lower(str32* str);` |
+| `str32_trim` | `func void str32_trim(str32* str);` |
+| `str32_replace_char` | `func void str32_replace_char(str32* str, c32 from_chr, c32 to_chr);` |
+| `str32_remove_char` | `func sz str32_remove_char(str32* str, c32 chr);` |
+| `str32_remove_whitespace` | `func sz str32_remove_whitespace(str32* str);` |
+| `str32_remove_prefix` | `func b32 str32_remove_prefix(str32* str, cstr32 prefix);` |
+| `str32_remove_suffix` | `func b32 str32_remove_suffix(str32* str, cstr32 suffix);` |
+| `str32_replace` | `func sz str32_replace(str32* str, cstr32 from, cstr32 rep);` |
+| `str32_beautify` | `func void str32_beautify(str32* str);` |
+| `str8_to_str16` | `func sz str8_to_str16(str8 src, str16* dst);` |
+| `str8_to_str32` | `func sz str8_to_str32(str8 src, str32* dst);` |
+| `str16_to_str8` | `func sz str16_to_str8(str16 src, str8* dst);` |
+| `str16_to_str32` | `func sz str16_to_str32(str16 src, str32* dst);` |
+| `str32_to_str8` | `func sz str32_to_str8(str32 src, str8* dst);` |
+| `str32_to_str16` | `func sz str32_to_str16(str32 src, str16* dst);` |
+
+#### Macros
+
+| Macro | Form |
+| --- | --- |
+| None | - |
 
 ### `strings/unicode.h`
 
 - Types: **0**
 - Functions: **16**
+- Macros: **0**
 
 #### Types
 
-- None
+| Type | Declaration |
+| --- | --- |
+| None | - |
 
 #### Functions
 
-- `unicode_is_valid(c32 codepoint) -> b32`
-  - What it does: Performs unicode is valid
-  - Parameters:
-    - `codepoint` (`c32`): Input parameter
-- `utf8_encode_size(c32 codepoint) -> sz`
-  - What it does: Performs utf8 encode size
-  - Parameters:
-    - `codepoint` (`c32`): Input parameter
-- `utf8_byte_count(c8 first_byte) -> sz`
-  - What it does: Performs utf8 byte count
-  - Parameters:
-    - `first_byte` (`c8`): Input parameter
-- `utf8_decode(cstr8 ptr, sz* consumed) -> c32`
-  - What it does: Performs utf8 decode
-  - Parameters:
-    - `ptr` (`cstr8`): Input data used by the operation
-    - `consumed` (`sz*`): Input parameter
-- `utf8_encode(c32 codepoint, c8* out) -> sz`
-  - What it does: Performs utf8 encode
-  - Parameters:
-    - `codepoint` (`c32`): Input parameter
-    - `out` (`c8*`): Destination storage for output data
-- `utf8_codepoint_count(cstr8 src, sz src_size) -> sz`
-  - What it does: Performs utf8 codepoint count
-  - Parameters:
-    - `src` (`cstr8`): Input data used by the operation
-    - `src_size` (`sz`): Size or capacity value used by the operation
-- `utf16_encode_size(c32 codepoint) -> sz`
-  - What it does: Performs utf16 encode size
-  - Parameters:
-    - `codepoint` (`c32`): Input parameter
-- `utf16_decode(cstr16 ptr, sz* consumed) -> c32`
-  - What it does: Performs utf16 decode
-  - Parameters:
-    - `ptr` (`cstr16`): Input data used by the operation
-    - `consumed` (`sz*`): Input parameter
-- `utf16_encode(c32 codepoint, c16* out) -> sz`
-  - What it does: Performs utf16 encode
-  - Parameters:
-    - `codepoint` (`c32`): Input parameter
-    - `out` (`c16*`): Destination storage for output data
-- `utf16_codepoint_count(cstr16 src, sz src_size) -> sz`
-  - What it does: Performs utf16 codepoint count
-  - Parameters:
-    - `src` (`cstr16`): Input data used by the operation
-    - `src_size` (`sz`): Size or capacity value used by the operation
-- `utf8_to_utf16(cstr8 src, sz src_size, c16* dst, sz dst_cap) -> sz`
-  - What it does: Performs utf8 to utf16
-  - Parameters:
-    - `src` (`cstr8`): Input data used by the operation
-    - `src_size` (`sz`): Size or capacity value used by the operation
-    - `dst` (`c16*`): Destination storage for output data
-    - `dst_cap` (`sz`): Input parameter
-- `utf8_to_utf32(cstr8 src, sz src_size, c32* dst, sz dst_cap) -> sz`
-  - What it does: Performs utf8 to utf32
-  - Parameters:
-    - `src` (`cstr8`): Input data used by the operation
-    - `src_size` (`sz`): Size or capacity value used by the operation
-    - `dst` (`c32*`): Destination storage for output data
-    - `dst_cap` (`sz`): Input parameter
-- `utf16_to_utf8(cstr16 src, sz src_size, c8* dst, sz dst_cap) -> sz`
-  - What it does: Performs utf16 to utf8
-  - Parameters:
-    - `src` (`cstr16`): Input data used by the operation
-    - `src_size` (`sz`): Size or capacity value used by the operation
-    - `dst` (`c8*`): Destination storage for output data
-    - `dst_cap` (`sz`): Input parameter
-- `utf16_to_utf32(cstr16 src, sz src_size, c32* dst, sz dst_cap) -> sz`
-  - What it does: Performs utf16 to utf32
-  - Parameters:
-    - `src` (`cstr16`): Input data used by the operation
-    - `src_size` (`sz`): Size or capacity value used by the operation
-    - `dst` (`c32*`): Destination storage for output data
-    - `dst_cap` (`sz`): Input parameter
-- `utf32_to_utf8(cstr32 src, sz src_size, c8* dst, sz dst_cap) -> sz`
-  - What it does: Performs utf32 to utf8
-  - Parameters:
-    - `src` (`cstr32`): Input data used by the operation
-    - `src_size` (`sz`): Size or capacity value used by the operation
-    - `dst` (`c8*`): Destination storage for output data
-    - `dst_cap` (`sz`): Input parameter
-- `utf32_to_utf16(cstr32 src, sz src_size, c16* dst, sz dst_cap) -> sz`
-  - What it does: Performs utf32 to utf16
-  - Parameters:
-    - `src` (`cstr32`): Input data used by the operation
-    - `src_size` (`sz`): Size or capacity value used by the operation
-    - `dst` (`c16*`): Destination storage for output data
-    - `dst_cap` (`sz`): Input parameter
+| Function | Declaration |
+| --- | --- |
+| `unicode_is_valid` | `func b32 unicode_is_valid(c32 codepoint);` |
+| `utf8_encode_size` | `func sz utf8_encode_size(c32 codepoint);` |
+| `utf8_byte_count` | `func sz utf8_byte_count(c8 first_byte);` |
+| `utf8_decode` | `func c32 utf8_decode(cstr8 ptr, sz* consumed);` |
+| `utf8_encode` | `func sz utf8_encode(c32 codepoint, c8* out);` |
+| `utf8_codepoint_count` | `func sz utf8_codepoint_count(cstr8 src, sz src_size);` |
+| `utf16_encode_size` | `func sz utf16_encode_size(c32 codepoint);` |
+| `utf16_decode` | `func c32 utf16_decode(cstr16 ptr, sz* consumed);` |
+| `utf16_encode` | `func sz utf16_encode(c32 codepoint, c16* out);` |
+| `utf16_codepoint_count` | `func sz utf16_codepoint_count(cstr16 src, sz src_size);` |
+| `utf8_to_utf16` | `func sz utf8_to_utf16(cstr8 src, sz src_size, c16* dst, sz dst_cap);` |
+| `utf8_to_utf32` | `func sz utf8_to_utf32(cstr8 src, sz src_size, c32* dst, sz dst_cap);` |
+| `utf16_to_utf8` | `func sz utf16_to_utf8(cstr16 src, sz src_size, c8* dst, sz dst_cap);` |
+| `utf16_to_utf32` | `func sz utf16_to_utf32(cstr16 src, sz src_size, c32* dst, sz dst_cap);` |
+| `utf32_to_utf8` | `func sz utf32_to_utf8(cstr32 src, sz src_size, c8* dst, sz dst_cap);` |
+| `utf32_to_utf16` | `func sz utf32_to_utf16(cstr32 src, sz src_size, c16* dst, sz dst_cap);` |
+
+#### Macros
+
+| Macro | Form |
+| --- | --- |
+| None | - |
 
 ## system
 
-Hardware, runtime and platform information APIs.
+CPU, hardware, locale, and runtime/system information.
 
 ### `system/cpu_info.h`
 
 - Types: **2**
 - Functions: **1**
+- Macros: **0**
 
 #### Types
 
-- `cpu_instruction_set_info` (struct)
-  - What it represents: Represents `cpu instruction set info` data grouped in a struct
-  - Members:
-    - `mmx`: `b32`
-    - `sse`: `b32`
-    - `sse2`: `b32`
-    - `sse3`: `b32`
-    - `ssse3`: `b32`
-    - `sse41`: `b32`
-    - `sse42`: `b32`
-    - `avx`: `b32`
-    - `avx2`: `b32`
-    - `avx512f`: `b32`
-    - `aes`: `b32`
-    - `fma`: `b32`
-    - `bmi1`: `b32`
-    - `bmi2`: `b32`
-    - `popcnt`: `b32`
-    - `neon`: `b32`
-    - `crc32`: `b32`
-- `cpu_info` (struct)
-  - What it represents: Represents `cpu info` data grouped in a struct
-  - Members:
-    - `vendor_name`: `str8_short`
-    - `brand_name`: `str8_short`
-    - `logical_core_count`: `u32`
-    - `cache_line_bytes`: `u32`
-    - `instruction_sets`: `cpu_instruction_set_info`
+| Type | Declaration |
+| --- | --- |
+| `cpu_instruction_set_info` | `typedef struct cpu_instruction_set_info { ... } cpu_instruction_set_info;` |
+| `cpu_info` | `typedef struct cpu_info { ... } cpu_info;` |
 
 #### Functions
 
-- `cpu_info_query(cpu_info* out_info) -> b32`
-  - What it does: Performs cpu info query
-  - Parameters:
-    - `out_info` (`cpu_info*`): Output value written by the function
+| Function | Declaration |
+| --- | --- |
+| `cpu_info_query` | `func b32 cpu_info_query(cpu_info* out_info);` |
+
+#### Macros
+
+| Macro | Form |
+| --- | --- |
+| None | - |
 
 ### `system/hardware_info.h`
 
 - Types: **1**
 - Functions: **1**
+- Macros: **0**
 
 #### Types
 
-- `hardware_info` (struct)
-  - What it represents: Represents `hardware info` data grouped in a struct
-  - Members:
-    - `cpu`: `cpu_info`
-    - `memory_total`: `sz`
-    - `memory_available`: `sz`
-    - `monitor_count`: `u32`
-    - `keyboard_count`: `u32`
-    - `mouse_count`: `u32`
-    - `gamepad_count`: `u32`
-    - `video_driver_name`: `str8_short`
-    - `primary_keyboard_name`: `str8_short`
-    - `primary_mouse_name`: `str8_short`
+| Type | Declaration |
+| --- | --- |
+| `hardware_info` | `typedef struct hardware_info { ... } hardware_info;` |
 
 #### Functions
 
-- `hardware_info_query(hardware_info* out_info) -> b32`
-  - What it does: Performs hardware info query
-  - Parameters:
-    - `out_info` (`hardware_info*`): Output value written by the function
+| Function | Declaration |
+| --- | --- |
+| `hardware_info_query` | `func b32 hardware_info_query(hardware_info* out_info);` |
+
+#### Macros
+
+| Macro | Form |
+| --- | --- |
+| None | - |
 
 ### `system/language.h`
 
 - Types: **1**
 - Functions: **1**
+- Macros: **0**
 
 #### Types
 
-- `language_info` (struct)
-  - What it represents: Represents `language info` data grouped in a struct
-  - Members:
-    - `desktop_language`: `str8_short`
-    - `keyboard_language`: `str8_short`
-    - `keyboard_layout_name`: `str8_short`
+| Type | Declaration |
+| --- | --- |
+| `language_info` | `typedef struct language_info { ... } language_info;` |
 
 #### Functions
 
-- `language_query(language_info* out_info) -> b32`
-  - What it does: Performs language query
-  - Parameters:
-    - `out_info` (`language_info*`): Output value written by the function
+| Function | Declaration |
+| --- | --- |
+| `language_query` | `func b32 language_query(language_info* out_info);` |
+
+#### Macros
+
+| Macro | Form |
+| --- | --- |
+| None | - |
 
 ### `system/system_info.h`
 
 - Types: **1**
 - Functions: **1**
+- Macros: **0**
 
 #### Types
 
-- `system_info` (struct)
-  - What it represents: Represents `system info` data grouped in a struct
-  - Members:
-    - `os_name`: `str8_short`
-    - `os_version`: `str8_short`
-    - `architecture_name`: `str8_short`
-    - `computer_name`: `str8_short`
-    - `user_name`: `str8_short`
-    - `user_home`: `str8_short`
-    - `page_size`: `sz`
-    - `allocation_granularity`: `sz`
+| Type | Declaration |
+| --- | --- |
+| `system_info` | `typedef struct system_info { ... } system_info;` |
 
 #### Functions
 
-- `system_info_query(system_info* out_info) -> b32`
-  - What it does: Performs system info query
-  - Parameters:
-    - `out_info` (`system_info*`): Output value written by the function
+| Function | Declaration |
+| --- | --- |
+| `system_info_query` | `func b32 system_info_query(system_info* out_info);` |
+
+#### Macros
+
+| Macro | Form |
+| --- | --- |
+| None | - |
 
 ### `system/system_runtime.h`
 
 - Types: **1**
 - Functions: **1**
+- Macros: **0**
 
 #### Types
 
-- `system_runtime_info` (struct)
-  - What it represents: Represents `system runtime info` data grouped in a struct
-  - Members:
-    - `cpu_usage_percent`: `f32`
-    - `memory_total`: `sz`
-    - `memory_used`: `sz`
-    - `memory_available`: `sz`
-    - `process_memory_used`: `sz`
-    - `process_memory_peak`: `sz`
+| Type | Declaration |
+| --- | --- |
+| `system_runtime_info` | `typedef struct system_runtime_info { ... } system_runtime_info;` |
 
 #### Functions
 
-- `system_runtime_query(system_runtime_info* out_info) -> b32`
-  - What it does: Performs system runtime query
-  - Parameters:
-    - `out_info` (`system_runtime_info*`): Output value written by the function
+| Function | Declaration |
+| --- | --- |
+| `system_runtime_query` | `func b32 system_runtime_query(system_runtime_info* out_info);` |
+
+#### Macros
+
+| Macro | Form |
+| --- | --- |
+| None | - |
 
 ## threads
 
-Thread primitives and synchronization types.
+Threading, atomics, mutexes, semaphores, and synchronization primitives.
 
 ### `threads/atomics.h`
 
 - Types: **6**
 - Functions: **73**
+- Macros: **0**
 
 #### Types
 
-- `atomic_i32` (struct)
-  - What it represents: Represents `atomic i32` data grouped in a struct
-  - Members:
-    - `val`: `i32`
-- `atomic_u32` (struct)
-  - What it represents: Represents `atomic u32` data grouped in a struct
-  - Members:
-    - `val`: `u32`
-- `atomic_i64` (struct)
-  - What it represents: Represents `atomic i64` data grouped in a struct
-  - Members:
-    - `val`: `i64`
-- `atomic_u64` (struct)
-  - What it represents: Represents `atomic u64` data grouped in a struct
-  - Members:
-    - `val`: `u64`
-- `atomic_ptr` (struct)
-  - What it represents: Represents `atomic ptr` data grouped in a struct
-  - Members:
-    - `val`: `void*`
-- `atomic_memory_order` (enum)
-  - What it represents: Represents a set of named constants for `atomic memory order`
-  - Members:
-    - `ATOMIC_MEMORY_ORDER_RELAXED`: `enum value`
-    - `ATOMIC_MEMORY_ORDER_CONSUME`: `enum value`
-    - `ATOMIC_MEMORY_ORDER_ACQUIRE`: `enum value`
-    - `ATOMIC_MEMORY_ORDER_RELEASE`: `enum value`
-    - `ATOMIC_MEMORY_ORDER_ACQ_REL`: `enum value`
-    - `ATOMIC_MEMORY_ORDER_SEQ_CST`: `enum value`
+| Type | Declaration |
+| --- | --- |
+| `atomic_i32` | `typedef struct atomic_i32 { ... } atomic_i32;` |
+| `atomic_u32` | `typedef struct atomic_u32 { ... } atomic_u32;` |
+| `atomic_i64` | `typedef struct atomic_i64 { ... } atomic_i64;` |
+| `atomic_u64` | `typedef struct atomic_u64 { ... } atomic_u64;` |
+| `atomic_ptr` | `typedef struct atomic_ptr { ... } atomic_ptr;` |
+| `atomic_memory_order` | `typedef enum atomic_memory_order { ... } atomic_memory_order;` |
 
 #### Functions
 
-- `atomic_i32_get(atomic_i32* atom) -> i32`
-  - What it does: Performs atomic i32 get
-  - Parameters:
-    - `atom` (`atomic_i32*`): Input parameter
-- `atomic_i32_get_explicit(atomic_i32* atom, atomic_memory_order order) -> i32`
-  - What it does: Gets atomic i32 get explicit
-  - Parameters:
-    - `atom` (`atomic_i32*`): Input parameter
-    - `order` (`atomic_memory_order`): Input parameter
-- `atomic_i32_set(atomic_i32* atom, i32 val) -> i32`
-  - What it does: Performs atomic i32 set
-  - Parameters:
-    - `atom` (`atomic_i32*`): Input parameter
-    - `val` (`i32`): Input parameter
-- `atomic_i32_set_explicit(atomic_i32* atom, i32 val, atomic_memory_order order) -> i32`
-  - What it does: Sets atomic i32 set explicit
-  - Parameters:
-    - `atom` (`atomic_i32*`): Input parameter
-    - `val` (`i32`): Input parameter
-    - `order` (`atomic_memory_order`): Input parameter
-- `atomic_i32_cmpex(atomic_i32* atom, i32* expected, i32 desired) -> b32`
-  - What it does: Performs atomic i32 cmpex
-  - Parameters:
-    - `atom` (`atomic_i32*`): Input parameter
-    - `expected` (`i32*`): Input parameter
-    - `desired` (`i32`): Input parameter
-- `atomic_i32_add(atomic_i32* atom, i32 delta) -> i32`
-  - What it does: Adds atomic i32 add
-  - Parameters:
-    - `atom` (`atomic_i32*`): Input parameter
-    - `delta` (`i32`): Input parameter
-- `atomic_i32_and(atomic_i32* atom, i32 mask) -> i32`
-  - What it does: Performs atomic i32 and
-  - Parameters:
-    - `atom` (`atomic_i32*`): Input parameter
-    - `mask` (`i32`): Input parameter
-- `atomic_i32_or(atomic_i32* atom, i32 mask) -> i32`
-  - What it does: Performs atomic i32 or
-  - Parameters:
-    - `atom` (`atomic_i32*`): Input parameter
-    - `mask` (`i32`): Input parameter
-- `atomic_i32_xor(atomic_i32* atom, i32 mask) -> i32`
-  - What it does: Performs atomic i32 xor
-  - Parameters:
-    - `atom` (`atomic_i32*`): Input parameter
-    - `mask` (`i32`): Input parameter
-- `atomic_i32_sub(atomic_i32* atom, i32 delta) -> i32`
-  - What it does: Performs atomic i32 sub
-  - Parameters:
-    - `atom` (`atomic_i32*`): Input parameter
-    - `delta` (`i32`): Input parameter
-- `atomic_i32_eq(atomic_i32* atom, i32 val) -> b32`
-  - What it does: Performs atomic i32 eq
-  - Parameters:
-    - `atom` (`atomic_i32*`): Input parameter
-    - `val` (`i32`): Input parameter
-- `atomic_i32_neq(atomic_i32* atom, i32 val) -> b32`
-  - What it does: Performs atomic i32 neq
-  - Parameters:
-    - `atom` (`atomic_i32*`): Input parameter
-    - `val` (`i32`): Input parameter
-- `atomic_i32_lt(atomic_i32* atom, i32 val) -> b32`
-  - What it does: Performs atomic i32 lt
-  - Parameters:
-    - `atom` (`atomic_i32*`): Input parameter
-    - `val` (`i32`): Input parameter
-- `atomic_i32_gt(atomic_i32* atom, i32 val) -> b32`
-  - What it does: Performs atomic i32 gt
-  - Parameters:
-    - `atom` (`atomic_i32*`): Input parameter
-    - `val` (`i32`): Input parameter
-- `atomic_i32_lte(atomic_i32* atom, i32 val) -> b32`
-  - What it does: Performs atomic i32 lte
-  - Parameters:
-    - `atom` (`atomic_i32*`): Input parameter
-    - `val` (`i32`): Input parameter
-- `atomic_i32_gte(atomic_i32* atom, i32 val) -> b32`
-  - What it does: Performs atomic i32 gte
-  - Parameters:
-    - `atom` (`atomic_i32*`): Input parameter
-    - `val` (`i32`): Input parameter
-- `atomic_u32_get(atomic_u32* atom) -> u32`
-  - What it does: Performs atomic u32 get
-  - Parameters:
-    - `atom` (`atomic_u32*`): Input parameter
-- `atomic_u32_get_explicit(atomic_u32* atom, atomic_memory_order order) -> u32`
-  - What it does: Gets atomic u32 get explicit
-  - Parameters:
-    - `atom` (`atomic_u32*`): Input parameter
-    - `order` (`atomic_memory_order`): Input parameter
-- `atomic_u32_set(atomic_u32* atom, u32 val) -> u32`
-  - What it does: Performs atomic u32 set
-  - Parameters:
-    - `atom` (`atomic_u32*`): Input parameter
-    - `val` (`u32`): Input parameter
-- `atomic_u32_set_explicit(atomic_u32* atom, u32 val, atomic_memory_order order) -> u32`
-  - What it does: Sets atomic u32 set explicit
-  - Parameters:
-    - `atom` (`atomic_u32*`): Input parameter
-    - `val` (`u32`): Input parameter
-    - `order` (`atomic_memory_order`): Input parameter
-- `atomic_u32_cmpex(atomic_u32* atom, u32* expected, u32 desired) -> b32`
-  - What it does: Performs atomic u32 cmpex
-  - Parameters:
-    - `atom` (`atomic_u32*`): Input parameter
-    - `expected` (`u32*`): Input parameter
-    - `desired` (`u32`): Input parameter
-- `atomic_u32_add(atomic_u32* atom, u32 delta) -> u32`
-  - What it does: Adds atomic u32 add
-  - Parameters:
-    - `atom` (`atomic_u32*`): Input parameter
-    - `delta` (`u32`): Input parameter
-- `atomic_u32_and(atomic_u32* atom, u32 mask) -> u32`
-  - What it does: Performs atomic u32 and
-  - Parameters:
-    - `atom` (`atomic_u32*`): Input parameter
-    - `mask` (`u32`): Input parameter
-- `atomic_u32_or(atomic_u32* atom, u32 mask) -> u32`
-  - What it does: Performs atomic u32 or
-  - Parameters:
-    - `atom` (`atomic_u32*`): Input parameter
-    - `mask` (`u32`): Input parameter
-- `atomic_u32_xor(atomic_u32* atom, u32 mask) -> u32`
-  - What it does: Performs atomic u32 xor
-  - Parameters:
-    - `atom` (`atomic_u32*`): Input parameter
-    - `mask` (`u32`): Input parameter
-- `atomic_u32_sub(atomic_u32* atom, u32 delta) -> u32`
-  - What it does: Performs atomic u32 sub
-  - Parameters:
-    - `atom` (`atomic_u32*`): Input parameter
-    - `delta` (`u32`): Input parameter
-- `atomic_u32_eq(atomic_u32* atom, u32 val) -> b32`
-  - What it does: Performs atomic u32 eq
-  - Parameters:
-    - `atom` (`atomic_u32*`): Input parameter
-    - `val` (`u32`): Input parameter
-- `atomic_u32_neq(atomic_u32* atom, u32 val) -> b32`
-  - What it does: Performs atomic u32 neq
-  - Parameters:
-    - `atom` (`atomic_u32*`): Input parameter
-    - `val` (`u32`): Input parameter
-- `atomic_u32_lt(atomic_u32* atom, u32 val) -> b32`
-  - What it does: Performs atomic u32 lt
-  - Parameters:
-    - `atom` (`atomic_u32*`): Input parameter
-    - `val` (`u32`): Input parameter
-- `atomic_u32_gt(atomic_u32* atom, u32 val) -> b32`
-  - What it does: Performs atomic u32 gt
-  - Parameters:
-    - `atom` (`atomic_u32*`): Input parameter
-    - `val` (`u32`): Input parameter
-- `atomic_u32_lte(atomic_u32* atom, u32 val) -> b32`
-  - What it does: Performs atomic u32 lte
-  - Parameters:
-    - `atom` (`atomic_u32*`): Input parameter
-    - `val` (`u32`): Input parameter
-- `atomic_u32_gte(atomic_u32* atom, u32 val) -> b32`
-  - What it does: Performs atomic u32 gte
-  - Parameters:
-    - `atom` (`atomic_u32*`): Input parameter
-    - `val` (`u32`): Input parameter
-- `atomic_i64_get(atomic_i64* atom) -> i64`
-  - What it does: Performs atomic i64 get
-  - Parameters:
-    - `atom` (`atomic_i64*`): Input parameter
-- `atomic_i64_get_explicit(atomic_i64* atom, atomic_memory_order order) -> i64`
-  - What it does: Gets atomic i64 get explicit
-  - Parameters:
-    - `atom` (`atomic_i64*`): Input parameter
-    - `order` (`atomic_memory_order`): Input parameter
-- `atomic_i64_set(atomic_i64* atom, i64 val) -> i64`
-  - What it does: Performs atomic i64 set
-  - Parameters:
-    - `atom` (`atomic_i64*`): Input parameter
-    - `val` (`i64`): Input parameter
-- `atomic_i64_set_explicit(atomic_i64* atom, i64 val, atomic_memory_order order) -> i64`
-  - What it does: Sets atomic i64 set explicit
-  - Parameters:
-    - `atom` (`atomic_i64*`): Input parameter
-    - `val` (`i64`): Input parameter
-    - `order` (`atomic_memory_order`): Input parameter
-- `atomic_i64_cmpex(atomic_i64* atom, i64* expected, i64 desired) -> b32`
-  - What it does: Performs atomic i64 cmpex
-  - Parameters:
-    - `atom` (`atomic_i64*`): Input parameter
-    - `expected` (`i64*`): Input parameter
-    - `desired` (`i64`): Input parameter
-- `atomic_i64_add(atomic_i64* atom, i64 delta) -> i64`
-  - What it does: Adds atomic i64 add
-  - Parameters:
-    - `atom` (`atomic_i64*`): Input parameter
-    - `delta` (`i64`): Input parameter
-- `atomic_i64_and(atomic_i64* atom, i64 mask) -> i64`
-  - What it does: Performs atomic i64 and
-  - Parameters:
-    - `atom` (`atomic_i64*`): Input parameter
-    - `mask` (`i64`): Input parameter
-- `atomic_i64_or(atomic_i64* atom, i64 mask) -> i64`
-  - What it does: Performs atomic i64 or
-  - Parameters:
-    - `atom` (`atomic_i64*`): Input parameter
-    - `mask` (`i64`): Input parameter
-- `atomic_i64_xor(atomic_i64* atom, i64 mask) -> i64`
-  - What it does: Performs atomic i64 xor
-  - Parameters:
-    - `atom` (`atomic_i64*`): Input parameter
-    - `mask` (`i64`): Input parameter
-- `atomic_i64_sub(atomic_i64* atom, i64 delta) -> i64`
-  - What it does: Performs atomic i64 sub
-  - Parameters:
-    - `atom` (`atomic_i64*`): Input parameter
-    - `delta` (`i64`): Input parameter
-- `atomic_i64_eq(atomic_i64* atom, i64 val) -> b32`
-  - What it does: Performs atomic i64 eq
-  - Parameters:
-    - `atom` (`atomic_i64*`): Input parameter
-    - `val` (`i64`): Input parameter
-- `atomic_i64_neq(atomic_i64* atom, i64 val) -> b32`
-  - What it does: Performs atomic i64 neq
-  - Parameters:
-    - `atom` (`atomic_i64*`): Input parameter
-    - `val` (`i64`): Input parameter
-- `atomic_i64_lt(atomic_i64* atom, i64 val) -> b32`
-  - What it does: Performs atomic i64 lt
-  - Parameters:
-    - `atom` (`atomic_i64*`): Input parameter
-    - `val` (`i64`): Input parameter
-- `atomic_i64_gt(atomic_i64* atom, i64 val) -> b32`
-  - What it does: Performs atomic i64 gt
-  - Parameters:
-    - `atom` (`atomic_i64*`): Input parameter
-    - `val` (`i64`): Input parameter
-- `atomic_i64_lte(atomic_i64* atom, i64 val) -> b32`
-  - What it does: Performs atomic i64 lte
-  - Parameters:
-    - `atom` (`atomic_i64*`): Input parameter
-    - `val` (`i64`): Input parameter
-- `atomic_i64_gte(atomic_i64* atom, i64 val) -> b32`
-  - What it does: Performs atomic i64 gte
-  - Parameters:
-    - `atom` (`atomic_i64*`): Input parameter
-    - `val` (`i64`): Input parameter
-- `atomic_u64_get(atomic_u64* atom) -> u64`
-  - What it does: Performs atomic u64 get
-  - Parameters:
-    - `atom` (`atomic_u64*`): Input parameter
-- `atomic_u64_get_explicit(atomic_u64* atom, atomic_memory_order order) -> u64`
-  - What it does: Gets atomic u64 get explicit
-  - Parameters:
-    - `atom` (`atomic_u64*`): Input parameter
-    - `order` (`atomic_memory_order`): Input parameter
-- `atomic_u64_set(atomic_u64* atom, u64 val) -> u64`
-  - What it does: Performs atomic u64 set
-  - Parameters:
-    - `atom` (`atomic_u64*`): Input parameter
-    - `val` (`u64`): Input parameter
-- `atomic_u64_set_explicit(atomic_u64* atom, u64 val, atomic_memory_order order) -> u64`
-  - What it does: Sets atomic u64 set explicit
-  - Parameters:
-    - `atom` (`atomic_u64*`): Input parameter
-    - `val` (`u64`): Input parameter
-    - `order` (`atomic_memory_order`): Input parameter
-- `atomic_u64_cmpex(atomic_u64* atom, u64* expected, u64 desired) -> b32`
-  - What it does: Performs atomic u64 cmpex
-  - Parameters:
-    - `atom` (`atomic_u64*`): Input parameter
-    - `expected` (`u64*`): Input parameter
-    - `desired` (`u64`): Input parameter
-- `atomic_u64_add(atomic_u64* atom, u64 delta) -> u64`
-  - What it does: Adds atomic u64 add
-  - Parameters:
-    - `atom` (`atomic_u64*`): Input parameter
-    - `delta` (`u64`): Input parameter
-- `atomic_u64_and(atomic_u64* atom, u64 mask) -> u64`
-  - What it does: Performs atomic u64 and
-  - Parameters:
-    - `atom` (`atomic_u64*`): Input parameter
-    - `mask` (`u64`): Input parameter
-- `atomic_u64_or(atomic_u64* atom, u64 mask) -> u64`
-  - What it does: Performs atomic u64 or
-  - Parameters:
-    - `atom` (`atomic_u64*`): Input parameter
-    - `mask` (`u64`): Input parameter
-- `atomic_u64_xor(atomic_u64* atom, u64 mask) -> u64`
-  - What it does: Performs atomic u64 xor
-  - Parameters:
-    - `atom` (`atomic_u64*`): Input parameter
-    - `mask` (`u64`): Input parameter
-- `atomic_u64_sub(atomic_u64* atom, u64 delta) -> u64`
-  - What it does: Performs atomic u64 sub
-  - Parameters:
-    - `atom` (`atomic_u64*`): Input parameter
-    - `delta` (`u64`): Input parameter
-- `atomic_u64_eq(atomic_u64* atom, u64 val) -> b32`
-  - What it does: Performs atomic u64 eq
-  - Parameters:
-    - `atom` (`atomic_u64*`): Input parameter
-    - `val` (`u64`): Input parameter
-- `atomic_u64_neq(atomic_u64* atom, u64 val) -> b32`
-  - What it does: Performs atomic u64 neq
-  - Parameters:
-    - `atom` (`atomic_u64*`): Input parameter
-    - `val` (`u64`): Input parameter
-- `atomic_u64_lt(atomic_u64* atom, u64 val) -> b32`
-  - What it does: Performs atomic u64 lt
-  - Parameters:
-    - `atom` (`atomic_u64*`): Input parameter
-    - `val` (`u64`): Input parameter
-- `atomic_u64_gt(atomic_u64* atom, u64 val) -> b32`
-  - What it does: Performs atomic u64 gt
-  - Parameters:
-    - `atom` (`atomic_u64*`): Input parameter
-    - `val` (`u64`): Input parameter
-- `atomic_u64_lte(atomic_u64* atom, u64 val) -> b32`
-  - What it does: Performs atomic u64 lte
-  - Parameters:
-    - `atom` (`atomic_u64*`): Input parameter
-    - `val` (`u64`): Input parameter
-- `atomic_u64_gte(atomic_u64* atom, u64 val) -> b32`
-  - What it does: Performs atomic u64 gte
-  - Parameters:
-    - `atom` (`atomic_u64*`): Input parameter
-    - `val` (`u64`): Input parameter
-- `atomic_ptr_get(atomic_ptr* atom) -> void*`
-  - What it does: Performs atomic ptr get
-  - Parameters:
-    - `atom` (`atomic_ptr*`): Input parameter
-- `atomic_ptr_set(atomic_ptr* atom, void* val) -> void*`
-  - What it does: Performs atomic ptr set
-  - Parameters:
-    - `atom` (`atomic_ptr*`): Input parameter
-    - `val` (`void*`): Input parameter
-- `atomic_ptr_cmpex(atomic_ptr* atom, void** expected, void* desired) -> b32`
-  - What it does: Performs atomic ptr cmpex
-  - Parameters:
-    - `atom` (`atomic_ptr*`): Input parameter
-    - `expected` (`void**`): Input parameter
-    - `desired` (`void*`): Input parameter
-- `atomic_ptr_eq(atomic_ptr* atom, void* val) -> b32`
-  - What it does: Performs atomic ptr eq
-  - Parameters:
-    - `atom` (`atomic_ptr*`): Input parameter
-    - `val` (`void*`): Input parameter
-- `atomic_ptr_neq(atomic_ptr* atom, void* val) -> b32`
-  - What it does: Performs atomic ptr neq
-  - Parameters:
-    - `atom` (`atomic_ptr*`): Input parameter
-    - `val` (`void*`): Input parameter
-- `atomic_fence_acquire() -> void`
-  - What it does: Performs atomic fence acquire
-  - Parameters: none
-- `atomic_fence_release() -> void`
-  - What it does: Performs atomic fence release
-  - Parameters: none
-- `atomic_fence() -> void`
-  - What it does: Performs atomic fence
-  - Parameters: none
-- `atomic_pause() -> void`
-  - What it does: Performs atomic pause
-  - Parameters: none
+| Function | Declaration |
+| --- | --- |
+| `atomic_i32_get` | `func i32 atomic_i32_get(atomic_i32* atom);` |
+| `atomic_i32_get_explicit` | `func i32 atomic_i32_get_explicit(atomic_i32* atom, atomic_memory_order order);` |
+| `atomic_i32_set` | `func i32 atomic_i32_set(atomic_i32* atom, i32 val);` |
+| `atomic_i32_set_explicit` | `func i32 atomic_i32_set_explicit(atomic_i32* atom, i32 val, atomic_memory_order order);` |
+| `atomic_i32_cmpex` | `func b32 atomic_i32_cmpex(atomic_i32* atom, i32* expected, i32 desired);` |
+| `atomic_i32_add` | `func i32 atomic_i32_add(atomic_i32* atom, i32 delta);` |
+| `atomic_i32_and` | `func i32 atomic_i32_and(atomic_i32* atom, i32 mask);` |
+| `atomic_i32_or` | `func i32 atomic_i32_or(atomic_i32* atom, i32 mask);` |
+| `atomic_i32_xor` | `func i32 atomic_i32_xor(atomic_i32* atom, i32 mask);` |
+| `atomic_i32_sub` | `func i32 atomic_i32_sub(atomic_i32* atom, i32 delta);` |
+| `atomic_i32_eq` | `func b32 atomic_i32_eq(atomic_i32* atom, i32 val);` |
+| `atomic_i32_neq` | `func b32 atomic_i32_neq(atomic_i32* atom, i32 val);` |
+| `atomic_i32_lt` | `func b32 atomic_i32_lt(atomic_i32* atom, i32 val);` |
+| `atomic_i32_gt` | `func b32 atomic_i32_gt(atomic_i32* atom, i32 val);` |
+| `atomic_i32_lte` | `func b32 atomic_i32_lte(atomic_i32* atom, i32 val);` |
+| `atomic_i32_gte` | `func b32 atomic_i32_gte(atomic_i32* atom, i32 val);` |
+| `atomic_u32_get` | `func u32 atomic_u32_get(atomic_u32* atom);` |
+| `atomic_u32_get_explicit` | `func u32 atomic_u32_get_explicit(atomic_u32* atom, atomic_memory_order order);` |
+| `atomic_u32_set` | `func u32 atomic_u32_set(atomic_u32* atom, u32 val);` |
+| `atomic_u32_set_explicit` | `func u32 atomic_u32_set_explicit(atomic_u32* atom, u32 val, atomic_memory_order order);` |
+| `atomic_u32_cmpex` | `func b32 atomic_u32_cmpex(atomic_u32* atom, u32* expected, u32 desired);` |
+| `atomic_u32_add` | `func u32 atomic_u32_add(atomic_u32* atom, u32 delta);` |
+| `atomic_u32_and` | `func u32 atomic_u32_and(atomic_u32* atom, u32 mask);` |
+| `atomic_u32_or` | `func u32 atomic_u32_or(atomic_u32* atom, u32 mask);` |
+| `atomic_u32_xor` | `func u32 atomic_u32_xor(atomic_u32* atom, u32 mask);` |
+| `atomic_u32_sub` | `func u32 atomic_u32_sub(atomic_u32* atom, u32 delta);` |
+| `atomic_u32_eq` | `func b32 atomic_u32_eq(atomic_u32* atom, u32 val);` |
+| `atomic_u32_neq` | `func b32 atomic_u32_neq(atomic_u32* atom, u32 val);` |
+| `atomic_u32_lt` | `func b32 atomic_u32_lt(atomic_u32* atom, u32 val);` |
+| `atomic_u32_gt` | `func b32 atomic_u32_gt(atomic_u32* atom, u32 val);` |
+| `atomic_u32_lte` | `func b32 atomic_u32_lte(atomic_u32* atom, u32 val);` |
+| `atomic_u32_gte` | `func b32 atomic_u32_gte(atomic_u32* atom, u32 val);` |
+| `atomic_i64_get` | `func i64 atomic_i64_get(atomic_i64* atom);` |
+| `atomic_i64_get_explicit` | `func i64 atomic_i64_get_explicit(atomic_i64* atom, atomic_memory_order order);` |
+| `atomic_i64_set` | `func i64 atomic_i64_set(atomic_i64* atom, i64 val);` |
+| `atomic_i64_set_explicit` | `func i64 atomic_i64_set_explicit(atomic_i64* atom, i64 val, atomic_memory_order order);` |
+| `atomic_i64_cmpex` | `func b32 atomic_i64_cmpex(atomic_i64* atom, i64* expected, i64 desired);` |
+| `atomic_i64_add` | `func i64 atomic_i64_add(atomic_i64* atom, i64 delta);` |
+| `atomic_i64_and` | `func i64 atomic_i64_and(atomic_i64* atom, i64 mask);` |
+| `atomic_i64_or` | `func i64 atomic_i64_or(atomic_i64* atom, i64 mask);` |
+| `atomic_i64_xor` | `func i64 atomic_i64_xor(atomic_i64* atom, i64 mask);` |
+| `atomic_i64_sub` | `func i64 atomic_i64_sub(atomic_i64* atom, i64 delta);` |
+| `atomic_i64_eq` | `func b32 atomic_i64_eq(atomic_i64* atom, i64 val);` |
+| `atomic_i64_neq` | `func b32 atomic_i64_neq(atomic_i64* atom, i64 val);` |
+| `atomic_i64_lt` | `func b32 atomic_i64_lt(atomic_i64* atom, i64 val);` |
+| `atomic_i64_gt` | `func b32 atomic_i64_gt(atomic_i64* atom, i64 val);` |
+| `atomic_i64_lte` | `func b32 atomic_i64_lte(atomic_i64* atom, i64 val);` |
+| `atomic_i64_gte` | `func b32 atomic_i64_gte(atomic_i64* atom, i64 val);` |
+| `atomic_u64_get` | `func u64 atomic_u64_get(atomic_u64* atom);` |
+| `atomic_u64_get_explicit` | `func u64 atomic_u64_get_explicit(atomic_u64* atom, atomic_memory_order order);` |
+| `atomic_u64_set` | `func u64 atomic_u64_set(atomic_u64* atom, u64 val);` |
+| `atomic_u64_set_explicit` | `func u64 atomic_u64_set_explicit(atomic_u64* atom, u64 val, atomic_memory_order order);` |
+| `atomic_u64_cmpex` | `func b32 atomic_u64_cmpex(atomic_u64* atom, u64* expected, u64 desired);` |
+| `atomic_u64_add` | `func u64 atomic_u64_add(atomic_u64* atom, u64 delta);` |
+| `atomic_u64_and` | `func u64 atomic_u64_and(atomic_u64* atom, u64 mask);` |
+| `atomic_u64_or` | `func u64 atomic_u64_or(atomic_u64* atom, u64 mask);` |
+| `atomic_u64_xor` | `func u64 atomic_u64_xor(atomic_u64* atom, u64 mask);` |
+| `atomic_u64_sub` | `func u64 atomic_u64_sub(atomic_u64* atom, u64 delta);` |
+| `atomic_u64_eq` | `func b32 atomic_u64_eq(atomic_u64* atom, u64 val);` |
+| `atomic_u64_neq` | `func b32 atomic_u64_neq(atomic_u64* atom, u64 val);` |
+| `atomic_u64_lt` | `func b32 atomic_u64_lt(atomic_u64* atom, u64 val);` |
+| `atomic_u64_gt` | `func b32 atomic_u64_gt(atomic_u64* atom, u64 val);` |
+| `atomic_u64_lte` | `func b32 atomic_u64_lte(atomic_u64* atom, u64 val);` |
+| `atomic_u64_gte` | `func b32 atomic_u64_gte(atomic_u64* atom, u64 val);` |
+| `atomic_ptr_get` | `func void* atomic_ptr_get(atomic_ptr* atom);` |
+| `atomic_ptr_set` | `func void* atomic_ptr_set(atomic_ptr* atom, void* val);` |
+| `atomic_ptr_cmpex` | `func b32 atomic_ptr_cmpex(atomic_ptr* atom, void** expected, void* desired);` |
+| `atomic_ptr_eq` | `func b32 atomic_ptr_eq(atomic_ptr* atom, void* val);` |
+| `atomic_ptr_neq` | `func b32 atomic_ptr_neq(atomic_ptr* atom, void* val);` |
+| `atomic_fence_acquire` | `func void atomic_fence_acquire(void);` |
+| `atomic_fence_release` | `func void atomic_fence_release(void);` |
+| `atomic_fence` | `func void atomic_fence(void);` |
+| `atomic_pause` | `func void atomic_pause(void);` |
+
+#### Macros
+
+| Macro | Form |
+| --- | --- |
+| None | - |
 
 ### `threads/condvar.h`
 
 - Types: **1**
 - Functions: **7**
+- Macros: **2**
 
 #### Types
 
-- `condvar` (alias)
-  - What it represents: Type alias used for `condvar`
-  - Members: none (alias/function type)
+| Type | Declaration |
+| --- | --- |
+| `condvar` | `typedef void* condvar;` |
 
 #### Functions
 
-- `_condvar_create(callsite site) -> condvar`
-  - What it does: Creates  condvar create resources or state
-  - Parameters:
-    - `site` (`callsite`): Input parameter
-- `_condvar_destroy(condvar cond, callsite site) -> b32`
-  - What it does: Destroys  condvar destroy resources or state
-  - Parameters:
-    - `cond` (`condvar`): Input parameter
-    - `site` (`callsite`): Input parameter
-- `condvar_is_valid(condvar cond) -> b32`
-  - What it does: Performs condvar is valid
-  - Parameters:
-    - `cond` (`condvar`): Input parameter
-- `condvar_wait(condvar cond, mutex mtx) -> void`
-  - What it does: Performs condvar wait
-  - Parameters:
-    - `cond` (`condvar`): Input parameter
-    - `mtx` (`mutex`): Input parameter
-- `condvar_wait_timeout(condvar cond, mutex mtx, u32 millis) -> b32`
-  - What it does: Performs condvar wait timeout
-  - Parameters:
-    - `cond` (`condvar`): Input parameter
-    - `mtx` (`mutex`): Input parameter
-    - `millis` (`u32`): Input parameter
-- `condvar_signal(condvar cond) -> void`
-  - What it does: Performs condvar signal
-  - Parameters:
-    - `cond` (`condvar`): Input parameter
-- `condvar_broadcast(condvar cond) -> void`
-  - What it does: Performs condvar broadcast
-  - Parameters:
-    - `cond` (`condvar`): Input parameter
+| Function | Declaration |
+| --- | --- |
+| `_condvar_create` | `func condvar _condvar_create(callsite site);` |
+| `_condvar_destroy` | `func b32 _condvar_destroy(condvar cond, callsite site);` |
+| `condvar_is_valid` | `func b32 condvar_is_valid(condvar cond);` |
+| `condvar_wait` | `func void condvar_wait(condvar cond, mutex mtx);` |
+| `condvar_wait_timeout` | `func b32 condvar_wait_timeout(condvar cond, mutex mtx, u32 millis);` |
+| `condvar_signal` | `func void condvar_signal(condvar cond);` |
+| `condvar_broadcast` | `func void condvar_broadcast(condvar cond);` |
+
+#### Macros
+
+| Macro | Form |
+| --- | --- |
+| `condvar_create` | `condvar_create()` |
+| `condvar_destroy` | `condvar_destroy(cond)` |
 
 ### `threads/mutex.h`
 
 - Types: **1**
 - Functions: **7**
+- Macros: **2**
 
 #### Types
 
-- `mutex` (alias)
-  - What it represents: Type alias used for `mutex`
-  - Members: none (alias/function type)
+| Type | Declaration |
+| --- | --- |
+| `mutex` | `typedef void* mutex;` |
 
 #### Functions
 
-- `_mutex_create(callsite site) -> mutex`
-  - What it does: Creates  mutex create resources or state
-  - Parameters:
-    - `site` (`callsite`): Input parameter
-- `_mutex_destroy(mutex mtx, callsite site) -> b32`
-  - What it does: Destroys  mutex destroy resources or state
-  - Parameters:
-    - `mtx` (`mutex`): Input parameter
-    - `site` (`callsite`): Input parameter
-- `mutex_is_valid(mutex mtx) -> b32`
-  - What it does: Performs mutex is valid
-  - Parameters:
-    - `mtx` (`mutex`): Input parameter
-- `mutex_lock(mutex mtx) -> void`
-  - What it does: Performs mutex lock
-  - Parameters:
-    - `mtx` (`mutex`): Input parameter
-- `mutex_trylock(mutex mtx) -> b32`
-  - What it does: Performs mutex trylock
-  - Parameters:
-    - `mtx` (`mutex`): Input parameter
-- `mutex_timed_lock(mutex mtx, i32 timeout_ms) -> b32`
-  - What it does: Performs mutex timed lock
-  - Parameters:
-    - `mtx` (`mutex`): Input parameter
-    - `timeout_ms` (`i32`): Input parameter
-- `mutex_unlock(mutex mtx) -> void`
-  - What it does: Performs mutex unlock
-  - Parameters:
-    - `mtx` (`mutex`): Input parameter
+| Function | Declaration |
+| --- | --- |
+| `_mutex_create` | `func mutex _mutex_create(callsite site);` |
+| `_mutex_destroy` | `func b32 _mutex_destroy(mutex mtx, callsite site);` |
+| `mutex_is_valid` | `func b32 mutex_is_valid(mutex mtx);` |
+| `mutex_lock` | `func void mutex_lock(mutex mtx);` |
+| `mutex_trylock` | `func b32 mutex_trylock(mutex mtx);` |
+| `mutex_timed_lock` | `func b32 mutex_timed_lock(mutex mtx, i32 timeout_ms);` |
+| `mutex_unlock` | `func void mutex_unlock(mutex mtx);` |
+
+#### Macros
+
+| Macro | Form |
+| --- | --- |
+| `mutex_create` | `mutex_create()` |
+| `mutex_destroy` | `mutex_destroy(mtx)` |
 
 ### `threads/rwlock.h`
 
 - Types: **1**
 - Functions: **11**
+- Macros: **2**
 
 #### Types
 
-- `rwlock` (alias)
-  - What it represents: Type alias used for `rwlock`
-  - Members: none (alias/function type)
+| Type | Declaration |
+| --- | --- |
+| `rwlock` | `typedef void* rwlock;` |
 
 #### Functions
 
-- `_rwlock_create(callsite site) -> rwlock`
-  - What it does: Creates  rwlock create resources or state
-  - Parameters:
-    - `site` (`callsite`): Input parameter
-- `_rwlock_destroy(rwlock rw, callsite site) -> b32`
-  - What it does: Destroys  rwlock destroy resources or state
-  - Parameters:
-    - `rw` (`rwlock`): Input parameter
-    - `site` (`callsite`): Input parameter
-- `rwlock_is_valid(rwlock rw) -> b32`
-  - What it does: Performs rwlock is valid
-  - Parameters:
-    - `rw` (`rwlock`): Input parameter
-- `rwlock_read_lock(rwlock rw) -> void`
-  - What it does: Reads data for rwlock read lock
-  - Parameters:
-    - `rw` (`rwlock`): Input parameter
-- `rwlock_read_unlock(rwlock rw) -> void`
-  - What it does: Reads data for rwlock read unlock
-  - Parameters:
-    - `rw` (`rwlock`): Input parameter
-- `rwlock_write_lock(rwlock rw) -> void`
-  - What it does: Writes data for rwlock write lock
-  - Parameters:
-    - `rw` (`rwlock`): Input parameter
-- `rwlock_write_unlock(rwlock rw) -> void`
-  - What it does: Writes data for rwlock write unlock
-  - Parameters:
-    - `rw` (`rwlock`): Input parameter
-- `rwlock_try_read_lock(rwlock rw) -> b32`
-  - What it does: Reads data for rwlock try read lock
-  - Parameters:
-    - `rw` (`rwlock`): Input parameter
-- `rwlock_try_write_lock(rwlock rw) -> b32`
-  - What it does: Writes data for rwlock try write lock
-  - Parameters:
-    - `rw` (`rwlock`): Input parameter
-- `rwlock_timed_read_lock(rwlock rw, i32 timeout_ms) -> b32`
-  - What it does: Reads data for rwlock timed read lock
-  - Parameters:
-    - `rw` (`rwlock`): Input parameter
-    - `timeout_ms` (`i32`): Input parameter
-- `rwlock_timed_write_lock(rwlock rw, i32 timeout_ms) -> b32`
-  - What it does: Writes data for rwlock timed write lock
-  - Parameters:
-    - `rw` (`rwlock`): Input parameter
-    - `timeout_ms` (`i32`): Input parameter
+| Function | Declaration |
+| --- | --- |
+| `_rwlock_create` | `func rwlock _rwlock_create(callsite site);` |
+| `_rwlock_destroy` | `func b32 _rwlock_destroy(rwlock rw, callsite site);` |
+| `rwlock_is_valid` | `func b32 rwlock_is_valid(rwlock rw);` |
+| `rwlock_read_lock` | `func void rwlock_read_lock(rwlock rw);` |
+| `rwlock_read_unlock` | `func void rwlock_read_unlock(rwlock rw);` |
+| `rwlock_write_lock` | `func void rwlock_write_lock(rwlock rw);` |
+| `rwlock_write_unlock` | `func void rwlock_write_unlock(rwlock rw);` |
+| `rwlock_try_read_lock` | `func b32 rwlock_try_read_lock(rwlock rw);` |
+| `rwlock_try_write_lock` | `func b32 rwlock_try_write_lock(rwlock rw);` |
+| `rwlock_timed_read_lock` | `func b32 rwlock_timed_read_lock(rwlock rw, i32 timeout_ms);` |
+| `rwlock_timed_write_lock` | `func b32 rwlock_timed_write_lock(rwlock rw, i32 timeout_ms);` |
+
+#### Macros
+
+| Macro | Form |
+| --- | --- |
+| `rwlock_create` | `rwlock_create()` |
+| `rwlock_destroy` | `rwlock_destroy(rw)` |
 
 ### `threads/semaphore.h`
 
 - Types: **1**
 - Functions: **7**
+- Macros: **2**
 
 #### Types
 
-- `semaphore` (alias)
-  - What it represents: Type alias used for `semaphore`
-  - Members: none (alias/function type)
+| Type | Declaration |
+| --- | --- |
+| `semaphore` | `typedef void* semaphore;` |
 
 #### Functions
 
-- `_semaphore_create(u32 initial_count, callsite site) -> semaphore`
-  - What it does: Creates  semaphore create resources or state
-  - Parameters:
-    - `initial_count` (`u32`): Number of elements/items involved
-    - `site` (`callsite`): Input parameter
-- `_semaphore_destroy(semaphore sem, callsite site) -> b32`
-  - What it does: Destroys  semaphore destroy resources or state
-  - Parameters:
-    - `sem` (`semaphore`): Input parameter
-    - `site` (`callsite`): Input parameter
-- `semaphore_is_valid(semaphore sem) -> b32`
-  - What it does: Performs semaphore is valid
-  - Parameters:
-    - `sem` (`semaphore`): Input parameter
-- `semaphore_acquire(semaphore sem) -> void`
-  - What it does: Performs semaphore acquire
-  - Parameters:
-    - `sem` (`semaphore`): Input parameter
-- `semaphore_try_acquire(semaphore sem) -> b32`
-  - What it does: Performs semaphore try acquire
-  - Parameters:
-    - `sem` (`semaphore`): Input parameter
-- `semaphore_acquire_timeout(semaphore sem, u32 millis) -> b32`
-  - What it does: Performs semaphore acquire timeout
-  - Parameters:
-    - `sem` (`semaphore`): Input parameter
-    - `millis` (`u32`): Input parameter
-- `semaphore_release(semaphore sem) -> void`
-  - What it does: Performs semaphore release
-  - Parameters:
-    - `sem` (`semaphore`): Input parameter
+| Function | Declaration |
+| --- | --- |
+| `_semaphore_create` | `func semaphore _semaphore_create(u32 initial_count, callsite site);` |
+| `_semaphore_destroy` | `func b32 _semaphore_destroy(semaphore sem, callsite site);` |
+| `semaphore_is_valid` | `func b32 semaphore_is_valid(semaphore sem);` |
+| `semaphore_acquire` | `func void semaphore_acquire(semaphore sem);` |
+| `semaphore_try_acquire` | `func b32 semaphore_try_acquire(semaphore sem);` |
+| `semaphore_acquire_timeout` | `func b32 semaphore_acquire_timeout(semaphore sem, u32 millis);` |
+| `semaphore_release` | `func void semaphore_release(semaphore sem);` |
+
+#### Macros
+
+| Macro | Form |
+| --- | --- |
+| `semaphore_create` | `semaphore_create(initial_count)` |
+| `semaphore_destroy` | `semaphore_destroy(sem)` |
 
 ### `threads/spinlock.h`
 
 - Types: **1**
 - Functions: **6**
+- Macros: **2**
 
 #### Types
 
-- `spinlock` (alias)
-  - What it represents: Type alias used for `spinlock`
-  - Members: none (alias/function type)
+| Type | Declaration |
+| --- | --- |
+| `spinlock` | `typedef void* spinlock;` |
 
 #### Functions
 
-- `_spinlock_create(callsite site) -> spinlock`
-  - What it does: Creates  spinlock create resources or state
-  - Parameters:
-    - `site` (`callsite`): Input parameter
-- `_spinlock_destroy(spinlock sl, callsite site) -> b32`
-  - What it does: Destroys  spinlock destroy resources or state
-  - Parameters:
-    - `sl` (`spinlock`): Input parameter
-    - `site` (`callsite`): Input parameter
-- `spinlock_is_valid(spinlock sl) -> b32`
-  - What it does: Performs spinlock is valid
-  - Parameters:
-    - `sl` (`spinlock`): Input parameter
-- `spinlock_lock(spinlock sl) -> void`
-  - What it does: Performs spinlock lock
-  - Parameters:
-    - `sl` (`spinlock`): Input parameter
-- `spinlock_unlock(spinlock sl) -> void`
-  - What it does: Performs spinlock unlock
-  - Parameters:
-    - `sl` (`spinlock`): Input parameter
-- `spinlock_try_lock(spinlock sl) -> b32`
-  - What it does: Performs spinlock try lock
-  - Parameters:
-    - `sl` (`spinlock`): Input parameter
+| Function | Declaration |
+| --- | --- |
+| `_spinlock_create` | `func spinlock _spinlock_create(callsite site);` |
+| `_spinlock_destroy` | `func b32 _spinlock_destroy(spinlock sl, callsite site);` |
+| `spinlock_is_valid` | `func b32 spinlock_is_valid(spinlock sl);` |
+| `spinlock_lock` | `func void spinlock_lock(spinlock sl);` |
+| `spinlock_unlock` | `func void spinlock_unlock(spinlock sl);` |
+| `spinlock_try_lock` | `func b32 spinlock_try_lock(spinlock sl);` |
+
+#### Macros
+
+| Macro | Form |
+| --- | --- |
+| `spinlock_create` | `spinlock_create()` |
+| `spinlock_destroy` | `spinlock_destroy(sl)` |
 
 ### `threads/thread.h`
 
 - Types: **2**
 - Functions: **7**
+- Macros: **4**
 
 #### Types
 
-- `thread` (alias)
-  - What it represents: Type alias used for `thread`
-  - Members: none (alias/function type)
-- `thread_func` (alias)
-  - What it represents: Type alias used for `thread func`
-  - Members: none (alias/function type)
+| Type | Declaration |
+| --- | --- |
+| `thread` | `typedef void* thread;` |
+| `thread_func` | `typedef i32 (*thread_func)(void* arg);` |
 
 #### Functions
 
-- `_thread_create(thread_func entry, void* arg, ctx_setup setup, callsite site) -> thread`
-  - What it does: Creates  thread create resources or state
-  - Parameters:
-    - `entry` (`thread_func`): Input parameter
-    - `arg` (`void*`): Input parameter
-    - `setup` (`ctx_setup`): Input parameter
-    - `site` (`callsite`): Input parameter
-- `_thread_create_named(thread_func entry, void* arg, cstr8 name, ctx_setup setup, callsite site) -> thread`
-  - What it does: Creates  thread create named resources or state
-  - Parameters:
-    - `entry` (`thread_func`): Input parameter
-    - `arg` (`void*`): Input parameter
-    - `name` (`cstr8`): Input parameter
-    - `setup` (`ctx_setup`): Input parameter
-    - `site` (`callsite`): Input parameter
-- `_thread_detach(thread thd, callsite site) -> b32`
-  - What it does: Performs  thread detach
-  - Parameters:
-    - `thd` (`thread`): Input parameter
-    - `site` (`callsite`): Input parameter
-- `_thread_join(thread thd, i32* out_exit_code, callsite site) -> b32`
-  - What it does: Performs  thread join
-  - Parameters:
-    - `thd` (`thread`): Input parameter
-    - `out_exit_code` (`i32*`): Output value written by the function
-    - `site` (`callsite`): Input parameter
-- `thread_is_valid(thread thd) -> b32`
-  - What it does: Performs thread is valid
-  - Parameters:
-    - `thd` (`thread`): Input parameter
-- `thread_get_id(thread thd) -> u64`
-  - What it does: Gets thread get id
-  - Parameters:
-    - `thd` (`thread`): Input parameter
-- `thread_get_name(thread thd) -> cstr8`
-  - What it does: Gets thread get name
-  - Parameters:
-    - `thd` (`thread`): Input parameter
+| Function | Declaration |
+| --- | --- |
+| `_thread_create` | `func thread _thread_create(thread_func entry, void* arg, ctx_setup setup, callsite site);` |
+| `_thread_create_named` | `func thread _thread_create_named( thread_func entry, void* arg, cstr8 name, ctx_setup setup, callsite site);` |
+| `_thread_detach` | `func b32 _thread_detach(thread thd, callsite site);` |
+| `_thread_join` | `func b32 _thread_join(thread thd, i32* out_exit_code, callsite site);` |
+| `thread_is_valid` | `func b32 thread_is_valid(thread thd);` |
+| `thread_get_id` | `func u64 thread_get_id(thread thd);` |
+| `thread_get_name` | `func cstr8 thread_get_name(thread thd);` |
+
+#### Macros
+
+| Macro | Form |
+| --- | --- |
+| `thread_create` | `thread_create(entry, arg, setup)` |
+| `thread_create_named` | `thread_create_named(entry, arg, name, setup)` |
+| `thread_detach` | `thread_detach(thd)` |
+| `thread_join` | `thread_join(thd, out_exit_code)` |
 
 ### `threads/thread_current.h`
 
 - Types: **1**
 - Functions: **7**
+- Macros: **0**
 
 #### Types
 
-- `thread_priority` (enum)
-  - What it represents: Represents a set of named constants for `thread priority`
-  - Members:
-    - `THREAD_PRIORITY_LOW`: `enum value`
-    - `THREAD_PRIORITY_MEDIUM`: `enum value`
-    - `THREAD_PRIORITY_HIGH`: `enum value`
-    - `THREAD_PRIORITY_CRITICAL`: `enum value`
+| Type | Declaration |
+| --- | --- |
+| `thread_priority` | `typedef enum thread_priority { ... } thread_priority;` |
 
 #### Functions
 
-- `thread_id() -> u64`
-  - What it does: Performs thread id
-  - Parameters: none
-- `thread_get_priority() -> thread_priority`
-  - What it does: Gets thread get priority
-  - Parameters: none
-- `thread_set_priority(thread_priority priority) -> b32`
-  - What it does: Sets thread set priority
-  - Parameters:
-    - `priority` (`thread_priority`): Input parameter
-- `thread_sleep(u32 millis) -> void`
-  - What it does: Performs thread sleep
-  - Parameters:
-    - `millis` (`u32`): Input parameter
-- `thread_yield() -> void`
-  - What it does: Performs thread yield
-  - Parameters: none
-- `thread_sleep_ns(u64 nanos) -> void`
-  - What it does: Performs thread sleep ns
-  - Parameters:
-    - `nanos` (`u64`): Input parameter
-- `thread_sleep_precise(u64 nanos) -> void`
-  - What it does: Performs thread sleep precise
-  - Parameters:
-    - `nanos` (`u64`): Input parameter
+| Function | Declaration |
+| --- | --- |
+| `thread_id` | `func u64 thread_id(void);` |
+| `thread_get_priority` | `func thread_priority thread_get_priority(void);` |
+| `thread_set_priority` | `func b32 thread_set_priority(thread_priority priority);` |
+| `thread_sleep` | `func void thread_sleep(u32 millis);` |
+| `thread_yield` | `func void thread_yield(void);` |
+| `thread_sleep_ns` | `func void thread_sleep_ns(u64 nanos);` |
+| `thread_sleep_precise` | `func void thread_sleep_precise(u64 nanos);` |
+
+#### Macros
+
+| Macro | Form |
+| --- | --- |
+| None | - |
 
 ### `threads/thread_group.h`
 
 - Types: **2**
 - Functions: **8**
+- Macros: **3**
 
 #### Types
 
-- `thread_group_func` (alias)
-  - What it represents: Type alias used for `thread group func`
-  - Members: none (alias/function type)
-- `thread_group` (alias)
-  - What it represents: Type alias used for `thread group`
-  - Members: none (alias/function type)
+| Type | Declaration |
+| --- | --- |
+| `thread_group_func` | `typedef i32 (*thread_group_func)(u32 idx, void* arg);` |
+| `thread_group` | `typedef void* thread_group;` |
 
 #### Functions
 
-- `_thread_group_create(u32 count, thread_group_func entry, void* arg, ctx_setup setup, callsite site) -> thread_group`
-  - What it does: Creates  thread group create resources or state
-  - Parameters:
-    - `count` (`u32`): Number of elements/items involved
-    - `entry` (`thread_group_func`): Input parameter
-    - `arg` (`void*`): Input parameter
-    - `setup` (`ctx_setup`): Input parameter
-    - `site` (`callsite`): Input parameter
-- `_thread_group_create_named(u32 count, thread_group_func entry, void* arg, ctx_setup setup, cstr8 base_name, callsite site) -> thread_group`
-  - What it does: Creates  thread group create named resources or state
-  - Parameters:
-    - `count` (`u32`): Number of elements/items involved
-    - `entry` (`thread_group_func`): Input parameter
-    - `arg` (`void*`): Input parameter
-    - `setup` (`ctx_setup`): Input parameter
-    - `base_name` (`cstr8`): Input parameter
-    - `site` (`callsite`): Input parameter
-- `_thread_group_destroy(thread_group group, callsite site) -> b32`
-  - What it does: Destroys  thread group destroy resources or state
-  - Parameters:
-    - `group` (`thread_group`): Input parameter
-    - `site` (`callsite`): Input parameter
-- `thread_group_is_valid(thread_group group) -> b32`
-  - What it does: Performs thread group is valid
-  - Parameters:
-    - `group` (`thread_group`): Input parameter
-- `thread_group_get_count(thread_group group) -> u32`
-  - What it does: Gets thread group get count
-  - Parameters:
-    - `group` (`thread_group`): Input parameter
-- `thread_group_get(thread_group group, u32 idx) -> thread`
-  - What it does: Performs thread group get
-  - Parameters:
-    - `group` (`thread_group`): Input parameter
-    - `idx` (`u32`): Zero-based index used to select an item
-- `thread_group_join_all(thread_group group, i32* out_exit_codes) -> b32`
-  - What it does: Performs thread group join all
-  - Parameters:
-    - `group` (`thread_group`): Input parameter
-    - `out_exit_codes` (`i32*`): Output value written by the function
-- `thread_group_detach_all(thread_group group) -> b32`
-  - What it does: Performs thread group detach all
-  - Parameters:
-    - `group` (`thread_group`): Input parameter
+| Function | Declaration |
+| --- | --- |
+| `_thread_group_create` | `func thread_group _thread_group_create( u32 count, thread_group_func entry, void* arg, ctx_setup setup, callsite site);` |
+| `_thread_group_create_named` | `func thread_group _thread_group_create_named( u32 count, thread_group_func entry, void* arg, ctx_setup setup, cstr8 base_name, callsite site);` |
+| `_thread_group_destroy` | `func b32 _thread_group_destroy(thread_group group, callsite site);` |
+| `thread_group_is_valid` | `func b32 thread_group_is_valid(thread_group group);` |
+| `thread_group_get_count` | `func u32 thread_group_get_count(thread_group group);` |
+| `thread_group_get` | `func thread thread_group_get(thread_group group, u32 idx);` |
+| `thread_group_join_all` | `func b32 thread_group_join_all(thread_group group, i32* out_exit_codes);` |
+| `thread_group_detach_all` | `func b32 thread_group_detach_all(thread_group group);` |
+
+#### Macros
+
+| Macro | Form |
+| --- | --- |
+| `thread_group_create` | `thread_group_create(count, entry, arg, setup)` |
+| `thread_group_create_named` | `thread_group_create_named(count, entry, arg, setup, base_name)` |
+| `thread_group_destroy` | `thread_group_destroy(group)` |
 
 ## utils
 
-General utility APIs such as compression, timers, UUID, logging and IDs.
+Utility helpers such as command line parsing, compression, logging, timers, IDs, and versioning.
 
 ### `utils/cmdline.h`
 
 - Types: **1**
 - Functions: **10**
+- Macros: **0**
 
 #### Types
 
-- `cmdline` (struct)
-  - What it represents: Represents `cmdline` data grouped in a struct
-  - Members:
-    - `count`: `sz`
-    - `args`: `c8**`
+| Type | Declaration |
+| --- | --- |
+| `cmdline` | `typedef struct cmdline { ... } cmdline;` |
 
 #### Functions
 
-- `cmdline_build(sz count, c8** args) -> cmdline`
-  - What it does: Performs cmdline build
-  - Parameters:
-    - `count` (`sz`): Number of elements/items involved
-    - `args` (`c8**`): Input parameter
-- `cmdline_get_count(cmdline cmdl) -> sz`
-  - What it does: Gets cmdline get count
-  - Parameters:
-    - `cmdl` (`cmdline`): Input parameter
-- `cmdline_is_empty(cmdline cmdl) -> b32`
-  - What it does: Performs cmdline is empty
-  - Parameters:
-    - `cmdl` (`cmdline`): Input parameter
-- `cmdline_get_arg(cmdline cmdl, sz idx) -> cstr8`
-  - What it does: Gets cmdline get arg
-  - Parameters:
-    - `cmdl` (`cmdline`): Input parameter
-    - `idx` (`sz`): Zero-based index used to select an item
-- `cmdline_get_program(cmdline cmdl) -> cstr8`
-  - What it does: Gets cmdline get program
-  - Parameters:
-    - `cmdl` (`cmdline`): Input parameter
-- `cmdline_find(cmdline cmdl, cstr8 arg, sz* out_idx) -> b32`
-  - What it does: Performs cmdline find
-  - Parameters:
-    - `cmdl` (`cmdline`): Input parameter
-    - `arg` (`cstr8`): Input parameter
-    - `out_idx` (`sz*`): Output value written by the function
-- `cmdline_has(cmdline cmdl, cstr8 arg) -> b32`
-  - What it does: Performs cmdline has
-  - Parameters:
-    - `cmdl` (`cmdline`): Input parameter
-    - `arg` (`cstr8`): Input parameter
-- `cmdline_get_option(cmdline cmdl, cstr8 name) -> cstr8`
-  - What it does: Gets cmdline get option
-  - Parameters:
-    - `cmdl` (`cmdline`): Input parameter
-    - `name` (`cstr8`): Input parameter
-- `cmdline_get_option_i64(cmdline cmdl, cstr8 name, i64* out) -> b32`
-  - What it does: Gets cmdline get option i64
-  - Parameters:
-    - `cmdl` (`cmdline`): Input parameter
-    - `name` (`cstr8`): Input parameter
-    - `out` (`i64*`): Destination storage for output data
-- `cmdline_get_option_f64(cmdline cmdl, cstr8 name, f64* out) -> b32`
-  - What it does: Gets cmdline get option f64
-  - Parameters:
-    - `cmdl` (`cmdline`): Input parameter
-    - `name` (`cstr8`): Input parameter
-    - `out` (`f64*`): Destination storage for output data
+| Function | Declaration |
+| --- | --- |
+| `cmdline_build` | `func cmdline cmdline_build(sz count, c8** args);` |
+| `cmdline_get_count` | `func sz cmdline_get_count(cmdline cmdl);` |
+| `cmdline_is_empty` | `func b32 cmdline_is_empty(cmdline cmdl);` |
+| `cmdline_get_arg` | `func cstr8 cmdline_get_arg(cmdline cmdl, sz idx);` |
+| `cmdline_get_program` | `func cstr8 cmdline_get_program(cmdline cmdl);` |
+| `cmdline_find` | `func b32 cmdline_find(cmdline cmdl, cstr8 arg, sz* out_idx);` |
+| `cmdline_has` | `func b32 cmdline_has(cmdline cmdl, cstr8 arg);` |
+| `cmdline_get_option` | `func cstr8 cmdline_get_option(cmdline cmdl, cstr8 name);` |
+| `cmdline_get_option_i64` | `func b32 cmdline_get_option_i64(cmdline cmdl, cstr8 name, i64* out);` |
+| `cmdline_get_option_f64` | `func b32 cmdline_get_option_f64(cmdline cmdl, cstr8 name, f64* out);` |
+
+#### Macros
+
+| Macro | Form |
+| --- | --- |
+| None | - |
 
 ### `utils/compress.h`
 
 - Types: **1**
 - Functions: **3**
+- Macros: **0**
 
 #### Types
 
-- `compress_error` (enum)
-  - What it represents: Represents a set of named constants for `compress error`
-  - Members:
-    - `COMPRESS_ERROR_NONE`: `enum value`
-    - `COMPRESS_ERROR_INVALID_ARGUMENT`: `enum value`
-    - `COMPRESS_ERROR_ALLOCATION_FAILED`: `enum value`
-    - `COMPRESS_ERROR_CORRUPT_DATA`: `enum value`
+| Type | Declaration |
+| --- | --- |
+| `compress_error` | `typedef enum compress_error { ... } compress_error;` |
 
 #### Functions
 
-- `compress_error_to_cstr(compress_error error) -> cstr8`
-  - What it does: Performs compress error to cstr
-  - Parameters:
-    - `error` (`compress_error`): Input parameter
-- `compress_encode(buffer src, allocator alloc, buffer* out_compressed) -> compress_error`
-  - What it does: Performs compress encode
-  - Parameters:
-    - `src` (`buffer`): Input data used by the operation
-    - `alloc` (`allocator`): Allocator/context used for memory management
-    - `out_compressed` (`buffer*`): Output value written by the function
-- `compress_decode(buffer src, allocator alloc, buffer* out_decompressed) -> compress_error`
-  - What it does: Performs compress decode
-  - Parameters:
-    - `src` (`buffer`): Input data used by the operation
-    - `alloc` (`allocator`): Allocator/context used for memory management
-    - `out_decompressed` (`buffer*`): Output value written by the function
+| Function | Declaration |
+| --- | --- |
+| `compress_error_to_cstr` | `func cstr8 compress_error_to_cstr(compress_error error);` |
+| `compress_encode` | `func compress_error compress_encode(buffer src, allocator alloc, buffer* out_compressed);` |
+| `compress_decode` | `func compress_error compress_decode(buffer src, allocator alloc, buffer* out_decompressed);` |
+
+#### Macros
+
+| Macro | Form |
+| --- | --- |
+| None | - |
 
 ### `utils/crc.h`
 
 - Types: **0**
 - Functions: **8**
+- Macros: **0**
 
 #### Types
 
-- None
+| Type | Declaration |
+| --- | --- |
+| None | - |
 
 #### Functions
 
-- `crc32_init() -> u32`
-  - What it does: Initializes crc32 init
-  - Parameters: none
-- `crc32_update(u32 crc, const void* data, sz size) -> u32`
-  - What it does: Performs crc32 update
-  - Parameters:
-    - `crc` (`u32`): Input parameter
-    - `data` (`const void*`): Input data used by the operation
-    - `size` (`sz`): Size or capacity value used by the operation
-- `crc32_finalize(u32 crc) -> u32`
-  - What it does: Performs crc32 finalize
-  - Parameters:
-    - `crc` (`u32`): Input parameter
-- `crc32(const void* data, sz size) -> u32`
-  - What it does: Performs crc32
-  - Parameters:
-    - `data` (`const void*`): Input data used by the operation
-    - `size` (`sz`): Size or capacity value used by the operation
-- `crc64_init() -> u64`
-  - What it does: Initializes crc64 init
-  - Parameters: none
-- `crc64_update(u64 crc, const void* data, sz size) -> u64`
-  - What it does: Performs crc64 update
-  - Parameters:
-    - `crc` (`u64`): Input parameter
-    - `data` (`const void*`): Input data used by the operation
-    - `size` (`sz`): Size or capacity value used by the operation
-- `crc64_finalize(u64 crc) -> u64`
-  - What it does: Performs crc64 finalize
-  - Parameters:
-    - `crc` (`u64`): Input parameter
-- `crc64(const void* data, sz size) -> u64`
-  - What it does: Performs crc64
-  - Parameters:
-    - `data` (`const void*`): Input data used by the operation
-    - `size` (`sz`): Size or capacity value used by the operation
+| Function | Declaration |
+| --- | --- |
+| `crc32_init` | `func u32 crc32_init(void);` |
+| `crc32_update` | `func u32 crc32_update(u32 crc, const void* data, sz size);` |
+| `crc32_finalize` | `func u32 crc32_finalize(u32 crc);` |
+| `crc32` | `func u32 crc32(const void* data, sz size);` |
+| `crc64_init` | `func u64 crc64_init(void);` |
+| `crc64_update` | `func u64 crc64_update(u64 crc, const void* data, sz size);` |
+| `crc64_finalize` | `func u64 crc64_finalize(u64 crc);` |
+| `crc64` | `func u64 crc64(const void* data, sz size);` |
+
+#### Macros
+
+| Macro | Form |
+| --- | --- |
+| None | - |
 
 ### `utils/digits.h`
 
 - Types: **0**
 - Functions: **20**
+- Macros: **0**
 
 #### Types
 
-- None
+| Type | Declaration |
+| --- | --- |
+| None | - |
 
 #### Functions
 
-- `u8_digits(u8 value) -> sz`
-  - What it does: Performs u8 digits
-  - Parameters:
-    - `value` (`u8`): Input parameter
-- `u16_digits(u16 value) -> sz`
-  - What it does: Performs u16 digits
-  - Parameters:
-    - `value` (`u16`): Input parameter
-- `u32_digits(u32 value) -> sz`
-  - What it does: Performs u32 digits
-  - Parameters:
-    - `value` (`u32`): Input parameter
-- `u64_digits(u64 value) -> sz`
-  - What it does: Performs u64 digits
-  - Parameters:
-    - `value` (`u64`): Input parameter
-- `i8_digits(i8 value) -> sz`
-  - What it does: Performs i8 digits
-  - Parameters:
-    - `value` (`i8`): Input parameter
-- `i16_digits(i16 value) -> sz`
-  - What it does: Performs i16 digits
-  - Parameters:
-    - `value` (`i16`): Input parameter
-- `i32_digits(i32 value) -> sz`
-  - What it does: Performs i32 digits
-  - Parameters:
-    - `value` (`i32`): Input parameter
-- `i64_digits(i64 value) -> sz`
-  - What it does: Performs i64 digits
-  - Parameters:
-    - `value` (`i64`): Input parameter
-- `u8x_digits(u8x value) -> sz`
-  - What it does: Performs u8x digits
-  - Parameters:
-    - `value` (`u8x`): Input parameter
-- `u16x_digits(u16x value) -> sz`
-  - What it does: Performs u16x digits
-  - Parameters:
-    - `value` (`u16x`): Input parameter
-- `u32x_digits(u32x value) -> sz`
-  - What it does: Performs u32x digits
-  - Parameters:
-    - `value` (`u32x`): Input parameter
-- `u64x_digits(u64x value) -> sz`
-  - What it does: Performs u64x digits
-  - Parameters:
-    - `value` (`u64x`): Input parameter
-- `sz_digits(sz value) -> sz`
-  - What it does: Performs sz digits
-  - Parameters:
-    - `value` (`sz`): Input parameter
-- `up_digits(up value) -> sz`
-  - What it does: Performs up digits
-  - Parameters:
-    - `value` (`up`): Input parameter
-- `i8x_digits(i8x value) -> sz`
-  - What it does: Performs i8x digits
-  - Parameters:
-    - `value` (`i8x`): Input parameter
-- `i16x_digits(i16x value) -> sz`
-  - What it does: Performs i16x digits
-  - Parameters:
-    - `value` (`i16x`): Input parameter
-- `i32x_digits(i32x value) -> sz`
-  - What it does: Performs i32x digits
-  - Parameters:
-    - `value` (`i32x`): Input parameter
-- `i64x_digits(i64x value) -> sz`
-  - What it does: Performs i64x digits
-  - Parameters:
-    - `value` (`i64x`): Input parameter
-- `sp_digits(sp value) -> sz`
-  - What it does: Performs sp digits
-  - Parameters:
-    - `value` (`sp`): Input parameter
-- `dp_digits(dp value) -> sz`
-  - What it does: Performs dp digits
-  - Parameters:
-    - `value` (`dp`): Input parameter
+| Function | Declaration |
+| --- | --- |
+| `u8_digits` | `func sz u8_digits(u8 value);` |
+| `u16_digits` | `func sz u16_digits(u16 value);` |
+| `u32_digits` | `func sz u32_digits(u32 value);` |
+| `u64_digits` | `func sz u64_digits(u64 value);` |
+| `i8_digits` | `func sz i8_digits(i8 value);` |
+| `i16_digits` | `func sz i16_digits(i16 value);` |
+| `i32_digits` | `func sz i32_digits(i32 value);` |
+| `i64_digits` | `func sz i64_digits(i64 value);` |
+| `u8x_digits` | `func sz u8x_digits(u8x value);` |
+| `u16x_digits` | `func sz u16x_digits(u16x value);` |
+| `u32x_digits` | `func sz u32x_digits(u32x value);` |
+| `u64x_digits` | `func sz u64x_digits(u64x value);` |
+| `sz_digits` | `func sz sz_digits(sz value);` |
+| `up_digits` | `func sz up_digits(up value);` |
+| `i8x_digits` | `func sz i8x_digits(i8x value);` |
+| `i16x_digits` | `func sz i16x_digits(i16x value);` |
+| `i32x_digits` | `func sz i32x_digits(i32x value);` |
+| `i64x_digits` | `func sz i64x_digits(i64x value);` |
+| `sp_digits` | `func sz sp_digits(sp value);` |
+| `dp_digits` | `func sz dp_digits(dp value);` |
+
+#### Macros
+
+| Macro | Form |
+| --- | --- |
+| None | - |
 
 ### `utils/endian.h`
 
 - Types: **0**
 - Functions: **14**
+- Macros: **0**
 
 #### Types
 
-- None
+| Type | Declaration |
+| --- | --- |
+| None | - |
 
 #### Functions
 
-- `endian_is_little() -> b32`
-  - What it does: Ends endian is little
-  - Parameters: none
-- `endian_is_big() -> b32`
-  - What it does: Ends endian is big
-  - Parameters: none
-- `endian_le16_to_native(u16 value) -> u16`
-  - What it does: Ends endian le16 to native
-  - Parameters:
-    - `value` (`u16`): Input parameter
-- `endian_le32_to_native(u32 value) -> u32`
-  - What it does: Ends endian le32 to native
-  - Parameters:
-    - `value` (`u32`): Input parameter
-- `endian_le64_to_native(u64 value) -> u64`
-  - What it does: Ends endian le64 to native
-  - Parameters:
-    - `value` (`u64`): Input parameter
-- `endian_be16_to_native(u16 value) -> u16`
-  - What it does: Ends endian be16 to native
-  - Parameters:
-    - `value` (`u16`): Input parameter
-- `endian_be32_to_native(u32 value) -> u32`
-  - What it does: Ends endian be32 to native
-  - Parameters:
-    - `value` (`u32`): Input parameter
-- `endian_be64_to_native(u64 value) -> u64`
-  - What it does: Ends endian be64 to native
-  - Parameters:
-    - `value` (`u64`): Input parameter
-- `endian_native_to_le16(u16 value) -> u16`
-  - What it does: Ends endian native to le16
-  - Parameters:
-    - `value` (`u16`): Input parameter
-- `endian_native_to_le32(u32 value) -> u32`
-  - What it does: Ends endian native to le32
-  - Parameters:
-    - `value` (`u32`): Input parameter
-- `endian_native_to_le64(u64 value) -> u64`
-  - What it does: Ends endian native to le64
-  - Parameters:
-    - `value` (`u64`): Input parameter
-- `endian_native_to_be16(u16 value) -> u16`
-  - What it does: Ends endian native to be16
-  - Parameters:
-    - `value` (`u16`): Input parameter
-- `endian_native_to_be32(u32 value) -> u32`
-  - What it does: Ends endian native to be32
-  - Parameters:
-    - `value` (`u32`): Input parameter
-- `endian_native_to_be64(u64 value) -> u64`
-  - What it does: Ends endian native to be64
-  - Parameters:
-    - `value` (`u64`): Input parameter
+| Function | Declaration |
+| --- | --- |
+| `endian_is_little` | `func b32 endian_is_little(void);` |
+| `endian_is_big` | `func b32 endian_is_big(void);` |
+| `endian_le16_to_native` | `func u16 endian_le16_to_native(u16 value);` |
+| `endian_le32_to_native` | `func u32 endian_le32_to_native(u32 value);` |
+| `endian_le64_to_native` | `func u64 endian_le64_to_native(u64 value);` |
+| `endian_be16_to_native` | `func u16 endian_be16_to_native(u16 value);` |
+| `endian_be32_to_native` | `func u32 endian_be32_to_native(u32 value);` |
+| `endian_be64_to_native` | `func u64 endian_be64_to_native(u64 value);` |
+| `endian_native_to_le16` | `func u16 endian_native_to_le16(u16 value);` |
+| `endian_native_to_le32` | `func u32 endian_native_to_le32(u32 value);` |
+| `endian_native_to_le64` | `func u64 endian_native_to_le64(u64 value);` |
+| `endian_native_to_be16` | `func u16 endian_native_to_be16(u16 value);` |
+| `endian_native_to_be32` | `func u32 endian_native_to_be32(u32 value);` |
+| `endian_native_to_be64` | `func u64 endian_native_to_be64(u64 value);` |
+
+#### Macros
+
+| Macro | Form |
+| --- | --- |
+| None | - |
 
 ### `utils/huffman.h`
 
 - Types: **2**
 - Functions: **8**
+- Macros: **4**
 
 #### Types
 
-- `huffman_code` (struct)
-  - What it represents: Represents `huffman code` data grouped in a struct
-  - Members:
-    - `bit_length`: `u16`
-    - `reserved0`: `u16`
-    - `reserved1`: `u32`
-    - `bits`: `u64 [HUFFMAN_CODE_WORD_CAP]`
-- `huffman_tree` (struct)
-  - What it represents: Represents `huffman tree` data grouped in a struct
-  - Members:
-    - `symbol_count`: `sz`
-    - `node_count`: `sz`
-    - `root_idx`: `u16`
-    - `root_symbol`: `u16`
-    - `symbol_frequencies`: `u64 [HUFFMAN_SYMBOL_CAP]`
-    - `codes`: `huffman_code [HUFFMAN_SYMBOL_CAP]`
-    - `node_frequencies`: `u64 [HUFFMAN_NODE_CAP]`
-    - `node_left`: `u16 [HUFFMAN_NODE_CAP]`
-    - `node_right`: `u16 [HUFFMAN_NODE_CAP]`
-    - `node_symbol`: `u16 [HUFFMAN_NODE_CAP]`
-    - `node_is_leaf`: `b32 [HUFFMAN_NODE_CAP]`
+| Type | Declaration |
+| --- | --- |
+| `huffman_code` | `typedef struct huffman_code { ... } huffman_code;` |
+| `huffman_tree` | `typedef struct huffman_tree { ... } huffman_tree;` |
 
 #### Functions
 
-- `huffman_tree_clear(huffman_tree* tree) -> void`
-  - What it does: Performs huffman tree clear
-  - Parameters:
-    - `tree` (`huffman_tree*`): Input parameter
-- `huffman_tree_build(huffman_tree* tree, const u64* frequencies, sz symbol_count) -> b32`
-  - What it does: Performs huffman tree build
-  - Parameters:
-    - `tree` (`huffman_tree*`): Input parameter
-    - `frequencies` (`const u64*`): Input parameter
-    - `symbol_count` (`sz`): Number of elements/items involved
-- `huffman_tree_build_for_bytes(huffman_tree* tree, buffer src) -> b32`
-  - What it does: Performs huffman tree build for bytes
-  - Parameters:
-    - `tree` (`huffman_tree*`): Input parameter
-    - `src` (`buffer`): Input data used by the operation
-- `huffman_tree_has_symbol(const huffman_tree* tree, u8 symbol) -> b32`
-  - What it does: Performs huffman tree has symbol
-  - Parameters:
-    - `tree` (`const huffman_tree*`): Input parameter
-    - `symbol` (`u8`): Input parameter
-- `huffman_tree_get_code(const huffman_tree* tree, u8 symbol) -> huffman_code`
-  - What it does: Gets huffman tree get code
-  - Parameters:
-    - `tree` (`const huffman_tree*`): Input parameter
-    - `symbol` (`u8`): Input parameter
-- `huffman_code_get_bit(const huffman_code* code, sz bit_idx) -> b32`
-  - What it does: Gets huffman code get bit
-  - Parameters:
-    - `code` (`const huffman_code*`): Input parameter
-    - `bit_idx` (`sz`): Zero-based index used to select an item
-- `huffman_tree_bit_length_for_bytes(const huffman_tree* tree, buffer src) -> u64`
-  - What it does: Performs huffman tree bit length for bytes
-  - Parameters:
-    - `tree` (`const huffman_tree*`): Input parameter
-    - `src` (`buffer`): Input data used by the operation
-- `huffman_tree_decode_symbol(const huffman_tree* tree, buffer bitstream, sz bit_offset, u8* out_symbol, sz* out_next_bit_offset) -> b32`
-  - What it does: Performs huffman tree decode symbol
-  - Parameters:
-    - `tree` (`const huffman_tree*`): Input parameter
-    - `bitstream` (`buffer`): Input parameter
-    - `bit_offset` (`sz`): Input parameter
-    - `out_symbol` (`u8*`): Output value written by the function
-    - `out_next_bit_offset` (`sz*`): Output value written by the function
+| Function | Declaration |
+| --- | --- |
+| `huffman_tree_clear` | `func void huffman_tree_clear(huffman_tree* tree);` |
+| `huffman_tree_build` | `func b32 huffman_tree_build(huffman_tree* tree, const u64* frequencies, sz symbol_count);` |
+| `huffman_tree_build_for_bytes` | `func b32 huffman_tree_build_for_bytes(huffman_tree* tree, buffer src);` |
+| `huffman_tree_has_symbol` | `func b32 huffman_tree_has_symbol(const huffman_tree* tree, u8 symbol);` |
+| `huffman_tree_get_code` | `func huffman_code huffman_tree_get_code(const huffman_tree* tree, u8 symbol);` |
+| `huffman_code_get_bit` | `func b32 huffman_code_get_bit(const huffman_code* code, sz bit_idx);` |
+| `huffman_tree_bit_length_for_bytes` | `func u64 huffman_tree_bit_length_for_bytes(const huffman_tree* tree, buffer src);` |
+| `huffman_tree_decode_symbol` | `func b32 huffman_tree_decode_symbol( const huffman_tree* tree, buffer bitstream, sz bit_offset, u8* out_symbol, sz* out_next_bit_offset);` |
+
+#### Macros
+
+| Macro | Form |
+| --- | --- |
+| `HUFFMAN_SYMBOL_CAP` | `HUFFMAN_SYMBOL_CAP` |
+| `HUFFMAN_CODE_WORD_CAP` | `HUFFMAN_CODE_WORD_CAP` |
+| `HUFFMAN_NODE_CAP` | `HUFFMAN_NODE_CAP` |
+| `HUFFMAN_INVALID_NODE` | `HUFFMAN_INVALID_NODE` |
 
 ### `utils/id.h`
 
 - Types: **4**
 - Functions: **44**
+- Macros: **0**
 
 #### Types
 
-- `id8` (struct)
-  - What it represents: Represents `id8` data grouped in a struct
-  - Members:
-    - `value`: `u8`
-- `id16` (struct)
-  - What it represents: Represents `id16` data grouped in a struct
-  - Members:
-    - `value`: `u16`
-- `id32` (struct)
-  - What it represents: Represents `id32` data grouped in a struct
-  - Members:
-    - `value`: `u32`
-- `id64` (struct)
-  - What it represents: Represents `id64` data grouped in a struct
-  - Members:
-    - `value`: `u64`
+| Type | Declaration |
+| --- | --- |
+| `id8` | `typedef struct id8 { ... } id8;` |
+| `id16` | `typedef struct id16 { ... } id16;` |
+| `id32` | `typedef struct id32 { ... } id32;` |
+| `id64` | `typedef struct id64 { ... } id64;` |
 
 #### Functions
 
-- `id8_zero() -> id8`
-  - What it does: Performs id8 zero
-  - Parameters: none
-- `id8_make(u8 value) -> id8`
-  - What it does: Performs id8 make
-  - Parameters:
-    - `value` (`u8`): Input parameter
-- `id8_get(id8 ident) -> u8`
-  - What it does: Performs id8 get
-  - Parameters:
-    - `ident` (`id8`): Input parameter
-- `id8_is_zero(id8 ident) -> b32`
-  - What it does: Performs id8 is zero
-  - Parameters:
-    - `ident` (`id8`): Input parameter
-- `id8_is_valid(id8 ident) -> b32`
-  - What it does: Performs id8 is valid
-  - Parameters:
-    - `ident` (`id8`): Input parameter
-- `id8_next(id8 ident) -> id8`
-  - What it does: Performs id8 next
-  - Parameters:
-    - `ident` (`id8`): Input parameter
-- `id8_cmp(id8 lhs, id8 rhs) -> i32`
-  - What it does: Performs id8 cmp
-  - Parameters:
-    - `lhs` (`id8`): Input data used by the operation
-    - `rhs` (`id8`): Input data used by the operation
-- `id8_string_length(id8 ident) -> sz`
-  - What it does: Performs id8 string length
-  - Parameters:
-    - `ident` (`id8`): Input parameter
-- `id8_parse_cstr8(cstr8 src, id8* out) -> b32`
-  - What it does: Performs id8 parse cstr8
-  - Parameters:
-    - `src` (`cstr8`): Input data used by the operation
-    - `out` (`id8*`): Destination storage for output data
-- `id8_to_cstr8(id8 ident, c8* dst, sz cap) -> b32`
-  - What it does: Performs id8 to cstr8
-  - Parameters:
-    - `ident` (`id8`): Input parameter
-    - `dst` (`c8*`): Destination storage for output data
-    - `cap` (`sz`): Input parameter
-- `id8_to_str8(id8 ident, str8* dst) -> b32`
-  - What it does: Performs id8 to str8
-  - Parameters:
-    - `ident` (`id8`): Input parameter
-    - `dst` (`str8*`): Destination storage for output data
-- `id16_zero() -> id16`
-  - What it does: Performs id16 zero
-  - Parameters: none
-- `id16_make(u16 value) -> id16`
-  - What it does: Performs id16 make
-  - Parameters:
-    - `value` (`u16`): Input parameter
-- `id16_get(id16 ident) -> u16`
-  - What it does: Performs id16 get
-  - Parameters:
-    - `ident` (`id16`): Input parameter
-- `id16_is_zero(id16 ident) -> b32`
-  - What it does: Performs id16 is zero
-  - Parameters:
-    - `ident` (`id16`): Input parameter
-- `id16_is_valid(id16 ident) -> b32`
-  - What it does: Performs id16 is valid
-  - Parameters:
-    - `ident` (`id16`): Input parameter
-- `id16_next(id16 ident) -> id16`
-  - What it does: Performs id16 next
-  - Parameters:
-    - `ident` (`id16`): Input parameter
-- `id16_cmp(id16 lhs, id16 rhs) -> i32`
-  - What it does: Performs id16 cmp
-  - Parameters:
-    - `lhs` (`id16`): Input data used by the operation
-    - `rhs` (`id16`): Input data used by the operation
-- `id16_string_length(id16 ident) -> sz`
-  - What it does: Performs id16 string length
-  - Parameters:
-    - `ident` (`id16`): Input parameter
-- `id16_parse_cstr8(cstr8 src, id16* out) -> b32`
-  - What it does: Performs id16 parse cstr8
-  - Parameters:
-    - `src` (`cstr8`): Input data used by the operation
-    - `out` (`id16*`): Destination storage for output data
-- `id16_to_cstr8(id16 ident, c8* dst, sz cap) -> b32`
-  - What it does: Performs id16 to cstr8
-  - Parameters:
-    - `ident` (`id16`): Input parameter
-    - `dst` (`c8*`): Destination storage for output data
-    - `cap` (`sz`): Input parameter
-- `id16_to_str8(id16 ident, str8* dst) -> b32`
-  - What it does: Performs id16 to str8
-  - Parameters:
-    - `ident` (`id16`): Input parameter
-    - `dst` (`str8*`): Destination storage for output data
-- `id32_zero() -> id32`
-  - What it does: Performs id32 zero
-  - Parameters: none
-- `id32_make(u32 value) -> id32`
-  - What it does: Performs id32 make
-  - Parameters:
-    - `value` (`u32`): Input parameter
-- `id32_get(id32 ident) -> u32`
-  - What it does: Performs id32 get
-  - Parameters:
-    - `ident` (`id32`): Input parameter
-- `id32_is_zero(id32 ident) -> b32`
-  - What it does: Performs id32 is zero
-  - Parameters:
-    - `ident` (`id32`): Input parameter
-- `id32_is_valid(id32 ident) -> b32`
-  - What it does: Performs id32 is valid
-  - Parameters:
-    - `ident` (`id32`): Input parameter
-- `id32_next(id32 ident) -> id32`
-  - What it does: Performs id32 next
-  - Parameters:
-    - `ident` (`id32`): Input parameter
-- `id32_cmp(id32 lhs, id32 rhs) -> i32`
-  - What it does: Performs id32 cmp
-  - Parameters:
-    - `lhs` (`id32`): Input data used by the operation
-    - `rhs` (`id32`): Input data used by the operation
-- `id32_string_length(id32 ident) -> sz`
-  - What it does: Performs id32 string length
-  - Parameters:
-    - `ident` (`id32`): Input parameter
-- `id32_parse_cstr8(cstr8 src, id32* out) -> b32`
-  - What it does: Performs id32 parse cstr8
-  - Parameters:
-    - `src` (`cstr8`): Input data used by the operation
-    - `out` (`id32*`): Destination storage for output data
-- `id32_to_cstr8(id32 ident, c8* dst, sz cap) -> b32`
-  - What it does: Performs id32 to cstr8
-  - Parameters:
-    - `ident` (`id32`): Input parameter
-    - `dst` (`c8*`): Destination storage for output data
-    - `cap` (`sz`): Input parameter
-- `id32_to_str8(id32 ident, str8* dst) -> b32`
-  - What it does: Performs id32 to str8
-  - Parameters:
-    - `ident` (`id32`): Input parameter
-    - `dst` (`str8*`): Destination storage for output data
-- `id64_zero() -> id64`
-  - What it does: Performs id64 zero
-  - Parameters: none
-- `id64_make(u64 value) -> id64`
-  - What it does: Performs id64 make
-  - Parameters:
-    - `value` (`u64`): Input parameter
-- `id64_get(id64 ident) -> u64`
-  - What it does: Performs id64 get
-  - Parameters:
-    - `ident` (`id64`): Input parameter
-- `id64_is_zero(id64 ident) -> b32`
-  - What it does: Performs id64 is zero
-  - Parameters:
-    - `ident` (`id64`): Input parameter
-- `id64_is_valid(id64 ident) -> b32`
-  - What it does: Performs id64 is valid
-  - Parameters:
-    - `ident` (`id64`): Input parameter
-- `id64_next(id64 ident) -> id64`
-  - What it does: Performs id64 next
-  - Parameters:
-    - `ident` (`id64`): Input parameter
-- `id64_cmp(id64 lhs, id64 rhs) -> i32`
-  - What it does: Performs id64 cmp
-  - Parameters:
-    - `lhs` (`id64`): Input data used by the operation
-    - `rhs` (`id64`): Input data used by the operation
-- `id64_string_length(id64 ident) -> sz`
-  - What it does: Performs id64 string length
-  - Parameters:
-    - `ident` (`id64`): Input parameter
-- `id64_parse_cstr8(cstr8 src, id64* out) -> b32`
-  - What it does: Performs id64 parse cstr8
-  - Parameters:
-    - `src` (`cstr8`): Input data used by the operation
-    - `out` (`id64*`): Destination storage for output data
-- `id64_to_cstr8(id64 ident, c8* dst, sz cap) -> b32`
-  - What it does: Performs id64 to cstr8
-  - Parameters:
-    - `ident` (`id64`): Input parameter
-    - `dst` (`c8*`): Destination storage for output data
-    - `cap` (`sz`): Input parameter
-- `id64_to_str8(id64 ident, str8* dst) -> b32`
-  - What it does: Performs id64 to str8
-  - Parameters:
-    - `ident` (`id64`): Input parameter
-    - `dst` (`str8*`): Destination storage for output data
+| Function | Declaration |
+| --- | --- |
+| `id8_zero` | `func id8 id8_zero(void);` |
+| `id8_make` | `func id8 id8_make(u8 value);` |
+| `id8_get` | `func u8 id8_get(id8 ident);` |
+| `id8_is_zero` | `func b32 id8_is_zero(id8 ident);` |
+| `id8_is_valid` | `func b32 id8_is_valid(id8 ident);` |
+| `id8_next` | `func id8 id8_next(id8 ident);` |
+| `id8_cmp` | `func i32 id8_cmp(id8 lhs, id8 rhs);` |
+| `id8_string_length` | `func sz id8_string_length(id8 ident);` |
+| `id8_parse_cstr8` | `func b32 id8_parse_cstr8(cstr8 src, id8* out);` |
+| `id8_to_cstr8` | `func b32 id8_to_cstr8(id8 ident, c8* dst, sz cap);` |
+| `id8_to_str8` | `func b32 id8_to_str8(id8 ident, str8* dst);` |
+| `id16_zero` | `func id16 id16_zero(void);` |
+| `id16_make` | `func id16 id16_make(u16 value);` |
+| `id16_get` | `func u16 id16_get(id16 ident);` |
+| `id16_is_zero` | `func b32 id16_is_zero(id16 ident);` |
+| `id16_is_valid` | `func b32 id16_is_valid(id16 ident);` |
+| `id16_next` | `func id16 id16_next(id16 ident);` |
+| `id16_cmp` | `func i32 id16_cmp(id16 lhs, id16 rhs);` |
+| `id16_string_length` | `func sz id16_string_length(id16 ident);` |
+| `id16_parse_cstr8` | `func b32 id16_parse_cstr8(cstr8 src, id16* out);` |
+| `id16_to_cstr8` | `func b32 id16_to_cstr8(id16 ident, c8* dst, sz cap);` |
+| `id16_to_str8` | `func b32 id16_to_str8(id16 ident, str8* dst);` |
+| `id32_zero` | `func id32 id32_zero(void);` |
+| `id32_make` | `func id32 id32_make(u32 value);` |
+| `id32_get` | `func u32 id32_get(id32 ident);` |
+| `id32_is_zero` | `func b32 id32_is_zero(id32 ident);` |
+| `id32_is_valid` | `func b32 id32_is_valid(id32 ident);` |
+| `id32_next` | `func id32 id32_next(id32 ident);` |
+| `id32_cmp` | `func i32 id32_cmp(id32 lhs, id32 rhs);` |
+| `id32_string_length` | `func sz id32_string_length(id32 ident);` |
+| `id32_parse_cstr8` | `func b32 id32_parse_cstr8(cstr8 src, id32* out);` |
+| `id32_to_cstr8` | `func b32 id32_to_cstr8(id32 ident, c8* dst, sz cap);` |
+| `id32_to_str8` | `func b32 id32_to_str8(id32 ident, str8* dst);` |
+| `id64_zero` | `func id64 id64_zero(void);` |
+| `id64_make` | `func id64 id64_make(u64 value);` |
+| `id64_get` | `func u64 id64_get(id64 ident);` |
+| `id64_is_zero` | `func b32 id64_is_zero(id64 ident);` |
+| `id64_is_valid` | `func b32 id64_is_valid(id64 ident);` |
+| `id64_next` | `func id64 id64_next(id64 ident);` |
+| `id64_cmp` | `func i32 id64_cmp(id64 lhs, id64 rhs);` |
+| `id64_string_length` | `func sz id64_string_length(id64 ident);` |
+| `id64_parse_cstr8` | `func b32 id64_parse_cstr8(cstr8 src, id64* out);` |
+| `id64_to_cstr8` | `func b32 id64_to_cstr8(id64 ident, c8* dst, sz cap);` |
+| `id64_to_str8` | `func b32 id64_to_str8(id64 ident, str8* dst);` |
+
+#### Macros
+
+| Macro | Form |
+| --- | --- |
+| None | - |
 
 ### `utils/log_state.h`
 
-- Types: **5**
+- Types: **4**
 - Functions: **18**
+- Macros: **10**
 
 #### Types
 
-- `log_state` (alias)
-  - What it represents: Type alias used for `log state`
-  - Members: none (alias/function type)
-- `log_level` (enum)
-  - What it represents: Represents a set of named constants for `log level`
-  - Members:
-    - `LOG_LEVEL_FATAL`: `enum value`
-    - `LOG_LEVEL_ERROR`: `enum value`
-    - `LOG_LEVEL_WARN`: `enum value`
-    - `LOG_LEVEL_INFO`: `enum value`
-    - `LOG_LEVEL_DEBUG`: `enum value`
-    - `LOG_LEVEL_VERBOSE`: `enum value`
-    - `LOG_LEVEL_TRACE`: `enum value`
-    - `LOG_LEVEL_MAX`: `enum value`
-- `log_msg` (struct)
-  - What it represents: Represents `log msg` data grouped in a struct
-  - Members:
-    - `next`: `struct log_msg*`
-    - `level`: `log_level`
-    - `site`: `callsite`
-    - `text`: `cstr8`
-- `log_frame` (struct)
-  - What it represents: Represents `log frame` data grouped in a struct
-  - Members:
-    - `next`: `struct log_frame*`
-    - `msgs_head`: `log_msg*`
-    - `msgs_tail`: `log_msg*`
-    - `msg_count`: `sz`
-- `log_state` (struct)
-  - What it represents: Represents `log state` data grouped in a struct
-  - Members:
-    - `is_init`: `b32`
-    - `mutex_handle`: `mutex`
-    - `level`: `log_level`
-    - `root_frame_storage`: `log_frame`
-    - `root_frame`: `log_frame*`
-    - `active_frame`: `log_frame*`
-    - `arena_alloc`: `arena`
+| Type | Declaration |
+| --- | --- |
+| `log_state` | `typedef struct log_state log_state;` |
+| `log_level` | `typedef enum log_level { ... } log_level;` |
+| `log_msg` | `typedef struct log_msg { ... } log_msg;` |
+| `log_frame` | `typedef struct log_frame { ... } log_frame;` |
 
 #### Functions
 
-- `log_level_to_str(log_level level) -> cstr8`
-  - What it does: Performs log level to str
-  - Parameters:
-    - `level` (`log_level`): Configuration value controlling behavior
-- `log_state_set_level(log_state* state, log_level level) -> void`
-  - What it does: Sets log state set level
-  - Parameters:
-    - `state` (`log_state*`): Configuration value controlling behavior
-    - `level` (`log_level`): Configuration value controlling behavior
-- `log_msg_next(log_msg* msg) -> log_msg*`
-  - What it does: Performs log msg next
-  - Parameters:
-    - `msg` (`log_msg*`): Input parameter
-- `log_msg_level(log_msg* msg) -> log_level`
-  - What it does: Performs log msg level
-  - Parameters:
-    - `msg` (`log_msg*`): Input parameter
-- `log_msg_site(log_msg* msg) -> callsite`
-  - What it does: Performs log msg site
-  - Parameters:
-    - `msg` (`log_msg*`): Input parameter
-- `log_msg_text(log_msg* msg) -> cstr8`
-  - What it does: Performs log msg text
-  - Parameters:
-    - `msg` (`log_msg*`): Input parameter
-- `log_frame_has_msgs(log_frame* frame) -> b32`
-  - What it does: Performs log frame has msgs
-  - Parameters:
-    - `frame` (`log_frame*`): Input parameter
-- `log_frame_msg_count(log_frame* frame) -> sz`
-  - What it does: Performs log frame msg count
-  - Parameters:
-    - `frame` (`log_frame*`): Input parameter
-- `log_frame_first(log_frame* frame) -> log_msg*`
-  - What it does: Performs log frame first
-  - Parameters:
-    - `frame` (`log_frame*`): Input parameter
-- `log_frame_last(log_frame* frame) -> log_msg*`
-  - What it does: Performs log frame last
-  - Parameters:
-    - `frame` (`log_frame*`): Input parameter
-- `_log_state_init(log_state* state, mutex mutex_handle, allocator alloc, callsite site) -> b32`
-  - What it does: Initializes  log state init
-  - Parameters:
-    - `state` (`log_state*`): Configuration value controlling behavior
-    - `mutex_handle` (`mutex`): Input parameter
-    - `alloc` (`allocator`): Allocator/context used for memory management
-    - `site` (`callsite`): Input parameter
-- `_log_state_quit(log_state* state, callsite site) -> void`
-  - What it does: Shuts down  log state quit
-  - Parameters:
-    - `state` (`log_state*`): Configuration value controlling behavior
-    - `site` (`callsite`): Input parameter
-- `log_state_is_init(log_state* state) -> b32`
-  - What it does: Initializes log state is init
-  - Parameters:
-    - `state` (`log_state*`): Configuration value controlling behavior
-- `log_state_clear(log_state* state) -> b32`
-  - What it does: Performs log state clear
-  - Parameters:
-    - `state` (`log_state*`): Configuration value controlling behavior
-- `log_state_sync(log_state* dst, log_state* src) -> void`
-  - What it does: Performs log state sync
-  - Parameters:
-    - `dst` (`log_state*`): Destination storage for output data
-    - `src` (`log_state*`): Input data used by the operation
-- `log_state_begin_frame(log_state* state) -> void`
-  - What it does: Begins log state begin frame
-  - Parameters:
-    - `state` (`log_state*`): Configuration value controlling behavior
-- `log_state_end_frame(log_state* state, u32 severity_mask) -> log_frame*`
-  - What it does: Ends log state end frame
-  - Parameters:
-    - `state` (`log_state*`): Configuration value controlling behavior
-    - `severity_mask` (`u32`): Input parameter
-- `_log(log_state* state, log_level level, callsite site, const char* msg, ...) -> void`
-  - What it does: Performs  log
-  - Parameters:
-    - `state` (`log_state*`): Configuration value controlling behavior
-    - `level` (`log_level`): Configuration value controlling behavior
-    - `site` (`callsite`): Input parameter
-    - `msg` (`const char*`): Input parameter
-    - `...` (`variadic`): Additional variadic arguments
+| Function | Declaration |
+| --- | --- |
+| `log_level_to_str` | `func cstr8 log_level_to_str(log_level level);` |
+| `log_state_set_level` | `func void log_state_set_level(log_state* state, log_level level);` |
+| `log_msg_next` | `func log_msg* log_msg_next(log_msg* msg);` |
+| `log_msg_level` | `func log_level log_msg_level(log_msg* msg);` |
+| `log_msg_site` | `func callsite log_msg_site(log_msg* msg);` |
+| `log_msg_text` | `func cstr8 log_msg_text(log_msg* msg);` |
+| `log_frame_has_msgs` | `func b32 log_frame_has_msgs(log_frame* frame);` |
+| `log_frame_msg_count` | `func sz log_frame_msg_count(log_frame* frame);` |
+| `log_frame_first` | `func log_msg* log_frame_first(log_frame* frame);` |
+| `log_frame_last` | `func log_msg* log_frame_last(log_frame* frame);` |
+| `_log_state_init` | `func b32 _log_state_init(log_state* state, mutex mutex_handle, allocator alloc, callsite site);` |
+| `_log_state_quit` | `func void _log_state_quit(log_state* state, callsite site);` |
+| `log_state_is_init` | `func b32 log_state_is_init(log_state* state);` |
+| `log_state_clear` | `func b32 log_state_clear(log_state* state);` |
+| `log_state_sync` | `func void log_state_sync(log_state* dst, log_state* src);` |
+| `log_state_begin_frame` | `func void log_state_begin_frame(log_state* state);` |
+| `log_state_end_frame` | `func log_frame* log_state_end_frame(log_state* state, u32 severity_mask);` |
+| `_log` | `func void _log(log_state* state, log_level level, callsite site, const char* msg, ...);` |
+
+#### Macros
+
+| Macro | Form |
+| --- | --- |
+| `LOG_LEVEL_DEFAULT` | `LOG_LEVEL_DEFAULT` |
+| `log_state_init` | `log_state_init(state, mutex_handle, alloc)` |
+| `log_state_quit` | `log_state_quit(state)` |
+| `log_state_fatal` | `log_state_fatal(state, ...)` |
+| `log_state_error` | `log_state_error(state, ...)` |
+| `log_state_warn` | `log_state_warn(state, ...)` |
+| `log_state_info` | `log_state_info(state, ...)` |
+| `log_state_debug` | `log_state_debug(state, ...)` |
+| `log_state_verbose` | `log_state_verbose(state, ...)` |
+| `log_state_trace` | `log_state_trace(state, ...)` |
 
 ### `utils/random_series.h`
 
 - Types: **1**
 - Functions: **29**
+- Macros: **0**
 
 #### Types
 
-- `random_series` (struct)
-  - What it represents: Represents `random series` data grouped in a struct
-  - Members:
-    - `current`: `u32`
-    - `seed`: `u32`
+| Type | Declaration |
+| --- | --- |
+| `random_series` | `typedef struct random_series { ... } random_series;` |
 
 #### Functions
 
-- `random_series_seed(random_series* series, u32 seed) -> void`
-  - What it does: Performs random series seed
-  - Parameters:
-    - `series` (`random_series*`): Input parameter
-    - `seed` (`u32`): Input parameter
-- `random_series_reset(random_series* series) -> void`
-  - What it does: Performs random series reset
-  - Parameters:
-    - `series` (`random_series*`): Input parameter
-- `random_series_chance_f64(random_series* series, f64 chance) -> b32`
-  - What it does: Performs random series chance f64
-  - Parameters:
-    - `series` (`random_series*`): Input parameter
-    - `chance` (`f64`): Input parameter
-- `random_series_chance_f32(random_series* series, f32 chance) -> b32`
-  - What it does: Performs random series chance f32
-  - Parameters:
-    - `series` (`random_series*`): Input parameter
-    - `chance` (`f32`): Input parameter
-- `random_series_chance(random_series* series, u32x chance) -> b32`
-  - What it does: Performs random series chance
-  - Parameters:
-    - `series` (`random_series*`): Input parameter
-    - `chance` (`u32x`): Input parameter
-- `random_series_u8(random_series* series) -> u8`
-  - What it does: Performs random series u8
-  - Parameters:
-    - `series` (`random_series*`): Input parameter
-- `random_series_u16(random_series* series) -> u16`
-  - What it does: Performs random series u16
-  - Parameters:
-    - `series` (`random_series*`): Input parameter
-- `random_series_u32(random_series* series) -> u32`
-  - What it does: Performs random series u32
-  - Parameters:
-    - `series` (`random_series*`): Input parameter
-- `random_series_u64(random_series* series) -> u64`
-  - What it does: Performs random series u64
-  - Parameters:
-    - `series` (`random_series*`): Input parameter
-- `random_series_i8(random_series* series) -> i8`
-  - What it does: Performs random series i8
-  - Parameters:
-    - `series` (`random_series*`): Input parameter
-- `random_series_i16(random_series* series) -> i16`
-  - What it does: Performs random series i16
-  - Parameters:
-    - `series` (`random_series*`): Input parameter
-- `random_series_i32(random_series* series) -> i32`
-  - What it does: Performs random series i32
-  - Parameters:
-    - `series` (`random_series*`): Input parameter
-- `random_series_i64(random_series* series) -> i64`
-  - What it does: Performs random series i64
-  - Parameters:
-    - `series` (`random_series*`): Input parameter
-- `random_series_f32(random_series* series) -> f32`
-  - What it does: Performs random series f32
-  - Parameters:
-    - `series` (`random_series*`): Input parameter
-- `random_series_f64(random_series* series) -> f64`
-  - What it does: Performs random series f64
-  - Parameters:
-    - `series` (`random_series*`): Input parameter
-- `random_series_rng_u8(random_series* series, u8 min_value, u8 max_value) -> u8`
-  - What it does: Performs random series rng u8
-  - Parameters:
-    - `series` (`random_series*`): Input parameter
-    - `min_value` (`u8`): Input parameter
-    - `max_value` (`u8`): Input parameter
-- `random_series_rng_u16(random_series* series, u16 min_value, u16 max_value) -> u16`
-  - What it does: Performs random series rng u16
-  - Parameters:
-    - `series` (`random_series*`): Input parameter
-    - `min_value` (`u16`): Input parameter
-    - `max_value` (`u16`): Input parameter
-- `random_series_rng_u32(random_series* series, u32 min_value, u32 max_value) -> u32`
-  - What it does: Performs random series rng u32
-  - Parameters:
-    - `series` (`random_series*`): Input parameter
-    - `min_value` (`u32`): Input parameter
-    - `max_value` (`u32`): Input parameter
-- `random_series_rng_u64(random_series* series, u64 min_value, u64 max_value) -> u64`
-  - What it does: Performs random series rng u64
-  - Parameters:
-    - `series` (`random_series*`): Input parameter
-    - `min_value` (`u64`): Input parameter
-    - `max_value` (`u64`): Input parameter
-- `random_series_rng_i8(random_series* series, i8 min_value, i8 max_value) -> i8`
-  - What it does: Performs random series rng i8
-  - Parameters:
-    - `series` (`random_series*`): Input parameter
-    - `min_value` (`i8`): Input parameter
-    - `max_value` (`i8`): Input parameter
-- `random_series_rng_i16(random_series* series, i16 min_value, i16 max_value) -> i16`
-  - What it does: Performs random series rng i16
-  - Parameters:
-    - `series` (`random_series*`): Input parameter
-    - `min_value` (`i16`): Input parameter
-    - `max_value` (`i16`): Input parameter
-- `random_series_rng_i32(random_series* series, i32 min_value, i32 max_value) -> i32`
-  - What it does: Performs random series rng i32
-  - Parameters:
-    - `series` (`random_series*`): Input parameter
-    - `min_value` (`i32`): Input parameter
-    - `max_value` (`i32`): Input parameter
-- `random_series_rng_i64(random_series* series, i64 min_value, i64 max_value) -> i64`
-  - What it does: Performs random series rng i64
-  - Parameters:
-    - `series` (`random_series*`): Input parameter
-    - `min_value` (`i64`): Input parameter
-    - `max_value` (`i64`): Input parameter
-- `random_series_rng_f32(random_series* series, f32 min_value, f32 max_value) -> f32`
-  - What it does: Performs random series rng f32
-  - Parameters:
-    - `series` (`random_series*`): Input parameter
-    - `min_value` (`f32`): Input parameter
-    - `max_value` (`f32`): Input parameter
-- `random_series_rng_f64(random_series* series, f64 min_value, f64 max_value) -> f64`
-  - What it does: Performs random series rng f64
-  - Parameters:
-    - `series` (`random_series*`): Input parameter
-    - `min_value` (`f64`): Input parameter
-    - `max_value` (`f64`): Input parameter
-- `random_series_u_f32(random_series* series) -> f32`
-  - What it does: Performs random series u f32
-  - Parameters:
-    - `series` (`random_series*`): Input parameter
-- `random_series_u_f64(random_series* series) -> f64`
-  - What it does: Performs random series u f64
-  - Parameters:
-    - `series` (`random_series*`): Input parameter
-- `random_series_b_f32(random_series* series) -> f32`
-  - What it does: Performs random series b f32
-  - Parameters:
-    - `series` (`random_series*`): Input parameter
-- `random_series_b_f64(random_series* series) -> f64`
-  - What it does: Performs random series b f64
-  - Parameters:
-    - `series` (`random_series*`): Input parameter
+| Function | Declaration |
+| --- | --- |
+| `random_series_seed` | `func void random_series_seed(random_series* series, u32 seed);` |
+| `random_series_reset` | `func void random_series_reset(random_series* series);` |
+| `random_series_chance_f64` | `func b32 random_series_chance_f64(random_series* series, f64 chance);` |
+| `random_series_chance_f32` | `func b32 random_series_chance_f32(random_series* series, f32 chance);` |
+| `random_series_chance` | `func b32 random_series_chance(random_series* series, u32x chance);` |
+| `random_series_u8` | `func u8 random_series_u8(random_series* series);` |
+| `random_series_u16` | `func u16 random_series_u16(random_series* series);` |
+| `random_series_u32` | `func u32 random_series_u32(random_series* series);` |
+| `random_series_u64` | `func u64 random_series_u64(random_series* series);` |
+| `random_series_i8` | `func i8 random_series_i8(random_series* series);` |
+| `random_series_i16` | `func i16 random_series_i16(random_series* series);` |
+| `random_series_i32` | `func i32 random_series_i32(random_series* series);` |
+| `random_series_i64` | `func i64 random_series_i64(random_series* series);` |
+| `random_series_f32` | `func f32 random_series_f32(random_series* series);` |
+| `random_series_f64` | `func f64 random_series_f64(random_series* series);` |
+| `random_series_rng_u8` | `func u8 random_series_rng_u8(random_series* series, u8 min_value, u8 max_value);` |
+| `random_series_rng_u16` | `func u16 random_series_rng_u16(random_series* series, u16 min_value, u16 max_value);` |
+| `random_series_rng_u32` | `func u32 random_series_rng_u32(random_series* series, u32 min_value, u32 max_value);` |
+| `random_series_rng_u64` | `func u64 random_series_rng_u64(random_series* series, u64 min_value, u64 max_value);` |
+| `random_series_rng_i8` | `func i8 random_series_rng_i8(random_series* series, i8 min_value, i8 max_value);` |
+| `random_series_rng_i16` | `func i16 random_series_rng_i16(random_series* series, i16 min_value, i16 max_value);` |
+| `random_series_rng_i32` | `func i32 random_series_rng_i32(random_series* series, i32 min_value, i32 max_value);` |
+| `random_series_rng_i64` | `func i64 random_series_rng_i64(random_series* series, i64 min_value, i64 max_value);` |
+| `random_series_rng_f32` | `func f32 random_series_rng_f32(random_series* series, f32 min_value, f32 max_value);` |
+| `random_series_rng_f64` | `func f64 random_series_rng_f64(random_series* series, f64 min_value, f64 max_value);` |
+| `random_series_u_f32` | `func f32 random_series_u_f32(random_series* series);` |
+| `random_series_u_f64` | `func f64 random_series_u_f64(random_series* series);` |
+| `random_series_b_f32` | `func f32 random_series_b_f32(random_series* series);` |
+| `random_series_b_f64` | `func f64 random_series_b_f64(random_series* series);` |
+
+#### Macros
+
+| Macro | Form |
+| --- | --- |
+| None | - |
 
 ### `utils/stacktrace.h`
 
 - Types: **1**
 - Functions: **1**
+- Macros: **1**
 
 #### Types
 
-- `stacktrace_frame` (struct)
-  - What it represents: Represents `stacktrace frame` data grouped in a struct
-  - Members:
-    - `address`: `up`
-    - `symbol`: `str8_medium`
+| Type | Declaration |
+| --- | --- |
+| `stacktrace_frame` | `typedef struct stacktrace_frame { ... } stacktrace_frame;` |
 
 #### Functions
 
-- `stacktrace_capture(stacktrace_frame* out_frames, sz out_capacity, sz skip_frames) -> sz`
-  - What it does: Performs stacktrace capture
-  - Parameters:
-    - `out_frames` (`stacktrace_frame*`): Output value written by the function
-    - `out_capacity` (`sz`): Output value written by the function
-    - `skip_frames` (`sz`): Input parameter
+| Function | Declaration |
+| --- | --- |
+| `stacktrace_capture` | `func sz stacktrace_capture(stacktrace_frame* out_frames, sz out_capacity, sz skip_frames);` |
+
+#### Macros
+
+| Macro | Form |
+| --- | --- |
+| `STACKTRACE_CAPTURE_CAP` | `STACKTRACE_CAPTURE_CAP` |
 
 ### `utils/timer.h`
 
 - Types: **0**
 - Functions: **5**
+- Macros: **0**
 
 #### Types
 
-- None
+| Type | Declaration |
+| --- | --- |
+| None | - |
 
 #### Functions
 
-- `timer_clear(f32* timer) -> void`
-  - What it does: Performs timer clear
-  - Parameters:
-    - `timer` (`f32*`): Input parameter
-- `timer_bump(f32* timer) -> void`
-  - What it does: Performs timer bump
-  - Parameters:
-    - `timer` (`f32*`): Input parameter
-- `timer_increment(f32* timer, f32 dt, f32 scale) -> void`
-  - What it does: Performs timer increment
-  - Parameters:
-    - `timer` (`f32*`): Input parameter
-    - `dt` (`f32`): Input parameter
-    - `scale` (`f32`): Input parameter
-- `timer_consume(f32* timer, f32 rate) -> b32`
-  - What it does: Performs timer consume
-  - Parameters:
-    - `timer` (`f32*`): Input parameter
-    - `rate` (`f32`): Input parameter
-- `timer_consume_once(f32* timer, f32 rate) -> b32`
-  - What it does: Performs timer consume once
-  - Parameters:
-    - `timer` (`f32*`): Input parameter
-    - `rate` (`f32`): Input parameter
+| Function | Declaration |
+| --- | --- |
+| `timer_clear` | `func void timer_clear(f32* timer);` |
+| `timer_bump` | `func void timer_bump(f32* timer);` |
+| `timer_increment` | `func void timer_increment(f32* timer, f32 dt, f32 scale);` |
+| `timer_consume` | `func b32 timer_consume(f32* timer, f32 rate);` |
+| `timer_consume_once` | `func b32 timer_consume_once(f32* timer, f32 rate);` |
+
+#### Macros
+
+| Macro | Form |
+| --- | --- |
+| None | - |
 
 ### `utils/timestamp.h`
 
 - Types: **1**
 - Functions: **19**
+- Macros: **0**
 
 #### Types
 
-- `timestamp` (struct)
-  - What it represents: Represents `timestamp` data grouped in a struct
-  - Members:
-    - `microseconds`: `i64`
+| Type | Declaration |
+| --- | --- |
+| `timestamp` | `typedef struct timestamp { ... } timestamp;` |
 
 #### Functions
 
-- `timestamp_zero() -> timestamp`
-  - What it does: Performs timestamp zero
-  - Parameters: none
-- `timestamp_now() -> timestamp`
-  - What it does: Performs timestamp now
-  - Parameters: none
-- `timestamp_from_microseconds(i64 microseconds) -> timestamp`
-  - What it does: Performs timestamp from microseconds
-  - Parameters:
-    - `microseconds` (`i64`): Input parameter
-- `timestamp_from_milliseconds(i64 milliseconds) -> timestamp`
-  - What it does: Performs timestamp from milliseconds
-  - Parameters:
-    - `milliseconds` (`i64`): Input parameter
-- `timestamp_from_seconds(f64 seconds) -> timestamp`
-  - What it does: Performs timestamp from seconds
-  - Parameters:
-    - `seconds` (`f64`): Input parameter
-- `timestamp_from_minutes(f64 minutes) -> timestamp`
-  - What it does: Performs timestamp from minutes
-  - Parameters:
-    - `minutes` (`f64`): Input parameter
-- `timestamp_from_hours(f64 hours) -> timestamp`
-  - What it does: Performs timestamp from hours
-  - Parameters:
-    - `hours` (`f64`): Input parameter
-- `timestamp_as_microseconds(timestamp value) -> i64`
-  - What it does: Performs timestamp as microseconds
-  - Parameters:
-    - `value` (`timestamp`): Input parameter
-- `timestamp_as_milliseconds(timestamp value) -> f64`
-  - What it does: Performs timestamp as milliseconds
-  - Parameters:
-    - `value` (`timestamp`): Input parameter
-- `timestamp_as_seconds(timestamp value) -> f64`
-  - What it does: Performs timestamp as seconds
-  - Parameters:
-    - `value` (`timestamp`): Input parameter
-- `timestamp_as_minutes(timestamp value) -> f64`
-  - What it does: Performs timestamp as minutes
-  - Parameters:
-    - `value` (`timestamp`): Input parameter
-- `timestamp_as_hours(timestamp value) -> f64`
-  - What it does: Performs timestamp as hours
-  - Parameters:
-    - `value` (`timestamp`): Input parameter
-- `timestamp_is_zero(timestamp value) -> b32`
-  - What it does: Performs timestamp is zero
-  - Parameters:
-    - `value` (`timestamp`): Input parameter
-- `timestamp_add(timestamp lhs, timestamp rhs) -> timestamp`
-  - What it does: Adds timestamp add
-  - Parameters:
-    - `lhs` (`timestamp`): Input data used by the operation
-    - `rhs` (`timestamp`): Input data used by the operation
-- `timestamp_sub(timestamp lhs, timestamp rhs) -> timestamp`
-  - What it does: Performs timestamp sub
-  - Parameters:
-    - `lhs` (`timestamp`): Input data used by the operation
-    - `rhs` (`timestamp`): Input data used by the operation
-- `timestamp_scale(timestamp value, f64 factor) -> timestamp`
-  - What it does: Performs timestamp scale
-  - Parameters:
-    - `value` (`timestamp`): Input parameter
-    - `factor` (`f64`): Input parameter
-- `timestamp_abs(timestamp value) -> timestamp`
-  - What it does: Performs timestamp abs
-  - Parameters:
-    - `value` (`timestamp`): Input parameter
-- `timestamp_clamp(timestamp value, timestamp min_value, timestamp max_value) -> timestamp`
-  - What it does: Performs timestamp clamp
-  - Parameters:
-    - `value` (`timestamp`): Input parameter
-    - `min_value` (`timestamp`): Input parameter
-    - `max_value` (`timestamp`): Input parameter
-- `timestamp_cmp(timestamp lhs, timestamp rhs) -> i32`
-  - What it does: Performs timestamp cmp
-  - Parameters:
-    - `lhs` (`timestamp`): Input data used by the operation
-    - `rhs` (`timestamp`): Input data used by the operation
+| Function | Declaration |
+| --- | --- |
+| `timestamp_zero` | `func timestamp timestamp_zero(void);` |
+| `timestamp_now` | `func timestamp timestamp_now(void);` |
+| `timestamp_from_microseconds` | `func timestamp timestamp_from_microseconds(i64 microseconds);` |
+| `timestamp_from_milliseconds` | `func timestamp timestamp_from_milliseconds(i64 milliseconds);` |
+| `timestamp_from_seconds` | `func timestamp timestamp_from_seconds(f64 seconds);` |
+| `timestamp_from_minutes` | `func timestamp timestamp_from_minutes(f64 minutes);` |
+| `timestamp_from_hours` | `func timestamp timestamp_from_hours(f64 hours);` |
+| `timestamp_as_microseconds` | `func i64 timestamp_as_microseconds(timestamp value);` |
+| `timestamp_as_milliseconds` | `func f64 timestamp_as_milliseconds(timestamp value);` |
+| `timestamp_as_seconds` | `func f64 timestamp_as_seconds(timestamp value);` |
+| `timestamp_as_minutes` | `func f64 timestamp_as_minutes(timestamp value);` |
+| `timestamp_as_hours` | `func f64 timestamp_as_hours(timestamp value);` |
+| `timestamp_is_zero` | `func b32 timestamp_is_zero(timestamp value);` |
+| `timestamp_add` | `func timestamp timestamp_add(timestamp lhs, timestamp rhs);` |
+| `timestamp_sub` | `func timestamp timestamp_sub(timestamp lhs, timestamp rhs);` |
+| `timestamp_scale` | `func timestamp timestamp_scale(timestamp value, f64 factor);` |
+| `timestamp_abs` | `func timestamp timestamp_abs(timestamp value);` |
+| `timestamp_clamp` | `func timestamp timestamp_clamp(timestamp value, timestamp min_value, timestamp max_value);` |
+| `timestamp_cmp` | `func i32 timestamp_cmp(timestamp lhs, timestamp rhs);` |
+
+#### Macros
+
+| Macro | Form |
+| --- | --- |
+| None | - |
 
 ### `utils/uuid.h`
 
 - Types: **1**
 - Functions: **20**
+- Macros: **0**
 
 #### Types
 
-- `uuid` (struct)
-  - What it represents: Represents `uuid` data grouped in a struct
-  - Members:
-    - `bytes`: `u8 [16]`
+| Type | Declaration |
+| --- | --- |
+| `uuid` | `typedef struct uuid { ... } uuid;` |
 
 #### Functions
 
-- `uuid_zero() -> uuid`
-  - What it does: Performs uuid zero
-  - Parameters: none
-- `uuid_from_bytes(const u8* bytes) -> uuid`
-  - What it does: Performs uuid from bytes
-  - Parameters:
-    - `bytes` (`const u8*`): Input parameter
-- `uuid_from_u64(u64 upper, u64 lower) -> uuid`
-  - What it does: Performs uuid from u64
-  - Parameters:
-    - `upper` (`u64`): Input parameter
-    - `lower` (`u64`): Input parameter
-- `uuid_get_bytes(uuid value, u8* dst) -> void`
-  - What it does: Gets uuid get bytes
-  - Parameters:
-    - `value` (`uuid`): Input parameter
-    - `dst` (`u8*`): Destination storage for output data
-- `uuid_get_upper(uuid value) -> u64`
-  - What it does: Gets uuid get upper
-  - Parameters:
-    - `value` (`uuid`): Input parameter
-- `uuid_get_lower(uuid value) -> u64`
-  - What it does: Gets uuid get lower
-  - Parameters:
-    - `value` (`uuid`): Input parameter
-- `uuid_is_zero(uuid value) -> b32`
-  - What it does: Performs uuid is zero
-  - Parameters:
-    - `value` (`uuid`): Input parameter
-- `uuid_equal(uuid lhs, uuid rhs) -> b32`
-  - What it does: Performs uuid equal
-  - Parameters:
-    - `lhs` (`uuid`): Input data used by the operation
-    - `rhs` (`uuid`): Input data used by the operation
-- `uuid_cmp(uuid lhs, uuid rhs) -> i32`
-  - What it does: Performs uuid cmp
-  - Parameters:
-    - `lhs` (`uuid`): Input data used by the operation
-    - `rhs` (`uuid`): Input data used by the operation
-- `uuid_get_version(uuid value) -> u8`
-  - What it does: Gets uuid get version
-  - Parameters:
-    - `value` (`uuid`): Input parameter
-- `uuid_get_variant(uuid value) -> u8`
-  - What it does: Gets uuid get variant
-  - Parameters:
-    - `value` (`uuid`): Input parameter
-- `uuid_string_length() -> sz`
-  - What it does: Performs uuid string length
-  - Parameters: none
-- `uuid_parse_cstr8(cstr8 src, uuid* out) -> b32`
-  - What it does: Performs uuid parse cstr8
-  - Parameters:
-    - `src` (`cstr8`): Input data used by the operation
-    - `out` (`uuid*`): Destination storage for output data
-- `uuid_to_cstr8(uuid value, c8* dst, sz cap) -> b32`
-  - What it does: Performs uuid to cstr8
-  - Parameters:
-    - `value` (`uuid`): Input parameter
-    - `dst` (`c8*`): Destination storage for output data
-    - `cap` (`sz`): Input parameter
-- `uuid_to_cstr16(uuid value, c16* dst, sz cap) -> b32`
-  - What it does: Performs uuid to cstr16
-  - Parameters:
-    - `value` (`uuid`): Input parameter
-    - `dst` (`c16*`): Destination storage for output data
-    - `cap` (`sz`): Input parameter
-- `uuid_to_cstr32(uuid value, c32* dst, sz cap) -> b32`
-  - What it does: Performs uuid to cstr32
-  - Parameters:
-    - `value` (`uuid`): Input parameter
-    - `dst` (`c32*`): Destination storage for output data
-    - `cap` (`sz`): Input parameter
-- `uuid_to_str8(uuid value, str8* dst) -> b32`
-  - What it does: Performs uuid to str8
-  - Parameters:
-    - `value` (`uuid`): Input parameter
-    - `dst` (`str8*`): Destination storage for output data
-- `uuid_to_str16(uuid value, str16* dst) -> b32`
-  - What it does: Performs uuid to str16
-  - Parameters:
-    - `value` (`uuid`): Input parameter
-    - `dst` (`str16*`): Destination storage for output data
-- `uuid_to_str32(uuid value, str32* dst) -> b32`
-  - What it does: Performs uuid to str32
-  - Parameters:
-    - `value` (`uuid`): Input parameter
-    - `dst` (`str32*`): Destination storage for output data
-- `uuid_generate_v4(random_series* series) -> uuid`
-  - What it does: Performs uuid generate v4
-  - Parameters:
-    - `series` (`random_series*`): Input parameter
+| Function | Declaration |
+| --- | --- |
+| `uuid_zero` | `func uuid uuid_zero(void);` |
+| `uuid_from_bytes` | `func uuid uuid_from_bytes(const u8* bytes);` |
+| `uuid_from_u64` | `func uuid uuid_from_u64(u64 upper, u64 lower);` |
+| `uuid_get_bytes` | `func void uuid_get_bytes(uuid value, u8* dst);` |
+| `uuid_get_upper` | `func u64 uuid_get_upper(uuid value);` |
+| `uuid_get_lower` | `func u64 uuid_get_lower(uuid value);` |
+| `uuid_is_zero` | `func b32 uuid_is_zero(uuid value);` |
+| `uuid_equal` | `func b32 uuid_equal(uuid lhs, uuid rhs);` |
+| `uuid_cmp` | `func i32 uuid_cmp(uuid lhs, uuid rhs);` |
+| `uuid_get_version` | `func u8 uuid_get_version(uuid value);` |
+| `uuid_get_variant` | `func u8 uuid_get_variant(uuid value);` |
+| `uuid_string_length` | `func sz uuid_string_length(void);` |
+| `uuid_parse_cstr8` | `func b32 uuid_parse_cstr8(cstr8 src, uuid* out);` |
+| `uuid_to_cstr8` | `func b32 uuid_to_cstr8(uuid value, c8* dst, sz cap);` |
+| `uuid_to_cstr16` | `func b32 uuid_to_cstr16(uuid value, c16* dst, sz cap);` |
+| `uuid_to_cstr32` | `func b32 uuid_to_cstr32(uuid value, c32* dst, sz cap);` |
+| `uuid_to_str8` | `func b32 uuid_to_str8(uuid value, str8* dst);` |
+| `uuid_to_str16` | `func b32 uuid_to_str16(uuid value, str16* dst);` |
+| `uuid_to_str32` | `func b32 uuid_to_str32(uuid value, str32* dst);` |
+| `uuid_generate_v4` | `func uuid uuid_generate_v4(random_series* series);` |
+
+#### Macros
+
+| Macro | Form |
+| --- | --- |
+| None | - |
 
 ### `utils/version.h`
 
 - Types: **1**
 - Functions: **17**
+- Macros: **0**
 
 #### Types
 
-- `parts` (union)
-  - What it represents: Represents `parts` data in alternative memory layouts
-  - Members:
-    - `packed`: `u32`
-    - `major`: `struct { u8`
-    - `minor`: `u8`
-    - `patch`: `u16`
+| Type | Declaration |
+| --- | --- |
+| `version` | `typedef union version { ... } version;` |
 
 #### Functions
 
-- `version_zero() -> version`
-  - What it does: Performs version zero
-  - Parameters: none
-- `version_from_packed(u32 packed) -> version`
-  - What it does: Performs version from packed
-  - Parameters:
-    - `packed` (`u32`): Input parameter
-- `version_make(u8 major, u8 minor, u16 patch) -> version`
-  - What it does: Performs version make
-  - Parameters:
-    - `major` (`u8`): Input parameter
-    - `minor` (`u8`): Input parameter
-    - `patch` (`u16`): Input parameter
-- `version_get_packed(version ver) -> u32`
-  - What it does: Gets version get packed
-  - Parameters:
-    - `ver` (`version`): Input parameter
-- `version_get_major(version ver) -> u8`
-  - What it does: Gets version get major
-  - Parameters:
-    - `ver` (`version`): Input parameter
-- `version_get_minor(version ver) -> u8`
-  - What it does: Gets version get minor
-  - Parameters:
-    - `ver` (`version`): Input parameter
-- `version_get_patch(version ver) -> u16`
-  - What it does: Gets version get patch
-  - Parameters:
-    - `ver` (`version`): Input parameter
-- `version_is_zero(version ver) -> b32`
-  - What it does: Performs version is zero
-  - Parameters:
-    - `ver` (`version`): Input parameter
-- `version_string_length(version ver) -> sz`
-  - What it does: Performs version string length
-  - Parameters:
-    - `ver` (`version`): Input parameter
-- `version_cmp(version lhs, version rhs) -> i32`
-  - What it does: Performs version cmp
-  - Parameters:
-    - `lhs` (`version`): Input data used by the operation
-    - `rhs` (`version`): Input data used by the operation
-- `version_to_cstr8(version ver, c8* dst, sz cap) -> b32`
-  - What it does: Performs version to cstr8
-  - Parameters:
-    - `ver` (`version`): Input parameter
-    - `dst` (`c8*`): Destination storage for output data
-    - `cap` (`sz`): Input parameter
-- `version_to_cstr16(version ver, c16* dst, sz cap) -> b32`
-  - What it does: Performs version to cstr16
-  - Parameters:
-    - `ver` (`version`): Input parameter
-    - `dst` (`c16*`): Destination storage for output data
-    - `cap` (`sz`): Input parameter
-- `version_to_cstr32(version ver, c32* dst, sz cap) -> b32`
-  - What it does: Performs version to cstr32
-  - Parameters:
-    - `ver` (`version`): Input parameter
-    - `dst` (`c32*`): Destination storage for output data
-    - `cap` (`sz`): Input parameter
-- `version_to_str8(version ver, str8* dst) -> b32`
-  - What it does: Performs version to str8
-  - Parameters:
-    - `ver` (`version`): Input parameter
-    - `dst` (`str8*`): Destination storage for output data
-- `version_to_str16(version ver, str16* dst) -> b32`
-  - What it does: Performs version to str16
-  - Parameters:
-    - `ver` (`version`): Input parameter
-    - `dst` (`str16*`): Destination storage for output data
-- `version_to_str32(version ver, str32* dst) -> b32`
-  - What it does: Performs version to str32
-  - Parameters:
-    - `ver` (`version`): Input parameter
-    - `dst` (`str32*`): Destination storage for output data
-- `version_parse_cstr8(cstr8 src, version* out_ver) -> b32`
-  - What it does: Performs version parse cstr8
-  - Parameters:
-    - `src` (`cstr8`): Input data used by the operation
-    - `out_ver` (`version*`): Output value written by the function
+| Function | Declaration |
+| --- | --- |
+| `version_zero` | `func version version_zero(void);` |
+| `version_from_packed` | `func version version_from_packed(u32 packed);` |
+| `version_make` | `func version version_make(u8 major, u8 minor, u16 patch);` |
+| `version_get_packed` | `func u32 version_get_packed(version ver);` |
+| `version_get_major` | `func u8 version_get_major(version ver);` |
+| `version_get_minor` | `func u8 version_get_minor(version ver);` |
+| `version_get_patch` | `func u16 version_get_patch(version ver);` |
+| `version_is_zero` | `func b32 version_is_zero(version ver);` |
+| `version_string_length` | `func sz version_string_length(version ver);` |
+| `version_cmp` | `func i32 version_cmp(version lhs, version rhs);` |
+| `version_to_cstr8` | `func b32 version_to_cstr8(version ver, c8* dst, sz cap);` |
+| `version_to_cstr16` | `func b32 version_to_cstr16(version ver, c16* dst, sz cap);` |
+| `version_to_cstr32` | `func b32 version_to_cstr32(version ver, c32* dst, sz cap);` |
+| `version_to_str8` | `func b32 version_to_str8(version ver, str8* dst);` |
+| `version_to_str16` | `func b32 version_to_str16(version ver, str16* dst);` |
+| `version_to_str32` | `func b32 version_to_str32(version ver, str32* dst);` |
+| `version_parse_cstr8` | `func b32 version_parse_cstr8(cstr8 src, version* out_ver);` |
+
+#### Macros
+
+| Macro | Form |
+| --- | --- |
+| None | - |

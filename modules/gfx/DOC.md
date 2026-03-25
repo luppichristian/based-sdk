@@ -2,7 +2,7 @@
 
 `gfx` is the rendering-facing module built on top of `core`. It exposes module-level graphics entry points and serves as the integration surface for graphics backends.
 
-This guide is organized by API area and then by header so you can quickly jump to relevant types and functions.
+The canonical API reference remains `./api_index.txt`. This guide is organized by API area and then by header so you can quickly locate public types, functions, and macros.
 
 ## API Areas
 
@@ -16,16 +16,23 @@ Graphics module-facing API for availability and module identity.
 
 - Types: **0**
 - Functions: **2**
+- Macros: **0**
 
 #### Types
 
-- None
+| Type | Declaration |
+| --- | --- |
+| None | - |
 
 #### Functions
 
-- `gfx_module_is_available() -> b32`
-  - What it does: Performs gfx module is available
-  - Parameters: none
-- `gfx_module_get_name() -> cstr8`
-  - What it does: Gets gfx module get name
-  - Parameters: none
+| Function | Declaration |
+| --- | --- |
+| `gfx_module_is_available` | `func b32 gfx_module_is_available(void);` |
+| `gfx_module_get_name` | `func cstr8 gfx_module_get_name(void);` |
+
+#### Macros
+
+| Macro | Form |
+| --- | --- |
+| None | - |

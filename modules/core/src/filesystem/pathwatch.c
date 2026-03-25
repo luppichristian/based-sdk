@@ -26,9 +26,6 @@ typedef struct pathwatch_watch_binding {
   path watch_path;
 } pathwatch_watch_binding;
 
-#define PATHWATCH_BINDING_CAP       ((sz)64)
-#define PATHWATCH_WATCH_BINDING_CAP ((sz)1024)
-
 func pathwatch_binding* pathwatch_bindings(void) {
   profile_func_begin;
   local_persist pathwatch_binding bindings[PATHWATCH_BINDING_CAP] = {0};

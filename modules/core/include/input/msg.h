@@ -34,6 +34,9 @@ typedef enum msg_category {
   MSG_CATEGORY_MAX,
 } msg_category;
 
+// Maximum number of process-global message handlers that can be registered.
+#define MSG_HANDLER_CAP 64u
+
 #define MSG_DATA_SIZE kb(2)
 
 // Normalized event record used by the input messaging system.
@@ -73,6 +76,7 @@ func b32 _msg_post(const msg* src, callsite site);
 
 // Registers one message handler and returns a non-zero handler id on success.
 // Handlers are dispatched by descending priority.
+// Registration fails once MSG_HANDLER_CAP handlers are active.
 func u64 msg_add_handler(const msg_handler_desc* desc);
 
 // Removes a previously registered message handler.

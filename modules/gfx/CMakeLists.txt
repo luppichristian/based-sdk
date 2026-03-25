@@ -31,8 +31,9 @@ add_custom_command(
     TARGET based-gfx
     POST_BUILD
     COMMAND "${Python3_EXECUTABLE}" "${CMAKE_SOURCE_DIR}/scripts/generate_api_indexes.py" --root "${CMAKE_SOURCE_DIR}" --modules gfx
+    COMMAND "${Python3_EXECUTABLE}" "${CMAKE_SOURCE_DIR}/scripts/generate_module_docs.py" --root "${CMAKE_SOURCE_DIR}" --modules gfx
     WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
-    COMMENT "Regenerating gfx api_index.txt if stale"
+    COMMENT "Regenerating gfx API docs if stale"
     VERBATIM
 )
 

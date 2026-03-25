@@ -51,8 +51,9 @@ add_custom_command(
     TARGET based-core
     POST_BUILD
     COMMAND "${Python3_EXECUTABLE}" "${CMAKE_SOURCE_DIR}/scripts/generate_api_indexes.py" --root "${CMAKE_SOURCE_DIR}" --modules core
+    COMMAND "${Python3_EXECUTABLE}" "${CMAKE_SOURCE_DIR}/scripts/generate_module_docs.py" --root "${CMAKE_SOURCE_DIR}" --modules core
     WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
-    COMMENT "Regenerating core api_index.txt if stale"
+    COMMENT "Regenerating core API docs if stale"
     VERBATIM
 )
 if(BASED_PROFILER_ENABLED)

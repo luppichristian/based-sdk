@@ -5,7 +5,7 @@ This guide explains how to configure, build, and test `based` from this reposito
 ## 1) Prerequisites
 
 - CMake 3.19 or newer
-- Python 3 (required by CMake configuration and API index generation scripts)
+- Python 3 (required by CMake configuration and API index/DOC generation scripts)
 - A C/C++ toolchain
   - Linux/macOS: `clang`/`clang++` recommended
   - Windows: `clang-cl` recommended
@@ -69,6 +69,8 @@ cmake -S . -B build -G Ninja \
 ```bash
 cmake --build build --parallel
 ```
+
+After each module target finishes building, the build runs the maintenance scripts that regenerate that module's `api_index.txt` and `DOC.md` when they are stale.
 
 ## 4) Run tests
 

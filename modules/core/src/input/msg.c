@@ -74,7 +74,6 @@ func b32 msg_handle_runtime_internal(msg* src, void* user_data) {
 }
 
 #define MSG_DEVICE_TRACK_CAP ((sz)128)
-#define MSG_HANDLER_CAP      64u
 
 typedef struct msg_handler_entry {
   u64 handler_id;

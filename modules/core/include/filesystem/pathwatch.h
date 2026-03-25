@@ -20,6 +20,12 @@ typedef enum pathwatch_action {
   PATHWATCH_ACTION_MOVE = 4,
 } pathwatch_action;
 
+// Maximum number of concurrently tracked pathwatch instances.
+#define PATHWATCH_BINDING_CAP ((sz)64)
+
+// Maximum number of concurrently tracked watch bindings across all watchers.
+#define PATHWATCH_WATCH_BINDING_CAP ((sz)1024)
+
 typedef struct pathwatch_event {
   pathwatch_id pathwatch_id;
   pathwatch_watch_id watch_id;
@@ -36,6 +42,7 @@ typedef struct pathwatch {
 
 // Creates a pathwatch wrapper around efsw.
 // Changes are posted immediately as MSG_CORE_TYPE_PATHWATCH messages.
+// Creation fails once PATHWATCH_BINDING_CAP watchers are active.
 func pathwatch _pathwatch_create(b32 use_generic_mode, callsite site);
 
 // Releases the watcher and every active watch.
@@ -54,6 +61,7 @@ func b32 pathwatch_pause(pathwatch* watcher);
 func b32 pathwatch_resume(pathwatch* watcher);
 
 // Adds a watched directory. Returns a positive watch id on success, or a negative error code.
+// Registration fails once PATHWATCH_WATCH_BINDING_CAP watch bindings are active.
 func pathwatch_watch_id pathwatch_add(pathwatch* watcher, const path* src, b32 recursive);
 
 // Removes the watch identified by watch_id. Returns 1 on success, 0 otherwise.

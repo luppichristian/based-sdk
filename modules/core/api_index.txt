@@ -758,23 +758,25 @@
 13: typedef i64 pathwatch_id;
 14: typedef i64 pathwatch_watch_id;
 16: typedef enum pathwatch_action {
-23: typedef struct pathwatch_event {
-32: typedef struct pathwatch {
-39: func pathwatch _pathwatch_create(b32 use_generic_mode, callsite site);
-42: func void _pathwatch_destroy(pathwatch* watcher, callsite site);
-44: #define pathwatch_create(use_generic_mode) \
-46: #define pathwatch_destroy(watcher) \
-50: func b32 pathwatch_start(pathwatch* watcher);
-52: func b32 pathwatch_stop(pathwatch* watcher);
-53: func b32 pathwatch_pause(pathwatch* watcher);
-54: func b32 pathwatch_resume(pathwatch* watcher);
-57: func pathwatch_watch_id pathwatch_add(pathwatch* watcher, const path* src, b32 recursive);
-60: func b32 pathwatch_remove(pathwatch* watcher, pathwatch_watch_id watch_id);
-63: func b32 pathwatch_remove_path(pathwatch* watcher, const path* src);
-66: func b32 pathwatch_get_path(pathwatch_watch_id watch_id, path* out_watch_path);
-69: func b32 pathwatch_follow_symlinks(pathwatch* watcher, b32 enabled);
-72: func b32 pathwatch_allow_out_of_scope_links(pathwatch* watcher, b32 enabled);
-75: func cstr8 pathwatch_get_last_error(void);
+24: #define PATHWATCH_BINDING_CAP ((sz)64)
+27: #define PATHWATCH_WATCH_BINDING_CAP ((sz)1024)
+29: typedef struct pathwatch_event {
+38: typedef struct pathwatch {
+46: func pathwatch _pathwatch_create(b32 use_generic_mode, callsite site);
+49: func void _pathwatch_destroy(pathwatch* watcher, callsite site);
+51: #define pathwatch_create(use_generic_mode) \
+53: #define pathwatch_destroy(watcher) \
+57: func b32 pathwatch_start(pathwatch* watcher);
+59: func b32 pathwatch_stop(pathwatch* watcher);
+60: func b32 pathwatch_pause(pathwatch* watcher);
+61: func b32 pathwatch_resume(pathwatch* watcher);
+65: func pathwatch_watch_id pathwatch_add(pathwatch* watcher, const path* src, b32 recursive);
+68: func b32 pathwatch_remove(pathwatch* watcher, pathwatch_watch_id watch_id);
+71: func b32 pathwatch_remove_path(pathwatch* watcher, const path* src);
+74: func b32 pathwatch_get_path(pathwatch_watch_id watch_id, path* out_watch_path);
+77: func b32 pathwatch_follow_symlinks(pathwatch* watcher, b32 enabled);
+80: func b32 pathwatch_allow_out_of_scope_links(pathwatch* watcher, b32 enabled);
+83: func cstr8 pathwatch_get_last_error(void);
 
 === include\input\audio_device.h ===
 6: #include "devices.h"
@@ -830,18 +832,19 @@
 7: #include "../strings/cstrings.h"
 9: typedef void* device;
 11: typedef enum battery_state {
-29: typedef enum device_type {
-44: typedef struct device_info {
-58: func b32 device_is_valid(device src);
-61: func device_type devices_get_type(device src);
-64: func void* device_get_handle(device src);
-67: func u64 device_get_state(device src);
-70: func cstr8 devices_get_type_name(device_type type);
-73: func sz devices_get_count(device_type type);
-76: func u32 devices_get_type_count(device_type type);
-79: func device devices_get_device(device_type type, sz idx);
-82: func b32 devices_is_connected(device dev_id);
-85: func b32 devices_get_info(device dev_id, device_info* out_info);
+20: #define DEVICES_HANDLE_CAP ((sz)1024)
+31: typedef enum device_type {
+46: typedef struct device_info {
+60: func b32 device_is_valid(device src);
+63: func device_type devices_get_type(device src);
+66: func void* device_get_handle(device src);
+69: func u64 device_get_state(device src);
+72: func cstr8 devices_get_type_name(device_type type);
+75: func sz devices_get_count(device_type type);
+78: func u32 devices_get_type_count(device_type type);
+81: func device devices_get_device(device_type type, sz idx);
+84: func b32 devices_is_connected(device dev_id);
+87: func b32 devices_get_info(device dev_id, device_info* out_info);
 
 === include\input\gamepads.h ===
 6: #include "devices.h"
@@ -930,18 +933,18 @@
 6: #include "../basic/codespace.h"
 7: #include "../basic/utility_defines.h"
 26: typedef enum msg_category {
-37: #define MSG_DATA_SIZE kb(2)
-40: typedef struct msg {
-48: typedef b32 (*msg_handler_fn)(msg* src, void* user_data);
-49: typedef b32 (*msg_filter_fn)(const msg* src, void* user_data);
-51: typedef struct msg_handler_desc {
-67: func b32 msg_poll(msg* out_msg);
-71: func b32 _msg_post(const msg* src, callsite site);
-72: #define msg_post(src) _msg_post((src), CALLSITE_HERE)
-76: func u64 msg_add_handler(const msg_handler_desc* desc);
-79: func b32 msg_remove_handler(u64 handler_id);
-82: func void msg_clear_handlers(void);
-85: func void msg_set_filter(msg_filter_fn filter_fn, void* user_data);
+38: #define MSG_HANDLER_CAP 64u
+40: #define MSG_DATA_SIZE kb(2)
+43: typedef struct msg {
+51: typedef b32 (*msg_handler_fn)(msg* src, void* user_data);
+52: typedef b32 (*msg_filter_fn)(const msg* src, void* user_data);
+54: typedef struct msg_handler_desc {
+70: func b32 msg_poll(msg* out_msg);
+74: func b32 _msg_post(const msg* src, callsite site);
+75: #define msg_post(src) _msg_post((src), CALLSITE_HERE)
+80: func u64 msg_add_handler(const msg_handler_desc* desc);
+83: func b32 msg_remove_handler(u64 handler_id);
+86: func void msg_set_filter(msg_filter_fn filter_fn, void* user_data);
 
 === include\input\msg_core.h ===
 6: #include "../basic/assert.h"
