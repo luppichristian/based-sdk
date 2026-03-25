@@ -35,7 +35,17 @@
 #  include <CoreFoundation/CoreFoundation.h>
 #  include <IOKit/hid/IOHIDKeys.h>
 #  include <IOKit/hid/IOHIDManager.h>
-#  include <IOKit/hid/IOHIDUsageTables.h>
+#  if defined(__has_include)
+#    if __has_include(<IOKit/hid/IOHIDUsageTables.h>)
+#      include <IOKit/hid/IOHIDUsageTables.h>
+#    elif __has_include(<IOKit/hidsystem/IOHIDUsageTables.h>)
+#      include <IOKit/hidsystem/IOHIDUsageTables.h>
+#    else
+#      error "IOHIDUsageTables.h not found"
+#    endif
+#  else
+#    include <IOKit/hid/IOHIDUsageTables.h>
+#  endif
 #  include <dlfcn.h>
 #  include <execinfo.h>
 #  include <fcntl.h>

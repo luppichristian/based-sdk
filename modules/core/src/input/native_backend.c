@@ -735,7 +735,7 @@ global_var native_macos_state native_macos = {0};
 func cstr8 native_macos_product_name(IOHIDDeviceRef device_ref, str8_short* out_name) {
   profile_func_begin;
   if (out_name != NULL) {
-    out_name[0] = '\0';
+    (*out_name)[0] = '\0';
   }
   if (device_ref == NULL || out_name == NULL) {
     profile_func_end;
@@ -744,10 +744,10 @@ func cstr8 native_macos_product_name(IOHIDDeviceRef device_ref, str8_short* out_
 
   CFStringRef product = (CFStringRef)IOHIDDeviceGetProperty(device_ref, CFSTR(kIOHIDProductKey));
   if (product != NULL) {
-    (void)CFStringGetCString(product, out_name, (CFIndex)size_of(*out_name), kCFStringEncodingUTF8);
+    (void)CFStringGetCString(product, *out_name, (CFIndex)size_of(*out_name), kCFStringEncodingUTF8);
   }
   profile_func_end;
-  return out_name;
+  return *out_name;
 }
 
 func mouse_button native_macos_button_from_usage(u32 usage) {
