@@ -10,11 +10,12 @@
 #  ifndef WIN32_LEAN_AND_MEAN
 #    define WIN32_LEAN_AND_MEAN
 #  endif
+#  include <windows.h>
+
 #  include <dbghelp.h>
 #  include <direct.h>
 #  include <hidsdi.h>
 #  include <psapi.h>
-#  include <windows.h>
 #elif defined(PLATFORM_LINUX)
 #  include <dlfcn.h>
 #  include <execinfo.h>
